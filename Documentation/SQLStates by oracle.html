@@ -1,0 +1,1168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0062)http://docs.oracle.com/cd/A58617_01/server.804/a58231/appd.htm -->
+<HTML><HEAD><META content="IE=5.0000" http-equiv="X-UA-Compatible">
+ 
+<META name="GENERATOR" content="MSHTML 11.00.9600.17496"> 
+<META http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<META name="NewFiles" content="DefaultSingle"> 
+<META name="Title" content="SQLSTATE Codes"> <TITLE>SQLSTATE Codes</TITLE> <LINK 
+title="Library" href="../../index.htm" rel="home" <link=""> <LINK title="Index" 
+href="index.htm" rel="index"> <LINK title="Copyright" href="../../dcommon/html/cpyr.htm" 
+rel="copyright"> <LINK title="Up" href="appd.htm" rel="up"> <LINK title="Next" 
+href="appe.htm" rel="next"> <LINK title="Previous" href="appc.htm" rel="previous"> 
+</HEAD> 
+<BODY bgcolor="#ffffff"><A name="top"></A> 
+<TABLE width="100%" cellspacing="0" cellpadding="0">
+  <TBODY>
+  <TR>
+    <TD align="LEFT" valign="TOP"><FONT color="#330099" face="Helvetica, Arial, sans-serif"><B>SQL*Module 
+      for Ada Programmer's Guide<BR>Release 8.0</B><BR>A58231-01</FONT></TD>
+    <TD align="RIGHT" valign="BOTTOM">
+      <TABLE cellspacing="0" cellpadding="0">
+        <TBODY>
+        <TR>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/index.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/prodicon.gif" 
+            border="0"><BR><FONT size="-2">Library</FONT></A></TD>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/server.804/index.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/bookicon.gif" 
+            border="0"><BR><FONT size="-2">Product</FONT></A></TD>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/toc.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/conticon.gif" 
+            border="0"><BR><FONT size="-2">Contents</FONT></A></TD>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/index.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/indxicon.gif" 
+            border="0"><BR><FONT 
+    size="-2">Index</FONT></A></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE>
+<HR>
+
+<P><A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/appc.htm"><IMG 
+width="30" height="30" alt="Prev" src="SQLStates%20by%20oracle_bestanden/larrow.gif" 
+border="0"></A> <A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/appe.htm"><IMG 
+width="30" height="30" alt="Next" src="SQLStates%20by%20oracle_bestanden/rarrow.gif" 
+border="0"></A> 
+<DIV class="IND"><!-- End Header --> <A name="158"></A> <!--TOC=Title-"158"--> 
+<H1 class="Title"><FONT color="#330099" 
+face="Helvetica, Arial, sans-serif">D<BR>SQLSTATE Codes</FONT></H1><!--/TOC=Title--> 
+<A name="547"></A> 
+<P class="BP">This appendix contains a table of the SQLSTATE codes and the 
+conditions and errors associated with them. </P><A name="549"></A> <!--TOC=h1-"549"--> 
+<H2 class="H1"><FONT color="#330099" face="Helvetica, Arial, sans-serif"> 
+SQLSTATE Codes</FONT></H2><!--/TOC=h1--> <A name="1250"></A>
+<P><A name="1250"> 
+<TABLE width="100%" class="Informal" border="1" cellspacing="0" 
+  cellpadding="3"><TBODY>
+  <TR class="Informal">
+    <TH align="left" class="Informal" valign="bottom"><A name="1285"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">Code</FONT> </P> &nbsp;</TH>
+    <TH align="left" class="Informal" valign="bottom"><A name="1287"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">Condition</FONT> </P> 
+    &nbsp;</TH>
+    <TH align="left" class="Informal" valign="bottom"><A name="1289"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">Oracle Error</FONT> </P> 
+    &nbsp;</TH></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1291"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">00000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1293"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">successful completion</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1295"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00000</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1297"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1299"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">warning</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1301"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1303"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01001</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1305"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">cursor operation 
+      conflict</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1307"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1309"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01002</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1311"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">disconnect error</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1313"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1315"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01003</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1317"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">null value eliminated in set 
+      function</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1319"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1321"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01004</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1323"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">string data - right 
+      truncation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1325"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1327"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01005</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="2572"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">insufficient item descriptor 
+      areas</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1331"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1333"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01006</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1335"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">privilege not revoked</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1337"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1339"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01007</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1341"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">privilege not granted</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1343"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1345"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01008</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1347"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">implicit zero-bit 
+      padding</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1349"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1351"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">01009</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1353"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">search condition too long for 
+      info schema</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1355"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1357"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">0100A</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1359"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">query expression too long for 
+      info schema</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1361"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1363"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">02000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1365"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">no data</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1367"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01095</FONT> </P><A name="1969"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01403</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1369"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1371"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">dynamic SQL error</FONT> </P> 
+      &nbsp;</TD>
+    <TD class="Informal"><A name="1373"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1375"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07001</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1377"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">using clause does not match 
+      parameter specs</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1379"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1381"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07002</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1383"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">using clause does not match 
+      target specs</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1385"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1387"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07003</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1389"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">cursor specification cannot 
+      be executed</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1391"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1393"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07004</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1395"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">using clause required for 
+      dynamic parameters</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1397"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1399"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07005</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1401"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">prepared statement not a 
+      cursor specification</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1403"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1405"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07006</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1407"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">restricted datatype attribute 
+      violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1409"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1411"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07007</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1413"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">using clause required for 
+      result fields</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1415"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1417"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07008</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1419"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid descriptor 
+      count</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1421"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02126</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1423"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">07009</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1425"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid descriptor 
+      index</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1427"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1429"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">08000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1431"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">connection exception</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1433"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1435"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">08001</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1437"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL client unable to 
+      establish SQL connection</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1439"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1441"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">08002</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1443"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">connection name in use</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1445"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1447"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">08003</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1449"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">connection does not 
+      exist</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1451"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02121</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1453"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">08004</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1455"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL server rejected SQL 
+      connection</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1457"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1459"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">08006</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1461"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">connection failure</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1463"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1465"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">08007</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1467"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">transaction resolution 
+      unknown</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1469"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1471"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">0A000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1473"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">feature not supported</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1475"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-03000 .. 03099</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1477"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">0A001</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1479"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">multiple server 
+      transactions</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1481"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1483"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">21000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1485"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">cardinality violation</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1487"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01427</FONT> </P><A name="1970"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02112</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1489"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1491"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">data exception</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1493"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1495"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22001</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1497"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">string data - right 
+      truncation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1499"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01401</FONT> </P><A name="1971"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01406</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1501"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22002</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1503"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">null value - no indicator 
+      parameter</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1505"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01405</FONT> </P><A name="1972"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02124</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1507"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22003</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1509"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">numeric value out of 
+      range</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1511"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01426</FONT> </P><A name="1973"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01438</FONT> </P><A name="1974"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01455</FONT> </P><A name="1975"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01457</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1513"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22005</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1515"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">error in assignment</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1517"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1519"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22007</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1521"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid date-time 
+      format</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1523"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1525"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22008</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1527"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">date-time field 
+      overflow</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1529"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01800 .. 01899</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1531"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22009</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1533"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid time zone 
+      displacement value</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1535"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1537"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22011</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1539"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">substring error</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1541"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1543"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22012</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1545"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">division by zero</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1547"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01476</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1549"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22015</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1551"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">interval field 
+      overflow</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1553"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1555"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22018</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1557"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid character value for 
+      cast</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1559"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1561"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22019</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1563"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid escape 
+      character</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1565"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00911</FONT> </P><A name="1976"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01425</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1567"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22021</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1569"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">character not in 
+      repertoire</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1571"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1573"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22022</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1575"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">indicator overflow</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1577"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01411</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1579"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22023</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1581"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid parameter 
+      value</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1583"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01025</FONT> </P><A name="1977"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01488</FONT> </P><A name="1978"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-04000 .. 04019</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1585"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22024</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1587"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">unterminated C string</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1589"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01479 .. 01480 </FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1591"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22025</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1593"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid escape 
+      sequence</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1595"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01424 </FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1597"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22026</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1599"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">string data - length 
+      mismatch</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1601"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1603"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">22027</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1605"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">trim error</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1607"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1609"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">23000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1611"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">integrity constraint 
+      violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1613"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00001</FONT> </P><A name="1979"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02290 .. 02299</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1615"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">24000 </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1617"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid cursor state</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1619"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01001 .. 01003</FONT> 
+      </P><A name="1980"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01410</FONT> </P><A name="1981"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-08006</FONT> </P><A name="1982"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02114</FONT> </P><A name="1983"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02117</FONT> </P><A name="1984"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02118</FONT> </P><A name="1985"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02122</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1621"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">25000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1623"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid transaction 
+      state</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1625"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1627"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">26000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1629"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid SQL statement 
+      name</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1631"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1633"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">27000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1635"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">triggered data change 
+      violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1637"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1639"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">28000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1641"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid authorization 
+      specification</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1643"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1645"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">2A000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1647"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">direct SQL syntax error or 
+      access rule violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1649"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1651"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">2B000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1653"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">dependent privilege 
+      descriptors still exist</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1655"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1657"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">2C000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1659"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid character set 
+      name</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1661"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1663"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">2D000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1665"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid transaction 
+      termination</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1667"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1669"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">2E000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1671"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid connection 
+      name</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1673"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1675"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">33000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1677"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid SQL descriptor 
+      name</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1679"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1681"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">34000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1683"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid cursor name</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1685"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1687"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">35000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1689"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid condition 
+      number</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1691"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1693"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">37000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1695"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">dynamic SQL syntax error or 
+      access rule violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1697"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1699"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">3C000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1701"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ambiguous cursor name</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1703"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1705"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">3D000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1707"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid catalog name</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1709"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1711"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">3F000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1713"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid schema name</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1715"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1717"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">40000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1719"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">transaction rollback</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1721"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02091 .. 02092 </FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1723"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">40001</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1725"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">serialization failure</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1727"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1729"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">40002</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1731"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">integrity constraint 
+      violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1733"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1735"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">40003</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1737"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">statement completion 
+      unknown</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1739"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1741"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">42000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1743"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">syntax error or access rule 
+      violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1745"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00022</FONT> </P><A name="1986"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00251</FONT> </P><A name="1987"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00900 .. 00999</FONT> 
+      </P><A name="1988"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01031</FONT> </P><A name="1989"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01490 .. 01493</FONT> 
+      </P><A name="1990"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01700 .. 01799</FONT> 
+      </P><A name="1991"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01900 .. 02099</FONT> 
+      </P><A name="1992"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02140 .. 02289</FONT> 
+      </P><A name="1993"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02420 .. 02424</FONT> 
+      </P><A name="1994"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02450 .. 02499</FONT> 
+      </P><A name="1995"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-03276 .. 03299</FONT> 
+      </P><A name="1996"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-04040 .. 04059</FONT> 
+      </P><A name="1997"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-04070 .. 04099</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1747"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">44000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1749"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">with check option 
+      violation</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1751"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01402</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1753"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">60000  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1755"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">system errors</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1757"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00370 .. 00429</FONT> 
+      </P><A name="1998"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00600 .. 00899</FONT> 
+      </P><A name="1999"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-06430 .. 06449</FONT> 
+      </P><A name="2000"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-07200 .. 07999</FONT> 
+      </P><A name="2001"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-09700 .. 09999</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1759"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">61000  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1761"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">resource error</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1763"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00018 .. 00035</FONT> 
+      </P><A name="2002"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00050 .. 00068</FONT> 
+      </P><A name="2003"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02376 .. 02399</FONT> 
+      </P><A name="2004"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-04020 .. 04039</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1765"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">62000  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1767"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">multi-threaded server and 
+      detached process errors</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1769"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00100 .. 00120</FONT> 
+      </P><A name="2005"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00440 .. 00569</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1771"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">63000   </FONT> </P> 
+&nbsp;</TD>
+    <TD class="Informal"><A name="1773"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">Oracle*XA and two-task 
+      interface errors</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1775"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00150 .. 00159</FONT> 
+      </P><A name="2006"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02128</FONT> </P><A name="2007"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02700 .. 02899</FONT> 
+      </P><A name="2008"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-03100 .. 03199</FONT> 
+      </P><A name="2009"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-06200 .. 06249 </FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1777"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">64000  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1779"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">control file, database file, 
+      and redo file errors;</FONT> </P><A name="2010"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">archival and media recovery 
+      errors  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1781"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00200 .. 00369</FONT> 
+      </P><A name="2011"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01100 .. 01250</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1783"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">65000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1785"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">PL/SQL errors</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1787"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-06500 .. 06599</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1789"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">66000  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1791"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL*Net driver errors</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1793"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-06000 .. 06149</FONT> 
+      </P><A name="2012"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-06250 .. 06429</FONT> 
+      </P><A name="2013"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-06600 .. 06999</FONT> 
+      </P><A name="2014"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-12100 .. 12299</FONT> 
+      </P><A name="2015"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-12500 .. 12599</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1795"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">67000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1797"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">licensing errors</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1799"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00430 .. 00439</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1801"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">69000  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1803"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL*Connect errors</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1805"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-00570 .. 00599</FONT> 
+      </P><A name="2016"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-07000 .. 07199</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1807"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">72000  </FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1809"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL execute phase 
+      errors</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1811"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01000 .. 01099</FONT> 
+      </P><A name="2017"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01400 .. 01489</FONT> 
+      </P><A name="2018"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01495 .. 01499</FONT> 
+      </P><A name="2019"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-01500 .. 01699</FONT> 
+      </P><A name="2020"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02400 .. 02419</FONT> 
+      </P><A name="2021"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-02425 .. 02449</FONT> 
+      </P><A name="2022"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-04060 .. 04069</FONT> 
+      </P><A name="2023"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-08000 .. 08190</FONT> 
+      </P><A name="2024"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-12000 .. 12019</FONT> 
+      </P><A name="2025"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-12300 .. 12499</FONT> 
+      </P><A name="2026"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-12700 .. 21999</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1813"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82100</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1815"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">out of memory (could not 
+      allocate)</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1817"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02100</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1819"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82101</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1821"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent cursor cache: 
+      unit cursor/global cursor mismatch</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1823"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02101</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1825"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82102</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1827"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent cursor cache: no 
+      global cursor entry</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1829"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02102</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1831"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82103</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1833"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent cursor cache: 
+      out of range cursor cache reference</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1835"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02103</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1837"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82104</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1839"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent host cache: no 
+      cursor cache available</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1841"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02104</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1843"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82105</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1845"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent cursor cache: 
+      global cursor not found</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1847"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02105</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1849"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82106</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1851"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent cursor cache: 
+      invalid Oracle cursor number</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1853"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02106</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1855"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82107</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1857"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">program too old for runtime 
+      library</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1859"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02107</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1861"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82108</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1863"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid descriptor passed to 
+      runtime library</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1865"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02108</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1867"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82109</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1869"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent host cache: host 
+      reference is out of range</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1871"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02109</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1873"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82110</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1875"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">inconsistent host cache: 
+      invalid host cache entry type</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1877"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02110</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1879"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82111</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1881"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">heap consistency error</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1883"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02111</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1885"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82112</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1887"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">unable to open message 
+      file</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1889"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02113</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1891"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82113</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1893"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">code generation internal 
+      consistency failed</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1895"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02115</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1897"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82114</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1899"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">reentrant code generator gave 
+      invalid context</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1901"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02116</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1903"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82115</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1905"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid hstdef 
+      argument</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1907"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02119</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1909"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82116</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1911"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">first and second arguments to 
+      sqlrcn both null</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1913"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02120</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1915"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82117</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1917"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">invalid OPEN or PREPARE for 
+      this connection</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1919"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02122</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1921"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82118</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1923"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">application context not 
+      found</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1925"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02123</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1927"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82119</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1929"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">connect error; can't get 
+      error text</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1931"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02125</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1933"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82120</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1935"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">precompiler/SQLLIB version 
+      mismatch.</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1937"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02127</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1939"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82121</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1941"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">FETCHed number of bytes is 
+      odd</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1943"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02129</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1945"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">82122</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1947"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">EXEC TOOLS interface is not 
+      available</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1949"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">SQL-02130</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1951"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">90000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1953"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">debug events</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1955"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">ORA-10000 .. 10999</FONT> 
+      </P> &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1957"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">99999</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1959"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">catch all</FONT> </P> 
+    &nbsp;</TD>
+    <TD class="Informal"><A name="1961"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">all others</FONT> </P> 
+    &nbsp;</TD></TR>
+  <TR align="LEFT" class="Informal" valign="TOP">
+    <TD class="Informal"><A name="1963"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">HZ000</FONT> </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1965"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica">remote database access</FONT> 
+      </P> &nbsp;</TD>
+    <TD class="Informal"><A name="1967"></A> 
+      <P class="TBS"><FONT face="Arial, Helvetica"></FONT> </P> 
+  &nbsp;</TD></TR></TBODY></TABLE>
+<TABLE width="100%" class="TableNote" cellspacing="0" cellpadding="3">
+  <TBODY>
+  <TR align="LEFT" class="TableNote" valign="TOP">
+    <TD class="TableNote"></TD></TR></TBODY></TABLE></A> <A name="1251"></A> 
+<P class="BP"></P><A name="556"></A> 
+<P class="BP"></P><A name="436"></A> 
+<P class="BP"></P>
+<HR size="1" noshade="">
+
+<P class="BP"><!-- Start Footer --> </P></DIV>
+<DIV class="OUTD">
+<HR>
+
+<TABLE width="100%" cellspacing="0" cellpadding="0">
+  <TBODY>
+  <TR>
+    <TD width="33%" valign="BOTTOM">
+      <TABLE cellspacing="0" cellpadding="0">
+        <TBODY>
+        <TR>
+          <TD align="CENTER"><A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/appc.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/larrow.gif" 
+            border="0"><BR><FONT size="-2">Prev</FONT></A></TD>
+          <TD align="CENTER"><A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/appe.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/rarrow.gif" 
+            border="0"><BR><FONT 
+size="-2">Next</FONT></A></TD></TR></TBODY></TABLE></TD>
+    <TD width="34%" align="CENTER"><A href="http://docs.oracle.com/cd/A58617_01/dcommon/html/cpyr.htm"><IMG 
+      width="75" height="15" alt="Oracle" src="SQLStates%20by%20oracle_bestanden/oracle.gif" 
+      border="0"><BR><FONT size="-2">Copyright © 1997 Oracle 
+      Corporation.</FONT></A> <BR><FONT size="-2">All Rights Reserved.</FONT> 
+</TD>
+    <TD width="33%" align="RIGHT" valign="BOTTOM">
+      <TABLE cellspacing="0" cellpadding="0">
+        <TBODY>
+        <TR>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/index.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/prodicon.gif" 
+            border="0"><BR><FONT size="-2">Library</FONT></A></TD>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/server.804/index.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/bookicon.gif" 
+            border="0"><BR><FONT size="-2">Product</FONT></A></TD>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/toc.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/conticon.gif" 
+            border="0"><BR><FONT size="-2">Contents</FONT></A></TD>
+          <TD width="25%" align="CENTER" valign="TOP"><A href="http://docs.oracle.com/cd/A58617_01/server.804/a58231/index.htm"><IMG 
+            width="30" height="30" alt="" src="SQLStates%20by%20oracle_bestanden/indxicon.gif" 
+            border="0"><BR><FONT 
+    size="-2">Index</FONT></A></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE></DIV></BODY></HTML>
