@@ -1,0 +1,9 @@
+﻿  stdafx.cpp
+  TestSQL.cpp
+  TestFormatting.cpp
+  TestDataSet.cpp
+  TestConnection.cpp
+  TestClosingCursor.cpp
+  Generating Code...
+  TestSQL.vcxproj -> C:\Develop\SQLComponents\Debug\TestSQL.exe
+  TestSQL.vcxproj -> C:\Develop\SQLComponents\Debug\TestSQL.pdb (Full PDB)

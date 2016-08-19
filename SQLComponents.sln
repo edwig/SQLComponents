@@ -7,6 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSQL", "TestSQL\TestSQL.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLComponents", "SQLComponents\SQLComponenten.vcxproj", "{0E56E030-9CDD-47A7-B580-DCD4E103F968}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{949635B6-421F-42B2-B9AB-A56CE0B371E7}"
+	ProjectSection(SolutionItems) = preProject
+		Readme = Readme
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32

@@ -6,6 +6,8 @@
 #define new DEBUG_NEW
 #endif
 
+#pragma warning (disable: 4477)
+
 void TestConnection()
 {
   printf("Testing the connection:\n");

@@ -30,6 +30,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 SQLTransaction::SQLTransaction(SQLDatabase* p_database
@@ -44,6 +46,14 @@ SQLTransaction::SQLTransaction(SQLDatabase* p_database
   {
     Start(p_name, p_isSubTransaction);
   }
+}
+
+SQLTransaction::SQLTransaction(HDBC p_hdbc)
+               :m_hdbc(p_hdbc)
+               ,m_database(NULL)
+               ,m_active(false)
+{
+  Start("",false);
 }
 
 SQLTransaction::~SQLTransaction()
@@ -74,8 +84,18 @@ SQLTransaction::Start(CString p_name, bool p_startSubtransaction)
   }
 
   // Try to start the transaction
+  if(m_database)
+  {
   m_savepoint = m_database->StartTransaction(this, p_startSubtransaction);
-
+  }
+  else
+  {
+    SQLRETURN ret = SQLSetConnectAttr(m_hdbc,SQL_ATTR_AUTOCOMMIT,(SQLPOINTER)SQL_AUTOCOMMIT_OFF,SQL_IS_UINTEGER);
+    if(!SQL_SUCCEEDED(ret))
+    {
+      throw CString("Error setting autocommit mode to 'off', starting a transaction");
+    }
+  }
   // We are alive!
   m_name   = p_name;
   m_active = true;
@@ -97,8 +117,25 @@ SQLTransaction::Commit()
   
   // Do the commit, if it fails, the database will 
   // automatically do a rollback
+  if(m_database)
+  {
   m_database->CommitTransaction(this);
-
+  }
+  else
+  {
+    // Do the commit
+    SQLRETURN ret = SQLEndTran(SQL_HANDLE_DBC,m_hdbc,SQL_COMMIT);
+    if(!SQL_SUCCEEDED(ret))
+    {
+      // Throw something, so we reach the catch block
+      throw CString("Error commiting transaction");
+    }
+    ret = SQLSetConnectAttr(m_hdbc,SQL_ATTR_AUTOCOMMIT,(SQLPOINTER)SQL_AUTOCOMMIT_ON,SQL_IS_UINTEGER);
+    if(!SQL_SUCCEEDED(ret))
+    {
+      throw CString("Error setting autocommit mode to 'on', after a committed transaction");
+    }
+  }
   // Cleanup after use
   m_name      = "";
   m_savepoint = "";
@@ -109,7 +146,25 @@ SQLTransaction::Rollback()
 {
   // Do the rollboack. Cleaning will be done by
   // the AfterRollback method, called by SQLDatabase
+  if(m_database)
+  {
   m_database->RollbackTransaction(this);
+  }
+  else
+  {
+    // Do the rollback
+    SQLRETURN ret = SQLEndTran(SQL_HANDLE_DBC,m_hdbc,SQL_ROLLBACK);
+    if(!SQL_SUCCEEDED(ret))
+    {
+      // Throw something, so we reach the catch block
+      throw CString("Error commiting transaction");
+    }
+    ret = SQLSetConnectAttr(m_hdbc,SQL_ATTR_AUTOCOMMIT,(SQLPOINTER)SQL_AUTOCOMMIT_ON,SQL_IS_UINTEGER);
+    if(!SQL_SUCCEEDED(ret))
+    {
+      throw CString("Error setting autocommit mode to 'on', after a rollback transaction");
+    }
+  }
 }
 
 void 

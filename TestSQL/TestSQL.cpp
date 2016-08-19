@@ -7,6 +7,8 @@
 #define new DEBUG_NEW
 #endif
 
+#pragma warning (disable: 4477)
+
 // CString g_dsn("owoc09");
 // CString g_user("k2b");
 // CString g_password("k2b");

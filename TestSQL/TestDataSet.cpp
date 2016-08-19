@@ -7,6 +7,8 @@
 #define new DEBUG_NEW
 #endif
 
+#pragma warning (disable: 4477)
+
 double
 TestAppend(SQLDatabase* p_dbs,long p_master)
 {

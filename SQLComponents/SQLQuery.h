@@ -26,6 +26,7 @@
 //
 #pragma once
 #include "SQLVariant.h"
+#include "SQLDatabase.h"
 #include "Locker.h"
 #include <sql.h>
 #include <map>
@@ -54,9 +55,11 @@ public:
   SQLQuery();
   // Construct SQL query connected to a database
   SQLQuery(SQLDatabase* p_database);
+  SQLQuery(HDBC p_hdbc);
  ~SQLQuery();
 
   void Init(SQLDatabase* p_database);
+  void Init(HDBC p_connection);
   void Close();
   void Open();
   void ResetParameters();

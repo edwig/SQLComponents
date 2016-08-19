@@ -4,6 +4,9 @@
 //
 
 #pragma once
+
+#define NO_WARN_MBCS_MFC_DEPRECATION
+
 #include "targetver.h"
 #include <stdio.h>
 #include <tchar.h>

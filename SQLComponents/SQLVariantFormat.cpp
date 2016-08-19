@@ -34,6 +34,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning (disable: 4482) // Non standard enum used
@@ -503,6 +505,17 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
   int posDat2 = datum.Find('-',posDate + 1);
   if(posDat2 < 0)
   {
+    try
+    {
+      SQLDate lang(datum);
+      p_date->day   = (SQLUSMALLINT)lang.Day();
+      p_date->month = (SQLUSMALLINT)lang.Month();
+      p_date->year  = (SQLUSMALLINT)lang.Year();
+      return true;
+    }
+    catch(...)
+    {
+    }
     return false;
   }
   if(posDate == 2 && posDat2 == 5)
@@ -784,7 +797,7 @@ SQLVariantFormat::DateCalculate(char p_bewerking,CString p_argument)
      (p_bewerking == '+' || p_bewerking == '-'))
   {
 
-    Aantal = sscanf_s(p_argument, "%d %c", &Getal, &GetalType );
+    Aantal = sscanf_s(p_argument, "%d %c", &Getal, &GetalType,(unsigned int)sizeof(char));
 
     //SetDateTimeSpan( long lDays, int nHours, int nMins, int nSecs );
     if (Getal != 0 )
@@ -874,17 +887,15 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
   // standaard windows opmaak
   CString getal;
 
+  // Eventueel vers ophalen uit de SQLVariant
   if(m_variant)
   {
     if(m_variant->IsNumericType())
     {
       m_variant->GetAsString(m_format);
     }
-    else
-    {
-      return ER_FormatNumberNoNumber;
-    }
   }
+  // Getal varianten omzetten. Zet ook "123,4500000" om naar "123.45"
   double waarde = StringDoubleWaarde();
   getal.Format("%f",waarde);
 

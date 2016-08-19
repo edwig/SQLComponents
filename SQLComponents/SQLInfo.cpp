@@ -33,9 +33,12 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning (disable: 4996)
+#pragma warning (disable: 4312)
 
 // This macro is used for synchronious ODBC calls
 #define ODBC_CALL_ONCE(SQLFunc) \
@@ -224,12 +227,10 @@ SQLInfo::Init()
   m_RDBMSkeywords.clear();
   m_ODBCKeywords.clear();
 
-  DataTypeMap::iterator it;
-  for(it = m_dataTypes.begin();it != m_dataTypes.end(); ++it)
+  // Alle datatypen verwijderen
+  for(auto& type : m_dataTypes)
   {
-    TypeInfo* val = it->second;
-    it->second = NULL;
-    delete val;
+    delete type.second;
   }
   m_dataTypes.clear();
 }
@@ -1841,7 +1842,6 @@ SQLInfo::MakeInfoTableForeign(WordList* p_list,bool ref)
   {
     return false;
   }
-  SQLRETURN    m_retCode;
   SQLCHAR      szPKCatalogName [SQL_MAX_BUFFER];
   SQLLEN       cbPKCatalogName = 0;
   SQLCHAR      szPKSchemaName  [SQL_MAX_BUFFER];
@@ -2098,7 +2098,6 @@ SQLInfo::MakeInfoTableStatistics(WordList*   p_list
   {
     return false;
   }
-  SQLRETURN    m_retCode;
   SQLCHAR      szCatalogName [SQL_MAX_BUFFER + 1] = "";
   SQLLEN       cbCatalogName = 0;
   SQLCHAR      szSchemaName  [SQL_MAX_BUFFER + 1] = "";
@@ -2335,7 +2334,6 @@ SQLInfo::MakeInfoTableSpecials(WordList* p_list)
   {
     return false;
   }
-  SQLRETURN    m_retCode;
   SQLCHAR      szCatalogName [SQL_MAX_BUFFER];
   SQLCHAR      szSchemaName  [SQL_MAX_BUFFER];
   SQLCHAR      szTableName   [SQL_MAX_BUFFER];
@@ -2449,7 +2447,6 @@ SQLInfo::MakeInfoTablePrivileges(WordList* p_list)
   {
     return false;
   }
-  SQLRETURN    m_retCode;
   SQLCHAR      szCatalogName [SQL_MAX_BUFFER];
   SQLLEN       cbCatalogName = 0;
   SQLCHAR      szSchemaName  [SQL_MAX_BUFFER];

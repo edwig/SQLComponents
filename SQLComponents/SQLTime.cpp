@@ -35,6 +35,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 // CTOR as a NULL time
@@ -384,27 +386,27 @@ SQLTime::ShortTime(const CString& p_string,int& p_hour,int& p_min,int& p_sec)
 bool
 SQLTime::ParseXMLTime(const CString& p_string)
 {
-  int uu[2] = {0,0};
-  int mi[2] = {0,0};
-  int se[2] = {0,0};
-  int fraction = 0;
-  int UTCuu[2] = {0,0};
-  int UTCmi[2] = {0,0};
+  unsigned int uu[2] = {0,0};
+  unsigned int mi[2] = {0,0};
+  unsigned int se[2] = {0,0};
+  unsigned int fraction = 0;
+  unsigned int UTCuu[2] = {0,0};
+  unsigned int UTCmi[2] = {0,0};
 
   //  Parse the string
   // changed char to unsigned int for 64 bit implementation
   char sep1,sep2,sep3,sep4,sep5;
   int n = sscanf_s(p_string,"%1d%1d%c%1d%1d%c%1d%1d%c%d%c%1d%1d%c%1d%1d",
                   &uu[0],&uu[1],
-                  &sep1,sizeof(char),
+                  &sep1,(unsigned int) sizeof(char),
                   &mi[0],&mi[1],
-                  &sep2,sizeof(char),
+                  &sep2,(unsigned int) sizeof(char),
                   &se[0],&se[1],
-                  &sep3,sizeof(char),
+                  &sep3,(unsigned int) sizeof(char),
                   &fraction,
-                  &sep4,sizeof(char),
+                  &sep4,(unsigned int) sizeof(char),
                   &UTCuu[0],&UTCuu[1],
-                  &sep5,sizeof(char),
+                  &sep5,(unsigned int) sizeof(char),
                   &UTCmi[0],&UTCmi[1]);
 
   int uurBuffer = uu[0] * 10 + uu[1];

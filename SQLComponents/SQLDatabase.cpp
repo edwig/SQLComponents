@@ -41,6 +41,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 SQLDatabase::SQLDatabase()
@@ -69,9 +71,46 @@ SQLDatabase::SQLDatabase()
   InitializeCriticalSection(&m_databaseLock);
 }
 
+SQLDatabase::SQLDatabase(HDBC p_hdbc)
+            :m_hdbc(p_hdbc)
+            ,m_henv(NULL)
+            ,m_info(NULL)
+            ,m_infoTree(NULL)
+{
+  m_rdbmsType         = RDBMS_UNKNOWN;
+  m_loginTimeout      = LOGIN_TIMEOUT;
+  m_async_possible    = 0;
+  m_canDoTransactions = 0;
+  m_odbcVersion       = 0;
+  m_driverMainVersion = 0;
+  m_lastAction        = 0;
+  m_needLongDataLen   = false;
+  m_mars              = true;
+  m_readOnly          = false;
+  m_logLevel          = NULL;
+  m_logPrinter        = NULL;
+  m_logContext        = NULL;
+  m_loggingLevel      = 0;
+  m_schemaAction      = SCHEMA_NO_ACTION;
+  
+  // Initialise locking
+  InitializeCriticalSection(&m_databaseLock);
+
+  // Discover our database
+  if(p_hdbc)
+  {
+    CollectInfo();
+    SetAttributesAfterConnect(false);
+  }
+}
+
 SQLDatabase::~SQLDatabase()
 {
+  // Only close the database if we did open it
+  if(m_henv)
+  {
   Close();
+  }
   DeleteCriticalSection(&m_databaseLock);
 }
 
@@ -152,6 +191,7 @@ SQLDatabase::Close()
   
   // DO NOT reset the logging pointers
   // This should be done externally by the connected application
+  // But in most cases we just forget about it
   // m_logLevel   = NULL;
   // m_logPrinter = NULL;
   // m_logContext = NULL;
@@ -278,6 +318,7 @@ SQLDatabase::Open(CString const& p_connectString,bool p_readOnly)
   // If connection fails
   if(!Check(res))
   {
+    Close();
     throw CString("Error at opening database: ") + GetErrorString();
   }
   // Remember the returned completed connect string of the database
@@ -360,10 +401,14 @@ SQLDatabase::SetAttributesAfterConnect(bool p_readOnly)
 bool 
 SQLDatabase::CollectInfo()
 {
-  char  szInfo[_MAX_PATH];
-  char  szInfo2[64];
+  char  szInfo1[_MAX_PATH];
+  char  szInfo2[_MAX_PATH];
   BOOL  LoadVersie = TRUE;
-  SWORD nResult;
+  SQLSMALLINT nResult = 0;
+
+  // Make empty
+  szInfo1[0] = 0;
+  szInfo2[0] = 0;
 
   if(!IsOpen())
   {
@@ -373,31 +418,31 @@ SQLDatabase::CollectInfo()
   // Set lock on the stack
   Locker<SQLDatabase> lock(this,INFINITE);
 
-  SqlGetInfo(m_hdbc, SQL_DATA_SOURCE_NAME, szInfo, sizeof(szInfo), &nResult);
-  m_datasource = szInfo;
+  SqlGetInfo(m_hdbc, SQL_DATA_SOURCE_NAME, szInfo1, sizeof(szInfo1), &nResult);
+  m_datasource = szInfo1;
 
   // DB name & version
-  SqlGetInfo(m_hdbc, SQL_DBMS_NAME,szInfo, sizeof(szInfo), &nResult);
+  SqlGetInfo(m_hdbc, SQL_DBMS_NAME,szInfo1, sizeof(szInfo1),&nResult);
   SqlGetInfo(m_hdbc, SQL_DBMS_VER,szInfo2, sizeof(szInfo2),&nResult);
 
 
-  if ( m_DBName.CompareNoCase(szInfo) == 0 && 
+  if ( m_DBName.CompareNoCase(szInfo1)   == 0 && 
        m_DBVersie.CompareNoCase(szInfo2) == 0)
   {
     LoadVersie = FALSE;
   }
-  m_DBName   = szInfo;
+  m_DBName   = szInfo1;
   m_DBVersie = szInfo2;
 
   if (LoadVersie)
   {
     // driver naam
-    SqlGetInfo(m_hdbc, SQL_DRIVER_NAME,szInfo, sizeof(szInfo), &nResult);
-    m_DriverName = szInfo;
+    SqlGetInfo(m_hdbc, SQL_DRIVER_NAME,szInfo1, sizeof(szInfo1), &nResult);
+    m_DriverName = szInfo1;
 
     // driver versie
-    SqlGetInfo(m_hdbc, SQL_DRIVER_VER,szInfo, sizeof(szInfo), &nResult);
-    m_DriverVersion = szInfo;
+    SqlGetInfo(m_hdbc, SQL_DRIVER_VER,szInfo1, sizeof(szInfo1), &nResult);
+    m_DriverVersion = szInfo1;
     int pos = m_DriverVersion.Find('.');
     if(pos >= 0)
     {
@@ -407,22 +452,22 @@ SQLDatabase::CollectInfo()
       m_driverMainVersion = atoi(main);
     }
 
-    SqlGetInfo(m_hdbc, SQL_DRIVER_ODBC_VER, szInfo, sizeof(szInfo), &nResult);
-    m_odbcVersionComplete = szInfo;
-    m_odbcVersion = atoi(szInfo);
+    SqlGetInfo(m_hdbc, SQL_DRIVER_ODBC_VER, szInfo1, sizeof(szInfo1), &nResult);
+    m_odbcVersionComplete = szInfo1;
+    m_odbcVersion = atoi(szInfo1);
 
-    SqlGetInfo(m_hdbc, SQL_DBMS_NAME, szInfo, sizeof(szInfo), &nResult);
-    m_DBName = szInfo;
+    SqlGetInfo(m_hdbc, SQL_DBMS_NAME, szInfo1, sizeof(szInfo1), &nResult);
+    m_DBName = szInfo1;
 
-    SqlGetInfo(m_hdbc, SQL_DBMS_VER, szInfo, sizeof(szInfo), &nResult);
-    m_DBVersie = szInfo;
+    SqlGetInfo(m_hdbc, SQL_DBMS_VER, szInfo1, sizeof(szInfo1), &nResult);
+    m_DBVersie = szInfo1;
 
     SqlGetInfo(m_hdbc, SQL_ASYNC_MODE, &m_async_possible, sizeof(m_async_possible), &nResult);
 
     SqlGetInfo(m_hdbc, SQL_TXN_CAPABLE, &m_canDoTransactions, sizeof(m_async_possible), &nResult);
 
-    SqlGetInfo(m_hdbc, SQL_NEED_LONG_DATA_LEN, szInfo, sizeof(szInfo), &nResult);
-    m_needLongDataLen = (szInfo[0] == 'Y');
+    SqlGetInfo(m_hdbc, SQL_NEED_LONG_DATA_LEN, szInfo1, sizeof(szInfo1), &nResult);
+    m_needLongDataLen = (szInfo1[0] == 'Y');
   }
 
   // Get the default identifier for the kind of database
@@ -511,6 +556,12 @@ SQLDatabase::SetKnownRebinds()
     m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
     m_rebindParameters[SQL_C_ULONG] = SQL_C_LONG;
   }
+  else if(m_rdbmsType == RDBMS_SQLSERVER)
+  {
+    m_rebindParameters.clear();
+    m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
+    m_rebindParameters[SQL_C_ULONG] = SQL_C_LONG;
+  }
 }
 
 // Get the SQL Info object by database
@@ -563,9 +614,9 @@ SQLDatabase::RealDatabaseName()
   if(databaseName.IsEmpty())
   {
     // After ODBC 2.0, SQL_DATABASE_NAME is replaced by current_qualifier
-    long len;
+    long length = 0;
     buffer = databaseName.GetBuffer(SQL_MAX_OPTION_STRING_LENGTH);
-    SQLGetConnectAttr(m_hdbc,SQL_CURRENT_QUALIFIER,buffer,SQL_MAX_OPTION_STRING_LENGTH,&len);
+    SQLGetConnectAttr(m_hdbc,SQL_CURRENT_QUALIFIER,buffer,SQL_MAX_OPTION_STRING_LENGTH,&length);
     databaseName.ReleaseBuffer();
     m_namingMethod = "ODBC current qualifier";
   }
@@ -791,7 +842,7 @@ SQLDatabase::GetSQLHandle(HSTMT *p_statementHandle, BOOL p_exception)
   return SQL_ERROR;
 }
 
-RETCODE 
+/*static*/ RETCODE 
 SQLDatabase::FreeSQLHandle(HSTMT* p_statementHandle,UWORD p_option)
 {
   SQLRETURN ret = SQL_SUCCESS;
@@ -822,6 +873,8 @@ SQLDatabase::FreeSQLHandle(HSTMT* p_statementHandle,UWORD p_option)
   return ret;
 };
 
+#pragma warning (disable: 4312)
+
 void 
 SQLDatabase::SetConnectAttr(int attr, int value,int type)
 {
@@ -831,6 +884,8 @@ SQLDatabase::SetConnectAttr(int attr, int value,int type)
     throw CString("Error at setting connection attributes at open: ") + GetErrorString();
   }
 }
+
+#pragma warning (error: 4312)
 
 // ODBC Native Support
 bool
@@ -848,6 +903,10 @@ SQLDatabase::ODBCNativeSQL(CString& p_sql)
   char* buffer = new char[2 * len];
   SQLINTEGER lengte = 0;
   buffer[0] = 0;
+
+  // Maar eerst eventuele macros vervangen.
+  // Anders gaat de parser op hol!!
+  ReplaceMacros(p_sql);
 
   // Let the driver do the translation
   SQLRETURN ret = SQLNativeSql(m_hdbc
@@ -1603,6 +1662,90 @@ SQLDatabase::SetSchemaAction(SchemaAction p_action)
     }
   }
 }
+
+//////////////////////////////////////////////////////////////////////////
+//
+// MACROS
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Do the Querytext macro replacement
+void           
+SQLDatabase::ReplaceMacros(CString& p_statement)
+{
+  for(auto& macro : m_macros)
+  {
+    CString text = macro.first;
+    CString repl = macro.second;
+
+    while(true)
+    {
+      // Zoek macro tekst
+      int pos = p_statement.Find(text);
+      if(pos < 0)
+      {
+        break;
+      }
+      // Macro vervangen
+      int quotes = FindQuotes(p_statement,pos);
+      if((quotes % 2) == 0)
+      {
+        // doe de replacement
+        ReplaceMacro(p_statement,pos,text.GetLength(),repl);
+      }
+    }
+  }
+}
+
+int
+SQLDatabase::FindQuotes(CString& p_statement,int p_lastpos)
+{
+  int quotes = 0;
+  for(int ind = 0; ind < p_lastpos; ++ind)
+  {
+    if(p_statement.GetAt(ind) == '\'')
+    {
+      ++quotes;
+    }
+  }
+  return quotes;
+}
+
+void
+SQLDatabase::ReplaceMacro(CString& p_statement,int p_pos,int p_length,CString p_replace)
+{
+  CString newStatement;
+  // First part, before macro
+  newStatement = p_statement.Left(p_pos);
+  // Add macro replacement
+  newStatement += p_replace;
+  // Add part after the macro
+  newStatement += p_statement.Mid(p_pos + p_length);
+
+  // Result
+  p_statement = newStatement;
+}
+
+// Add a macro replacement for SQL text
+void
+SQLDatabase::AddMacro(CString p_macro,CString p_replacement)
+{
+  p_macro.MakeUpper();
+  m_macros[p_macro] = p_replacement;
+}
+
+// Remove macro
+void
+SQLDatabase::DeleteMacro(CString p_macro)
+{
+  p_macro.MakeUpper();
+  Macros::iterator it = m_macros.find(p_macro);
+  if(it != m_macros.end())
+  {
+    m_macros.erase(it);
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //

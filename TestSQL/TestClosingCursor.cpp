@@ -7,6 +7,8 @@
 #define new DEBUG_NEW
 #endif
 
+#pragma warning (disable: 4477)
+
 void TestClosingCursor()
 {
   printf("Test closing the cursor:\n");

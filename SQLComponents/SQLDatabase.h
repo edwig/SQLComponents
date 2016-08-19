@@ -106,6 +106,7 @@ typedef std::vector<DataSourceInternal> DSMap;
 typedef std::stack<SQLTransaction*>     TransactieStack;
 typedef std::map<int,int>               RebindMap;
 typedef std::map<CString,CString>       ODBCOptions;
+typedef std::map<CString,CString>       Macros;
 
 typedef void (CALLBACK* LOGPRINT)(void*,const char*);
 typedef int  (CALLBACK* LOGLEVEL)(void*);
@@ -119,6 +120,7 @@ class SQLDatabase : public CObject
 {
 public:
   SQLDatabase();
+  SQLDatabase(HDBC p_hdbc);
  ~SQLDatabase(); 
   void Reset();
 
@@ -134,7 +136,6 @@ public:
   bool           SetReadOnly(bool p_readOnly);
   // Add a general ODBC option for use in the connection string
   void           AddConnectOption(CString p_keyword,CString p_value);
-  
   // Open the database on basis of datasource, user and password
   bool           Open(CString const& p_datasource
                      ,CString const& p_username
@@ -151,6 +152,15 @@ public:
   // GETTING/CONSTRUCTING the SQLInfo object
   SQLInfo*       GetSQLInfo();
   SQLInfoTree*   GetSQLInfoTree();
+
+  // MACRO's FOR SQL TEXT
+
+  // Do the Querytext macro replacement
+  void           ReplaceMacros(CString& p_statement);
+  // Add a macro replacement for SQL text
+  void           AddMacro(CString p_macro,CString p_replacement);
+  // Remove macro
+  void           DeleteMacro(CString p_macro);
 
   // DATABASE POOL METHODEN
   void           SetDatasource(CString p_dsn);
@@ -185,7 +195,7 @@ public:
   // SUPPORT FOR SQLQuery
   HDBC           GetDBHandle();
   RETCODE        GetSQLHandle (HSTMT* p_statementHandle, BOOL p_exception);
-  RETCODE        FreeSQLHandle(HSTMT* p_statementHandle, UWORD p_option = SQL_DROP);
+  static RETCODE FreeSQLHandle(HSTMT* p_statementHandle, UWORD p_option = SQL_DROP);
   CString        GetErrorString(SQL_HANDLE statement = 0);
   int            GetErrorNumber(SQL_HANDLE statement = 0);
   bool           GetErrorInfo(SQLSMALLINT type, SQLHANDLE handle, int& nummer, CString& tekst);
@@ -257,6 +267,10 @@ protected:
   void           SetAttributesBeforeConnect();
   // Setting connection attributes AFTER connect
   void           SetAttributesAfterConnect(bool p_readOnly);
+  // Find number of quotes upto the lastpos position
+  int            FindQuotes(CString& p_statement,int p_lastpos);
+  // Replace **ONE** macro in the statement text
+  void           ReplaceMacro(CString& p_statement,int p_pos,int p_length,CString p_replace);
 
   // From connect
   CString           m_datasource;           // Datasource at login
@@ -289,6 +303,7 @@ protected:
   CString           m_sqlState;                // Last SQLSTATE
   CString           m_schemaName;
   SchemaAction      m_schemaAction;
+  Macros            m_macros;                  // Macro replacements for SQL
 
   // Derived identifier names for various systems (BRIEF4all, Key2Brief)
   CString           m_dbIdent;                 // Database   identifier (6 chars name, 2 chars main-version)

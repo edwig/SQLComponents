@@ -35,6 +35,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning (disable : 4996)
@@ -152,7 +154,7 @@ SQLVariant::SQLVariant(short p_short)
 {
   Init();
   m_datatype    = SQL_C_SSHORT;
-  m_sqlDatatype = SQL_C_SSHORT;
+  m_sqlDatatype = SQL_INTEGER;
   m_indicator   = 0;
   m_data.m_dataSSHORT  = p_short;
 }
@@ -162,7 +164,7 @@ SQLVariant::SQLVariant(unsigned short p_short)
 {
   Init();
   m_datatype    = SQL_C_USHORT;
-  m_sqlDatatype = SQL_C_USHORT;
+  m_sqlDatatype = SQL_INTEGER;
   m_indicator   = 0;
   m_data.m_dataUSHORT  = p_short;
 }
@@ -172,7 +174,7 @@ SQLVariant::SQLVariant(long p_long)
 {
   Init();
   m_datatype    = SQL_C_SLONG;
-  m_sqlDatatype = SQL_C_SLONG;
+  m_sqlDatatype = SQL_INTEGER;
   m_indicator   = 0;
   m_data.m_dataSLONG = p_long;
 }
@@ -182,7 +184,7 @@ SQLVariant::SQLVariant(unsigned long p_long)
 {
   Init();
   m_datatype    = SQL_C_ULONG;
-  m_sqlDatatype = SQL_C_ULONG;
+  m_sqlDatatype = SQL_BIGINT;
   m_indicator   = 0;
   m_data.m_dataULONG = p_long;
 }
@@ -192,7 +194,7 @@ SQLVariant::SQLVariant(float p_float)
 {
   Init();
   m_datatype    = SQL_C_FLOAT;
-  m_sqlDatatype = SQL_C_FLOAT;
+  m_sqlDatatype = SQL_FLOAT;
   m_indicator   = 0;
   m_data.m_dataFLOAT = p_float;
 }
@@ -202,7 +204,7 @@ SQLVariant::SQLVariant(double p_double)
 {
   Init();
   m_datatype    = SQL_C_DOUBLE;
-  m_sqlDatatype = SQL_C_DOUBLE;
+  m_sqlDatatype = SQL_DOUBLE;
   m_indicator   = 0;
   m_data.m_dataDOUBLE = p_double;
 }
@@ -212,7 +214,7 @@ SQLVariant::SQLVariant(bool p_bit)
 {
   Init();
   m_datatype    = SQL_C_BIT;
-  m_sqlDatatype = SQL_C_BIT;
+  m_sqlDatatype = SQL_BIT;
   m_indicator   = 0;
   m_data.m_dataBIT = p_bit;
 }
@@ -222,7 +224,7 @@ SQLVariant::SQLVariant(char p_tinyint)
 {
   Init();
   m_datatype    = SQL_C_STINYINT;
-  m_sqlDatatype = SQL_C_STINYINT;
+  m_sqlDatatype = SQL_TINYINT;
   m_indicator   = 0;
   m_data.m_dataSTINYINT = p_tinyint;
 }
@@ -232,7 +234,7 @@ SQLVariant::SQLVariant(unsigned char p_tinyint)
 {
   Init();
   m_datatype    = SQL_C_UTINYINT;
-  m_sqlDatatype = SQL_C_UTINYINT;
+  m_sqlDatatype = SQL_TINYINT;
   m_indicator   = 0;
   m_data.m_dataUTINYINT = p_tinyint;
 }
@@ -242,7 +244,7 @@ SQLVariant::SQLVariant(__int64 p_bigint)
 {
   Init();
   m_datatype    = SQL_C_SBIGINT;
-  m_sqlDatatype = SQL_C_SBIGINT;
+  m_sqlDatatype = SQL_BIGINT;
   m_indicator   = 0;
   m_data.m_dataSBIGINT = p_bigint;
 }
@@ -252,7 +254,7 @@ SQLVariant::SQLVariant(unsigned __int64 p_bigint)
 {
   Init();
   m_datatype    = SQL_C_UBIGINT;
-  m_sqlDatatype = SQL_C_UBIGINT;
+  m_sqlDatatype = SQL_BIGINT;
   m_indicator   = 0;
   m_data.m_dataUBIGINT = p_bigint;
 }
@@ -262,7 +264,7 @@ SQLVariant::SQLVariant(SQL_NUMERIC_STRUCT* p_numeric)
 {
   Init();
   m_datatype    = SQL_C_NUMERIC;
-  m_sqlDatatype = SQL_C_NUMERIC;
+  m_sqlDatatype = SQL_NUMERIC;
   m_indicator   = 0;
   memcpy(&m_data.m_dataNUMERIC,p_numeric,sizeof(SQL_NUMERIC_STRUCT));
 }
@@ -272,7 +274,7 @@ SQLVariant::SQLVariant(SQLGUID* p_guid)
 {
   Init();
   m_datatype    = SQL_C_GUID;
-  m_sqlDatatype = SQL_C_GUID;
+  m_sqlDatatype = SQL_GUID;
   m_indicator   = 0;
   memcpy(&m_data.m_dataGUID,p_guid,sizeof(SQLGUID));
 }
@@ -282,7 +284,7 @@ SQLVariant::SQLVariant(void* p_binary,size_t p_size)
 {
   Init();
   m_datatype    = SQL_C_BINARY;
-  m_sqlDatatype = SQL_C_BINARY;
+  m_sqlDatatype = SQL_BINARY;
   m_indicator   = 0;
   m_data.m_dataBINARY = malloc(p_size + 1);
   memcpy(m_data.m_dataBINARY,p_binary,p_size);
@@ -293,7 +295,7 @@ SQLVariant::SQLVariant(DATE_STRUCT* p_date)
 {
   Init();
   m_datatype    = SQL_C_DATE;
-  m_sqlDatatype = SQL_C_DATE;
+  m_sqlDatatype = SQL_DATE;
   m_indicator   = 0;
   memcpy(&m_data.m_dataDATE,p_date,sizeof(DATE_STRUCT));
 }
@@ -303,7 +305,7 @@ SQLVariant::SQLVariant(TIME_STRUCT* p_time)
 {
   Init();
   m_datatype    = SQL_C_TIME;
-  m_sqlDatatype = SQL_C_TIME;
+  m_sqlDatatype = SQL_TIME;
   m_indicator   = 0;
   memcpy(&m_data.m_dataTIME,p_time,sizeof(TIME_STRUCT));
 }
@@ -312,7 +314,7 @@ SQLVariant::SQLVariant(TIMESTAMP_STRUCT* p_stamp)
 {
   Init();
   m_datatype    = SQL_C_TIMESTAMP;
-  m_sqlDatatype = SQL_C_TIMESTAMP;
+  m_sqlDatatype = SQL_TIMESTAMP;
   m_indicator   = 0;
   memcpy(&m_data.m_dataTIMESTAMP,p_stamp,sizeof(TIMESTAMP_STRUCT));
 }
@@ -327,7 +329,7 @@ SQLVariant::SQLVariant(int p_type,SQL_INTERVAL_STRUCT* p_inter)
   if(IsIntervalType() == false)
   {
     m_datatype    = SQL_C_INTERVAL_DAY_TO_SECOND;
-    m_sqlDatatype = SQL_C_INTERVAL_DAY_TO_SECOND;
+    m_sqlDatatype = SQL_INTERVAL_DAY_TO_SECOND;
   }
   memcpy(&m_data.m_dataINTERVAL,p_inter,sizeof(SQL_INTERVAL_STRUCT));
 }
@@ -336,7 +338,7 @@ SQLVariant::SQLVariant(SQLDate* p_date)
 {
   Init();
   m_datatype    = SQL_C_DATE;
-  m_sqlDatatype = SQL_C_DATE;
+  m_sqlDatatype = SQL_DATE;
 
   if(p_date->IsNull())
   {
@@ -355,7 +357,7 @@ SQLVariant::SQLVariant(SQLTime* p_time)
 {
   Init();
   m_datatype    = SQL_C_TIME;
-  m_sqlDatatype = SQL_C_TIME;
+  m_sqlDatatype = SQL_TIME;
 
   if(p_time->IsNull())
   {
@@ -374,7 +376,7 @@ SQLVariant::SQLVariant(SQLTimestamp* p_stamp)
 {
   Init();
   m_datatype    = SQL_C_TIMESTAMP;
-  m_sqlDatatype = SQL_C_TIMESTAMP;
+  m_sqlDatatype = SQL_TIMESTAMP;
 
   if(p_stamp->IsNull())
   {
@@ -563,13 +565,18 @@ SQLVariant::SetSQLDataType(int p_type)
       m_sqlDatatype = p_type;
     }
   }
-  if(m_datatype == SQL_C_BINARY)
+  else if(m_datatype == SQL_C_BINARY)
   {
     if(p_type == SQL_VARBINARY     ||
        p_type == SQL_LONGVARBINARY )
     {
       m_sqlDatatype = p_type;
     }
+  }
+  else 
+  {
+    // Various numerics, dates, timestamps etc.
+    m_sqlDatatype = p_type;
   }
 }
 
@@ -1990,7 +1997,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
     case SQL_C_NUMERIC:                   StringToNumeric(p_data,&m_data.m_dataNUMERIC);
                                           break;
     case SQL_C_GUID:                      //aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee 
-                                          scannum = scanf("{%lX-%X-%X-%2.2X%2.2X-%2.2X%2.2X%2.2X%2.2X%2.2X%2.2X}"
+                                          scannum = scanf("{%lX-%hX-%hX-%2hhX%2hhX-%2hhX%2hhX%2hhX%2hhX%2hhX%2hhX}"
                                                           ,&m_data.m_dataGUID.Data1 
                                                           ,&m_data.m_dataGUID.Data2 
                                                           ,&m_data.m_dataGUID.Data3 
@@ -2761,11 +2768,11 @@ SQLVariant::NumericToStringMantissa(SQL_NUMERIC_STRUCT* sqlnum
   /* add zeros for negative scale */
   if (reqscale < 0)
   {
-    int i;
+    int ind = 0;
     reqscale *= -1;
-    for (i= 1; i <= calcprec; ++i)
+    for (ind = 1; ind <= calcprec; ++i)
     {
-      *(numstr + i - reqscale) = *(numstr + i);
+      *(numstr + ind - reqscale) = *(numstr + ind);
     }
     numstr -= reqscale;
     memset(numstr + calcprec + 1, '0', reqscale);

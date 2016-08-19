@@ -33,6 +33,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 SQLDataSet::SQLDataSet()
@@ -1069,7 +1071,7 @@ SQLDataSet::XMLSave(XmlElement* p_dataset)
   {
     for(unsigned int ind = 0; ind < m_names.size(); ++ind)
     {
-      CString naam = GetFieldName(ind);
+      CString fieldname = GetFieldName(ind);
       SQLVariant* var = record->GetField(ind);
       int type = var->GetDataType();
       
@@ -1079,8 +1081,8 @@ SQLDataSet::XMLSave(XmlElement* p_dataset)
       veld->SetAttribute(DATASET_TYPE,type);
       veld->SetAttribute(DATASET_TYPENAME,var->FindDatatype(type));
 
-      XmlText* ntext = new XmlText(naam);
-      veld->LinkEndChild(ntext);
+      XmlText* newtext = new XmlText(fieldname);
+      veld->LinkEndChild(newtext);
     }
   }
 
@@ -1089,8 +1091,7 @@ SQLDataSet::XMLSave(XmlElement* p_dataset)
   p_dataset->LinkEndChild(records);
   for(unsigned int ind = 0; ind < m_records.size(); ++ind)
   {
-    SQLRecord* record = m_records[ind];
-    record->XMLSave(records);
+    m_records[ind]->XMLSave(records);
   }
 }
 

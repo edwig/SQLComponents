@@ -8,6 +8,8 @@
 #define new DEBUG_NEW
 #endif
 
+#pragma warning (disable: 4477)
+
 void
 TestXMLStrings()
 {

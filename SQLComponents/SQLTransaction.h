@@ -25,6 +25,7 @@
 // Version number:  1.1.0
 //
 #pragma once
+#include <sqltypes.h>
 
 class SQLDatabase;
 
@@ -35,6 +36,7 @@ public:
                  CString      p_name,
                  bool         p_startImmediate   = true, 
                  bool         p_isSubTransaction = false);
+  SQLTransaction(HDBC p_hdbc);
 
   // Destructor will rollback at an open transaction
  ~SQLTransaction();
@@ -62,6 +64,7 @@ private:
 
 private:
   SQLDatabase*  m_database;
+  HDBC          m_hdbc;
   CString       m_name;
   CString       m_savepoint;
   bool          m_active;

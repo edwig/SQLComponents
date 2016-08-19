@@ -36,6 +36,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -592,11 +594,11 @@ SQLDate::ShortDate(const CString& p_date,int& p_year,int& p_month,int& p_day)
 // Get the virtual date as in (+/- <number> <YEAR(S)/MONTH(S)/DAY(S)/WEEK(S)>)
 bool 
 SQLDate::GetVirtualDate(CString       p_sign,
- 					              CString       p_extraTime,
- 					              long          p_interval,
-					              DateStorage&  p_temp)
+                        CString       p_extraTime,
+                        long          p_interval,
+                        DateStorage&  p_temp)
 {       
-	SQLDate dt;
+  SQLDate dt;
   SQLDate mom = SQLDate::Today();
 
   if(!p_sign.IsEmpty())
@@ -612,24 +614,24 @@ SQLDate::GetVirtualDate(CString       p_sign,
     if(p_extraTime == g_dateNames[g_defaultLanguage][DN_DAY] || 
        p_extraTime == g_dateNames[g_defaultLanguage][DN_DAYS] )
     {
-	    mom = mom.AddDays(factor * p_interval);   
+      mom = mom.AddDays(factor * p_interval);   
     }
-		else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_WEEK] || 
-		         p_extraTime == g_dateNames[g_defaultLanguage][DN_WEEKS] )
-		{
-		  mom = mom.AddDays(factor * p_interval * 7);
-	  }
-		else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_MONTH] || 
-		         p_extraTime == g_dateNames[g_defaultLanguage][DN_MONTHS] )
-		{
-		  mom = mom.AddMonths(factor * p_interval);
-		}
-		else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_YEAR]  || 
-		         p_extraTime == g_dateNames[g_defaultLanguage][DN_YEARS] )
-		{
-		  mom = mom.AddYears(factor * p_interval);
+    else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_WEEK] || 
+             p_extraTime == g_dateNames[g_defaultLanguage][DN_WEEKS] )
+    {
+      mom = mom.AddDays(factor * p_interval * 7);
     }
-		else return false;
+    else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_MONTH] || 
+             p_extraTime == g_dateNames[g_defaultLanguage][DN_MONTHS] )
+    {
+      mom = mom.AddMonths(factor * p_interval);
+    }
+    else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_YEAR]  || 
+             p_extraTime == g_dateNames[g_defaultLanguage][DN_YEARS] )
+    {
+      mom = mom.AddYears(factor * p_interval);
+    }
+    else return false;
   }
   p_temp.m_year  = mom.Year();
   p_temp.m_month = mom.Month();
@@ -841,17 +843,17 @@ SQLDate::ParseXMLDate(const CString& p_string,SQLTimestamp& p_moment)
                   ,&ja[0],&ja[1],&ja[2],&ja[3]
                   ,&ma[0],&ma[1]
                   ,&da[0],&da[1]
-                  ,&sep3,sizeof(char)
+                  ,&sep3,(unsigned int) sizeof(char)
                   ,&uu[0],&uu[1]
-                  ,&sep4,sizeof(char)
+                  ,&sep4,(unsigned int) sizeof(char)
                   ,&mi[0],&mi[1]
-                  ,&sep5,sizeof(char)
+                  ,&sep5,(unsigned int) sizeof(char)
                   ,&se[0],&se[1]
-                  ,&sep6,sizeof(char)
+                  ,&sep6,(unsigned int) sizeof(char)
                   ,&fraction
-                  ,&sep7,sizeof(char)
+                  ,&sep7,(unsigned int) sizeof(char)
                   ,&UTCuu[0],&UTCuu[1]
-                  ,&sep8,sizeof(char)
+                  ,&sep8,(unsigned int) sizeof(char)
                   ,&UTCmi[0],&UTCmi[1]);
 
   int jaar    = ja[0] * 1000 + ja[1] * 100 + ja[2] * 10 + ja[3];

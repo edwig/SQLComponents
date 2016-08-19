@@ -1,0 +1,38 @@
+SQL Components
+==============
+
+
+General ODBC components to work with SQL Databases and all gory details therein.
+The 'standard' proces to work with these components is:
+
+
+// Define a database
+SQLDatabase database;
+
+// Go open the database from some ODBC datasource
+database.Open("database","user","password");
+
+if(database.IsOpen())
+{
+  // Get some meaningful SQL statement :-)
+  CString query = "SELECT * FROM DUAL";
+
+  // Grab a SQLQuery object, and connect to the database
+  SQLQUery query(database);
+
+  // Go run the statement
+  query.DoSQLStatement(sql);
+
+  // As long as we have a cursor running
+  while(query.GetRecord())
+  {
+    // Grab a column
+    SQLVariant* var = query.GetColumn(1);
+    // Do something with it
+    printf("The value is: %s",var.GetAsChar());
+  }
+}
+
+// Go close it
+// Or don't and just go out of scope
+database.Close();

@@ -32,6 +32,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 SQLRecord::SQLRecord(SQLDataSet* p_set,bool p_modifiable)

@@ -33,7 +33,11 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
+
+#pragma warning (disable: 4312)
 
 // CTOR: To be later connected to a database
 // by calling Init() seperatly
@@ -41,7 +45,7 @@ SQLQuery::SQLQuery()
          :m_lock(NULL,INFINITE)
          ,m_database(NULL)
 {
-  Init(NULL);
+  Init((SQLDatabase*)NULL);
 }
 
 // CTOR: After this we're good to go
@@ -49,6 +53,12 @@ SQLQuery::SQLQuery(SQLDatabase* p_database)
          :m_lock(p_database,INFINITE)
 {
   Init(p_database);
+}
+
+SQLQuery::SQLQuery(HDBC p_hdbc)
+         :m_lock(NULL,INFINITE)
+{
+  Init(p_hdbc);
 }
 
 SQLQuery::~SQLQuery()
@@ -76,6 +86,14 @@ SQLQuery::Init(SQLDatabase* p_database)
   m_maxRows          = 0;
   m_isSelectQuery    = false;
   m_speedThreshold   = QUERY_TOO_LONG;
+  m_connection       = NULL;
+}
+
+void
+SQLQuery::Init(HDBC p_connection)
+{
+  Init((SQLDatabase*)NULL);
+  m_connection = p_connection;
 }
 
 void
@@ -96,6 +114,8 @@ SQLQuery::Close()
 
         // Some databases give a SQLSTATE = 24000 if the cursor was at the end
         // This is documented behaviour of SQLCloseCursor
+        if(m_database)
+        {
         if(m_database->GetSQLState() != "24000")
         {
           m_database->LogPrint(0,m_lastError);
@@ -103,9 +123,10 @@ SQLQuery::Close()
         }
       }
     }
+    }
     // Free the statement and drop alle associated info
     // And all cursors on the database engine
-    m_retCode = m_database->FreeSQLHandle(&m_hstmt,SQL_DROP);
+    m_retCode = SQLDatabase::FreeSQLHandle(&m_hstmt,SQL_DROP);
     if(!SQL_SUCCEEDED(m_retCode))
     {
       GetLastError("Freeing the cursor: ");
@@ -158,15 +179,34 @@ void
 SQLQuery::Open()
 {
   // get statement handle in m_hstmt:
-  if(m_database == NULL || m_database->IsOpen() == false)
+  if(m_database)
+  {
+    m_retCode = m_database->GetSQLHandle(&m_hstmt,false);
+    if (!SQL_SUCCEEDED(m_retCode))
+    {
+      GetLastError("Getting statement handle: ");
+      throw m_lastError;
+    }
+  }
+  else
+  {
+    if(m_connection == SQL_NULL_HANDLE)
+    {
+      throw CString("No database handle. Are you logged in to a database?");
+    }
+    // Create the statement handle
+    SQLRETURN res = odbc_std_app ? SqlAllocHandle(SQL_HANDLE_STMT,m_connection,&m_hstmt)
+                                 : SqlAllocStmt(m_connection,&m_hstmt);
+    if(!SQL_SUCCEEDED(res))
+    {
+      GetLastError("Error creating a statement handle: ");
+      throw m_lastError;
+    }
+  }
+
+  if(m_hstmt == NULL)
   {
     throw CString("No database connection at SQLQUery::Open function");
-  }
-  RETCODE m_retCode = m_database->GetSQLHandle(&m_hstmt,false);
-  if (!SQL_SUCCEEDED(m_retCode))
-  {
-    GetLastError("Getting statement handle: ");
-    throw m_lastError;
   }
   // DISABLED!!
   // Without escae scanning other things will go wrong.
@@ -202,8 +242,11 @@ SQLQuery::Open()
   // Numeric and Decimal formats can be mangled by disbehaving ODCBC drivers
   // So they must be set or gotten in a predefined format (e.g. Oracle needs DOUBLE for a NUMERIC column)
   // Also see method "SQLType2CType" for the use of the rebind maps
-  m_rebindParameters = m_database->GetRebindMapParameters();
-  m_rebindColumns    = m_database->GetRebindMapColumns();
+  if(m_database)
+  {
+    m_rebindParameters = m_database->GetRebindMapParameters();
+    m_rebindColumns    = m_database->GetRebindMapColumns();
+  }
 }
 
 // Set all columns to NULL
@@ -243,6 +286,13 @@ SQLQuery::GetODBCVersion()
 void
 SQLQuery::ReportQuerySpeed(LARGE_INTEGER p_start)
 {
+  // Cannot do reporting for a 'lose' SQLQuery
+  if(m_database == NULL)
+  {
+    return;
+  }
+
+  // Getting the counters
   long seconds = 0;
   LARGE_INTEGER einde;
   LARGE_INTEGER freq;
@@ -389,7 +439,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
     m_isSelectQuery = true;
   }
 
-  if(m_database->LogLevel() >= LOGLEVEL_MAX)
+  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
   {
     m_database->LogPrint(LOGLEVEL_MAX,"[Datbase query]\n");
     m_database->LogPrint(LOGLEVEL_MAX,p_statement.GetString());
@@ -409,6 +459,12 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   // Optimization: remove trailing spaces
   statement.Trim();
 
+  // Do the Querytext macro replacement
+  if(m_database)
+  {
+    m_database->ReplaceMacros(statement);
+  }
+
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
   // in the processing of the query-strings which crashes it in CharNexW
   // by a missing NUL-Terminator. By changing the length of the statement
@@ -416,7 +472,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   SQLINTEGER lengthStatement = statement.GetLength() + 1;
 
   // GO DO IT RIGHT AWAY
-  m_retCode = SqlExecDirect(m_hstmt,(SQLCHAR*)(LPCSTR)p_statement,lengthStatement);
+  m_retCode = SqlExecDirect(m_hstmt,(SQLCHAR*)(LPCSTR)statement,lengthStatement);
 
   if(SQL_SUCCEEDED(m_retCode))
   {
@@ -453,7 +509,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
     // rcExec == SQL_STILL_EXECUTING
     // rcExec == SQL_NEED_DATA
   }
-  if(m_database->LogLevel() >= LOGLEVEL_MAX)
+  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
   {
     ReportQuerySpeed(start);
   }
@@ -545,6 +601,12 @@ SQLQuery::DoSQLPrepare(const CString& p_statement)
   }
   // Optimization: remove trailing spaces
   statement.Trim();
+
+  // Do the Querytext macro replacement
+  if(m_database)
+  {
+    m_database->ReplaceMacros(statement);
+  }
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
   // in the processing of the query-strings which crashes it in CharNexW
@@ -657,7 +719,8 @@ SQLQuery::BindParameters()
       // AT EXEC data piece by piece
       dataPointer = (SQLPOINTER) icol;
       // Some database types need to know the length beforehand (Oracle!)
-      var->SetSizeIndicator(m_database->GetNeedLongDataLen());
+      // If no database type known, set to true, just to be sure!
+      var->SetSizeIndicator(m_database ? m_database->GetNeedLongDataLen() : true);
       bufferSize = 0;
     }
     // Check rebinds to do for scripting 
@@ -674,7 +737,7 @@ SQLQuery::BindParameters()
     {
       var->SetParameterType(SQL_PARAM_INPUT);
     }
-    if(m_database->LogLevel() >= LOGLEVEL_MAX)
+    if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
     {
       if(icol == 1)
       {
@@ -767,6 +830,7 @@ SQLQuery::BindColumns()
     }
     SQLVariant* var = new SQLVariant(type,(int)precision);
     var->SetColumnNumber(icol);
+    var->SetSQLDataType(dataType);
     if(atexec)
     {
       m_hasLongColumns = true;
@@ -790,7 +854,7 @@ SQLQuery::BindColumns()
     SQLVariant* var = it->second;
     if(var->GetAtExec() == false)
     {
-      int icol = var->GetColumnNumber();
+      int bcol = var->GetColumnNumber();
       int type = var->GetDataType();
       if(m_rebindColumns)
       {
@@ -801,7 +865,7 @@ SQLQuery::BindColumns()
         }
       }
       m_retCode = SqlBindCol(m_hstmt                                   // statement handle
-                            ,(SQLUSMALLINT) icol                       // Column number
+                            ,(SQLUSMALLINT) bcol                       // Column number
                             ,(SQLSMALLINT)  type                       // Data type
                             ,(SQLPOINTER)   var->GetDataPointer()      // Data pointer
                             ,(SQLINTEGER)   var->GetDataSize()         // Data length
@@ -856,7 +920,7 @@ SQLQuery::ProvideAtExecData()
             // Next SQLParamData/SQLExecute cycle
             break;
           }
-          data   = (SQLPOINTER)((SQLINTEGER)data + piece);
+          data   = (SQLPOINTER)((DWORD_PTR)data + (DWORD_PTR)piece);
           total += piece;
           if(size - total < piece)
           {
@@ -968,10 +1032,10 @@ SQLQuery::RetrieveAtExecData()
       SQLLEN actualLength = 0;
       m_retCode = SqlGetData(m_hstmt
                             ,(SQLUSMALLINT) col
-                            ,(SQLSMALLINT)  var->GetSQLDataType()
-	                        ,(SQLPOINTER)   var->GetDataPointer()
-	                        ,(SQLINTEGER)   0  // Request the actual length of this field
-	                        ,&actualLength);
+                            ,(SQLSMALLINT)  var->GetDataType()
+                          ,(SQLPOINTER)   var->GetDataPointer()
+                          ,(SQLINTEGER)   0  // Request the actual length of this field
+                          ,&actualLength);
       if(SQL_SUCCEEDED(m_retCode))
       {
         if(actualLength == SQL_NO_TOTAL)
@@ -995,7 +1059,7 @@ SQLQuery::RetrieveAtExecData()
             pointer += length;
             m_retCode = SqlGetData(m_hstmt
                                  ,(SQLUSMALLINT) col
-                                 ,(SQLUSMALLINT) var->GetSQLDataType()
+                                 ,(SQLUSMALLINT) var->GetDataType()
                                  ,(SQLPOINTER)   pointer
                                  ,(SQLINTEGER)   size + extra
                                  ,(SQLLEN*)      var->GetIndicatorPointer());
@@ -1275,9 +1339,10 @@ SQLQuery::GetColumnLength(int p_column)
                                ,(SQLSMALLINT)  inputSize
                                ,(SQLSMALLINT*) &outputSize
                                ,(SQLLEN*)      &integerValue);
-    if (!m_database->Check(m_retCode))
+    if (!SQL_SUCCEEDED(m_retCode))
     {
-      throw m_database->GetErrorString(m_hstmt);
+      GetLastError();
+      throw m_lastError;
     }
   }
   return (int)integerValue;
@@ -1300,9 +1365,10 @@ SQLQuery::GetColumnDisplaySize(int p_column)
                                ,(SQLSMALLINT)  inputSize
                                ,(SQLSMALLINT*) &outputSize
                                ,(SQLLEN*)      &integerValue);
-    if (!m_database->Check(m_retCode))
+    if (!SQL_SUCCEEDED(m_retCode))
     {
-      throw m_database->GetErrorString(m_hstmt);
+      GetLastError();
+      throw m_lastError;
     }
   }
   return (int)integerValue;
@@ -1339,9 +1405,10 @@ SQLQuery::DescribeColumn(int           p_col
                             ,(SQLULEN*)     &cbColDef
                             ,(SQLSMALLINT*) &ibScale
                             ,(SQLSMALLINT*) &fNullable);
-  if (!m_database->Check(m_retCode))
+  if(!SQL_SUCCEEDED(m_retCode))
   {
-    throw m_database->GetErrorString(m_hstmt);
+    GetLastError();
+    throw m_lastError;
   }
   // Explicit 2.x call (SQLColAttributes instead of SQLColAttribute)
   m_retCode = SqlColAttributes(m_hstmt
@@ -1351,21 +1418,23 @@ SQLQuery::DescribeColumn(int           p_col
                               ,(SQLSMALLINT)  cbDescMax
                               ,(SQLSMALLINT*) &cbDescResult
                               ,(SQLLEN*)      &fDesc);
-  if (!m_database->Check(m_retCode))
+  if(!SQL_SUCCEEDED(m_retCode))
   {
-    throw m_database->GetErrorString(m_hstmt);
+    GetLastError();
+    throw m_lastError;
   }
   // Explicit 2.x call (SQLColAttributes instead of SQLColAttribute)
   m_retCode = SqlColAttributes(m_hstmt
                               ,(SQLUSMALLINT) p_col
-	                            ,(SQLUSMALLINT) SQL_COLUMN_LENGTH
-	                            ,(SQLPOINTER)   rgbDesc
-	                            ,(SQLSMALLINT)  cbDescMax
-	                            ,(SQLSMALLINT*) &cbDescResult
-	                            ,(SQLLEN*)      &fDesc);
-  if (!m_database->Check(m_retCode))
+                              ,(SQLUSMALLINT) SQL_COLUMN_LENGTH
+                              ,(SQLPOINTER)   rgbDesc
+                              ,(SQLSMALLINT)  cbDescMax
+                              ,(SQLSMALLINT*) &cbDescResult
+                              ,(SQLLEN*)      &fDesc);
+  if(!SQL_SUCCEEDED(m_retCode))
   {
-    throw m_database->GetErrorString(m_hstmt);
+    GetLastError();
+    throw m_lastError;
   }
   // Rebinding
   sqlType = SQLType2CType(sqlType);
