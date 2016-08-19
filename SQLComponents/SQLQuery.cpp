@@ -116,13 +116,13 @@ SQLQuery::Close()
         // This is documented behaviour of SQLCloseCursor
         if(m_database)
         {
-        if(m_database->GetSQLState() != "24000")
-        {
-          m_database->LogPrint(0,m_lastError);
-          m_database->LogPrint(0,"Trying to continue without closing the cursor!");
+          if(m_database->GetSQLState() != "24000")
+          {
+            m_database->LogPrint(0,m_lastError);
+            m_database->LogPrint(0,"Trying to continue without closing the cursor!");
+          }
         }
       }
-    }
     }
     // Free the statement and drop alle associated info
     // And all cursors on the database engine
@@ -182,7 +182,7 @@ SQLQuery::Open()
   if(m_database)
   {
     m_retCode = m_database->GetSQLHandle(&m_hstmt,false);
-    if (!SQL_SUCCEEDED(m_retCode))
+    if(!SQL_SUCCEEDED(m_retCode))
     {
       GetLastError("Getting statement handle: ");
       throw m_lastError;
@@ -1033,9 +1033,9 @@ SQLQuery::RetrieveAtExecData()
       m_retCode = SqlGetData(m_hstmt
                             ,(SQLUSMALLINT) col
                             ,(SQLSMALLINT)  var->GetDataType()
-                          ,(SQLPOINTER)   var->GetDataPointer()
-                          ,(SQLINTEGER)   0  // Request the actual length of this field
-                          ,&actualLength);
+                            ,(SQLPOINTER)   var->GetDataPointer()
+                            ,(SQLINTEGER)   0  // Request the actual length of this field
+                            ,&actualLength);
       if(SQL_SUCCEEDED(m_retCode))
       {
         if(actualLength == SQL_NO_TOTAL)

@@ -109,7 +109,7 @@ SQLDatabase::~SQLDatabase()
   // Only close the database if we did open it
   if(m_henv)
   {
-  Close();
+    Close();
   }
   DeleteCriticalSection(&m_databaseLock);
 }
@@ -372,7 +372,7 @@ SQLDatabase::SetAttributesAfterConnect(bool p_readOnly)
   }
 
   if(m_async_possible == SQL_AM_CONNECTION ||
-    m_async_possible == SQL_AM_STATEMENT  )
+     m_async_possible == SQL_AM_STATEMENT  )
   {
     SetConnectAttr(SQL_ATTR_ASYNC_ENABLE,SQL_ASYNC_ENABLE_OFF,SQL_IS_UINTEGER);
   }
@@ -423,7 +423,7 @@ SQLDatabase::CollectInfo()
 
   // DB name & version
   SqlGetInfo(m_hdbc, SQL_DBMS_NAME,szInfo1, sizeof(szInfo1),&nResult);
-  SqlGetInfo(m_hdbc, SQL_DBMS_VER,szInfo2, sizeof(szInfo2),&nResult);
+  SqlGetInfo(m_hdbc, SQL_DBMS_VER, szInfo2, sizeof(szInfo2),&nResult);
 
 
   if ( m_DBName.CompareNoCase(szInfo1)   == 0 && 
@@ -1143,10 +1143,6 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
           throw CString("Error starting sub-transaction: ") + err;
         }
       }
-
-      // TODO: Check that the engine supports SAVEPOINT's
-      // SQLQuery rs(this);
-      // rs.DoSQLStatement("SAVEPOINT " + transName);
     }
   }
   // Add the transaction on the transaction stack
@@ -1202,6 +1198,25 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
 
         // Throw an exception with the errorinfo of the failed commit
         throw CString("Error at commit: ") + error;
+      }
+    }
+    else
+    {
+      // It's a sub transaction
+      // If the database is capable: Do the commit of the sub transaction
+      // Otherwise: do nothing and wait for the outer transaction to commit the whole in-one-go
+      CString startSubtrans = reinterpret_cast<SQLInfoDB*>(m_info)->GetCommitSubTransaction(p_transaction->GetSavePoint());
+      if(!startSubtrans.IsEmpty())
+      {
+        try
+        {
+          SQLQuery rs(this);
+          rs.DoSQLStatement(startSubtrans);
+        }
+        catch(CString& err)
+        {
+          throw CString("Error committing a sub-transaction: ") + err;
+        }
       }
     }
   }
@@ -1269,9 +1284,19 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
     else
     {
       // It is a subtransaction
-      // To do: Check for capability
-      SQLQuery rs(this);
-      rs.DoSQLStatement("ROLLBACK TO " + p_transaction->GetSavePoint());
+      CString startSubtrans = reinterpret_cast<SQLInfoDB*>(m_info)->GetRollbackSubTransaction(p_transaction->GetSavePoint());
+      if(!startSubtrans.IsEmpty())
+      {
+        try
+        {
+          SQLQuery rs(this);
+          rs.DoSQLStatement(startSubtrans);
+        }
+        catch(CString& err)
+        {
+          throw CString("Error rolling back a sub-transaction: ") + err;
+        }
+      }
     }
   }
   // Notify all rolledback transactions

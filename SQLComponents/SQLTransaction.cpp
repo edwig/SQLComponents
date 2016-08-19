@@ -86,7 +86,7 @@ SQLTransaction::Start(CString p_name, bool p_startSubtransaction)
   // Try to start the transaction
   if(m_database)
   {
-  m_savepoint = m_database->StartTransaction(this, p_startSubtransaction);
+    m_savepoint = m_database->StartTransaction(this, p_startSubtransaction);
   }
   else
   {
@@ -119,7 +119,7 @@ SQLTransaction::Commit()
   // automatically do a rollback
   if(m_database)
   {
-  m_database->CommitTransaction(this);
+    m_database->CommitTransaction(this);
   }
   else
   {
@@ -148,7 +148,7 @@ SQLTransaction::Rollback()
   // the AfterRollback method, called by SQLDatabase
   if(m_database)
   {
-  m_database->RollbackTransaction(this);
+    m_database->RollbackTransaction(this);
   }
   else
   {
