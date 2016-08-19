@@ -621,6 +621,28 @@ SQLInfoAccess::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return CString("IIF(ISNULL(") + p_test + ")," + p_isnull + "," + p_test + ")";
 }
 
+// Gets the subtransaction commands
+CString 
+SQLInfoAccess::GetStartSubTransaction(CString p_savepointName) const
+{
+  // Does not know how to do sub-transactions
+  return "";
+}
+
+CString 
+SQLInfoAccess::GetCommitSubTransaction(CString p_savepointName) const
+{
+  // Does not know how to do sub-transactions
+  return "";
+}
+
+CString 
+SQLInfoAccess::GetRollbackSubTransaction(CString p_savepointName) const
+{
+  // Does not know how to do sub-transactions
+  return "";
+}
+
 // SQL CATALOG QUERIES
 // ===================================================================
 

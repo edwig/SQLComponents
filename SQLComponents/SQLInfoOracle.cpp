@@ -463,7 +463,7 @@ SQLInfoOracle::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,CStr
 unsigned long 
 SQLInfoOracle::GetMaxStatementLength() const
 {
-	return 0;		// No limit in Oracle
+  return 0;		// No limit in Oracle
 }
 
 // Prefix for an add constraint DDL command in SQLAtlerTableGenerator
@@ -652,6 +652,27 @@ SQLInfoOracle::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return CString("NVL(") + p_test + "," + p_isnull + ")";
 }
 
+// Gets the subtransaction commands
+CString 
+SQLInfoOracle::GetStartSubTransaction(CString p_savepointName) const
+{
+  return CString("SAVEPOINT ") + p_savepointName;
+}
+
+CString 
+SQLInfoOracle::GetCommitSubTransaction(CString p_savepointName) const
+{
+  // There is no savepoint commit in Oracle!!
+  return "";
+}
+
+CString 
+SQLInfoOracle::GetRollbackSubTransaction(CString p_savepointName) const
+{
+  return CString("ROLLBACK TO ") + p_savepointName;
+}
+
+
 // SQL CATALOG QUERIES
 // ===================================================================
 
@@ -814,7 +835,7 @@ CString
 SQLInfoOracle::GetSQLMakeSynonym(CString& p_objectName) const
 {
   // Beware: public synonym without qualifier, for qualifier.objectname
-	return "CREATE PUBLIC SYNONYM " + p_objectName + " FOR " + p_objectName;
+  return "CREATE PUBLIC SYNONYM " + p_objectName + " FOR " + p_objectName;
 }
 
 // Get SQL to drop the synonym
@@ -836,7 +857,7 @@ SQLInfoOracle::DoCreateSequence(CString& p_sequenceName,int p_startpos)
     create.AppendFormat(" START WITH %d",p_startpos);
   }
   query.DoSQLStatement(create);
-	query.DoSQLStatement(GetSQLMakeSynonym(p_sequenceName));
+  query.DoSQLStatement(GetSQLMakeSynonym(p_sequenceName));
   query.DoSQLStatement("GRANT SELECT, ALTER ON " + p_sequenceName + " TO " +  GetGrantedUsers());
 }
 
@@ -1048,7 +1069,7 @@ SQLInfoOracle::DoCreateOrReplaceView(CString p_code,CString p_viewName)
   SQLQuery query(m_database);
   query.DoSQLStatement(p_code);
   query.DoSQLStatement("GRANT SELECT ON " + p_viewName + " TO " + GetGrantedUsers());
-	query.TryDoSQLStatement("CREATE OR REPLACE PUBLIC SYNONYM " + p_viewName + " FOR " + p_viewName);
+  query.TryDoSQLStatement("CREATE OR REPLACE PUBLIC SYNONYM " + p_viewName + " FOR " + p_viewName);
 }
 
 // Remove a view from the database
@@ -1180,11 +1201,11 @@ SQLInfoOracle::DoRenameTable(CString& p_oldName,CString& p_newName) const
 CString
 SQLInfoOracle::GetUserErrorText(CString& p_procName) const
 {
-	CString query;
+  CString query;
   CString errorText;
-	CString procName(p_procName);
+  CString procName(p_procName);
   procName.MakeUpper();
-	query = "SELECT line\n"
+  query = "SELECT line\n"
           "      ,position\n"
           "      ,text\n"
           "  FROM user_errors\n"
@@ -1194,13 +1215,13 @@ SQLInfoOracle::GetUserErrorText(CString& p_procName) const
   SQLQuery qry2(m_database);
   qry1.DoSQLStatement(query);
 
-	while (qry1.GetRecord())
-	{
+  while (qry1.GetRecord())
+  {
     CString s = qry1.GetColumn(3)->GetAsChar();
     if(s.Find("Statement ignored") < 0) 
     {
       s.Format("Error in line %d, column %d: %s\n",qry1.GetColumn(1)->GetAsSLong(),qry1.GetColumn(2)->GetAsSLong());
-		  errorText += s;
+      errorText += s;
       query.Format( "SELECT text\n"
                     "  FROM all_source\n"
                     " WHERE type = 'FUNCTION'\n"
@@ -1210,12 +1231,12 @@ SQLInfoOracle::GetUserErrorText(CString& p_procName) const
                    ,qry1.GetColumn(1)->GetAsSLong());
       qry2.DoSQLStatement(query);
       while(qry2.GetRecord())
-	    {
+      {
         s.Format("Line %d: %s\n",qry1.GetColumn(1)->GetAsSLong(),qry2.GetColumn(1)->GetAsChar());
         errorText += s;
       }
     }
-	}
+  }
   return errorText;
 }
 
@@ -1262,21 +1283,21 @@ SQLInfoOracle::GetParameterLength(int p_SQLType) const
     case SQL_VARCHAR:                   retval =  4000;  break;
     case SQL_LONGVARCHAR:               retval = 32000;  break;
     case SQL_DECIMAL:                   retval = 32000;  break;
-	  case SQL_SMALLINT:                  retval = 0;      break;
-	  case SQL_INTEGER:                   retval = sizeof(long); break;
-	  case SQL_REAL:                      retval = 0;      break;
-	  case SQL_DOUBLE:                    retval = 0;      break;
-	  case SQL_FLOAT:                     retval = 0;      break;
-	  case SQL_BINARY:                    retval = 0;      break;
-	  case SQL_VARBINARY:                 retval = 0;      break;
-	  case SQL_LONGVARBINARY:             retval = 0;      break;
-	  case SQL_DATE:                      retval = 0;      break;
+    case SQL_SMALLINT:                  retval = 0;      break;
+    case SQL_INTEGER:                   retval = sizeof(long); break;
+    case SQL_REAL:                      retval = 0;      break;
+    case SQL_DOUBLE:                    retval = 0;      break;
+    case SQL_FLOAT:                     retval = 0;      break;
+    case SQL_BINARY:                    retval = 0;      break;
+    case SQL_VARBINARY:                 retval = 0;      break;
+    case SQL_LONGVARBINARY:             retval = 0;      break;
+    case SQL_DATE:                      retval = 0;      break;
     case SQL_TIME:                      retval = 0;      break;
     case SQL_TIMESTAMP:                 retval = 19;     break;
-	  case SQL_NUMERIC:                   retval = 0;      break;
-	  case SQL_BIGINT:                    retval = 0;      break;
-	  case SQL_TINYINT:                   retval = 0;      break;
-	  case SQL_BIT:                       retval = 0;      break;
+    case SQL_NUMERIC:                   retval = 0;      break;
+    case SQL_BIGINT:                    retval = 0;      break;
+    case SQL_TINYINT:                   retval = 0;      break;
+    case SQL_BIT:                       retval = 0;      break;
     case SQL_INTERVAL_YEAR:
     case SQL_INTERVAL_YEAR_TO_MONTH:
     case SQL_INTERVAL_MONTH:
@@ -1429,8 +1450,8 @@ SQLInfoOracle::GetSPLSourcecodeFromDatabase(const CString& p_owner,const CString
   CString sProcBody = "CREATE OR REPLACE ";
   while (qry.GetRecord())
   {
-	  sProcBody += qry.GetColumn(1)->GetAsChar();
-	}
+    sProcBody += qry.GetColumn(1)->GetAsChar();
+  }
   return sProcBody;
 }
 

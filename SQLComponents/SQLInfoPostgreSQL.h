@@ -254,6 +254,11 @@ public:
   // Gets the Not-NULL-Value statement of the database
   CString GetNVLStatement(CString& p_test,CString& p_isnull) const;
 
+  // Gets the subtransaction commands
+  CString GetStartSubTransaction   (CString p_savepointName) const;
+  CString GetCommitSubTransaction  (CString p_savepointName) const;
+  CString GetRollbackSubTransaction(CString p_savepointName) const;
+
   // SQL CATALOG QUERIES
   // ===================
 

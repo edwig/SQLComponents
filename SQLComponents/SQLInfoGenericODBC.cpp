@@ -607,6 +607,28 @@ SQLInfoGenericODBC::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
 }
 
+// Gets the subtransaction commands
+CString 
+SQLInfoGenericODBC::GetStartSubTransaction(CString p_savepointName) const
+{
+  // Generic ODBC does not known about sub transactions!
+  return CString("");
+}
+
+CString 
+SQLInfoGenericODBC::GetCommitSubTransaction(CString p_savepointName) const
+{
+  // Generic ODBC does not known about sub transactions!
+  return CString("");
+}
+
+CString 
+SQLInfoGenericODBC::GetRollbackSubTransaction(CString p_savepointName) const
+{
+  // Generic ODBC does not known about sub transactions!
+  return CString("");
+}
+
 // SQL CATALOG QUERIES
 // ===================================================================
 

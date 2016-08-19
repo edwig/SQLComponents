@@ -435,7 +435,7 @@ SQLInfoSQLServer::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,C
 unsigned long 
 SQLInfoSQLServer::GetMaxStatementLength() const
 {
-	return 0;		// No limit
+  return 0;		// No limit
 }
 
 // Prefix for an add constraint DDL command in SQLAtlerTableGenerator
@@ -630,6 +630,26 @@ SQLInfoSQLServer::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return CString("NVL(") + p_test + "," + p_isnull + ")";
 }
 
+// Gets the subtransaction commands
+CString 
+SQLInfoSQLServer::GetStartSubTransaction(CString p_savepointName) const
+{
+  return CString("BEGIN TRANSACTION ") + p_savepointName;
+}
+
+CString 
+SQLInfoSQLServer::GetCommitSubTransaction(CString p_savepointName) const
+{
+  return CString("ROLLBACK TRANSACTION ") + p_savepointName;
+}
+
+CString 
+SQLInfoSQLServer::GetRollbackSubTransaction(CString p_savepointName) const
+{
+  return CString("ROLLBACK TRANSACTION ") + p_savepointName;
+}
+
+
 // SQL CATALOG QUERIES
 // ===================================================================
 
@@ -769,7 +789,7 @@ SQLInfoSQLServer::GetSQLTableReferences(CString& p_tablename) const
 CString
 SQLInfoSQLServer::GetSQLMakeSynonym(CString& /*p_objectName*/) const
 {
-	return "";
+  return "";
 }
 
 // Get SQL to drop the synonym
@@ -1131,21 +1151,21 @@ SQLInfoSQLServer::GetParameterLength(int p_SQLType) const
     case SQL_VARCHAR:         retval =  4000;      break;
     case SQL_LONGVARCHAR:     retval = 32000;      break;
     case SQL_DECIMAL:         retval = 32000;      break;
-	  case SQL_SMALLINT:        retval =     0;      break;
-	  case SQL_INTEGER:         retval = sizeof(long); break;
-	  case SQL_REAL:            retval = 0;      break;
-	  case SQL_DOUBLE:          retval = 0;      break;
-	  case SQL_FLOAT:           retval = 0;      break;
-	  case SQL_BINARY:          retval = 0;      break;
-	  case SQL_VARBINARY:       retval = 0;      break;
-	  case SQL_LONGVARBINARY:   retval = 0;      break;
-	  case SQL_DATE:            retval = 0;      break;
+    case SQL_SMALLINT:        retval =     0;      break;
+    case SQL_INTEGER:         retval = sizeof(long); break;
+    case SQL_REAL:            retval = 0;      break;
+    case SQL_DOUBLE:          retval = 0;      break;
+    case SQL_FLOAT:           retval = 0;      break;
+    case SQL_BINARY:          retval = 0;      break;
+    case SQL_VARBINARY:       retval = 0;      break;
+    case SQL_LONGVARBINARY:   retval = 0;      break;
+    case SQL_DATE:            retval = 0;      break;
     case SQL_TIME:            retval = 0;      break;
     case SQL_TIMESTAMP:       retval = 19;     break;
-	  case SQL_NUMERIC:         retval = 0;      break;
-	  case SQL_BIGINT:          retval = 0;      break;
-	  case SQL_TINYINT:         retval = 0;      break;
-	  case SQL_BIT:             retval = 0;      break;
+    case SQL_NUMERIC:         retval = 0;      break;
+    case SQL_BIGINT:          retval = 0;      break;
+    case SQL_TINYINT:         retval = 0;      break;
+    case SQL_BIT:             retval = 0;      break;
     case SQL_INTERVAL_YEAR:
     case SQL_INTERVAL_YEAR_TO_MONTH:
     case SQL_INTERVAL_MONTH:

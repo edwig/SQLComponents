@@ -422,7 +422,7 @@ SQLInfoInformix::GetMaxStatementLength() const
 {
   // The current limit of the INFORMIX ODBC driver is MAX_UINT16
   // We limit somewhat lower, just to be on the sure side
-	return 64000;		
+  return 64000;		
 }
 
 // Prefix for an add constraint DDL command in SQLAtlerTableGenerator
@@ -607,6 +607,25 @@ SQLInfoInformix::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return CString("NVL(") + p_test + "," + p_isnull + ")";
 }
 
+// Gets the subtransaction commands
+CString 
+SQLInfoInformix::GetStartSubTransaction(CString p_savepointName) const
+{
+  return CString("SAVEPOINT ") + p_savepointName;
+}
+
+CString 
+SQLInfoInformix::GetCommitSubTransaction(CString p_savepointName) const
+{
+  return CString("COMMIT TRANSACTION ") + p_savepointName;
+}
+
+CString 
+SQLInfoInformix::GetRollbackSubTransaction(CString p_savepointName) const
+{
+  return CString("ROLLBACK TO SAVEPOINT ") + p_savepointName;
+}
+
 // SQL CATALOG QUERIES
 // ==================================================================
 
@@ -693,12 +712,12 @@ SQLInfoInformix::GetSQLGetConstraintsForTable(CString& p_tableName) const
   CString lowerName(p_tableName);
   lowerName.MakeLower();
   CString contabel = "SELECT con.constrname "
-		 	              "      ,con.tabid "
-			              "      ,con.constrid "
+                    "      ,con.tabid "
+                    "      ,con.constrid "
                     "  FROM sysconstraints con "
-		                "      ,systables tab "
-		                " WHERE tab.tabid   = con.tabid "
-		                "   AND con.constrtype in ('C', 'U') "
+                    "      ,systables tab "
+                    " WHERE tab.tabid   = con.tabid "
+                    "   AND con.constrtype in ('C', 'U') "
                     "   AND tab.tabname = '" + lowerName + "'";
   return contabel;
 }
@@ -712,15 +731,15 @@ SQLInfoInformix::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) co
 
   // Reads all current indici in the database in a list
   // So we can figure out if an index need to be generated
-	CString query = "select idx.idxname\n"
-							    "      ,idx.tabid\n"      // Table
+  CString query = "select idx.idxname\n"
+                  "      ,idx.tabid\n"      // Table
                   "      ,idx.idxtype\n"		 // U=Uniek, D=Duplicates
-							    "      ,part1,part2, part3, part4, part5, part6, part7, part8\n"
-							    "      ,part9,part10,part11,part12,part13,part14,part15,part16\n"
-					        "  from sysindexes idx\n"
-					        "      ,systables  tab\n"
+                  "      ,part1,part2, part3, part4, part5, part6, part7, part8\n"
+                  "      ,part9,part10,part11,part12,part13,part14,part15,part16\n"
+                  "  from sysindexes idx\n"
+                  "      ,systables  tab\n"
                   " where tab.tabid = idx.tabid\n"
-						      "   and tab.tabname ='" + lowerName + "'\n " 
+                  "   and tab.tabname ='" + lowerName + "'\n " 
                   "   and idx.idxname not matches ' [0-9]*'";
   return query;
 }
@@ -731,9 +750,9 @@ SQLInfoInformix::GetSQLTableReferences(CString& p_tablename) const
 {
   CString lowerName(p_tablename);
   lowerName.MakeLower();
-	// EH Reads all current references
+  // EH Reads all current references
   CString query = "select con.constrname "
-		              "      ,con.tabid "
+                  "      ,con.tabid "
                   "      ,con.constrid "
                   "  from sysconstraints con "
                   "      ,systables tab "
@@ -838,7 +857,7 @@ SQLInfoInformix::GetSQLSearchSession(const CString& p_databaseName,const CString
          " WHERE  sid IN\n"
          "      ( SELECT odb_sessionid\n"
          "          FROM sysmaster:sysopendb\n"
-		     "         WHERE odb_dbname = '" + p_databaseName + "'\n"
+         "         WHERE odb_dbname = '" + p_databaseName + "'\n"
          "           AND NOT odb_sessionid IN\n"
          "             ( SELECT sessie_nr\n"
          "                 FROM " + p_sessionTable +"))";
@@ -1103,21 +1122,21 @@ SQLInfoInformix::GetParameterLength(int p_SQLType) const
     case SQL_VARCHAR:           retval = 32000;    break;
     case SQL_LONGVARCHAR:       retval = 32000;    break;
     case SQL_DECIMAL:           retval = 32000;    break;
-	  case SQL_SMALLINT:          retval = 0;    break;
-	  case SQL_INTEGER:           retval = 0;    break;
-	  case SQL_REAL:              retval = 0;    break;
-	  case SQL_DOUBLE:            retval = 0;    break;
-	  case SQL_FLOAT:             retval = 0;    break;
-	  case SQL_BINARY:            retval = 0;    break;
-	  case SQL_VARBINARY:         retval = 0;    break;
-	  case SQL_LONGVARBINARY:     retval = 0;    break;
-	  case SQL_DATE:              retval = 0;    break;
+    case SQL_SMALLINT:          retval = 0;    break;
+    case SQL_INTEGER:           retval = 0;    break;
+    case SQL_REAL:              retval = 0;    break;
+    case SQL_DOUBLE:            retval = 0;    break;
+    case SQL_FLOAT:             retval = 0;    break;
+    case SQL_BINARY:            retval = 0;    break;
+    case SQL_VARBINARY:         retval = 0;    break;
+    case SQL_LONGVARBINARY:     retval = 0;    break;
+    case SQL_DATE:              retval = 0;    break;
     case SQL_TIME:              retval = 0;    break;
     case SQL_TIMESTAMP:         retval = 19;   break;
-	  case SQL_NUMERIC:           retval = 0;    break;
-	  case SQL_BIGINT:            retval = 0;    break;
-	  case SQL_TINYINT:           retval = 0;    break;
-	  case SQL_BIT:               retval = 0;    break;
+    case SQL_NUMERIC:           retval = 0;    break;
+    case SQL_BIGINT:            retval = 0;    break;
+    case SQL_TINYINT:           retval = 0;    break;
+    case SQL_BIT:               retval = 0;    break;
     case SQL_INTERVAL_YEAR:
     case SQL_INTERVAL_YEAR_TO_MONTH:
     case SQL_INTERVAL_MONTH:
@@ -1237,7 +1256,7 @@ SQLInfoInformix::GetSPLSourcecodeFromDatabase(const CString& /*p_owner*/,const C
   sQuery = "SELECT sbody.data\n"
            "  FROM sysprocbody sbody\n"
            "      ,sysprocedures sproc\n"
-	         " WHERE sbody.procid   = sproc.procid\n"
+           " WHERE sbody.procid   = sproc.procid\n"
            "   AND sproc.procname = '" + sName + "'\n"
            "   AND datakey        = 'T'";
   SQLQuery sql(m_database);
@@ -1245,8 +1264,8 @@ SQLInfoInformix::GetSPLSourcecodeFromDatabase(const CString& /*p_owner*/,const C
   CString sProcBody;
   while (sql.GetRecord())
   {
-	  sProcBody = sql.GetColumn(1)->GetAsChar();
-	}
+    sProcBody = sql.GetColumn(1)->GetAsChar();
+  }
   return sProcBody;
 }
 

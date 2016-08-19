@@ -175,9 +175,9 @@ public:
 
   // Gives the statement to alter a table columns' name
   CString GetSQLModifyColumnName(CString p_tablename,CString p_oldName,CString p_newName,CString p_datatype);
-	
-	// Gets the maximum length of an SQL statement
-	unsigned long GetMaxStatementLength() const;
+  
+  // Gets the maximum length of an SQL statement
+  unsigned long GetMaxStatementLength() const;
 
   // Prefix for an add constraint DDL command in SQLAtlerTableGenerator
   CString GetAddConstraintPrefix(CString p_constraintName) const;
@@ -253,6 +253,11 @@ public:
 
   // Gets the Not-NULL-Value statement of the database
   CString GetNVLStatement(CString& p_test,CString& p_isnull) const;
+
+  // Gets the subtransaction commands
+  CString GetStartSubTransaction   (CString p_savepointName) const;
+  CString GetCommitSubTransaction  (CString p_savepointName) const;
+  CString GetRollbackSubTransaction(CString p_savepointName) const;
 
   // SQL CATALOG QUERIES
   // ===================

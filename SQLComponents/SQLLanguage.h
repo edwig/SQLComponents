@@ -79,7 +79,8 @@ typedef enum _dateNames
   ,DN_YEAR
   ,DN_YEARS
   ,DN_LASTNAME       // Arraysize!
-};
+}
+DateNames;
 
 // STATIC DEFINITIONS OF NAME ARRAYS
 

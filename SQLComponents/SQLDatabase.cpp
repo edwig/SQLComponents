@@ -1071,9 +1071,23 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
       transName.Format("AutoSavePoint%d", m_transactions.size());
 
       // Set savepoint
+      CString startSubtrans = reinterpret_cast<SQLInfoDB*>(m_info)->GetStartSubTransaction(transName);
+      if(!startSubtrans.IsEmpty())
+      {
+        try
+        {
+          SQLQuery rs(this);
+          rs.DoSQLStatement(startSubtrans);
+        }
+        catch(CString& err)
+        {
+          throw CString("Error starting sub-transaction: ") + err;
+        }
+      }
+
       // TODO: Check that the engine supports SAVEPOINT's
-      SQLQuery rs(this);
-      rs.DoSQLStatement("SAVEPOINT " + transName);
+      // SQLQuery rs(this);
+      // rs.DoSQLStatement("SAVEPOINT " + transName);
     }
   }
   // Add the transaction on the transaction stack

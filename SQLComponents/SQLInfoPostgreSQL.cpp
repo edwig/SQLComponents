@@ -435,7 +435,7 @@ SQLInfoPostgreSQL::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,
 unsigned long 
 SQLInfoPostgreSQL::GetMaxStatementLength() const
 {
-	return 0;		//	Geen limiet
+  return 0;		//	Geen limiet
 }
 
 // Prefix voor een add constraint DDL commando voor SQLAtlerTableGenerator
@@ -616,6 +616,26 @@ CString
 SQLInfoPostgreSQL::GetNVLStatement(CString& p_test,CString& p_isnull) const
 {
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
+}
+
+// Gets the subtransaction commands
+CString 
+SQLInfoPostgreSQL::GetStartSubTransaction(CString p_savepointName) const
+{
+  return CString("SAVEPOINT ") + p_savepointName;
+}
+
+CString 
+SQLInfoPostgreSQL::GetCommitSubTransaction(CString p_savepointName) const
+{
+  // Geen commit voor subtransaction
+  return CString("");
+}
+
+CString 
+SQLInfoPostgreSQL::GetRollbackSubTransaction(CString p_savepointName) const
+{
+  return CString("ROLLBACK TO SAVEPOINT ") + p_savepointName;
 }
 
 // SQL CATALOG QUERIES
@@ -807,7 +827,7 @@ CString
 SQLInfoPostgreSQL::GetSQLMakeSynonym(CString& /*p_objectName*/) const
 {
   // Let op: public synonym zonder qualifier, for qualifier.tabelnaam
-	return "";
+  return "";
 }
 
 // Verwijder een synonym
@@ -1255,21 +1275,21 @@ SQLInfoPostgreSQL::GetParameterLength(int p_SQLType) const
     case SQL_VARCHAR:       retval = 4000; break;
     case SQL_LONGVARCHAR:   retval = 32000;break;
     case SQL_DECIMAL:       retval = 32000;break;
-	  case SQL_SMALLINT:      retval = 0;    break;
-	  case SQL_INTEGER:       retval = sizeof(long);break;
-	  case SQL_REAL:          retval = 0;    break;
-	  case SQL_DOUBLE:        retval = 0;    break;
-	  case SQL_FLOAT:         retval = 0;    break;
-	  case SQL_BINARY:        retval = 0;    break;
-	  case SQL_VARBINARY:     retval = 0;    break;
-	  case SQL_LONGVARBINARY: retval = 0;    break;
-	  case SQL_DATE:          retval = 0;    break;
+    case SQL_SMALLINT:      retval = 0;    break;
+    case SQL_INTEGER:       retval = sizeof(long);break;
+    case SQL_REAL:          retval = 0;    break;
+    case SQL_DOUBLE:        retval = 0;    break;
+    case SQL_FLOAT:         retval = 0;    break;
+    case SQL_BINARY:        retval = 0;    break;
+    case SQL_VARBINARY:     retval = 0;    break;
+    case SQL_LONGVARBINARY: retval = 0;    break;
+    case SQL_DATE:          retval = 0;    break;
     case SQL_TIME:          retval = 0;    break;
     case SQL_TIMESTAMP:     retval = 19;   break;
-	  case SQL_NUMERIC:       retval = 0;    break;
-	  case SQL_BIGINT:        retval = 0;    break;
-	  case SQL_TINYINT:       retval = 0;    break;
-	  case SQL_BIT:           retval = 0;    break;
+    case SQL_NUMERIC:       retval = 0;    break;
+    case SQL_BIGINT:        retval = 0;    break;
+    case SQL_TINYINT:       retval = 0;    break;
+    case SQL_BIT:           retval = 0;    break;
     case SQL_INTERVAL_YEAR:
     case SQL_INTERVAL_YEAR_TO_MONTH:
     case SQL_INTERVAL_MONTH:
@@ -1405,8 +1425,8 @@ SQLInfoPostgreSQL::GetSPLSourcecodeFromDatabase(const CString& p_owner,const CSt
   CString sProcBody = "CREATE OR REPLACE ";
   while (sql.GetRecord())
   {
-	  sProcBody += sql.GetColumn(1)->GetAsChar();
-	}
+    sProcBody += sql.GetColumn(1)->GetAsChar();
+  }
   return sProcBody;
 }
 

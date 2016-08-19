@@ -242,7 +242,7 @@ protected:
   CString     m_searchTableName;
   CString     m_searchTableType;
 
-	WordList    m_ODBCKeywords;          // Stationary ODBC keywords
+  WordList    m_ODBCKeywords;          // Stationary ODBC keywords
   WordList    m_RDBMSkeywords;         // Keywords  reported by the RDBMS
   DataTypeMap m_dataTypes;             // Datatypes reported by the RDBMS
 

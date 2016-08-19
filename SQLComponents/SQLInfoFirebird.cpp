@@ -441,7 +441,7 @@ SQLInfoFirebird::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,CS
 unsigned long 
 SQLInfoFirebird::GetMaxStatementLength() const
 {
-	return 0;		//	Geen limiet
+  return 0;		//	Geen limiet
 }
 
 // Prefix voor een add constraint DDL commando voor SQLAtlerTableGenerator
@@ -624,6 +624,25 @@ SQLInfoFirebird::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
 }
 
+// Gets the subtransaction commands
+CString 
+SQLInfoFirebird::GetStartSubTransaction(CString p_savepointName) const
+{
+  return CString("SAVEPOINT ") + p_savepointName;
+}
+
+CString 
+SQLInfoFirebird::GetCommitSubTransaction(CString p_savepointName) const
+{
+  return CString("COMMIT TRANSACTION ") + p_savepointName;
+}
+
+CString 
+SQLInfoFirebird::GetRollbackSubTransaction(CString p_savepointName) const
+{
+  return CString("ROLLBACK TO ") + p_savepointName;
+}
+
 // SQL CATALOG QUERIES
 // ====================================================================
 
@@ -729,7 +748,7 @@ SQLInfoFirebird::GetSQLTableIndexes(CString& p_user,CString& p_tableName) const
 {
   CString upperName(p_tableName);
   upperName.MakeUpper(); 
-	CString query = "SELECT idx.rdb$index_name\n"
+  CString query = "SELECT idx.rdb$index_name\n"
                   "      ,idx.rdb$unique_flag\n" // 1 if unique, null if not
                   "      ,col.rdb$field_name\n"
                   "      ,idx.rdb$index_type\n"  // 1 if descending, null on ascending
@@ -1231,21 +1250,21 @@ SQLInfoFirebird::GetParameterLength(int p_SQLType) const
     case SQL_VARCHAR:       retval = 32000;    break;
     case SQL_LONGVARCHAR:   retval = 32000;    break;
     case SQL_DECIMAL:       retval = 32000;    break;
-	  case SQL_SMALLINT:      retval = 0;    break;
-	  case SQL_INTEGER:       retval = 0;    break;
-	  case SQL_REAL:          retval = 0;    break;
-	  case SQL_DOUBLE:        retval = 0;    break;
-	  case SQL_FLOAT:         retval = 0;    break;
-	  case SQL_BINARY:        retval = 0;    break;
-	  case SQL_VARBINARY:     retval = 0;    break;
-	  case SQL_LONGVARBINARY: retval = 0;    break;
-	  case SQL_DATE:          retval = 0;    break;
+    case SQL_SMALLINT:      retval = 0;    break;
+    case SQL_INTEGER:       retval = 0;    break;
+    case SQL_REAL:          retval = 0;    break;
+    case SQL_DOUBLE:        retval = 0;    break;
+    case SQL_FLOAT:         retval = 0;    break;
+    case SQL_BINARY:        retval = 0;    break;
+    case SQL_VARBINARY:     retval = 0;    break;
+    case SQL_LONGVARBINARY: retval = 0;    break;
+    case SQL_DATE:          retval = 0;    break;
     case SQL_TIME:          retval = 0;    break;
     case SQL_TIMESTAMP:     retval = 19;   break;
-	  case SQL_NUMERIC:       retval = 0;    break;
-	  case SQL_BIGINT:        retval = 0;    break;
-	  case SQL_TINYINT:       retval = 0;    break;
-	  case SQL_BIT:           retval = 0;    break;
+    case SQL_NUMERIC:       retval = 0;    break;
+    case SQL_BIGINT:        retval = 0;    break;
+    case SQL_TINYINT:       retval = 0;    break;
+    case SQL_BIT:           retval = 0;    break;
     case SQL_INTERVAL_YEAR:
     case SQL_INTERVAL_YEAR_TO_MONTH:
     case SQL_INTERVAL_MONTH:
