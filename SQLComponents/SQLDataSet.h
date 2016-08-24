@@ -83,6 +83,7 @@ public:
 class SQLDatabase;
 class SQLQuery;
 typedef std::vector<SQLRecord*>   RecordSet;
+typedef std::vector<SQLVariant*>  VariantSet;
 typedef std::vector<SQLParameter> ParameterSet;
 typedef std::vector<CString>      NamenMap;
 typedef std::vector<int>          TypenMap;
@@ -128,8 +129,10 @@ public:
   // Forget the records
   bool         Forget(bool p_force = false);
   // Find the object record of a primary key
-  int          FindObjectRecNum(int p_primary);
-  SQLRecord*   FindObjectRecord(int p_primary);
+  int          FindObjectRecNum(int p_primary);           // If your primary is an INTEGER     (Fast!!)
+  int          FindObjectRecNum(VariantSet& p_primary);   // If your primary is a compound key (Slower)
+  SQLRecord*   FindObjectRecord(int p_primary);           // If your primary is an INTEGER     (Fast!!)
+  SQLRecord*   FindObjectRecord(VariantSet& p_primary);   // If your primary is a compound key (Slower)
 
   // SETTERS
 
@@ -209,9 +212,9 @@ private:
   void         Updates();
   void         Inserts();
 
-  CString      GetSQLDelete(SQLQuery* p_query,SQLRecord* p_record);
-  CString      GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record);
-  CString      GetSQLInsert(SQLQuery* p_query,SQLRecord* p_record);
+  CString      GetSQLDelete  (SQLQuery* p_query,SQLRecord* p_record);
+  CString      GetSQLUpdate  (SQLQuery* p_query,SQLRecord* p_record);
+  CString      GetSQLInsert  (SQLQuery* p_query,SQLRecord* p_record);
   CString      GetWhereClause(SQLQuery* p_query,SQLRecord* p_record,int& p_parameter);
 
   // Private data of the dataset
