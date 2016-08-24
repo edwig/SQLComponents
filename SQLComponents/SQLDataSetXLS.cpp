@@ -524,15 +524,15 @@ SQLDataSetXLS::Open()
 
       // Lees de data rows
       for(int row = 1; row < rows; ++row)
-        {
-          SQLRecord* record = InsertRecord();
+      {
+        SQLRecord* record = InsertRecord();
         for(int col = 0; col < cols; ++col)
         {
           char* value = sheet->CellValue(row,col,buffer,100);
           SQLVariant* var = new SQLVariant(value);
           record->AddField(var);
-          }
         }
+      }
     }
     catch(CString str)
     {

@@ -91,10 +91,6 @@ public:
 private:
   // Open a text delimited file for reading or writing
   bool  Open(); 
-  bool  OpenWorksheet();
-  bool  OpenXmlWorksheet();
-  bool  OpenCsvWorksheet();
-
   // Close and forget the spreadsheet
   void  Close();
   // Convert Excel column in alphabet into column number
