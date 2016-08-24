@@ -163,7 +163,7 @@ bool
 SQLDataSetXLS::Commit()
 {
   if(m_excel) // If file is an Excel spreadsheet
-      {
+  {
     m_workbook->Save();
     m_transaction = false;
     return true;
