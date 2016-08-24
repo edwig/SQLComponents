@@ -122,6 +122,7 @@ SQLDataSetXLS::ReadXLS(CString p_sheet)
   }
   else if(m_xmlExcel)
   {
+    m_sheetName = p_sheet;
     if(m_xmlWorkbook->GetError().IsEmpty())
     {
       if(Open())
@@ -163,6 +164,12 @@ bool
 SQLDataSetXLS::Commit()
 {
   if(m_excel) // If file is an Excel spreadsheet
+  {
+    m_workbook->Save();
+    m_transaction = false;
+    return true;
+  }
+  if(m_xmlExcel)
   {
     m_workbook->Save();
     m_transaction = false;
@@ -584,7 +591,7 @@ SQLDataSetXLS::Open()
       {
         CString value = sheet->GetCellValue(row,col);
         SQLVariant* var = new SQLVariant(value.GetString());
-        record->AddField(var);
+        record->AddField(var,true); // It's for an insertion
       }
     }
     return true;
@@ -648,11 +655,13 @@ SQLDataSetXLS::Open()
   }
 }
 
-void
+bool
 SQLDataSetXLS::Close()
 {
   m_append = false;
   SQLDataSet::Close();
+
+  return true;
 }
 
 // Convert Excel column in alphabet into column number

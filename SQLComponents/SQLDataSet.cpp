@@ -763,7 +763,7 @@ SQLDataSet::InsertRecord()
   SQLRecord* record = new SQLRecord(this);
   m_records.push_back(record);
   m_current = (int)(m_records.size() - 1);
-
+  m_status |= SQL_Insertions;
   return record;
 }
 

@@ -50,6 +50,8 @@ public:
   bool Commit(); 
   // Undo changes to spreadsheet
   bool RollBack(); 
+  // Close worksheet
+  bool  CloseWorksheet();
 
   // Add header row to spreadsheet
   bool AddHeaders(CStringArray &FieldNames, bool replace = false); 
@@ -92,7 +94,7 @@ private:
   // Open a text delimited file for reading or writing
   bool  Open(); 
   // Close and forget the spreadsheet
-  void  Close();
+  bool  Close();
   // Convert Excel column in alphabet into column number
   int   CalculateColumnNumber(CString column, bool p_name = true); 
   // Read a row from spreadsheet. Default is read the next row
@@ -144,4 +146,10 @@ inline bool
 SQLDataSetXLS::GetIsXLS()
 {
   return (m_excel || m_xmlExcel);
+}
+
+inline bool  
+SQLDataSetXLS::CloseWorksheet()
+{
+  return Close();
 }
