@@ -113,6 +113,7 @@ public:
   int  Goto(int p_record);
   bool IsFirst();
   bool IsLast();
+  int  Current();
 
   // OPERATIONS
 
@@ -146,8 +147,10 @@ public:
   void         SetPrimaryTable(CString p_tableName);
   // Set primary key column name (for updates)
   void         SetPrimaryKeyColumn(CString p_name);
+  void         SetPrimaryKeyColumn(WordList& p_list);
   // Set searchable column
   void         SetSearchableColumn(CString p_name);
+  void         SetSearchableColumn(WordList& p_list);
   // Set parameter for a query
   void         SetParameter(SQLParameter p_parameter);
   void         SetParameter(CString p_naam,SQLVariant p_waarde);
@@ -228,7 +231,7 @@ private:
   ParameterSet m_parameters;
   NamenMap     m_primaryKey;
   // Object mapping
-  CString      m_searchColumn;
+  CString      m_searchColumn;  // -> NamenMap m_searchColumn
   ObjectMap    m_objects;
 protected:
   int          m_status;
@@ -312,7 +315,13 @@ SQLDataSet::SetPrimaryKeyColumn(CString p_name)
   m_primaryKey.push_back(p_name);
 }
 
-inline void 
+inline int
+SQLDataSet::Current()
+{
+  return m_current;
+}
+
+inline void
 AggregateInfo::Init()
 {
   m_sum  = 0.0;
