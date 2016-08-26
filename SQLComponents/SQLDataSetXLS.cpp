@@ -175,12 +175,6 @@ SQLDataSetXLS::Commit()
     m_transaction = false;
     return true;
   }
-  if(m_xmlExcel)
-  {
-    m_workbook->Save();
-    m_transaction = false;
-    return true;
-  }
   else // if file is a text delimited file
   {
     try
