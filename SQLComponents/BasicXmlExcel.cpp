@@ -1,6 +1,17 @@
-#include "StdAfx.h"
+//////////////////////////////////////////////////////////////////////////
+//
+// BasicExcel
+//
+// Original Version: Yap Chun Wei  (2006)
+// Expanded Version: Martin Fuchs  (2009) and Ami Castonguay
+// Expanded Version: Long Wenbiao  (2010)
+// Expanded Version: Edwig Huisman (2012)
+// For more credits: See the .h interface file
+//
+//////////////////////////////////////////////////////////////////////////
+//
+#include "stdafx.h"
 #include "BasicXmlExcel.h"
-// #include "GetLastErrorAsString.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -404,7 +415,7 @@ BasicXmlExcel::ReadSheetNames()
       SetError(res);
       break;
     }
-    if(stricmp(ze.name,"xl/workbook.xml") == 0)
+    if(_stricmp(ze.name,"xl/workbook.xml") == 0)
     {
       int   bufflen = ze.unc_size + 1;
       char* buffer  = (char*) malloc(bufflen);
@@ -496,9 +507,13 @@ BasicXmlExcel::Load()
 bool
 BasicXmlExcel::LoadStrings()
 {
-  if(m_zip == NULL || m_sheetRead == true)
+  if(m_zip == NULL)
   {
     return false;
+  }
+  if(m_sheetRead)
+  {
+    return true;
   }
   ZIPENTRY ze;
   ZRESULT  res     = ZR_OK;
@@ -571,9 +586,13 @@ BasicXmlExcel::LoadStrings()
 bool
 BasicXmlExcel::LoadWorksheets()
 {
-  if(m_zip == NULL || m_sheetRead == true)
+  if(m_zip == NULL)
   {
     return false;
+  }
+  if(m_sheetRead)
+  {
+    return true;
   }
   // Make sure we have the sheetnames
   if(m_sheetRead == false)

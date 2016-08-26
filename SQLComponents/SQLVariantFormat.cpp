@@ -447,8 +447,9 @@ SQLVariantFormat::SetCurrentDate()
   m_owner   = true;
   m_variant = new SQLVariant();
   m_variant->SetData(SQL_C_TIMESTAMP,m_format);
- }
+}
 
+#pragma warning (disable: 4996)
 bool
 SQLVariantFormat::GetTimeFromStringVariant(SQLVariant* p_variant,CString p_format,TIME_STRUCT* p_time)
 {
@@ -486,7 +487,7 @@ SQLVariantFormat::GetTimeFromStringVariant(SQLVariant* p_variant,CString p_forma
   }
   return false;
 }
-
+#pragma warning (error:4996)
 
 bool
 SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_format,DATE_STRUCT* p_date)
