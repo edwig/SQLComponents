@@ -1044,6 +1044,14 @@ SQLInfoOracle::GetSQLOptimizeTable(CString& p_owner,CString& p_tableName,int& p_
   return optim;
 }
 
+// Getting the fact that there is only **one** (1) user session in the database
+bool
+SQLInfoOracle::GetOnlyOneUserSession()
+{
+  // Yet to implement
+  return true;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 

@@ -934,7 +934,15 @@ SQLInfoInformix::GetSQLOptimizeTable(CString& /*p_owner*/,CString& p_tableName,i
   return optim;
 }
 
-// SQL DDL HANDELINGEN
+// Getting the fact that there is only **one** (1) user session in the database
+bool
+SQLInfoInformix::GetOnlyOneUserSession()
+{
+  // Yet to implement
+  return true;
+}
+
+// SQL DDL ACTIONS
 // ====================================================================
 
 // Do the commit for the DDL commands in the catalog

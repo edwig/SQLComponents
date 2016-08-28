@@ -950,6 +950,14 @@ SQLInfoSQLServer::GetSQLOptimizeTable(CString& /*p_owner*/,CString& /*p_tableNam
   return "";
 }
 
+// Getting the fact that there is only **one** (1) user session in the database
+bool
+SQLInfoSQLServer::GetOnlyOneUserSession()
+{
+  // Yet to implement
+  return true;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 

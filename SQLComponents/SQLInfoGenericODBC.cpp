@@ -896,6 +896,15 @@ SQLInfoGenericODBC::GetSQLOptimizeTable(CString& /*p_owner*/,CString& /*p_tableN
   return "";
 }
 
+// Getting the fact that there is only **one** (1) user session in the database
+bool
+SQLInfoGenericODBC::GetOnlyOneUserSession()
+{
+  // No way to get the number of user sessions!
+  // So always continue with management functions
+  return true;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 

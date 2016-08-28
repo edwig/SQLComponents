@@ -351,8 +351,11 @@ public:
   // Get query to optimize the table statistics
   virtual CString GetSQLOptimizeTable(CString& p_owner,CString& p_tableName,int& p_number) = 0;
 
-  // SQL DDL HANDELINGEN
-  // ===================
+  // Getting the fact that there is only **one** (1) user session in the database
+  virtual bool    GetOnlyOneUserSession() = 0;
+
+  // SQL DDL OPERATIONS
+  // ==================
 
   // Do the commit for the DDL commands in the catalog
   virtual void    DoCommitDDLcommands() const = 0;

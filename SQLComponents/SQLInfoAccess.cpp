@@ -943,6 +943,15 @@ SQLInfoAccess::GetSQLOptimizeTable(CString& /*p_owner*/,CString& /*p_tableName*/
   return "";
 }
 
+// Getting the fact that there is only **one** (1) user session in the database
+bool    
+SQLInfoAccess::GetOnlyOneUserSession()
+{
+  // No way to get the number of user sessions!
+  // So always continue with management functions
+  return true;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 

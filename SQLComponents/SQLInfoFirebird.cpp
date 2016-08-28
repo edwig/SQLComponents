@@ -1055,6 +1055,19 @@ SQLInfoFirebird::GetSQLOptimizeTable(CString& p_owner,CString& p_tableName,int& 
   return "";
 }
 
+// Getting the fact that there is only **one** (1) user session in the database
+bool
+SQLInfoFirebird::GetOnlyOneUserSession()
+{
+  CString sql("SELECT COUNT(*)\n"
+              "  FROM MON$ATTACHMENTS\n"
+              " WHERE MON$SYSTEM_FLAG = 0");
+
+  SQLQuery query(m_database);
+  SQLVariant* sessions = query.DoSQLStatementScalar(sql);
+  return sessions->GetAsSLong() <= 1;
+}
+
 // SQL DDL ACTIONS
 // ====================================================================
 
