@@ -66,6 +66,7 @@ public:
    // Type constructors
    SQLVariant(const char* p_data);            // SQL_C_CHAR
    SQLVariant(CString& p_data);               // SQL_C_CHAR
+   SQLVariant(unsigned char* p_bookmark);     // SQL_C_VARBOOKMARK / SQL_C_BINARY
    SQLVariant(short p_short);                 // SQL_C_SHORT / SQL_C_SSHORT
    SQLVariant(unsigned short p_short);        // SQL_C_USHORT
    SQLVariant(long p_long);                   // SQL_C_LONG / SQL_C_SLONG
@@ -83,7 +84,7 @@ public:
    SQLVariant(DATE_STRUCT* p_date);           // SQL_C_DATE / SQL_C_TYPE_DATE
    SQLVariant(TIME_STRUCT* p_time);           // SQL_C_TIME / SQL_C_TYPE_TIME
    SQLVariant(TIMESTAMP_STRUCT* p_stamp);     // SQL_C_TIMESTAMP / SQL_C_TYPE_TIMESTAMP
-   SQLVariant(int p_type,SQL_INTERVAL_STRUCT* p_inter);  // SQL_C_INTERVAL_YEAR -> SQL_C_INTERVAL_DAY_TO_SECOND
+   SQLVariant(SQLINTERVAL p_type,SQL_INTERVAL_STRUCT* p_inter);  // SQL_C_INTERVAL_YEAR -> SQL_C_INTERVAL_DAY_TO_SECOND
    // From complex constructors
    SQLVariant(SQLDate* p_date);               // SQLDate
    SQLVariant(SQLTime* p_time);               // SQLTime
@@ -159,9 +160,24 @@ public:
    SQLTime              GetAsSQLTime();
    SQLTimestamp         GetAsSQLTimestamp();
 
-   // General operators
+   // Assignment operator
    SQLVariant& operator  =(const SQLVariant& p_origineel);
+
+   // Comparison operators
    bool        operator ==(const SQLVariant& p_right);
+   bool        operator !=(const SQLVariant& p_right);
+// bool        operator  >(const SQLVariant& p_right);
+// bool        operator >=(const SQLVariant& p_right);
+// bool        operator  <(const SQLVariant& p_right);
+// bool        operator <=(const SQLVariant& p_right);
+// 
+// // Arithmetic operators
+// SQLVariant& operator  +(const SQLVariant& p_right);
+// SQLVariant& operator  -(const SQLVariant& p_right);
+// SQLVariant& operator  *(const SQLVariant& p_right);
+// SQLVariant& operator  /(const SQLVariant& p_right);
+// SQLVariant& operator  %(const SQLVariant& p_right);
+
 private:
    // Total internal reset (type and data store)
    void    ResetDataType(int p_type);

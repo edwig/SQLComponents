@@ -217,6 +217,16 @@ SQLDataSet::SetParameter(CString p_naam,SQLVariant p_waarde)
   m_parameters.push_back(par);
 }
 
+void         
+SQLDataSet::SetPrimaryKeyColumn(WordList& p_list)
+{
+  m_primaryKey.clear();
+  for(auto& column : p_list)
+  {
+    m_primaryKey.push_back(column);
+  }
+}
+
 SQLVariant*  
 SQLDataSet::GetParameter(CString& p_name)
 {
@@ -316,7 +326,7 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
 }
 
 bool
-SQLDataSet::Open(bool p_stopBijGeenKolommen /*= false*/)
+SQLDataSet::Open(bool p_stopIfNoColumns /*= false*/)
 {
   bool   result = false;
   CString query = m_query;
@@ -356,7 +366,7 @@ SQLDataSet::Open(bool p_stopBijGeenKolommen /*= false*/)
 
     // Do the SELECT query
     qr.DoSQLStatement(query);
-    if (p_stopBijGeenKolommen && qr.GetNumberOfColumns() == 0)
+    if (p_stopIfNoColumns && qr.GetNumberOfColumns() == 0)
     {
       return false;
     }

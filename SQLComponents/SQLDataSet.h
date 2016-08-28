@@ -100,7 +100,7 @@ public:
   // Query done and records gotten?
   bool IsOpen();
   // Perform query: Do SetQuery first
-  bool Open(bool p_stopBijGeenKolommen = false);
+  bool Open(bool p_stopIfNoColumns = false);
   // Append (read extra) into the dataset
   bool Append();
   // Remove resultset
@@ -151,7 +151,6 @@ public:
   void         SetPrimaryKeyColumn(WordList& p_list);
   // Set searchable column
   void         SetSearchableColumn(CString p_name);
-  void         SetSearchableColumn(WordList& p_list);
   // Set parameter for a query
   void         SetParameter(SQLParameter p_parameter);
   void         SetParameter(CString p_naam,SQLVariant p_waarde);
@@ -232,7 +231,7 @@ private:
   ParameterSet m_parameters;
   NamenMap     m_primaryKey;
   // Object mapping
-  CString      m_searchColumn;  // -> NamenMap m_searchColumn
+  CString      m_searchColumn; 
   ObjectMap    m_objects;
 protected:
   int          m_status;
