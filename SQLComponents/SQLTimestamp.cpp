@@ -29,6 +29,7 @@
 #include "SQLTimestamp.h"
 #include "SQLTime.h"
 #include "SQLDate.h"
+#include "SQLInterval.h"
 #include "SQLDatabase.h"
 #include "SQLLanguage.h"
 #include <strstream>
@@ -781,11 +782,11 @@ SQLTimestamp::ParseMoment(const CString& p_string)
     }
     else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_TODAY]) == 0)
     { 
-	    if (GetVirtualMoment(Sign, ExtraTime, interval, temp))
-	    {
-		    SetTimestamp(temp.m_year, temp.m_month, temp.m_day, 0, 0, 0);
-		    return;
-	    }
+      if (GetVirtualMoment(Sign, ExtraTime, interval, temp))
+      {
+        SetTimestamp(temp.m_year, temp.m_month, temp.m_day, 0, 0, 0);
+        return;
+      }
     }
     else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_FOM]) == 0)
     {
@@ -1045,60 +1046,60 @@ SQLTimestamp::GetVirtualMoment(CString Sign
                               ,int    interval
                               ,StampStorage& temp)
 { 	
-	SQLTimestamp mom(CurrentTimestamp());
+  SQLTimestamp mom(CurrentTimestamp());
   if (!Sign.IsEmpty())
   {
     int factor = (Sign == "+") ? 1 : -1;
-		if (Sign == "+" || Sign == "-")
-		{
+    if (Sign == "+" || Sign == "-")
+    {
       ExtraTime.MakeUpper();
       if (ExtraTime == "" )      
       {
         return false;
       }
-			else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_SEC]    || 
-			         ExtraTime == g_dateNames[g_defaultLanguage][DN_SECONDS] )
-			{
-				mom = mom.AddSeconds(factor * interval);
-		  }
-			else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_MIN]    || 
-			         ExtraTime == g_dateNames[g_defaultLanguage][DN_MINUTES] )
-			{
-				mom = mom.AddMinutes (factor * interval);
-		  }
-			else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_HOUR] || 
-			         ExtraTime == g_dateNames[g_defaultLanguage][DN_HOURS] )
-			{
-			  mom = mom.AddHours(factor * interval);
-			}
-			else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_DAY]  || 
-			         ExtraTime == g_dateNames[g_defaultLanguage][DN_DAYS]  )
-			{
-			  mom = mom.AddDays(factor * interval);
-			}
-			else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_WEEK] || 
-			         ExtraTime == g_dateNames[g_defaultLanguage][DN_WEEKS] )
-			{
-			  mom = mom.AddDays(factor * 7 * interval);
-			}
-			else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_MONTH] || 
-			         ExtraTime == g_dateNames[g_defaultLanguage][DN_MONTHS] )
-			{
-				mom = mom.AddMonths(factor * interval);
-			}
-			else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_YEAR] || 
-			         ExtraTime == g_dateNames[g_defaultLanguage][DN_YEARS] )
-			{
-			  mom = mom.AddYears(factor * interval);
-			}
-			else return false;
-		}
+      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_SEC]    || 
+               ExtraTime == g_dateNames[g_defaultLanguage][DN_SECONDS] )
+      {
+        mom = mom.AddSeconds(factor * interval);
+      }
+      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_MIN]    || 
+               ExtraTime == g_dateNames[g_defaultLanguage][DN_MINUTES] )
+      {
+        mom = mom.AddMinutes (factor * interval);
+      }
+      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_HOUR] || 
+               ExtraTime == g_dateNames[g_defaultLanguage][DN_HOURS] )
+      {
+        mom = mom.AddHours(factor * interval);
+      }
+      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_DAY]  || 
+               ExtraTime == g_dateNames[g_defaultLanguage][DN_DAYS]  )
+      {
+        mom = mom.AddDays(factor * interval);
+      }
+      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_WEEK] || 
+               ExtraTime == g_dateNames[g_defaultLanguage][DN_WEEKS] )
+      {
+        mom = mom.AddDays(factor * 7 * interval);
+      }
+      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_MONTH] || 
+               ExtraTime == g_dateNames[g_defaultLanguage][DN_MONTHS] )
+      {
+        mom = mom.AddMonths(factor * interval);
+      }
+      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_YEAR] || 
+               ExtraTime == g_dateNames[g_defaultLanguage][DN_YEARS] )
+      {
+        mom = mom.AddYears(factor * interval);
+      }
+      else return false;
+    }
     else
     {
       return false;
     }
   }
-	temp = mom.m_timestamp;
+  temp = mom.m_timestamp;
   return true;
 }
 

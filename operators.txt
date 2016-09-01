@@ -1,0 +1,48 @@
+[interval]   date      - date]
+[date]       date      + interval
+[date]       date      - interval
+[timestamp]  date      + time
+[interval]   time      - time
+[time]       time      + interval
+[time]       time      - interval
+[timestamp]  time      + date
+[interval]   timestamp - timestamp
+[timestamp]  timestamp + interval
+[timestamp]  timestamp - interval
+[date]       interval  + date
+[time]       interval  + time
+[timestamp]  interval  + timestamp
+[interval]   interval  + interval
+[interval]   interval  - interval
+[interval]   interval  * <number>
+[interval]   interval  / <number>
+
+[bool]       interval == interval
+[bool]       interval != interval
+[bool]       interval  > interval
+[bool]       interval >= interval
+[bool]       interval  < interval
+[bool]       interval <= interval
+
+[time]       =(time)
+[time]       =(timestamp)
+[date]       =(date)
+[date]       =(timestamp)
+[interval]   =(interval)
+[timestamp]  =(timestamp)
+[timestamp]  =(date)  at 00:00:00
+[timestamp]  =(time)  at current day
+
+[bool]       date == date
+[bool]       date != date
+[bool]		 date  > date
+[bool]       date  < date
+[bool]       date >= date
+[bool]       date <= date
+
+[bool]       time == time
+[bool]       time != time
+[bool]       time  > time
+[bool]       time  < time
+[bool]       time >= time
+[bool]       time <= time

@@ -49,6 +49,7 @@ extern DataTypes allParams[];
 class SQLDate;
 class SQLTime;
 class SQLTimestamp;
+class SQLInterval;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -84,11 +85,12 @@ public:
    SQLVariant(DATE_STRUCT* p_date);           // SQL_C_DATE / SQL_C_TYPE_DATE
    SQLVariant(TIME_STRUCT* p_time);           // SQL_C_TIME / SQL_C_TYPE_TIME
    SQLVariant(TIMESTAMP_STRUCT* p_stamp);     // SQL_C_TIMESTAMP / SQL_C_TYPE_TIMESTAMP
-   SQLVariant(SQLINTERVAL p_type,SQL_INTERVAL_STRUCT* p_inter);  // SQL_C_INTERVAL_YEAR -> SQL_C_INTERVAL_DAY_TO_SECOND
+   SQLVariant(SQL_INTERVAL_STRUCT* p_inter);  // SQL_C_INTERVAL_YEAR -> SQL_C_INTERVAL_DAY_TO_SECOND
    // From complex constructors
    SQLVariant(SQLDate* p_date);               // SQLDate
    SQLVariant(SQLTime* p_time);               // SQLTime
    SQLVariant(SQLTimestamp* p_stamp);         // SQLTimestamp
+   SQLVariant(SQLInterval* p_interval);       // SQLInterval
    // Destructor
   ~SQLVariant();
    void Init(); // Init empty
@@ -159,6 +161,7 @@ public:
    SQLDate              GetAsSQLDate();
    SQLTime              GetAsSQLTime();
    SQLTimestamp         GetAsSQLTimestamp();
+   SQLInterval          GetAsSQLInterval();
 
    // Assignment operator
    SQLVariant& operator  =(const SQLVariant& p_origineel);

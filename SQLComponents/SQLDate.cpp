@@ -119,20 +119,6 @@ SQLDate::SetNull()
   m_date.m_day   = 0;
 }
 
-SQLDate&
-SQLDate::operator=(const SQLTimestamp& p_date)
-{
-  if(p_date.IsNull())
-  {
-    SetNull();
-  }
-  else
-  {
-    SetDate(p_date.Year(),p_date.Month(),p_date.Day());
-  }
-  return *this;
-}
-
 // SQLDate::SetDate
 // Set the date year-month-day in a date instance
 bool
@@ -1069,3 +1055,143 @@ SQLDate::NamedDate(const CString& p_date,int& p_year,int& p_month,int& p_day)
   return result;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// OPERATORS
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Assignment operators
+
+SQLDate&
+SQLDate::operator=(const SQLDate& datum)
+{
+  if(&datum != this)
+  {
+    if(datum.IsNull())
+    {
+      SetNull();
+    }
+    else
+    {
+      SetDate(datum.Year(),datum.Month(),datum.Day());
+    }
+  }
+  return *this;
+}
+
+SQLDate&
+SQLDate::operator=(const SQLTimestamp& p_date)
+{
+  if(p_date.IsNull())
+  {
+    SetNull();
+  }
+  else
+  {
+    SetDate(p_date.Year(),p_date.Month(),p_date.Day());
+  }
+  return *this;
+}
+
+// Temporal operators
+
+SQLTimestamp  
+SQLDate::operator+(const SQLTime& p_time) const
+{
+  SQLTimestamp stamp;
+
+  // NULL if either of both sides is NULL
+  if(IsNull() || p_time.IsNull())
+  {
+    return stamp;
+  }
+  stamp.SetTimestamp(Year()
+                    ,Month()
+                    ,Day()
+                    ,p_time.Hour()
+                    ,p_time.Minute()
+                    ,p_time.Second());
+  return stamp;
+}
+
+SQLInterval   
+SQLDate::operator-(const SQLDate& p_date) const
+{
+  SQLInterval intval;
+  intval.SetIntervalType(SQL_IS_DAY);
+
+  // NULL if either of both sides is NULL
+  if(IsNull() || p_date.IsNull())
+  {
+    return intval;
+  }
+  DateValue value = AsNumber() - p_date.AsNumber();
+  intval.SetInterval(value,0,0,0,0);
+  return intval;
+}
+
+SQLDate
+SQLDate::operator+(const SQLInterval& p_interval) const
+{
+  // NULL if either of both sides is NULL
+  if(IsNull() || p_interval.IsNull())
+  {
+    SQLDate date;
+    return date;
+  }
+  // Check if interval is the correct type
+  if(p_interval.GetIsYearMonthType())
+  {
+    throw CString("Incompatible interval to add to a date");
+  }
+  // Do the calculation
+  SQLDate date(*this);
+  date.AddDays(p_interval.GetDays());
+
+  // Corner case where we land on the previous day!!
+  if(p_interval.GetIsNegative())
+  {
+    if(p_interval.GetHours()   || 
+       p_interval.GetMinutes() || 
+       p_interval.GetSeconds() || 
+       p_interval.GetFractionPart())
+    {
+      date.AddDays(-1);
+    }
+  }
+
+  return date;
+}
+
+SQLDate
+SQLDate::operator-(const SQLInterval& p_interval) const
+{
+  // NULL if either of both sides is NULL
+  if(IsNull() || p_interval.IsNull())
+  {
+    SQLDate date;
+    return date;
+  }
+  // Check if interval is the correct type
+  if(p_interval.GetIsYearMonthType())
+  {
+    throw CString("Incompatible interval to add to a date");
+  }
+  // Do the calculation
+  SQLDate date(*this);
+  date.AddDays(-(p_interval.GetDays()));
+
+  // Corner case where we land on the previous day!!
+  if(!p_interval.GetIsNegative())
+  {
+    if(p_interval.GetHours()   || 
+       p_interval.GetMinutes() || 
+       p_interval.GetSeconds() || 
+       p_interval.GetFractionPart())
+    {
+      date.AddDays(-1);
+    }
+  }
+  return date;
+}

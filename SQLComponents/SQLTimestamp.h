@@ -33,6 +33,7 @@
 class COleDateTime;
 class SQLTime;
 class SQLDate;
+class SQLInterval;
 class SQLDatabase;
 
 // Constants for one day
@@ -41,7 +42,7 @@ class SQLDatabase;
 #define SECONDS_PER_MINUTE (60)        // One minute in seconds
 // Number of nanoseconds per second
 #define NANOSECONDS_PER_SEC 1000000000
-// Modified Julian Day shift from epoch
+// Modified Julian Day Shift from Epoch (Astronomically)
 // Actually it's 2,400,000.5 days (12:00 (noon) januari 1st -4713 BC)
 #define MJD_EPOCH 2400001
 
@@ -82,31 +83,39 @@ public:
                     int p_hour,int p_min,  int p_sec,
                     int p_fraction = 0);
   void SetFraction(int p_fraction);
-	static       SQLTimestamp  CurrentTimestamp(bool p_fraction = false);
-	static const SQLTimestamp& FarInTheFuture();
+  static       SQLTimestamp  CurrentTimestamp(bool p_fraction = false);
+  static const SQLTimestamp& FarInTheFuture();
   static const SQLTimestamp& FarInThePast();
 
+  // Assignment operator
+  SQLTimestamp& operator= (const SQLTimestamp& p_timestamp);
+  SQLTimestamp& operator= (const SQLDate& p_date);
+  SQLTimestamp& operator= (const SQLTime& p_time);
+  // Temporal operators
+  SQLInterval   operator- (const SQLTimestamp& p_timestamp) const;
+  SQLTimestamp  operator+ (const SQLInterval& p_interval) const;
+  SQLTimestamp  operator- (const SQLInterval& p_interval) const;
   // Comparison operators
-	bool operator==(const SQLTimestamp& p_timestamp) const;
-	bool operator!=(const SQLTimestamp& p_timestamp) const;
-	bool operator< (const SQLTimestamp& p_timestamp) const;
-	bool operator> (const SQLTimestamp& p_timestamp) const;
-	bool operator<=(const SQLTimestamp& p_timestamp) const;
-	bool operator>=(const SQLTimestamp& p_timestamp) const;
+  bool          operator==(const SQLTimestamp& p_timestamp) const;
+  bool          operator!=(const SQLTimestamp& p_timestamp) const;
+  bool          operator< (const SQLTimestamp& p_timestamp) const;
+  bool          operator> (const SQLTimestamp& p_timestamp) const;
+  bool          operator<=(const SQLTimestamp& p_timestamp) const;
+  bool          operator>=(const SQLTimestamp& p_timestamp) const;
 
   // Comparison without correct NULL behaviour
   // So two NULL timestamps equals to each other
   bool    ExactEqual   (const SQLTimestamp& p_timestamp) const;
   bool    NotExactEqual(const SQLTimestamp& p_timestamp) const;
 
-	int     Year()    const;
-	int     Month()   const;      // Month of the year    (0-12)
-	int     Day()     const;      // Day of the month     (0-31)
-	int     Hour()    const;      // Hour of the day      (0-23)
-	int     Minute()  const;      // Minute in the hour   (0-59)
-	int     Second()  const;      // Second in the minute (0-59)
+  int     Year()    const;
+  int     Month()   const;      // Month of the year    (0-12)
+  int     Day()     const;      // Day of the month     (0-31)
+  int     Hour()    const;      // Hour of the day      (0-23)
+  int     Minute()  const;      // Minute in the hour   (0-59)
+  int     Second()  const;      // Second in the minute (0-59)
   int     Fraction()const;      // Fraction of a second in nanoseconds (0 - 999.999.999)
-	int     WeekDay() const;      // 1=sunday, 2=thursday, ... 7=saturday
+  int     WeekDay() const;      // 1=sunday, 2=thursday, ... 7=saturday
   CString WeekDayName(Language p_lang = LN_DEFAULT) const;  // Name of the day of the week
   CString MonthName  (Language p_lang = LN_DEFAULT) const;  // Name of the month of the year
   int     DaysInMonth() const;
@@ -125,8 +134,6 @@ public:
   SQLTimestamp AddMinutes (int p_number) const;
   SQLTimestamp AddSeconds (__int64 p_number) const;
   SQLTimestamp AddFraction(int p_fraction) const;
-
-  SQLTimestamp& operator=(const SQLTimestamp& p_timestamp);
 
   CString  AsString      (int p_precision = 0) const;
   CString  AsReadString  (int p_precision = 0) const;
@@ -148,10 +155,10 @@ public:
   //////////////////////////////////////////////////////
   // Static use by SQLDate and SQLTimestamp
   static void SplitStrDate(const CString& strDate,
-					                 CString&       CurrentDate,
-					                 CString&       Sign,
-					                 CString&       ExtraTime,
-  						             int&           interval);
+                           CString&       CurrentDate,
+                           CString&       Sign,
+                           CString&       ExtraTime,
+                           int&           interval);
 
 private:
   //
@@ -171,8 +178,8 @@ private:
   int     DaysInMonth(int p_year,int p_month) const;
   // Bereken een moment uit een interface string en extra operanden
   static bool GetVirtualMoment(CString Sign
-			                        ,CString ExtraTime
-			                        ,int    interval
+                              ,CString ExtraTime
+                              ,int    interval
                               ,StampStorage& temp);
   // Validate the timestamp for valid values for a database
   void    Validate();
@@ -184,7 +191,7 @@ private:
   // datamembers
   //
   StampStorage m_timestamp; // year/month/second/hour/minute/day
-	StampValue   m_value;		  // Seconds since MJD
+  StampValue   m_value;		  // Seconds since MJD
   int          m_fraction;  // 0 - 999.999.999 nanoseconds
 };
 

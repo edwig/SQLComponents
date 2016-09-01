@@ -328,11 +328,11 @@ SQLVariant::SQLVariant(TIMESTAMP_STRUCT* p_stamp)
 }
 
 // XTOR SQL_C_INTERVAL_YEAR -> SQL_C_INTERVAL_DAY_TO_SECOND
-SQLVariant::SQLVariant(SQLINTERVAL p_type,SQL_INTERVAL_STRUCT* p_inter)
+SQLVariant::SQLVariant(SQL_INTERVAL_STRUCT* p_inter)
 {
   Init();
-  m_datatype    = p_type;
-  m_sqlDatatype = p_type;
+  m_datatype    = p_inter->interval_type;
+  m_sqlDatatype = p_inter->interval_type;
   m_indicator   = 0;
   if(IsIntervalType() == false)
   {
@@ -2060,7 +2060,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                             m_data.m_dataTIMESTAMP.day    = (SQLUSMALLINT) day;
                                             m_data.m_dataTIMESTAMP.hour   = (SQLUSMALLINT) hour;
                                             m_data.m_dataTIMESTAMP.minute = (SQLUSMALLINT) min;
-                                            // Nanosecond resultion
+                                            // Nanosecond resolution
                                             sec = (int)floor(seconds);
                                             m_data.m_dataTIMESTAMP.second   = (SQLUSMALLINT) sec;
                                             m_data.m_dataTIMESTAMP.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
@@ -2085,8 +2085,13 @@ SQLVariant::SetData(int p_type,const char* p_data)
     case SQL_C_INTERVAL_MINUTE:           m_data.m_dataINTERVAL.intval.day_second.minute = atoi(p_data);
                                           m_data.m_dataINTERVAL.interval_type            = SQL_IS_MINUTE;
                                           break;
-    case SQL_C_INTERVAL_SECOND:           m_data.m_dataINTERVAL.intval.day_second.second = atoi(p_data);
-                                          m_data.m_dataINTERVAL.interval_type            = SQL_IS_SECOND;
+    case SQL_C_INTERVAL_SECOND:           seconds = atof(p_data);
+                                          m_data.m_dataINTERVAL.interval_type = SQL_IS_SECOND;
+                                          // Nanosecond resolution
+                                          sec = (int)floor(seconds);
+                                          m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
+                                          m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
+
                                           break;
     case SQL_C_INTERVAL_YEAR_TO_MONTH:    m_data.m_dataINTERVAL.interval_type = SQL_IS_YEAR_TO_MONTH;
                                           scannum = sscanf(p_data,"%d %d",&year,&month);
@@ -2127,13 +2132,16 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_DAY_TO_SECOND:    m_data.m_dataINTERVAL.interval_type = SQL_IS_DAY_TO_SECOND;
-                                          scannum = sscanf(p_data,"%d %d:%d:%d",&day,&hour,&min,&sec);
+                                          scannum = sscanf(p_data,"%d %d:%d:%lf",&day,&hour,&min,&seconds);
                                           if(scannum == 4)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.day    = day;
                                             m_data.m_dataINTERVAL.intval.day_second.hour   = hour;
                                             m_data.m_dataINTERVAL.intval.day_second.minute = min;
-                                            m_data.m_dataINTERVAL.intval.day_second.second = sec;
+                                            // Nanosecond resolution
+                                            sec = (int)floor(seconds);
+                                            m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
+                                            m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                           }
                                           else
                                           {
@@ -2153,12 +2161,15 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_HOUR_TO_SECOND:   m_data.m_dataINTERVAL.interval_type = SQL_IS_HOUR_TO_SECOND;
-                                          scannum = sscanf(p_data,"%d:%d:%d",&hour,&min,&sec);
+                                          scannum = sscanf(p_data,"%d:%d:%lf",&hour,&min,&seconds);
                                           if(scannum == 3)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.hour   = hour;
                                             m_data.m_dataINTERVAL.intval.day_second.minute = min;
-                                            m_data.m_dataINTERVAL.intval.day_second.second = sec;
+                                            // Nanosecond resolution
+                                            sec = (int)floor(seconds);
+                                            m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
+                                            m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                           }
                                           else
                                           {
@@ -2166,11 +2177,14 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: m_data.m_dataINTERVAL.interval_type = SQL_IS_MINUTE_TO_SECOND;
-                                          scannum = sscanf(p_data,"%d:%d",&min,&sec);
+                                          scannum = sscanf(p_data,"%d:%lf",&min,&seconds);
                                           if(scannum == 2)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.minute = min;
-                                            m_data.m_dataINTERVAL.intval.day_second.second = sec;
+                                            // Nanosecond resolution
+                                            sec = (int)floor(seconds);
+                                            m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
+                                            m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                           }
                                           else
                                           {

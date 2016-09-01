@@ -28,6 +28,7 @@
 #include "SQLTime.h" 
 #include "SQLDate.h"
 #include "SQLTimestamp.h"
+#include "SQLInterval.h"
 #include "SQLDatabase.h"
 #include "SQLLanguage.h"
 #include <sstream>
@@ -493,4 +494,114 @@ SQLTime::ParseXMLTime(const CString& p_string)
     }
   }
   return false;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// OPERATORS
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Assignment operators
+
+SQLTime&
+SQLTime::operator=(const SQLTime& p_time)
+{
+  // NULL is alsoo copied
+  m_seconds = p_time.m_seconds;
+  m_theTime = p_time.m_theTime;
+  return *this;
+}
+
+SQLTime&
+SQLTime::operator=(const SQLTimestamp& p_timestamp)
+{
+  if(IsNull() || p_timestamp.IsNull())
+  {
+    SetNull();
+  }
+  else
+  {
+    SetTime(p_timestamp.Hour()
+           ,p_timestamp.Minute()
+           ,p_timestamp.Second());
+  }
+  return *this;
+}
+
+// Temporal operators
+
+SQLInterval   
+SQLTime::operator-(const SQLTime& p_time) const
+{
+  SQLInterval intval;
+
+  // Test for NULL status
+  if(IsNull() || p_time.IsNull())
+  {
+    return intval;
+  }
+  // Setting interval by the number of seconds
+  intval.SetIntervalType(SQL_IS_HOUR_TO_SECOND);
+  intval.SetInterval(0,0,0,m_seconds - p_time.m_seconds,0);
+
+  return intval;
+}
+
+SQLTimestamp  
+SQLTime::operator+(const SQLDate& p_date) const
+{
+  SQLTimestamp stamp;
+
+  // Test for NULL status
+  if(IsNull() || p_date.IsNull())
+  {
+    return stamp;
+  }
+  // Setting the the timestamp
+  stamp.SetTimestamp(p_date.Day()
+                    ,p_date.Month()
+                    ,p_date.Year()
+                    ,Hour()
+                    ,Minute()
+                    ,Second());
+  return stamp;
+}
+
+SQLTime
+SQLTime::operator+(const SQLInterval& p_interval) const
+{
+  // Test for NULL status
+  if(IsNull() || p_interval.IsNull())
+  {
+    SQLTime time;
+    return time;
+  }
+  if(!p_interval.GetIsTimeType())
+  {
+    throw CString("Cannot add incompatible interval to time type");
+  }
+  TimeValue value = m_seconds + p_interval.GetSeconds();
+  SQLTime time((__int64) value);
+
+  return time;
+}
+
+SQLTime
+SQLTime::operator-(const SQLInterval& p_interval) const
+{
+  // Test for NULL status
+  if(IsNull() || p_interval.IsNull())
+  {
+    SQLTime time;
+    return time;
+  }
+  if(!p_interval.GetIsTimeType())
+  {
+    throw CString("Cannot add incompatible interval to time type");
+  }
+  TimeValue value = m_seconds - p_interval.GetSeconds();
+  SQLTime time((__int64)value);
+
+  return time;
 }
