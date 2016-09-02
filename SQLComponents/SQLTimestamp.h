@@ -46,14 +46,15 @@ class SQLDatabase;
 // Actually it's 2,400,000.5 days (12:00 (noon) januari 1st -4713 BC)
 #define MJD_EPOCH 2400001
 
-// Storage of a timestamp is doen by means of the exact number 
+// Storage of a timestamp is done by means of the exact number 
 // of seconds since MJD (Modified Julian Date). By doing this
 // the SQLTimestamps and SQLDates can be internally recalculated
 // as DateValue * SECONDS_PER_DAY = StampValue
+// MJD = (2,400,000.5) + 0.5 (17 nov 1858 instead of 16 nov 12:00 hours)
 
 struct StampStorage
 {
-  short m_year;      // 0 - 10000 year
+  short m_year;      // 1 - 9999  year
   char  m_month;     // 1 - 12    months
   char  m_day;       // 1 - 31    days
   char  m_hour;      // 0 - 23    hour
@@ -62,6 +63,7 @@ struct StampStorage
 };
 
 // Timestamp is stored internally as a total number of seconds
+// since MJD + 0.5 = 17 nov 1858 instead of 16 nov 12:00 hours
 typedef __int64 StampValue;
 
 class SQLTimestamp
@@ -87,14 +89,14 @@ public:
   static const SQLTimestamp& FarInTheFuture();
   static const SQLTimestamp& FarInThePast();
 
-  // Assignment operator
+  // Assignment operators
   SQLTimestamp& operator= (const SQLTimestamp& p_timestamp);
   SQLTimestamp& operator= (const SQLDate& p_date);
   SQLTimestamp& operator= (const SQLTime& p_time);
   // Temporal operators
   SQLInterval   operator- (const SQLTimestamp& p_timestamp) const;
-  SQLTimestamp  operator+ (const SQLInterval& p_interval) const;
-  SQLTimestamp  operator- (const SQLInterval& p_interval) const;
+  SQLTimestamp  operator+ (const SQLInterval&  p_interval)  const;
+  SQLTimestamp  operator- (const SQLInterval&  p_interval)  const;
   // Comparison operators
   bool          operator==(const SQLTimestamp& p_timestamp) const;
   bool          operator!=(const SQLTimestamp& p_timestamp) const;
@@ -108,7 +110,7 @@ public:
   bool    ExactEqual   (const SQLTimestamp& p_timestamp) const;
   bool    NotExactEqual(const SQLTimestamp& p_timestamp) const;
 
-  int     Year()    const;
+  int     Year()    const;      // Year                 (0-9999)
   int     Month()   const;      // Month of the year    (0-12)
   int     Day()     const;      // Day of the month     (0-31)
   int     Hour()    const;      // Hour of the day      (0-23)

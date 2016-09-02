@@ -185,6 +185,14 @@ SQLTime::AsStrippedSQLString(SQLDatabase* p_database) const
   return p_database->GetStrippedSQLTimeString(Hour(),Minute(),Second());
 }
 
+void
+SQLTime::AsTimeStruct(SQL_TIME_STRUCT* p_timestruct) const
+{
+  p_timestruct->hour   = (SQLUSMALLINT) Hour();
+  p_timestruct->minute = (SQLUSMALLINT) Minute();
+  p_timestruct->second = (SQLUSMALLINT) Second();
+}
+
 // Time as a number (seconds in the day)
 // Can return "-1" for a NULL value
 long
@@ -507,9 +515,12 @@ SQLTime::ParseXMLTime(const CString& p_string)
 SQLTime&
 SQLTime::operator=(const SQLTime& p_time)
 {
-  // NULL is alsoo copied
-  m_seconds = p_time.m_seconds;
-  m_theTime = p_time.m_theTime;
+  if(this != &p_time)
+  {
+    // NULL is alsoo copied
+    m_seconds = p_time.m_seconds;
+    m_theTime = p_time.m_theTime;
+  }
   return *this;
 }
 
@@ -542,8 +553,7 @@ SQLTime::operator-(const SQLTime& p_time) const
     return intval;
   }
   // Setting interval by the number of seconds
-  intval.SetIntervalType(SQL_IS_HOUR_TO_SECOND);
-  intval.SetInterval(0,0,0,m_seconds - p_time.m_seconds,0);
+  intval.SetInterval(SQL_IS_HOUR_TO_SECOND,0,0,0,m_seconds - p_time.m_seconds,0);
 
   return intval;
 }

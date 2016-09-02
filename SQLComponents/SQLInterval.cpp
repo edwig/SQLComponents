@@ -31,18 +31,7 @@
 #include "SQLTime.h"
 #include "SQLDatabase.h"
 
-// Macro the distinquish between year-month and day-second intervals
-#define INTERVAL_IS_A_YEAR_MONTH(interval)  ((interval).interval_type == SQL_IS_MONTH       ||\
-                                             (interval).interval_type == SQL_IS_YEAR        ||\
-                                             (interval).interval_type == SQL_IS_YEAR_TO_MONTH)
-
-#define INTERVAL_IS_A_DAY_SECOND(interval)  ((interval).interval_type >= SQL_IS_DAY              &&\
-                                             (interval).interval_type <= SQL_IS_MINUTE_TO_SECOND &&\
-                                             (interval).interval_type != SQL_IS_YEAR_TO_MONTH     )
-
-
-
-// XTOR Clean zero
+// XTOR Clean NULL
 SQLInterval::SQLInterval()
 {
   SetNull();
@@ -70,30 +59,27 @@ SQLInterval::SQLInterval(SQL_INTERVAL_STRUCT* p_interval)
 
 // XTOR from a decimal day interval
 // Possibly from a RDBMS that doesn't implement the INTERVAL datatype
-SQLInterval::SQLInterval(double p_databaseDouble)
+SQLInterval::SQLInterval(SQLINTERVAL p_type,double p_databaseDouble)
 {
-  SetFromDatabaseDouble(p_databaseDouble);
+  SetFromDatabaseDouble(p_type,p_databaseDouble);
 }
 
 // XTOR from a nanoseconds interval
-SQLInterval::SQLInterval(InterValue p_nanoseconds)
+SQLInterval::SQLInterval(SQLINTERVAL p_type,InterValue p_nanoseconds)
 {
-  m_interval.interval_type = SQL_IS_DAY_TO_SECOND;
-  SetInterval(p_nanoseconds);
+  SetInterval(p_type,p_nanoseconds);
 }
 
 // XTOR for year/year-month/month intervals
-SQLInterval::SQLInterval(int p_years,int p_months)
+SQLInterval::SQLInterval(SQLINTERVAL p_type,int p_years,int p_months)
 {
-  m_interval.interval_type = SQL_IS_YEAR_TO_MONTH;
-  SetInterval(p_years,p_months);
+  SetInterval(p_type,p_years,p_months);
 }
 
 // XTOR for days -> seconds intervals
-SQLInterval::SQLInterval(int p_days,int p_hours,int p_minutes,int p_seconds,int p_fraction /*=0*/)
+SQLInterval::SQLInterval(SQLINTERVAL p_type,int p_days,int p_hours,int p_minutes,int p_seconds,int p_fraction /*=0*/)
 {
-  m_interval.interval_type = SQL_IS_DAY_TO_SECOND;
-  SetInterval(p_days,p_hours,p_minutes,p_seconds,p_fraction);
+  SetInterval(p_type,p_days,p_hours,p_minutes,p_seconds,p_fraction);
 }
 
 // DTOR
@@ -115,14 +101,17 @@ SQLInterval::SetInterval(SQLINTERVAL p_type,const CString p_string)
 }
 
 bool    
-SQLInterval::SetInterval(InterValue p_nanoseconds)
+SQLInterval::SetInterval(SQLINTERVAL p_type,InterValue p_nanoseconds)
 {
-  if(m_interval.interval_type == SQL_IS_YEAR  ||
-     m_interval.interval_type == SQL_IS_MONTH ||
-     m_interval.interval_type == SQL_IS_YEAR_TO_MONTH)
+  // Retain type
+  m_interval.interval_type = p_type;
+  // Check negative
+  if(p_nanoseconds < 0L)
   {
-    return false;
+    m_value *= -1L;
+    m_interval.interval_sign = SQL_TRUE;
   }
+  // Recalculate the structure
   m_value = p_nanoseconds;
   RecalculateInterval();
   return Valid();
@@ -136,46 +125,98 @@ SQLInterval::SetInterval(SQL_INTERVAL_STRUCT& p_interval)
   return Valid();
 }
 
+// Set from years-months
+// Years/Months can be negative, to set negative interval
+// Both parameters must be set to negative!
 void
-SQLInterval::SetInterval(int p_years,int p_months)
+SQLInterval::SetInterval(SQLINTERVAL p_type,int p_years,int p_months)
 {
-  if(m_interval.interval_type == SQL_IS_YEAR  ||
-     m_interval.interval_type == SQL_IS_MONTH ||
-     m_interval.interval_type == SQL_IS_YEAR_TO_MONTH)
+  if(p_type == SQL_IS_YEAR  ||
+     p_type == SQL_IS_MONTH ||
+     p_type == SQL_IS_YEAR_TO_MONTH)
   {
+    // Reinit
     memset(&m_interval,0,sizeof(SQL_INTERVAL_STRUCT));
+    // Retain the type
+    m_interval.interval_type = p_type;
+    // Check for negative parameters
+    if(p_years < 0 || p_months < 0)
+    {
+      m_interval.interval_sign = SQL_TRUE;
+      if(p_years  < 0) p_years  *= -1;
+      if(p_months < 0) p_months *= -1;
+    }
+    // Store the interval
     m_interval.intval.year_month.year  = p_years;
     m_interval.intval.year_month.month = p_months;
     Normalise();
     RecalculateValue();
   }
+  else
+  {
+    throw CString("Cannot set day-second interval type from year-month value");
+  }
 }
 
+// Set from day-seconds
+// Values can be negative, to set a negative interval
+// All parameters must be positive or negative!
 void
-SQLInterval::SetInterval(int p_days,int p_hours,int p_minutes,int p_seconds,int p_fraction /*=0*/)
+SQLInterval::SetInterval(SQLINTERVAL p_type,int p_days,int p_hours,int p_minutes,int p_seconds,int p_fraction /*=0*/)
 {
-  if(m_interval.interval_type == SQL_IS_YEAR  ||
-     m_interval.interval_type == SQL_IS_MONTH ||
-     m_interval.interval_type == SQL_IS_YEAR_TO_MONTH)
+  // Check for correct type
+  if(p_type == SQL_IS_YEAR  ||
+     p_type == SQL_IS_MONTH ||
+     p_type == SQL_IS_YEAR_TO_MONTH)
   {
-    return;
+    throw CString("Cannot set year-month interval type from day-second value");
   }
+  // Re-init the interval
   memset(&m_interval,0,sizeof(SQL_INTERVAL_STRUCT));
+
+  // Check for negative
+  if(p_days < 0 || p_hours < 0 || p_minutes < 0 || p_seconds < 0 || p_fraction < 0)
+  {
+    m_interval.interval_sign = SQL_TRUE;
+    if(p_days     < 0) p_days     *= -1;
+    if(p_hours    < 0) p_hours    *= -1;
+    if(p_minutes  < 0) p_minutes  *= -1;
+    if(p_seconds  < 0) p_seconds  *= -1;
+    if(p_fraction < 0) p_fraction *= -1;
+  }
+  // Retain the type
+  m_interval.interval_type = p_type;
+  // Set the scalars
   m_interval.intval.day_second.day      = p_days;
   m_interval.intval.day_second.hour     = p_hours;
   m_interval.intval.day_second.minute   = p_minutes;
   m_interval.intval.day_second.second   = p_seconds;
   m_interval.intval.day_second.fraction = p_fraction;
+  // Normalise and set the structure
   Normalise();
   RecalculateValue();
 }
 
 void    
-SQLInterval::SetFromDatabaseDouble(double p_number)
+SQLInterval::SetFromDatabaseDouble(SQLINTERVAL p_type,double p_number)
 {
-  if(m_interval.interval_type == SQL_IS_YEAR  ||
-     m_interval.interval_type == SQL_IS_MONTH ||
-     m_interval.interval_type == SQL_IS_YEAR_TO_MONTH)
+  // Re-init the interval
+  memset(&m_interval,0,sizeof(SQL_INTERVAL_STRUCT));
+
+  // Retain the type
+  m_interval.interval_type = p_type;
+
+  // Check for negativity
+  if(p_number < 0.0)
+  {
+    p_number *= -1.0;
+    m_interval.interval_sign = SQL_TRUE;
+  }
+
+  // Check for type
+  if(p_type == SQL_IS_YEAR  ||
+     p_type == SQL_IS_MONTH ||
+     p_type == SQL_IS_YEAR_TO_MONTH)
   {
     m_value = static_cast<InterValue>(p_number);
   }
@@ -187,6 +228,7 @@ SQLInterval::SetFromDatabaseDouble(double p_number)
   RecalculateInterval();
 }
 
+// ONLY sets the fractional part
 void    
 SQLInterval::SetFractionPart(int p_fraction)
 {
@@ -338,9 +380,7 @@ SQLInterval::GetYears() const
 int
 SQLInterval::GetMonths() const
 {
-  if(m_interval.interval_type == SQL_IS_YEAR          ||
-     m_interval.interval_type == SQL_IS_YEAR_TO_MONTH ||
-     m_interval.interval_type == SQL_IS_MONTH         )
+  if(GetIsYearMonthType())
   {
     int value = m_interval.intval.year_month.year * 12 +
                 m_interval.intval.year_month.month;
@@ -366,13 +406,7 @@ SQLInterval::GetDays() const
 int
 SQLInterval::GetHours() const
 {
-  if(m_interval.interval_type == SQL_IS_DAY            ||
-     m_interval.interval_type == SQL_IS_DAY_TO_HOUR    ||
-     m_interval.interval_type == SQL_IS_DAY_TO_MINUTE  ||
-     m_interval.interval_type == SQL_IS_DAY_TO_SECOND  ||
-     m_interval.interval_type == SQL_IS_HOUR           ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_MINUTE ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_SECOND )
+  if(GetIsDaySecondType())
   {
     int value = m_interval.intval.day_second.day * 24 +
                 m_interval.intval.day_second.hour;
@@ -384,15 +418,7 @@ SQLInterval::GetHours() const
 int
 SQLInterval::GetMinutes() const
 {
-  if(m_interval.interval_type == SQL_IS_DAY            ||
-     m_interval.interval_type == SQL_IS_DAY_TO_HOUR    ||
-     m_interval.interval_type == SQL_IS_DAY_TO_MINUTE  ||
-     m_interval.interval_type == SQL_IS_DAY_TO_SECOND  ||
-     m_interval.interval_type == SQL_IS_HOUR           ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_MINUTE ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_SECOND ||
-     m_interval.interval_type == SQL_IS_MINUTE         ||
-     m_interval.interval_type == SQL_IS_MINUTE_TO_SECOND)
+  if(GetIsDaySecondType())
   {
     int value = m_interval.intval.day_second.day  * 60 * 24 +
                 m_interval.intval.day_second.hour * 60 +
@@ -405,16 +431,7 @@ SQLInterval::GetMinutes() const
 int
 SQLInterval::GetSeconds() const
 {
-  if(m_interval.interval_type == SQL_IS_DAY              ||
-     m_interval.interval_type == SQL_IS_DAY_TO_HOUR      ||
-     m_interval.interval_type == SQL_IS_DAY_TO_MINUTE    ||
-     m_interval.interval_type == SQL_IS_DAY_TO_SECOND    ||
-     m_interval.interval_type == SQL_IS_HOUR             ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_MINUTE   ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_SECOND   ||
-     m_interval.interval_type == SQL_IS_MINUTE           ||
-     m_interval.interval_type == SQL_IS_MINUTE_TO_SECOND ||
-     m_interval.interval_type == SQL_IS_SECOND            )
+  if(GetIsDaySecondType())
   {
     int value = m_interval.intval.day_second.day    * 60 * 60 * 24 +
                 m_interval.intval.day_second.hour   * 60 * 60 +
@@ -455,9 +472,7 @@ double
 SQLInterval::AsDatabaseDouble() const
 {
   // Year-month intervals
-  if(m_interval.interval_type == SQL_IS_MONTH ||
-     m_interval.interval_type == SQL_IS_YEAR  ||
-     m_interval.interval_type == SQL_IS_YEAR_TO_MONTH)
+  if(GetIsYearMonthType())
   {
     return static_cast<double>(m_value);
   }
@@ -475,6 +490,13 @@ SQLInterval::AsString() const
 {
   CString string;
 
+  // Check for NULL value
+  if(IsNull())
+  {
+    return string;
+  }
+
+  // String depends on the interval type
   switch(m_interval.interval_type)
   {
     case SQL_IS_YEAR:             string.Format("%d",m_interval.intval.year_month.year); 
@@ -558,34 +580,36 @@ SQLInterval::GetIntervalType() const
 bool
 SQLInterval::GetIsYearMonthType() const
 {
-  return INTERVAL_IS_A_YEAR_MONTH(m_interval);
+  // distinquish between year-month and day-second intervals
+  return (m_interval.interval_type == SQL_IS_MONTH       ||
+          m_interval.interval_type == SQL_IS_YEAR        ||
+          m_interval.interval_type == SQL_IS_YEAR_TO_MONTH);
 }
 
 bool
 SQLInterval::GetIsDaySecondType() const
 {
-  return INTERVAL_IS_A_DAY_SECOND(m_interval);
+  // distinquish between year-month and day-second intervals
+  return (m_interval.interval_type >= SQL_IS_DAY              &&
+          m_interval.interval_type <= SQL_IS_MINUTE_TO_SECOND &&
+          m_interval.interval_type != SQL_IS_YEAR_TO_MONTH);
+}
+
+bool
+SQLInterval::GetIsTimeType() const
+{
+  return (m_interval.interval_type == SQL_IS_HOUR   ||
+          m_interval.interval_type == SQL_IS_MINUTE ||
+          m_interval.interval_type == SQL_IS_SECOND ||
+          m_interval.interval_type == SQL_IS_HOUR_TO_MINUTE ||
+          m_interval.interval_type == SQL_IS_HOUR_TO_SECOND ||
+          m_interval.interval_type == SQL_IS_MINUTE_TO_SECOND);
 }
 
 bool
 SQLInterval::GetIsNegative() const
 {
   return m_interval.interval_sign == SQL_TRUE;
-}
-
-bool
-SQLInterval::GetIsTimeType() const
-{
-  if(m_interval.interval_type == SQL_IS_HOUR   ||
-     m_interval.interval_type == SQL_IS_MINUTE ||
-     m_interval.interval_type == SQL_IS_SECOND ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_MINUTE ||
-     m_interval.interval_type == SQL_IS_HOUR_TO_SECOND ||
-     m_interval.interval_type == SQL_IS_MINUTE_TO_SECOND)
-  {
-    return true;
-  }
-  return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -602,6 +626,14 @@ SQLInterval::AddYears(int p_years)
   {
     m_interval.intval.year_month.year += p_years;
   }
+  else if(m_interval.interval_type == SQL_IS_MONTH)
+  {
+    m_interval.intval.year_month.month += (p_years * 12);
+  }
+  else
+  {
+    throw CString("Cannot add years to a day-second interval");
+  }
   RecalculateValue();
 }
 
@@ -613,6 +645,14 @@ SQLInterval::AddMonths(int p_months)
   {
     m_interval.intval.year_month.month += p_months;
   }
+  else if(m_interval.interval_type == SQL_IS_YEAR)
+  {
+    m_interval.intval.year_month.year += (p_months / 24);
+  }
+  else
+  {
+    throw CString("Cannot add months to a day-second interval");
+  }
   Normalise();
   RecalculateValue();
 }
@@ -620,7 +660,14 @@ SQLInterval::AddMonths(int p_months)
 void    
 SQLInterval::AddDays(int p_days)
 {
-  m_value += (InterValue)p_days * SECONDS_PER_DAY * NANOSECONDS_PER_SEC;
+  if(GetIsDaySecondType())
+  {
+    m_value += (InterValue)p_days * SECONDS_PER_DAY * NANOSECONDS_PER_SEC;
+  }
+  else
+  {
+    throw CString("Cannot add days to a year-month interval type");
+  }
   RecalculateInterval();
 }
 
@@ -628,28 +675,56 @@ SQLInterval::AddDays(int p_days)
 void
 SQLInterval::AddHours(int p_hours)
 {
-  m_value += (InterValue)p_hours * SECONDS_PER_HOUR * NANOSECONDS_PER_SEC;
+  if(GetIsDaySecondType())
+  {
+    m_value += (InterValue)p_hours * SECONDS_PER_HOUR * NANOSECONDS_PER_SEC;
+  }
+  else
+  {
+    throw CString("Cannot add hours to a year-month interval type");
+  }
   RecalculateInterval();
 }
 
 void
 SQLInterval::AddMinutes(int p_minutes)
 {
-  m_value += (InterValue)p_minutes * SECONDS_PER_MINUTE * NANOSECONDS_PER_SEC;
+  if(GetIsDaySecondType())
+  {
+    m_value += (InterValue)p_minutes * SECONDS_PER_MINUTE * NANOSECONDS_PER_SEC;
+  }
+  else
+  {
+    throw CString("Cannot add minutes to a year-month interval type");
+  }
   RecalculateInterval();
 }
 
 void
 SQLInterval::AddSeconds(int p_seconds)
 {
-  m_value += (InterValue)p_seconds * NANOSECONDS_PER_SEC;
+  if(GetIsDaySecondType())
+  {
+    m_value += (InterValue)p_seconds * NANOSECONDS_PER_SEC;
+  }
+  else
+  {
+    throw CString("Cannot add seconds to a year-month interval type");
+  }
   RecalculateInterval();
 }
 
 void
 SQLInterval::AddFraction(int p_fraction)
 {
-  m_value += (InterValue)p_fraction;
+  if(GetIsDaySecondType())
+  {
+    m_value += (InterValue)p_fraction;
+  }
+  else
+  {
+    throw CString("Cannot add a fraction to a year-month interval type");
+  }
   RecalculateInterval();
 }
 
@@ -663,7 +738,7 @@ SQLInterval::AddFraction(int p_fraction)
 bool
 SQLInterval::IsNull() const
 {
-  // Not an SQLINTERVAL value!!
+  // Not an SQLINTERVAL value, but a NULL
   return (m_interval.interval_type == 0);
 }
 
@@ -671,7 +746,7 @@ void
 SQLInterval::SetNull()
 {
   memcpy(&m_interval,0,sizeof(SQL_INTERVAL_STRUCT));
-  m_value = 0;
+  m_value = 0L;
 }
 
 bool
@@ -1054,10 +1129,12 @@ SQLInterval::RecalculateInterval()
 SQLInterval&  
 SQLInterval::operator=(const SQLInterval& p_interval)
 {
-  // Copy everything including NULL status
-  memcpy(&m_interval,&p_interval.m_interval,sizeof(SQL_INTERVAL_STRUCT));
-  m_value = p_interval.m_value;
-
+  if(this != &p_interval)
+  {
+    // Copy everything including NULL status
+    memcpy(&m_interval,&p_interval.m_interval,sizeof(SQL_INTERVAL_STRUCT));
+    m_value = p_interval.m_value;
+  }
   return *this;
 }
 
@@ -1162,22 +1239,51 @@ SQLInterval::operator+(const SQLInterval& p_interval) const
   // Check both sides
   if(GetIsYearMonthType() && p_interval.GetIsYearMonthType())
   {
-    int years  = GetYears()  + p_interval.GetYears();
-    int months = GetMonths() + p_interval.GetMonths();
-    SQLInterval val(years,months);
+    InterValue value = m_value + p_interval.m_value;
+    SQLInterval val(m_interval.interval_type,0,(int)value);
     return val;
   }
   else if(GetIsDaySecondType() && p_interval.GetIsDaySecondType())
   {
-    InterValue val = AsValue() + p_interval.AsValue();
-    SQLInterval intval(val);
-    return val;
+    InterValue value = m_value - p_interval.m_value;
+    SQLInterval intval(m_interval.interval_type,value);
+    return intval;
   }
   else
   {
     throw CString("Cannot add two ordinal different intervals");
   }
 }
+
+SQLInterval   
+SQLInterval::operator-(const SQLInterval& p_interval) const
+{
+  // Check for NULL state
+  if(IsNull() || p_interval.IsNull())
+  {
+    SQLInterval intval;
+    return intval;
+  }
+
+  // Check both sides
+  if(GetIsYearMonthType() && p_interval.GetIsYearMonthType())
+  {
+    InterValue value = m_value - p_interval.m_value;
+    SQLInterval val(m_interval.interval_type,0,(int) value);
+    return val;
+  }
+  else if(GetIsDaySecondType() && p_interval.GetIsDaySecondType())
+  {
+    InterValue value = m_value - p_interval.m_value;
+    SQLInterval intval(m_interval.interval_type,value);
+    return intval;
+  }
+  else
+  {
+    throw CString("Cannot subtract two ordinal different intervals");
+  }
+}
+
 
 // Scalar sizing of the interval
 

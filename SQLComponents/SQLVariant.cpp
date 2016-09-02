@@ -354,10 +354,8 @@ SQLVariant::SQLVariant(SQLDate* p_date)
   }
   else
   {
-    m_indicator   = 0;
-    m_data.m_dataDATE.year  = (SQLSMALLINT) p_date->Year();
-    m_data.m_dataDATE.month = (SQLSMALLINT) p_date->Month();
-    m_data.m_dataDATE.day   = (SQLSMALLINT) p_date->Day();
+    m_indicator = 0;
+    p_date->AsDateStruct(&m_data.m_dataDATE);
   }
 }
 
@@ -373,10 +371,11 @@ SQLVariant::SQLVariant(SQLTime* p_time)
   }
   else
   {
-    m_indicator   = 0;
-    m_data.m_dataTIME.hour   = (SQLSMALLINT) p_time->Hour();
-    m_data.m_dataTIME.minute = (SQLSMALLINT) p_time->Minute();
-    m_data.m_dataTIME.second = (SQLSMALLINT) p_time->Second();
+    m_indicator = 0;
+    p_time->AsTimeStruct(&m_data.m_dataTIME);
+//     m_data.m_dataTIME.hour   = (SQLSMALLINT) p_time->Hour();
+//     m_data.m_dataTIME.minute = (SQLSMALLINT) p_time->Minute();
+//     m_data.m_dataTIME.second = (SQLSMALLINT) p_time->Second();
   }
 }
 
@@ -393,13 +392,24 @@ SQLVariant::SQLVariant(SQLTimestamp* p_stamp)
   else
   {
     m_indicator   = 0;
-    m_data.m_dataTIMESTAMP.year     = (SQLSMALLINT) p_stamp->Year();
-    m_data.m_dataTIMESTAMP.month    = (SQLSMALLINT) p_stamp->Month();
-    m_data.m_dataTIMESTAMP.day      = (SQLSMALLINT) p_stamp->Day();
-    m_data.m_dataTIMESTAMP.hour     = (SQLSMALLINT) p_stamp->Hour();
-    m_data.m_dataTIMESTAMP.minute   = (SQLSMALLINT) p_stamp->Minute();
-    m_data.m_dataTIMESTAMP.second   = (SQLSMALLINT) p_stamp->Second();
-    m_data.m_dataTIMESTAMP.fraction = (SQLUINTEGER) p_stamp->Fraction();
+    p_stamp->AsTimeStampStruct(&m_data.m_dataTIMESTAMP);
+  }
+}
+
+SQLVariant::SQLVariant(SQLInterval* p_interval)
+{
+  Init();
+  m_datatype    = p_interval->GetIntervalType();
+  m_sqlDatatype = m_datatype;
+
+  if(p_interval->IsNull())
+  {
+    m_indicator = SQL_NULL_DATA;
+  }
+  else
+  {
+    m_indicator = 0;
+    p_interval->AsIntervalStruct(&m_data.m_dataINTERVAL);
   }
 }
 
@@ -1859,6 +1869,18 @@ SQLVariant::GetAsSQLTimestamp()
   return SQLTimestamp(stamp->year,stamp->month,stamp->day
                      ,stamp->hour,stamp->minute,stamp->second
                      ,stamp->fraction);
+}
+
+SQLInterval
+SQLVariant::GetAsSQLInterval()
+{
+  if(IsNULL())
+  {
+    SQLInterval intval;
+    return intval;
+  }
+  SQLInterval interval(&m_data.m_dataINTERVAL);
+  return interval;
 }
 
 int

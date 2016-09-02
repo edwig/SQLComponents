@@ -41,25 +41,50 @@ typedef __int64 InterValue;
 class SQLInterval
 {
 public:
+  // Interval constructed as NULL interval
   SQLInterval();
-  SQLInterval(SQLINTERVAL p_type,const CString p_string);
+
+  // Interval constructed from another interval
   SQLInterval(SQLInterval& p_interval);
+
+  // Interval constructed from an ODBC structure
   SQLInterval(SQL_INTERVAL_STRUCT* p_interval);
-  SQLInterval(double p_databaseDouble);
-  SQLInterval(InterValue p_nanoseconds);
-  SQLInterval(int p_years,int p_months);
-  SQLInterval(int p_days, int p_hours,int p_minutes,int p_seconds,int p_fraction = 0);
+
+  // Interval constructed from a string
+  SQLInterval(SQLINTERVAL p_type,const CString p_string);
+
+  // Interval constructed from a database DECIMAL (Oracle etc)
+  SQLInterval(SQLINTERVAL p_type,double p_databaseDouble);
+
+  // Interval constructed from an internal value (other temporal type)
+  SQLInterval(SQLINTERVAL p_type,InterValue p_nanoseconds);
+
+  // Interval constructed from scalars (year-month)
+  SQLInterval(SQLINTERVAL p_type,int p_years,int p_months);
+
+  // Interval constructed from scalars (day-second)
+  SQLInterval(SQLINTERVAL p_type,int p_days, int p_hours,int p_minutes,int p_seconds,int p_fraction = 0);
+
+  // Destructor
  ~SQLInterval();
 
   // SETTERS
 
+  // Setting an interval from a string
   bool    SetInterval(SQLINTERVAL p_type,const CString p_string);
-  bool    SetInterval(InterValue p_nanoseconds);
+  // Setting an interval from an internal value
+  bool    SetInterval(SQLINTERVAL p_type,InterValue p_nanoseconds);
+  // Setting an interval from an ODBC structure
   bool    SetInterval(SQL_INTERVAL_STRUCT& p_interval);
-  void    SetInterval(int p_years,int p_months);  // if year is negative, interval is negative
-  void    SetInterval(int p_days,int p_hours,int p_minutes,int p_seconds,int p_fraction = 0); // days negative -> Interval = negative
-  void    SetFromDatabaseDouble(double p_number);
+  // Setting from a (year,month) pair. If either negative -> interval is negative.
+  void    SetInterval(SQLINTERVAL p_type,int p_years,int p_months);
+  // Setting from a (day,hour,min,sec,frac) set. If either is negative -> interval is negative
+  void    SetInterval(SQLINTERVAL p_type,int p_days,int p_hours,int p_minutes,int p_seconds,int p_fraction = 0);
+  // Setting from a database double (possibly Oracle)
+  void    SetFromDatabaseDouble(SQLINTERVAL p_type,double p_number);
+  // ONLY set the fraction part as a correction
   void    SetFractionPart(int p_fraction);
+  // Try to set the interval type, depends on the internal values
   bool    SetIntervalType(SQLINTERVAL p_type);
 
   // GETTERS

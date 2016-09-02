@@ -1127,7 +1127,7 @@ SQLDate::operator-(const SQLDate& p_date) const
     return intval;
   }
   DateValue value = AsNumber() - p_date.AsNumber();
-  intval.SetInterval(value,0,0,0,0);
+  intval.SetInterval(SQL_IS_DAY,value,0,0,0,0);
   return intval;
 }
 

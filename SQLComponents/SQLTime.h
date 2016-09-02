@@ -25,6 +25,7 @@
 // Version number:  1.1.0
 //
 #pragma once
+#include <sqltypes.h>
 
 class SQLDate;
 class SQLTimestamp;
@@ -61,6 +62,7 @@ public:
   CString AsString() const;
   CString AsSQLString(SQLDatabase* p_database) const;
   CString AsStrippedSQLString(SQLDatabase* p_database) const;
+  void    AsTimeStruct(SQL_TIME_STRUCT* p_timestruct) const;
   long    AsNumber() const;
 
   // Parts of the time
