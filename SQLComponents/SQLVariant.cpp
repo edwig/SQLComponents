@@ -67,7 +67,7 @@ DataTypes allTypes[] =
   ,{ "SIGNED BIGINT",              SQL_C_SBIGINT                   }
   ,{ "UNSIGNED BIGINT",            SQL_C_UBIGINT                   }
   ,{ "DECIMAL",                    SQL_C_NUMERIC                   }
-  ,{ "NUMERIC",                    SQL_C_NUMERIC                   }  
+  ,{ "NUMERIC",                    SQL_C_NUMERIC                   }
   ,{ "GUID",                       SQL_C_GUID                      }
   ,{ "BINARY",                     SQL_C_BINARY                    }
   ,{ "DATE",                       SQL_C_DATE                      }
@@ -373,9 +373,6 @@ SQLVariant::SQLVariant(SQLTime* p_time)
   {
     m_indicator = 0;
     p_time->AsTimeStruct(&m_data.m_dataTIME);
-//     m_data.m_dataTIME.hour   = (SQLSMALLINT) p_time->Hour();
-//     m_data.m_dataTIME.minute = (SQLSMALLINT) p_time->Minute();
-//     m_data.m_dataTIME.second = (SQLSMALLINT) p_time->Second();
   }
 }
 
