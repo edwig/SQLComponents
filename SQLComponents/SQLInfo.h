@@ -47,19 +47,23 @@ typedef struct _TypeInfo
 {
   CString     m_type_name;          // Datasource dependent type name. Use for CREATE TABLE
   SQLSMALLINT m_data_type;          // Data type by ODBC as in SQL_<Datatypename>
-  SQLINTEGER  m_precision;          // Column size. Binary data column widht
+  SQLINTEGER  m_precision;          // For numbers: precision, otherwise the column size for char/binaries
   CString     m_literal_prefix;     // Prefix in literal string, like {ts' for timestamp
   CString     m_literal_suffix;     // Suffix in literal string, like '}   for timestamp
   CString     m_create_params;      // How to create parameters, like (precision,scale) for decimals
   SQLSMALLINT m_nullable;           // Nullable: SQL_NO_NULLS (0), SQL_NULLABLE (1), SQL_NULLABLE_UNKNOWN (2)
   SQLSMALLINT m_case_sensitive;     // Case sensitive (TRUE,FALSE)
-  SQLSMALLINT m_searchable;
-  SQLSMALLINT m_unsigned;
-  SQLSMALLINT m_money;
-  SQLSMALLINT m_autoincrement;
-  CString     m_local_type_name;
-  SQLSMALLINT m_minimum_scale;
-  SQLSMALLINT m_maximum_scale;
+  SQLSMALLINT m_searchable;         // Searchable in where clause. SQL_PRED_NONE (SQL_UNSEARCHABLE), SQL_PRED_CHAR (1), SQL_PRED_BASIC (2), SQL_SEARCHABLE (3)
+  SQLSMALLINT m_unsigned;           // Unsigned (TRUE,FALSE)
+  SQLSMALLINT m_money;              // Money (FIXED_PRECISION_SCALE) (TRUE,FALSE)
+  SQLSMALLINT m_autoincrement;      // Auto incrementable (TRUE,FALSE,NULL for non-numeric)
+  CString     m_local_type_name;    // Local type name for display on UI's (not in DDL!)
+  SQLSMALLINT m_minimum_scale;      // Minimum scale of datatype. E.g. in seconds of the TIMESTAMP
+  SQLSMALLINT m_maximum_scale;      // Maximum scale of datatype, otherwise use column_size
+  SQLSMALLINT m_sqlDatatype;        // Driver independent SQL datatype
+  SQLSMALLINT m_sqlSubType;         // SQL subtype for TYPE_TIMESTAMP and INTERVAL types
+  SQLINTEGER  m_radix;              // Decimal radix (2,10 or NULL)
+  SQLSMALLINT m_interval_precision; // Number of decimals in interval precision of leading type
 }
 TypeInfo;
 

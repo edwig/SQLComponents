@@ -644,45 +644,78 @@ SQLInfo::ReadingDataTypes()
         {
           if(dataLen != 2) ti->m_nullable = 0;
         }
+        // Case sensitive search in datatype (TRUE/FALSE)
         ti->m_case_sensitive = 0;
         if(::SQLGetData(handle,8,SQL_C_SSHORT,&ti->m_case_sensitive,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_case_sensitive = 0;
         }
+        // Searchable in where clause
+        // SQL_PRED_NONE (SQL_UNSEARCHABLE), SQL_PRED_CHAR, SQL_PRED_BASIC, SQL_SEARCHABLE
         ti->m_searchable = 0;
         if(::SQLGetData(handle,9,SQL_C_SSHORT,&ti->m_searchable,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_searchable = 0;
         }
+        // UNSIGNED (TRUE, FALSE)
         ti->m_unsigned = 0;
         if(::SQLGetData(handle,10,SQL_C_SSHORT,&ti->m_unsigned,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_unsigned = 0;
         }
+        // FIXED PRECISION SCALE (LIKE MONEY)
         ti->m_money = 0;
         if(::SQLGetData(handle,11,SQL_C_SSHORT,&ti->m_money,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_money = 0;
         }
+        // Auto increment type like SERIAL (TRUE, FALSE, NULL for non-numeric)
         ti->m_autoincrement = 0;
         if(::SQLGetData(handle,12,SQL_C_SSHORT,&ti->m_autoincrement,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_autoincrement = 0;
         }
+        // Local type name for display on UI's (not in DDL!)
         ti->m_local_type_name = buffer;
         if(::SQLGetData(handle,13,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_local_type_name = buffer;
         }
+        // Minimum scale of the datatype (e.g. in timestamps)
         ti->m_minimum_scale = 0;
-        if(::SQLGetData(handle,11,SQL_C_SSHORT,&ti->m_minimum_scale,0,&dataLen) == SQL_SUCCESS)
+        if(::SQLGetData(handle,14,SQL_C_SSHORT,&ti->m_minimum_scale,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_minimum_scale = 0;
         }
+        // Maximum scale of the datatype. If 0 or NULL use column_size
         ti->m_maximum_scale = 0;
-        if(::SQLGetData(handle,11,SQL_C_SSHORT,&ti->m_maximum_scale,0,&dataLen) == SQL_SUCCESS)
+        if(::SQLGetData(handle,15,SQL_C_SSHORT,&ti->m_maximum_scale,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_maximum_scale = 0;
+        }
+        // Driver independent SQL datatype
+        ti->m_sqlDatatype = 0;
+        if(::SQLGetData(handle,16,SQL_C_SSHORT,&ti->m_sqlDatatype,0,&dataLen) == SQL_SUCCESS)
+        {
+          if(dataLen != 2) ti->m_sqlDatatype = 0;
+        }
+        // SQL subtype for TYPE_TIMESTAMP and INTERVAL types
+        ti->m_sqlSubType = 0;
+        if(::SQLGetData(handle,17,SQL_C_SSHORT,&ti->m_sqlSubType,0,&dataLen) == SQL_SUCCESS)
+        {
+          if(dataLen != 2) ti->m_sqlSubType = 0;
+        }
+        // Decimal radix (2,10 or NULL)
+        ti->m_radix = 0;
+        if(::SQLGetData(handle,18,SQL_C_SLONG,&ti->m_radix,0,&dataLen) == SQL_SUCCESS)
+        {
+          if(dataLen != 4) ti->m_radix = 0;
+        }
+        // Number of decimals in interval precision of leading type
+        ti->m_interval_precision = 0;
+        if(::SQLGetData(handle,19,SQL_C_SSHORT,&ti->m_interval_precision,0,&dataLen) == SQL_SUCCESS)
+        {
+          if(dataLen != 2) ti->m_interval_precision = 0;
         }
       }
     }

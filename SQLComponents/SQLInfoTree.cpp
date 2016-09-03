@@ -187,6 +187,14 @@ SQLInfoTree::MakeTreeInfo(CTreeCtrl* tree)
     tree->InsertItem(sitem,type);
     sitem.Format("Maximum scale: %s",InfoNumberToString(ti->m_maximum_scale));
     tree->InsertItem(sitem,type);
+    sitem.Format("Driver independent SQL datatype: %s",ODBCDataType(ti->m_sqlDatatype));
+    tree->InsertItem(sitem,type);
+    sitem.Format("Subtype for temporal types: %d",ti->m_sqlSubType);
+    tree->InsertItem(sitem,type);
+    sitem.Format("Decimal radix: %d",ti->m_radix);
+    tree->InsertItem(sitem,type);
+    sitem.Format("Interval leading precision: %d",ti->m_interval_precision);
+    tree->InsertItem(sitem,type);
     // Next datatype
     ++it;
   }
