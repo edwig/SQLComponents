@@ -45,14 +45,14 @@
 
 typedef struct _TypeInfo
 {
-  CString     m_type_name;
-  SQLSMALLINT m_data_type;
-  SQLINTEGER  m_precision;
-  CString     m_literal_prefix;
-  CString     m_literal_suffix;
-  CString     m_create_params;
-  SQLSMALLINT m_nullable;
-  SQLSMALLINT m_case_sensitive;
+  CString     m_type_name;          // Datasource dependent type name. Use for CREATE TABLE
+  SQLSMALLINT m_data_type;          // Data type by ODBC as in SQL_<Datatypename>
+  SQLINTEGER  m_precision;          // Column size. Binary data column widht
+  CString     m_literal_prefix;     // Prefix in literal string, like {ts' for timestamp
+  CString     m_literal_suffix;     // Suffix in literal string, like '}   for timestamp
+  CString     m_create_params;      // How to create parameters, like (precision,scale) for decimals
+  SQLSMALLINT m_nullable;           // Nullable: SQL_NO_NULLS (0), SQL_NULLABLE (1), SQL_NULLABLE_UNKNOWN (2)
+  SQLSMALLINT m_case_sensitive;     // Case sensitive (TRUE,FALSE)
   SQLSMALLINT m_searchable;
   SQLSMALLINT m_unsigned;
   SQLSMALLINT m_money;
@@ -82,28 +82,28 @@ public:
   ~SQLInfo();
 
   // Initialize all internal data structures to defaults
-  void Init();
+  void    Init();
   // (Re)set the connected database (e.g. after re-open)
-  void SetConnection(SQLDatabase* p_database = NULL);
+  void    SetConnection(SQLDatabase* p_database = NULL);
 
   // Get all static info from the ODBC driver via SQLGetInfo 
-  void GetInfo();
+  void    GetInfo();
 
   // Add an ODBC SQL Keyword
-  bool AddSQLWord(CString sql);
+  bool    AddSQLWord(CString sql);
   // Extra to be done on getting info 
   virtual void OnGetInfo(HDBC ,int ) {return;};
   // Is it a correct identifier (type 0=table,1=column)
-  bool IsCorrectName(LPCSTR naam,int type = 0);
+  bool    IsCorrectName(LPCSTR naam,int type = 0);
   // Can we start a transaction on the database
-  bool CanStartTransaction();
+  bool    CanStartTransaction();
   // Returns the fact whether an API function is supported
   // by the ODBC driver, regardless of ODBC version
-  bool SupportedFunction(unsigned int api_function);
+  bool    SupportedFunction(unsigned int api_function);
   // Return the native SQL command from an ODBC-escaped command
   CString NativeSQL(HDBC hdbc,CString& sqlCommand);
   // AT_EXEC data provider needs length beforehand
-  bool NeedLongDataLen();
+  bool    NeedLongDataLen();
   // Character name of an SQL_XXX datatype
   CString ODBCDataType(int DataType);
   // Show metadata warning (for interactive mode)
@@ -137,6 +137,9 @@ public:
 
   // Meta pointer to SQLGet<META> functions
   unsigned char* GetMetaPointer(unsigned char* p_buffer,bool p_meta);
+
+  // Getting datatype info
+  TypeInfo* GetTypeInfo(int p_sqlDatatype);
 
   // CONNECTION ATTRIBUTES
 
@@ -228,6 +231,7 @@ protected:
                         ,SQLCHAR* search_schema
                         ,SQLCHAR* search_table
                         ,SQLCHAR* search_type);
+  void    ReadingDataTypes();
 
 protected:
   bool           m_initDone;           // Already read in?

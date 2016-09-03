@@ -211,7 +211,7 @@ SQLInfo::Init()
   m_getdata_extensions = 0;
 
   // Statement
-  m_hstmt             = NULL;
+  m_hstmt              = NULL;
   m_retCode            = SQL_SUCCESS;
 
   // Workarounds
@@ -556,14 +556,23 @@ SQLInfo::GetInfo()
   m_convertVarBinary  = GetInfoInteger(SQL_CONVERT_VARBINARY);
   m_convertVarchar    = GetInfoInteger(SQL_CONVERT_VARCHAR);
 
+  ReadingDataTypes();
+  m_initDone = true;
+}
+
+void
+SQLInfo::ReadingDataTypes()
+{
   // Get all datatypes from this ODBC datasource in m_dataTypes
   if(!SupportedFunction(SQL_API_SQLGETTYPEINFO))
   {
-    AfxMessageBox("Cannot get datatype info from this ODBC driver",MB_OK);
+    // Cannot get datatype info from this ODBC driver
     return;
   }
   SQLHSTMT handle;
   SQLLEN   dataLen;
+  char     buffer[5120];
+
   m_retCode = SqlAllocHandle(SQL_HANDLE_STMT,m_hdbc,&handle);
   if (m_retCode == SQL_SUCCESS )
   {
@@ -581,6 +590,8 @@ SQLInfo::GetInfo()
         CString key;
         TypeInfo* ti = new TypeInfo();
         dataLen =0;
+
+        // DATA SOURCE DEPENDENT TYPE NAME. USE FOR CREATE TABLE
         if(::SQLGetData(handle,1,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) 
@@ -602,26 +613,32 @@ SQLInfo::GetInfo()
         // Put in m_datatypes
         m_dataTypes.insert(std::make_pair(key,ti));
 
+        // SQL_<*> TYPE NUMBER
         if(::SQLGetData(handle,2,SQL_C_SSHORT,&ti->m_data_type,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 2) ti->m_data_type = 0;
         }
+        // ODBC COLUMN SIZE
         if(::SQLGetData(handle,3,SQL_C_LONG,&ti->m_precision,0,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen != 4) ti->m_precision = 0;
         }
+        // LITERAL PREFIX FOR ODBC DRIVER, like {ts' for timestamp
         if(::SQLGetData(handle,4,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_literal_prefix = buffer;
         }
+        // LITERAL SUFFIX FOR ODBC DRIVER, like '} for timestamp
         if(::SQLGetData(handle,5,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_literal_suffix = buffer;
         }
+        // HOW TO CREATE PARAMETERS, like "(precision,scale)"
         if(::SQLGetData(handle,6,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_create_params = buffer;
         }
+        // Nullable: SQL_NO_NULLS, SQL_NULLABLE, SQL_NULLABLE_UNKNOWN
         ti->m_nullable = 0;
         if(::SQLGetData(handle,7,SQL_C_SSHORT,&ti->m_nullable,0,&dataLen) == SQL_SUCCESS)
         {
@@ -671,9 +688,23 @@ SQLInfo::GetInfo()
     }
     SqlFreeHandle(SQL_HANDLE_STMT,handle);
   }
-  m_initDone = true;
 }
 
+// Getting datatype info
+TypeInfo* 
+SQLInfo::GetTypeInfo(int p_sqlDatatype)
+{
+  DataTypeMap::iterator it;
+  
+  for(it = m_dataTypes.begin();it != m_dataTypes.end();++it)
+  {
+    if(it->second->m_data_type == p_sqlDatatype)
+    {
+      return it->second;
+    }
+  }
+  return nullptr;
+}
 
 // Returns the fact whether an API function is supported
 // by the ODBC driver, regardless of ODBC version
