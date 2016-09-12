@@ -177,7 +177,7 @@ public:
   virtual CString GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) const = 0;
 
   // Get the constraint form of a primary key to be added to a table after creation of that table
-  virtual CString GetPrimaryKeyConstraint(CString p_tablename,bool p_temporary) const = 0;
+  virtual CString GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool p_temporary) const = 0;
 
   // Performance parameters to be added to the database
   virtual CString GetSQLPerformanceSettings() const = 0;
@@ -361,6 +361,19 @@ public:
   // Getting the fact that there is only **one** (1) user session in the database
   virtual bool    GetOnlyOneUserSession() = 0;
 
+  // SQL DDL STATEMENTS
+  // ==================
+
+  // Add a column to a table
+  virtual CString GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull) = 0;
+
+  // Add a foreign key to a table
+  virtual CString GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary) = 0;
+
+  // Modify a column's definition in a table
+  virtual CString GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition) = 0;
+  virtual CString GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull) = 0;
+
   // SQL DDL OPERATIONS
   // ==================
 
@@ -375,6 +388,9 @@ public:
 
   // Remove a view from the database
   virtual void    DoDropView(CString p_viewName) = 0;
+
+  // Remove a column from a table
+  virtual void    DoDropColumn(CString p_tableName,CString p_columName) = 0;
 
   // Does the named view exists in the database
   virtual bool    DoesViewExists(CString& p_viewName) = 0;

@@ -398,9 +398,9 @@ SQLInfoPostgreSQL::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporar
 
 // Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
 CString
-SQLInfoPostgreSQL::GetPrimaryKeyConstraint(CString p_tablename,bool /*p_temporary*/) const
+SQLInfoPostgreSQL::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool /*p_temporary*/) const
 {
-  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(oid)\n";
+  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")";
 }
 
 // Performance paramters in de database zetten
@@ -1123,6 +1123,49 @@ SQLInfoPostgreSQL::GetOnlyOneUserSession()
   return true;
 }
 
+// SQL DDL STATEMENTS
+// ==================
+
+CString
+SQLInfoPostgreSQL::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+{
+  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+                 "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
+  if(p_notNull)
+  {
+    sql += " NOT NULL";
+  }
+  return sql;
+}
+
+// Add a foreign key to a table
+CString
+SQLInfoPostgreSQL::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
+{
+  CString sql = "ALTER TABLE " + p_tablename + "\n"
+                "  ADD CONSTRAINT " + p_constraintname + "\n"
+                "      FOREIGN KEY (" + p_column + ")\n"
+                "      REFERENCES " + p_refTable + "(" + p_primary + ")";
+  return sql;
+}
+
+CString 
+SQLInfoPostgreSQL::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+{
+  CString sql = "ALTER TABLE "    + p_tablename + "\n"
+                " ALTER COLUMN " + p_columnName + 
+                " SET DATA TYPE " + p_typeDefinition;
+  return sql;
+}
+
+CString 
+SQLInfoPostgreSQL::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+{
+  CString sql = "ALTER TABLE  " + p_tablename + "\n"
+                "ALTER COLUMN " + p_columnName + (p_notNull ? " SET " : " DROP ") + "NOT NULL";
+  return sql;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 
@@ -1158,6 +1201,17 @@ SQLInfoPostgreSQL::DoDropView(CString p_viewName)
 {
   SQLQuery sql(m_database);
   sql.DoSQLStatement("DROP VIEW " + p_viewName);
+  DoCommitDDLcommands();
+}
+
+// Remove a column from a table
+void
+SQLInfoPostgreSQL::DoDropColumn(CString p_tableName,CString p_columName)
+{
+  CString sql = "ALTER TABLE  " + p_tableName + "\n"
+                " DROP COLUMN " + p_columName;
+  SQLQuery query(m_database);
+  query.TryDoSQLStatement(sql);
   DoCommitDDLcommands();
 }
 

@@ -391,9 +391,9 @@ SQLInfoInformix::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) c
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString
-SQLInfoInformix::GetPrimaryKeyConstraint(CString p_tablename, bool /*p_temporary*/) const
+SQLInfoInformix::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary, bool /*p_temporary*/) const
 {
-  return "ADD CONSTRAINT PRIMARY KEY(oid) CONSTRAINT pk_" + p_tablename + "\n";
+  return "ADD CONSTRAINT PRIMARY KEY(" + p_primary + ") CONSTRAINT pk_" + p_tablename + "\n";
 }
 
 // Performance parameters to be added to the database
@@ -835,7 +835,7 @@ SQLInfoInformix::GetSQLTableReferences(CString p_schema
     query += part;
   }
   return query;
-  }
+}
 
 // Get the SQL Query to create a synonym
 CString 
@@ -1015,6 +1015,49 @@ SQLInfoInformix::GetOnlyOneUserSession()
   return true;
 }
 
+// SQL DDL STATEMENTS
+// ==================
+
+CString
+SQLInfoInformix::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+{
+  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+                 "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
+  if(p_notNull)
+  {
+    sql += " NOT NULL";
+  }
+  return sql;
+}
+
+// Add a foreign key to a table
+CString 
+SQLInfoInformix::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
+{
+  CString sql = "ALTER TABLE " + p_tablename + "\n"
+                "  ADD CONSTRAINT FOREIGN KEY (" + p_column + ")\n"
+                "      REFERENCES " + p_refTable + "(" + p_primary + ")\n"
+                "      CONSTRAINT + " + p_constraintname;
+  return sql;
+}
+
+CString 
+SQLInfoInformix::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+{
+  CString sql = "ALTER  TABLE  " + p_tablename + "\n";
+                "MODIFY COLUMN " + p_columnName + " " + p_typeDefinition;
+  return sql;
+}
+
+CString 
+SQLInfoInformix::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+{
+  CString sql = "ALTER  TABLE  " + p_tablename + "\n";
+                "MODIFY COLUMN " + p_columnName + " " + (p_notNull ? "NOT " : "") + "NULL";
+  return sql;
+}
+
+
 // SQL DDL ACTIONS
 // ====================================================================
 
@@ -1050,6 +1093,16 @@ SQLInfoInformix::DoDropView(CString p_viewName)
 {
   SQLQuery sql(m_database);
   sql.TryDoSQLStatement("DROP VIEW " + p_viewName);
+}
+
+// Remove a column from a table
+void
+SQLInfoInformix::DoDropColumn(CString p_tableName,CString p_columName)
+{
+  CString sql = "ALTER TABLE  " + p_tableName + "\n"
+                " DROP COLUMN " + p_columName;
+  SQLQuery query(m_database);
+  query.TryDoSQLStatement(sql);
 }
 
 // Does the named view exists in the database

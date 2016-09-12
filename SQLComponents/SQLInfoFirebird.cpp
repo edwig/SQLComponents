@@ -405,9 +405,9 @@ SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) c
 
 // Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
 CString
-SQLInfoFirebird::GetPrimaryKeyConstraint(CString p_tablename, bool p_temporary) const
+SQLInfoFirebird::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool p_temporary) const
 {
-  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(oid)\n";
+  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")";
 }
 
 // Performance parameters in de database zetten
@@ -996,38 +996,6 @@ SQLInfoFirebird::DoesConstraintExist(CString p_constraintName) const
   return false;
 }
 
-// Geeft querytekst om alle foreign keys van een schema te verwijderen
-// String 
-// SQLInfoFirebird::GeefAlleForeignKeysVerwijderen(String eigenaar) const
-// {
-//   String sqlCode;
-//   int    nummer;
-// 
-//   nummer = 1;
-//   eigenaar.MakeUpper();
-//   String query = "SELECT rel.rdb$relation_name\n"
-//                  "      ,con.rdb$constraint_name\n"
-//                  "      ,ind.rdb$field_name\n"
-//                  "  FROM rdb$relations rel\n" 
-//                  "      ,rdb$relation_constraints con\n"
-//                  "      ,rdb$index_segments ind\n"
-//                  " WHERE rel.rdb$owner_name    = '" + eigenaar + "'\n"
-//                  "   AND con.rdb$relation_name = rel.rdb$relation_name\n"
-//                  "   AND con.rdb$relation_type = 'FOREIGN KEY'";
-//   DBrecordset rs(GeefDatabase());
-//   rs.VoerSqlUit(query);
-//   while(rs.GetRecord())
-//   {
-//     String tabel  = rs.GetCol_LPCSTR(0);
-//     String constr = rs.GetCol_LPCSTR(1);
-//     String veld   = rs.GetCol_LPCSTR(2);
-//     String num    = String::LongNaarString(nummer++);
-//     sqlCode += (String)"ALTER  TABLE    " + tabel + " DROP CONSTRAINT " + constr + ";\n";
-//     sqlCode += (String)"CREATE INDEX FK_" + tabel + "_" + num + " ON " + tabel + "(" + veld + ");\n";
-//   }
-//   return sqlCode;
-// }
-
 // Geeft een lock-table query
 CString 
 SQLInfoFirebird::GetSQLLockTable(CString& p_tableName,bool p_exclusive) const
@@ -1054,6 +1022,48 @@ SQLInfoFirebird::GetOnlyOneUserSession()
   SQLQuery query(m_database);
   SQLVariant* sessions = query.DoSQLStatementScalar(sql);
   return sessions->GetAsSLong() <= 1;
+}
+
+// SQL DDL STATEMENTS
+// ==================
+
+CString
+SQLInfoFirebird::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+{
+  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+                 "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
+  if(p_notNull)
+  {
+    sql += " NOT NULL";
+  }
+  return sql;
+}
+
+CString
+SQLInfoFirebird::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
+{
+  CString sql = "ALTER TABLE " + p_tablename + "\n"
+                "  ADD CONSTRAINT " + p_constraintname + "\n"
+                "      FOREIGN KEY (" + p_column + ")\n"
+                "      REFERENCES " + p_refTable + "(" + p_primary + ")";
+  return sql;
+}
+
+CString 
+SQLInfoFirebird::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+{
+  CString sql = "ALTER TABLE "    + p_tablename + "\n"
+                " MODIFY COLUMN " + p_columnName + "\n"
+                " TYPE   " + p_typeDefinition;
+  return sql;
+}
+
+CString 
+SQLInfoFirebird::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+{
+  CString sql = "ALTER TABLE "    + p_tablename + "\n"
+                " MODIFY COLUMN " + p_columnName + (p_notNull ? " SET " : " DROP ") + "NOT NULL";
+  return sql;
 }
 
 // SQL DDL ACTIONS
@@ -1105,6 +1115,17 @@ SQLInfoFirebird::DoDropView(CString p_viewName)
                         " WHERE rdb$depended_on_name = '" + p_viewName + "'\n"
                         "   AND rdb$depended_on_type = 0");
   sql.TryDoSQLStatement("DROP VIEW " + p_viewName);
+}
+
+// Remove a column from a table
+void
+SQLInfoFirebird::DoDropColumn(CString p_tableName,CString p_columName)
+{
+  CString sql = "ALTER TABLE  " + p_tableName + "\n"
+                " DROP COLUMN " + p_columName;
+  SQLQuery query(m_database);
+  query.TryDoSQLStatement(sql);
+  DoCommitDDLcommands();
 }
 
 // Does the named view exists in the database

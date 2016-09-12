@@ -399,9 +399,9 @@ SQLInfoSQLServer::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString
-SQLInfoSQLServer::GetPrimaryKeyConstraint(CString p_tablename,bool /*p_temporary*/) const
+SQLInfoSQLServer::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool /*p_temporary*/) const
 {
-  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(oid)\n";
+  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")";
 }
 
 // Performance parameters to be added to the database
@@ -1003,6 +1003,48 @@ SQLInfoSQLServer::GetOnlyOneUserSession()
   return true;
 }
 
+// SQL DDL STATEMENTS
+// ==================
+
+CString
+SQLInfoSQLServer::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+{
+  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+                 "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
+  if(p_notNull)
+  {
+    sql += " NOT NULL";
+  }
+  return sql;
+}
+
+// Add a foreign key to a table
+CString
+SQLInfoSQLServer::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
+{
+  CString sql = "ALTER TABLE " + p_tablename + "\n"
+                "  ADD CONSTRAINT " + p_constraintname + "\n"
+                "      FOREIGN KEY (" + p_column + ")\n"
+                "      REFERENCES " + p_refTable + "(" + p_primary + ")";
+  return sql;
+}
+
+CString 
+SQLInfoSQLServer::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+{
+  CString sql = "ALTER TABLE  " + p_tablename  + "\n"
+                "ALTER COLUMN " + p_columnName + " " + p_typeDefinition;
+  return sql;
+}
+
+CString 
+SQLInfoSQLServer::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+{
+  CString sql = "ALTER TABLE  " + p_tablename  + "\n"
+                "ALTER COLUMN " + p_columnName + (p_notNull ? " NOT " : " ") + "NULL";
+  return sql;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 
@@ -1038,6 +1080,16 @@ SQLInfoSQLServer::DoDropView(CString p_viewName)
 {
   SQLQuery query(m_database);
   query.TryDoSQLStatement("DROP VIEW " + p_viewName);
+}
+
+// Remove a column from a table
+void
+SQLInfoSQLServer::DoDropColumn(CString p_tableName,CString p_columName)
+{
+  CString sql = "ALTER TABLE  " + p_tableName + "\n"
+                " DROP COLUMN " + p_columName;
+  SQLQuery query(m_database);
+  query.TryDoSQLStatement(sql);
 }
 
 // Does the named view exists in the database

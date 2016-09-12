@@ -165,7 +165,7 @@ public:
   CString GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) const;
 
   // Get the constraint form of a primary key to be added to a table after creation of that table
-  CString GetPrimaryKeyConstraint(CString p_tablename,bool p_temporary) const;
+  CString GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool p_temporary) const;
 
   // Performance parameters to be added to the database
   CString GetSQLPerformanceSettings() const;
@@ -349,6 +349,19 @@ public:
   // Getting the fact that there is only **one** (1) user session in the database
   bool    GetOnlyOneUserSession();
 
+  // SQL DDL STATEMENTS
+  // ==================
+
+  // Add a column to a table
+  CString GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull);
+
+  // Add a foreign key to a table
+  CString GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary);
+
+  // Modify a column's definition in a table
+  CString GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition);
+  CString GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull);
+
   // SQL DDL OPERATIONS
   // ==================
 
@@ -364,11 +377,14 @@ public:
   // Remove a view from the database
   void    DoDropView(CString p_viewName);
 
+  // Remove a column from a table
+  void    DoDropColumn(CString p_tableName,CString p_columName);
+
   // Does the named view exists in the database
-  bool       DoesViewExists(CString& p_viewName);
+  bool    DoesViewExists(CString& p_viewName);
 
   // Must create temoporary tables runtime 
-  bool       GetMustMakeTemptablesAtRuntime() const;
+  bool    GetMustMakeTemptablesAtRuntime() const;
 
   // Create a temporary table in an optimized manner with the givven index column
   void    DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const;

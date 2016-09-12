@@ -421,9 +421,9 @@ SQLInfoOracle::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/)
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString 
-SQLInfoOracle::GetPrimaryKeyConstraint(CString p_tablename,bool p_temporary) const
+SQLInfoOracle::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool p_temporary) const
 {
-  return "ADD (CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(oid)\n" +
+  return "ADD (CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")\n" +
          (p_temporary ?  ")" : ("USING INDEX " + GetStorageSpaceNameForIndexes() + ")\n"));
 }
 
@@ -1108,6 +1108,48 @@ SQLInfoOracle::GetOnlyOneUserSession()
   return true;
 }
 
+// SQL DDL STATEMENTS
+// ==================
+
+CString
+SQLInfoOracle::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+{
+  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+                 "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
+  if(p_notNull)
+  {
+    sql += " NOT NULL";
+  }
+  return sql;
+}
+
+// Add a foreign key to a table
+CString
+SQLInfoOracle::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
+{
+  CString sql = "ALTER TABLE " + p_tablename + "\n"
+                "  ADD CONSTRAINT " + p_constraintname + "\n"
+                "      FOREIGN KEY (" + p_column + ")\n"
+                "      REFERENCES " + p_refTable + "(" + p_primary + ")";
+  return sql;
+}
+
+CString 
+SQLInfoOracle::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+{
+  CString sql = "ALTER  TABLE  " + p_tablename + "\n";
+                "MODIFY COLUMN " + p_columnName + " " + p_typeDefinition;
+  return sql;
+}
+
+CString 
+SQLInfoOracle::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+{
+  CString sql = "ALTER  TABLE  " + p_tablename + "\n";
+                "MODIFY COLUMN " + p_columnName + " " + (p_notNull ? "NOT " : "") + "NULL";
+  return sql;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 
@@ -1145,6 +1187,16 @@ SQLInfoOracle::DoDropView(CString p_viewName)
   SQLQuery query(m_database);
   query.TryDoSQLStatement("DROP VIEW " + p_viewName);
   query.TryDoSQLStatement("DROP PUBLIC SYNONYM " + p_viewName);
+}
+
+// Remove a column from a table
+void
+SQLInfoOracle::DoDropColumn(CString p_tableName,CString p_columName)
+{
+  CString sql = "ALTER TABLE  " + p_tableName + "\n"
+                " DROP COLUMN " + p_columName;
+  SQLQuery query(m_database);
+  query.TryDoSQLStatement(sql);
 }
 
 // Does the named view exists in the database

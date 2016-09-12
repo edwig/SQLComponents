@@ -381,10 +381,10 @@ SQLInfoGenericODBC::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_tempora
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString 
-SQLInfoGenericODBC::GetPrimaryKeyConstraint(CString p_tablename,bool /*p_temporary*/) const
+SQLInfoGenericODBC::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool /*p_temporary*/) const
 {
   // General ISO definition of a primary key
-  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(oid)\n";
+  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")";
 }
 
 // Performance parameters to be added to the database
@@ -915,6 +915,49 @@ SQLInfoGenericODBC::GetOnlyOneUserSession()
   return true;
 }
 
+// SQL DDL STATEMENTS
+// ==================
+
+CString
+SQLInfoGenericODBC::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+{
+  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+                 "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
+  if(p_notNull)
+  {
+    sql += " NOT NULL";
+  }
+  return sql;
+}
+
+// Add a foreign key to a table
+CString 
+SQLInfoGenericODBC::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
+{
+  CString sql = "ALTER TABLE " + p_tablename + "\n"
+                "  ADD CONSTRAINT " + p_constraintname + "\n"
+                "      FOREIGN KEY (" + p_column + ")\n"
+                "      REFERENCES " + p_refTable + "(" + p_primary + ")";
+  return sql;
+}
+
+CString 
+SQLInfoGenericODBC::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+{
+  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+                 "      MODIFY " + p_columnName + " " + p_typeDefinition;
+  return sql;
+}
+
+CString 
+SQLInfoGenericODBC::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+{
+  CString sql = "ALTER TABLE " + p_tablename + "\n";
+                "      MODIFY " + p_columnName + (p_notNull ? "NOT " : " ") + "NULL";
+  return sql;
+}
+
+
 // SQL DDL ACTIONS
 // ===================================================================
 
@@ -947,6 +990,14 @@ SQLInfoGenericODBC::DoDropView(CString p_viewName)
 {
   SQLQuery query(m_database);
   query.TryDoSQLStatement("DROP VIEW " + p_viewName);
+}
+
+
+// Remove a column from a table
+void    
+SQLInfoGenericODBC::DoDropColumn(CString p_tableName,CString p_columName)
+{
+
 }
 
 // Does the named view exists in the database
