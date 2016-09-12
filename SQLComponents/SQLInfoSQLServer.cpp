@@ -85,6 +85,13 @@ SQLInfoSQLServer::IsCatalogUpper() const
   return false;
 }
 
+// System catalog supports full ISO schemas (same tables per schema)
+bool
+SQLInfoSQLServer::GetUnderstandsSchemas() const
+{
+  return true;
+}
+
 // Supports database/ODBCdriver comments in sql
 bool 
 SQLInfoSQLServer::SupportsDatabaseComments() const
@@ -775,15 +782,53 @@ SQLInfoSQLServer::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) c
 
 // Get SQL to read the referential constaints from the catalog
 CString 
-SQLInfoSQLServer::GetSQLTableReferences(CString& p_tablename) const
+SQLInfoSQLServer::GetSQLTableReferences(CString p_schema
+                                       ,CString p_tablename
+                                       ,CString p_constraint /*=""*/
+                                       ,int     /*p_maxColumns = SQLINFO_MAX_COLUMNS*/) const
 {
-  CString query = "SELECT con.name\n"
-                  "      ,tab.name\n"
-                  "  FROM dbo.sysobjects con, dbo.sysobjects tab\n"
-                  " WHERE tab.name = '" + p_tablename + "'"
-                  "   AND tab.Id = con.parent_obj\n"
-                  "   AND con.xtype = 'F'\n"
-                  "   AND con.type = 'F'\n";
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  CString query = "SELECT fok.name          as foreign_key_constraint\n"
+                  "      ,sch.name          as schema_name\n"
+                  "      ,tab.name          as table_name\n"
+                  "      ,col.name          as column_name\n"
+                  "      ,pri.name          as primary_table_name\n"
+                  "      ,pky.name          as primary_key_column\n"
+                  "      ,0                 as deferrable\n"
+                  "      ,0                 as initially_deferred\n"
+                  "      ,fok.is_disabled   as disabled\n"
+                  "      ,1                 as match_option\n"
+                  "      ,fok.delete_referential_action as delete_rule\n"
+                  "      ,fok.update_referential_action as update_rule\n"
+                  "  FROM sys.foreign_keys        fok\n"
+                  "      ,sys.foreign_key_columns fkc\n"
+                  "      ,sys.schemas sch\n"
+                  "      ,sys.tables  tab\n"
+                  "      ,sys.columns col\n"
+                  "      ,sys.tables  pri\n"
+                  "      ,sys.columns pky\n"
+                  " WHERE fok.type = 'F'\n"
+                  "   AND fok.parent_object_id     = tab.object_id\n"
+                  "   AND tab.schema_id            = sch.schema_id\n"
+                  "   AND fkc.constraint_object_id = fok.object_id\n"
+                  "   AND fkc.parent_object_id     = col.object_id\n"
+                  "   AND fkc.parent_column_id     = col.column_id\n"
+                  "   AND fkc.referenced_object_id = pri.object_id\n"
+                  "   AND fkc.referenced_object_id = pky.object_id\n"
+                  "   AND fkc.referenced_column_id = pky.column_id";
+  if(!p_schema.IsEmpty())
+  {
+    query += "\n   AND sch.name = '" + p_schema + "'";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    query += "\n   AND tab.name = '" + p_tablename + "'";
+  }
+  if(!p_constraint.IsEmpty())
+  {
+    query += "\n   AND fok.name = '" + p_constraint + "'";
+  }
   return query;
 }
 

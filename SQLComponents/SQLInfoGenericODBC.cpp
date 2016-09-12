@@ -77,6 +77,13 @@ SQLInfoGenericODBC::IsCatalogUpper() const
   return true;
 }
 
+// System catalog supports full ISO schemas (same tables per schema)
+bool
+SQLInfoGenericODBC::GetUnderstandsSchemas() const
+{
+  return true;
+}
+
 // Supports database/ODBCdriver comments in sql
 bool 
 SQLInfoGenericODBC::SupportsDatabaseComments() const
@@ -725,7 +732,8 @@ SQLInfoGenericODBC::GetSQLGetColumns(CString& /*p_user*/,CString& /*p_tableName*
 CString 
 SQLInfoGenericODBC::GetSQLGetConstraintsForTable(CString& /*p_tableName*/) const
 {
-  // To be implemented
+  // Cannot be implemented for generic ODBC
+  // Use SQLPrimaryKeys/SQLForeignKeys instead (see SQLInfo class)
   return "";
 }
 
@@ -733,15 +741,17 @@ SQLInfoGenericODBC::GetSQLGetConstraintsForTable(CString& /*p_tableName*/) const
 CString 
 SQLInfoGenericODBC::GetSQLTableIndexes(CString& /*p_user*/,CString& /*p_tableName*/) const
 {
-  // To be implemented
+  // Cannot be implemented for generic ODBC
+  // Use SQLStatistics instead (see SQLInfo class)
   return "";
 }
 
 // Get SQL to read the referential constaints from the catalog
 CString 
-SQLInfoGenericODBC::GetSQLTableReferences(CString& /*p_tablename*/) const
+SQLInfoGenericODBC::GetSQLTableReferences(CString p_schema,CString p_tablename,CString p_constraint /*=""*/,int /*p_maxColumns = SQLINFO_MAX_COLUMNS*/) const
 {
-  // To be implemented
+  // Cannot be implemented for generic ODBC
+  // Use SQLForeignKeys instead (see SQLInfo class)
   return "";
 }
 

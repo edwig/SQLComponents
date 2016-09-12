@@ -80,6 +80,13 @@ SQLInfoFirebird::IsCatalogUpper() const
   return true;
 }
 
+// System catalog supports full ISO schemas (same tables per schema)
+bool
+SQLInfoFirebird::GetUnderstandsSchemas() const
+{
+  return false;
+}
+
 // Ondersteund database/ODBCdriver commentaar in sql
 bool 
 SQLInfoFirebird::SupportsDatabaseComments() const
@@ -770,91 +777,72 @@ SQLInfoFirebird::GetSQLTableIndexes(CString& p_user,CString& p_tableName) const
 
 // Geef de query om de referential constaints uit de catalogus te lezen.
 CString 
-SQLInfoFirebird::GetSQLTableReferences(CString& p_tablename) const
+SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
+                                      ,CString p_tablename
+                                      ,CString p_constraint /*=""*/
+                                      ,int     p_maxColumns /*= SQLINFO_MAX_COLUMNS*/) const
 {
-  CString upperName(p_tablename);
-  upperName.MakeUpper();  
-  CString query = "SELECT rdb$constraint_name\n"
-                  "      ,rdb$relation_name\n"
-                  "  FROM rdb$relation_constraints\n"
-                  " WHERE rdb$relation_name   = '" + upperName + "'"
-                  "   AND rdb$constraint_type = 'FOREIGN KEY'";
+  p_tablename.MakeUpper();
+  p_constraint.MakeUpper();
+  CString query = "SELECT con.rdb$constraint_name         AS foreign_key_constraint\n"
+                  "      ,''                              AS schema_name\n"
+                  "      ,con.rdb$relation_name           AS table_name\n"
+                  "      ,seg.rdb$field_name              AS column_name\n"
+                  "      ,idx.rdb$relation_name           AS primary_table_name\n"
+                  "      ,psg.rdb$field_name              AS primary_key_column\n"
+                  "      ,case con.rdb$deferrable         WHEN 'YES'  THEN 1 ELSE 0 END as deferrable\n"
+                  "      ,case con.rdb$initially_deferred WHEN 'YES'  THEN 1 ELSE 0 END as initially_deferred\n"
+                  "      ,0                               as disabled\n"
+                  "      ,case ref.rdb$match_option       WHEN 'FULL' THEN 1 ELSE 0 END as match_option\n"
+                  "      ,case ref.rdb$update_rule        WHEN 'RESTRICT'     THEN 0\n"
+                  "                                       WHEN 'CASCADE'      THEN 1\n"
+                  "                                       WHEN 'SET NULL'     THEN 2\n"
+                  "                                       WHEN 'SET DEFAULT'  THEN 3\n"
+                  "                                       WHEN 'NO ACTION'    THEN 4\n"
+                  "                                       ELSE 0\n"
+                  "                                       END as update_rule\n"
+                  "      ,case ref.rdb$delete_Rule        WHEN 'RESTRICT'     THEN 0\n"
+                  "                                       WHEN 'CASCADE'      THEN 1\n"
+                  "                                       WHEN 'SET NULL'     THEN 2\n"
+                  "                                       WHEN 'SET DEFAULT'  THEN 3\n"
+                  "                                       WHEN 'NO ACTION'    THEN 4\n"
+                  "                                       ELSE 0\n"
+                  "                                       END as delete_rule\n"
+                  "  FROM rdb$relation_constraints con\n"
+                  "      ,rdb$ref_constraints ref\n"
+                  "      ,rdb$indices         idx\n"
+                  "      ,rdb$indices         cix\n"
+                  "      ,rdb$index_segments  seg\n"
+                  "      ,rdb$index_segments  psg\n"
+                  " WHERE con.rdb$constraint_name = ref.rdb$constraint_name\n"
+                  "   AND ref.rdb$const_name_uq   = idx.rdb$index_name\n"
+                  "   AND con.rdb$index_name      = cix.rdb$index_name\n"
+                  "   AND seg.rdb$index_name      = cix.rdb$index_name\n"
+                  "   AND psg.rdb$index_name      = idx.rdb$index_name\n"
+                  "   AND seg.rdb$field_position  = psg.rdb$field_position\n"
+                  "   AND con.rdb$constraint_type = 'FOREIGN KEY'";
+  if(!p_tablename.IsEmpty())
+  {
+    query += "\n   AND con.rdb$relation_name   = '" + p_tablename + "'";
+  }
+  if(!p_constraint.IsEmpty())
+  {
+    query += "\n   AND con.rdb$constraint_name = '" + p_constraint + "'";
+  }
   return query;
 }
 
-// Lijst met queries om referentiele integriteiten te verwijderen
-// nodig voor databases die geen "set constraints all deferred" hebben
-// CString
-// SQLInfoFirebird::GeefRefConstraintVerwijderenLijst(String patroon) const
-// {
-//   String resultaat;
-//   String query = "SELECT rdb$constraint_name\n"
-//                  "      ,rdb$relation_name\n"
-//                  "  FROM rdb$relation_constraints\n"
-//                  " WHERE rdb$constraint_type = 'FOREIGN KEY'";
-//   if(patroon != "")
-//   {
-//     query += "   AND rdb$relation_name like '" + patroon + "%'";
-//   }
-//   DBrecordset rs(GeefDatabase());
-//   rs.VoerSqlUit(query);
-//   while(rs.GetRecord())
-//   {
-//     String res = (String) "alter table " + rs.GetCol_LPCSTR(1) +
-//                           " drop constraint " + rs.GetCol_LPCSTR(0) + ";";
-//     resultaat += res;
-//   }
-//   return resultaat;
-// }
-  
-// Lijst met queries om de referentiele integriteiten weer te herstellen
-// nodig voor databases die geen "set cosntraints all deferred" hebben
-// String
-// SQLInfoFirebird::GeefRefConstraintToevoegenLijst(String patroon) const
-// {
-//   String resultaat = "";
-//   enum {ref_detailtabel=0,ref_constraintnaam,ref_detailkolom,ref_mastertabel};
-//   String query = "select rc.rdb$relation_name   as detail_tabel\n"
-//                  "      ,rc.rdb$constraint_name as constraint_naam\n"
-//                  "      ,ic.rdb$field_name      as detail_kolom\n"
-//                  "      ,mc.rdb$relation_name   as master_tabel\n"
-//                  "  from rdb$relation_constraints rc\n"
-//                  "      ,rdb$index_segments       ic\n"
-//                  "      ,rdb$ref_constraints      rt\n"
-//                  "      ,rdb$relation_constraints mc\n"
-//                  " where rc.rdb$constraint_type = 'FOREIGN KEY'\n"
-//                  "   and ic.rdb$index_name      = rc.rdb$index_name\n"
-//                  "   and rc.rdb$constraint_name = rt.rdb$constraint_name\n"
-//                  "   and rt.rdb$const_name_uq   = mc.rdb$constraint_name";
-//   if(patroon != "")
-//   {
-//     query += "   and rdb$relation_name like '" + patroon + "%'";
-//   }
-//   DBrecordset rs(GeefDatabase());
-//   rs.VoerSqlUit(query);
-//   while(rs.GetRecord())
-//   {
-//     String res = (String)
-//                  "alter table "     + rs.GetCol_LPCSTR(ref_detailtabel) +
-//                  " add constraint " + rs.GetCol_LPCSTR(ref_constraintnaam) +
-//                  " foreign key ("   + rs.GetCol_LPCSTR(ref_detailkolom) +
-//                  ") references "    + rs.GetCol_LPCSTR(ref_mastertabel) +
-//                  " (oid);";
-//     resultaat += res;
-//   }
-//   return resultaat;
-// }
 
 
-// Firebird werkt niet met synoniemen
+// Firebird doesn't use synonyms
 CString 
 SQLInfoFirebird::GetSQLMakeSynonym(CString& /*p_objectName*/) const
 {
   return "";
 }
 
-// Firebird werkt niet met synoniemen
-CString 
+// Firebird doesn't use synonyms
+CString
 SQLInfoFirebird::GetSQLDropSynonym(CString& p_objectName) const
 {
   return "";

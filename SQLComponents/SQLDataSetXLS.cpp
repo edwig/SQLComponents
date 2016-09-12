@@ -2,7 +2,7 @@
 //
 // Copyright (c) 1998- 2014 ir. W.E. Huisman
 // All rights reserved
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
 // to deal in the Software without restriction, including without limitation the rights 
@@ -22,7 +22,7 @@
 // CREDITS:
 // Loosly based on the article by: Yap Chun Wei
 // http://www.codeproject.com/Articles/1636/CSpreadSheet-A-Class-to-Read-and-Write-to-Excel-an
-//
+// 
 #include "stdafx.h"
 #include "SQLDataSetXLS.h"
 
@@ -590,8 +590,8 @@ SQLDataSetXLS::Open()
       for(int col = 1; col <= cols; ++col)
       {
         CString value = sheet->GetCellValue(row,col);
-        SQLVariant* var = new SQLVariant(value.GetString());
-        record->AddField(var,true); // It's for an insertion
+        SQLVariant var(value.GetString());
+        record->AddField(&var,true); // It's for an insertion
       }
     }
     return true;

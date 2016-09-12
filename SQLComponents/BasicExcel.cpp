@@ -6488,16 +6488,16 @@ BasicExcelWorksheet::CellValue(int row,int col,char* p_buffer,int p_length)
       case BasicExcelCell::STRING:    pointer = (char*)cell->GetString();
                                       break;
       case BasicExcelCell::WSTRING:   {
-                                      const std::wstring wstr(cell->GetWString());
-                                      std::string str = ::narrow_string(wstr);
-                                      pointer = (char*)str.c_str();
+                                        const std::wstring wstr(cell->GetWString());
+                                        std::string str = ::narrow_string(wstr);
+                                        pointer = (char*)str.c_str();
                                       }
                                       break;
       case BasicExcelCell::FORMULA:   {
-                                      double result = 0.0;
-                                      cell->Get(result);
-                                      sprintf_s(p_buffer,p_length,"%f",result);
-                                      TrimDoubleString(p_buffer);
+                                        double result = 0.0;
+                                        cell->Get(result);
+                                        sprintf_s(p_buffer,p_length,"%f",result);
+                                        TrimDoubleString(p_buffer);
                                       }
     }
   }

@@ -29,6 +29,10 @@
 #include "SQLDatabase.h"
 #include <vector>
 
+// Maximum supported columns in an index or a foreign key
+// Does not constrict every SQL RDBMS's, but some have multiple!!
+#define SQLINFO_MAX_COLUMNS  8
+
 class SQLInfoDB : public SQLInfo
 {
 public:
@@ -55,6 +59,9 @@ public:
 
   // System catalog is stored in uppercase in the database?
   virtual bool IsCatalogUpper () const = 0;
+
+  // System catalog supports full ISO schemas (same tables per schema)
+  virtual bool GetUnderstandsSchemas() const = 0;
   
   // Supports database/ODBCdriver comments in sql
   virtual bool SupportsDatabaseComments() const = 0;
@@ -301,7 +308,7 @@ public:
   virtual CString GetSQLTableIndexes(CString& p_user,CString& p_tableName) const = 0;
 
   // Get SQL to read the referential constaints from the catalog
-  virtual CString GetSQLTableReferences(CString& p_tablename) const = 0;
+  virtual CString GetSQLTableReferences(CString p_schema,CString p_tablename,CString p_constraint = "",int p_maxColumns = SQLINFO_MAX_COLUMNS) const = 0;
 
   // Get the SQL Query to create a synonym
   virtual CString GetSQLMakeSynonym(CString& p_objectName) const = 0;

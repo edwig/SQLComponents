@@ -822,7 +822,7 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
                                   m_interval.intval.day_second.second   = (SQLUINTEGER)seconds;
                                   m_interval.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                   break;
-    case SQL_IS_YEAR_TO_MONTH:    scannum = sscanf(string,"%d %d",&year,&month);
+    case SQL_IS_YEAR_TO_MONTH:    scannum = sscanf_s(string,"%d %d",&year,&month);
                                   if(scannum == 2)
                                   {
                                     m_interval.intval.year_month.year  = year;
@@ -834,7 +834,7 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
                                     retval = false;
                                   }
                                   break;
-    case SQL_IS_DAY_TO_HOUR:      scannum = sscanf(string,"%d %d",&day,&hour);
+    case SQL_IS_DAY_TO_HOUR:      scannum = sscanf_s(string,"%d %d",&day,&hour);
                                   if(scannum == 2)
                                   {
                                     m_interval.intval.day_second.day  = day;
@@ -845,7 +845,7 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
                                     retval = false;
                                   }
                                   break;
-    case SQL_IS_DAY_TO_MINUTE:    scannum = sscanf(string,"%d %d:%d",&day,&hour,&minute);
+    case SQL_IS_DAY_TO_MINUTE:    scannum = sscanf_s(string,"%d %d:%d",&day,&hour,&minute);
                                   if(scannum == 3)
                                   {
                                     m_interval.intval.day_second.day    = day;
@@ -857,7 +857,7 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
                                     retval = false;
                                   }
                                   break;
-    case SQL_IS_DAY_TO_SECOND:    scannum = sscanf(string,"%d %d:%d:%lf",&day,&hour,&minute,&seconds);
+    case SQL_IS_DAY_TO_SECOND:    scannum = sscanf_s(string,"%d %d:%d:%lf",&day,&hour,&minute,&seconds);
                                   if(scannum == 4)
                                   {
                                     m_interval.intval.day_second.day    = day;
@@ -873,7 +873,7 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
                                     retval = false;
                                   }
                                   break;
-    case SQL_IS_HOUR_TO_MINUTE:   scannum = sscanf(string,"%d:%d",&hour,&minute);
+    case SQL_IS_HOUR_TO_MINUTE:   scannum = sscanf_s(string,"%d:%d",&hour,&minute);
                                   if(scannum == 2)
                                   {
                                     m_interval.intval.day_second.hour   = hour;
@@ -884,7 +884,7 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
                                     retval = false;
                                   }
                                   break;
-    case SQL_IS_HOUR_TO_SECOND:   scannum = sscanf(string,"%d:%d:%lf",&hour,&minute,&seconds);
+    case SQL_IS_HOUR_TO_SECOND:   scannum = sscanf_s(string,"%d:%d:%lf",&hour,&minute,&seconds);
                                   if(scannum == 3)
                                   {
                                     m_interval.intval.day_second.hour   = hour;
@@ -899,7 +899,7 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
                                     retval = false;
                                   }
                                   break;
-    case SQL_IS_MINUTE_TO_SECOND: scannum = sscanf(string,"%d:%lf",&minute,&seconds);
+    case SQL_IS_MINUTE_TO_SECOND: scannum = sscanf_s(string,"%d:%lf",&minute,&seconds);
                                   if(scannum == 2)
                                   {
                                     m_interval.intval.day_second.minute = minute;

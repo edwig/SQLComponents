@@ -76,6 +76,13 @@ SQLInfoAccess::IsCatalogUpper() const
   return false;
 }
 
+// System catalog supports full ISO schemas (same tables per schema)
+bool 
+SQLInfoAccess::GetUnderstandsSchemas() const
+{
+  return false;
+}
+
 // Supports database/ODBCdriver comments in sql
 bool 
 SQLInfoAccess::SupportsDatabaseComments() const
@@ -768,16 +775,13 @@ SQLInfoAccess::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) cons
 
 // Get SQL to read the referential constaints from the catalog
 CString 
-SQLInfoAccess::GetSQLTableReferences(CString& p_tablename) const
+SQLInfoAccess::GetSQLTableReferences(CString p_schema
+                                    ,CString p_tablename
+                                    ,CString p_constraint /*=""*/
+                                    ,int     /* p_maxColumns = SQLINFO_MAX_COLUMNS*/) const
 {
-  CString query = "SELECT con.name\n"
-    "      ,tab.name\n"
-    "  FROM dbo.sysobjects con, dbo.sysobjects tab\n"
-    " WHERE tab.name = '" + p_tablename + "'"
-    "   AND tab.Id = con.parent_obj\n"
-    "   AND con.xtype = 'F'\n"
-    "   AND con.type = 'F'\n";
-  return query;
+  // Access driver not capable of getting the table references
+  return CString("");
 }
 
 // Get the SQL Query to create a synonym

@@ -29,7 +29,7 @@
 //
 #include "stdafx.h"
 #include "BasicXmlExcel.h"
-#include "GetLastErrorAsString.h"
+//#include "GetLastErrorAsString.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

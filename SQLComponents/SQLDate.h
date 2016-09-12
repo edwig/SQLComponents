@@ -120,12 +120,12 @@ public:
   SQLDate       operator+ (const SQLInterval& p_interval) const;
   SQLDate       operator- (const SQLInterval& p_interval) const;
   // Logical comparison operators on a a date
-  bool          operator <(const SQLDate& p_date) const;
-  bool          operator >(const SQLDate& p_date) const;
-  bool          operator==(const SQLDate& p_date) const;
-  bool          operator!=(const SQLDate& p_date) const;
-  bool          operator<=(const SQLDate& p_date) const;
-  bool          operator>=(const SQLDate& p_date) const;
+  bool     operator <(const SQLDate& p_date) const;
+  bool     operator >(const SQLDate& p_date) const;
+  bool     operator==(const SQLDate& p_date) const;
+  bool     operator!=(const SQLDate& p_date) const;
+  bool     operator<=(const SQLDate& p_date) const;
+  bool     operator>=(const SQLDate& p_date) const;
 
   // Asking for the current date
   static SQLDate Today();

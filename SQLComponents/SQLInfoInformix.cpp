@@ -90,6 +90,12 @@ SQLInfoInformix::IsCatalogUpper () const
   return false;
 }
 
+// System catalog supports full ISO schemas (same tables per schema)
+bool
+SQLInfoInformix::GetUnderstandsSchemas() const
+{
+  return false;
+}
 // Supports database/ODBCdriver comments in sql
 bool 
 SQLInfoInformix::SupportsDatabaseComments() const
@@ -748,21 +754,88 @@ SQLInfoInformix::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) co
 
 // Get SQL to read the referential constaints from the catalog
 CString 
-SQLInfoInformix::GetSQLTableReferences(CString& p_tablename) const
+SQLInfoInformix::GetSQLTableReferences(CString p_schema
+                                      ,CString p_tablename
+                                      ,CString p_constraint /*=""*/
+                                      ,int     p_maxColumns /*= SQLINFO_MAX_COLUMNS*/) const
 {
-  CString lowerName(p_tablename);
-  lowerName.MakeLower();
-  // EH Reads all current references
-  CString query = "select con.constrname "
-                  "      ,con.tabid "
-                  "      ,con.constrid "
-                  "  from sysconstraints con "
-                  "      ,systables tab "
-                  " where tab.tabid      = con.tabid "
-                  "   and con.constrtype = 'R' "
-                  "   and tab.tabname    = '" + lowerName + "'";
+  CString query;
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  p_constraint.MakeLower();
+
+  for(int ind = 1;ind <= p_maxColumns; ++ind)
+  {
+    CString part;
+    part.Format("SELECT con.constrname  AS foreign_key_constraint\n"
+                "      ,tab.owner       AS schema_name\n"
+                "      ,tab.tabname     AS table_name\n"
+                "      ,col.colname     AS column_name\n"
+                "      ,pri.tabname     AS primary_table_name\n"
+                "      ,pcl.colname     AS primary_column_name\n"
+                "      ,1               AS deferrable\n"
+                "      ,0               AS initially_deferred\n"
+                "      ,1               AS enabled\n"
+                "      ,CASE WHEN ref.matchtype = 'N' THEN 0\n"
+                "            WHEN ref.matchtype = 'P' THEN 1\n"
+                "            ELSE 0\n"
+                "       END  AS match_option\n"
+                "      ,CASE WHEN ref.updrule = 'R' THEN 0\n"
+                "            WHEN ref.updrule = 'C' THEN 1\n"
+                "            WHEN ref.updrule = 'N' THEN 2\n"
+                "            WHEN ref.updrule = 'D' THEN 3\n"
+                "            ELSE 0\n"
+                "       END  AS update_rule\n"
+                "      ,CASE WHEN ref.delrule = 'R' THEN 0\n"
+                "            WHEN ref.delrule = 'C' THEN 1\n"
+                "            WHEN ref.delrule = 'N' THEN 2\n"
+                "            WHEN ref.delrule = 'D' THEN 3\n"
+                "            ELSE 0\n"
+                "       END  AS delete_rule\n"
+                "  FROM sysconstraints con\n"
+                "      ,systables      tab\n"
+                "      ,syscolumns     col\n"
+                "      ,sysreferences  ref\n"
+                "      ,systables      pri\n"
+                "      ,sysindexes     idx\n"
+                "      ,sysconstraints pcn\n"
+                "      ,sysindexes     pix\n"
+                "      ,syscolumns     pcl\n"
+                " WHERE tab.tabid      = con.tabid\n"
+                "   AND con.constrid   = ref.constrid\n"
+                "   AND ref.ptabid     = pri.tabid\n"
+                "   AND con.idxname    = idx.idxname\n"
+                "   AND col.tabid      = tab.tabid\n"
+                "   AND col.colno      = idx.part%d\n"
+                "   AND pcn.tabid      = pri.tabid\n"
+                "   AND pix.idxname    = pcn.idxname\n"
+                "   AND pcl.tabid      = pri.tabid\n"
+                "   AND pcl.colno      = pix.part%d\n"
+                "   and con.constrtype = 'R'\n"
+                "   AND pcn.constrtype = 'P'\n"
+               ,ind
+               ,ind);
+    if(!p_schema.IsEmpty())
+    {
+      part += "\n    AND tab.owner = '" + p_schema + "'";
+    }
+    if(!p_tablename.IsEmpty())
+    {
+      part += "\n   AND tab.tabname    = '" + p_tablename + "'";
+    }
+    if(!p_constraint.IsEmpty())
+    {
+      part += "\n    AND con.constrname = '" + p_constraint + "'";
+    }
+    // Add to the query
+    if(!query.IsEmpty())
+    {
+      query += "\nUNION ALL\n";
+    }
+    query += part;
+  }
   return query;
-}
+  }
 
 // Get the SQL Query to create a synonym
 CString 

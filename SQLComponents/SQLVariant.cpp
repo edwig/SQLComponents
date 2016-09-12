@@ -1967,11 +1967,11 @@ SQLVariant::SetData(int p_type,const char* p_data)
     case SQL_C_CHAR:                      m_binaryLength = (int)(dataLen + 1);
                                           m_data.m_dataCHAR = (char*) malloc(m_binaryLength);
                                           strcpy_s(m_data.m_dataCHAR,m_binaryLength,p_data);
-                                          m_indicator = SQL_NTS;
+                                          m_indicator = dataLen > 0 ? SQL_NTS : SQL_NULL_DATA;
                                           break;
   //case SQL_C_VARBOOKMARK:               // Fall through
-    case SQL_C_BINARY:                    m_indicator    =
-                                          m_binaryLength = (int)(dataLen / 2);
+    case SQL_C_BINARY:                    m_binaryLength = (int)(dataLen / 2);
+                                          m_indicator    = m_binaryLength > 0 ? m_binaryLength : SQL_NULL_DATA;
                                           m_data.m_dataBINARY = (unsigned char*) malloc(2 + m_binaryLength);
                                           StringToBinary(p_data);
                                           break;

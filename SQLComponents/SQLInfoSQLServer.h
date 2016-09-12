@@ -48,6 +48,9 @@ public:
   // System catalog is stored in uppercase in the database?
   bool    IsCatalogUpper () const;
 
+  // System catalog supports full ISO schemas (same tables per schema)
+  bool    GetUnderstandsSchemas() const;
+
   // Supports database/ODBCdriver comments in sql
   bool    SupportsDatabaseComments() const;
 
@@ -293,7 +296,7 @@ public:
   CString GetSQLTableIndexes(CString& p_user,CString& p_tableName) const;
 
   // Get SQL to read the referential constaints from the catalog
-  CString GetSQLTableReferences(CString& p_tablename) const;
+  CString GetSQLTableReferences(CString p_schema,CString p_tablename,CString p_constraint = "",int p_maxColumns = SQLINFO_MAX_COLUMNS) const;
 
   // Get the SQL Query to create a synonym
   CString GetSQLMakeSynonym(CString& p_objectName) const;

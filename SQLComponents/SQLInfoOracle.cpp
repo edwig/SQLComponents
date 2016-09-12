@@ -93,6 +93,13 @@ SQLInfoOracle::IsCatalogUpper() const
   return true;
 }
 
+// System catalog supports full ISO schemas (same tables per schema)
+bool
+SQLInfoOracle::GetUnderstandsSchemas() const
+{
+  return true;
+}
+
 // Supports database/ODBCdriver comments in sql
 bool 
 SQLInfoOracle::SupportsDatabaseComments() const
@@ -820,15 +827,64 @@ SQLInfoOracle::GetSQLTableIndexes(CString& p_user,CString& p_tableName) const
 
 // Get SQL to read the referential constaints from the catalog
 CString 
-SQLInfoOracle::GetSQLTableReferences(CString& p_tablename) const
+SQLInfoOracle::GetSQLTableReferences(CString p_schema
+                                    ,CString p_tablename
+                                    ,CString p_constraint /*=""*/
+                                    ,int     /* p_maxColumns = SQLINFO_MAX_COLUMNS*/) const
 {
-  CString upperName = p_tablename;
-  upperName.MakeUpper(); 
-  CString query = "SELECT con.constraint_name\n"
-                  "      ,con.table_name\n"
-                  "  FROM user_constraints con\n"
-                  " WHERE constraint_type = 'R'\n"
-                  "   AND con.table_name  = '" + upperName + "'";
+  // Oracle catalog is in uppercase
+  p_schema.MakeUpper();
+  p_tablename.MakeUpper();
+  p_constraint.MakeUpper();
+
+  // Minimal requirements of the catalog
+  if(p_schema.IsEmpty() || p_tablename.IsEmpty())
+  {
+    throw CString("Cannot get table references without schema/tablename");
+  }
+
+  CString query = "SELECT con.constraint_name  AS foreign_key_constraint\n"
+                  "      ,con.owner            AS schema_name\n"
+                  "      ,con.table_name       AS table_name\n"
+                  "      ,col.column_name      AS column_name\n"
+                  "      ,pri.table_name       AS primary_table_name\n"
+                  "      ,CASE con.deferrable  WHEN 'NOT DEFERRABLE' THEN 0\n"
+                  "                            WHEN 'DEFERRABLE'     THEN 1\n"
+                  "                            ELSE 0 END AS DEFERRABLE\n"
+                  "      ,CASE con.deferred    WHEN 'IMMEDIATE'      THEN 0\n"
+                  "                            ELSE 1 END AS initially_deferred\n"
+                  "      ,CASE con.status      WHEN 'ENABLED' THEN 1\n"
+                  "                            ELSE 0 END AS enabled\n"
+                  "      ,0                    AS match_option\n"
+                  "      ,0                    AS update_rule\n"
+                  "      ,CASE con.delete_rule WHEN 'RESTRICT'    THEN 0\n"
+                  "                            WHEN 'CASCADE'     THEN 1\n"
+                  "                            WHEN 'SET NULL'    THEN 2\n"
+                  "                            WHEN 'SET DEFAULT' THEN 3\n"
+                  "                            WHEN 'NO ACTION'   THEN 4\n"
+                  "                            ELSE 0 END AS delete_rule\n"
+                  "  FROM dba_constraints  con\n"
+                  "      ,dba_cons_columns col\n"
+                  "      ,dba_constraints  pri\n"
+                  "      ,dba_cons_columns pky\n"
+                  " WHERE con.owner           = col.owner\n"
+                  "   AND con.constraint_name = col.constraint_name\n"
+                  "   AND con.table_name      = col.table_name\n"
+                  "   AND pri.owner           = con.r_owner\n"
+                  "   AND pri.constraint_name = con.r_constraint_name\n"
+                  "   AND pri.owner           = pky.owner\n"
+                  "   AND pri.constraint_name = pky.constraint_name\n"
+                  "   AND pri.table_name      = pky.table_name\n"
+                  "   AND col.position        = pky.position\n"
+                  "   AND con.constraint_type = 'R'";
+                  "   AND con.owner           = '" + p_schema    + "'\n"
+                  "   AND con.table_name      = '" + p_tablename + "'";
+
+  // Optionally a constraint name                
+  if(!p_constraint.IsEmpty())
+  {
+    query += "\n   AND con.constraint_name = '" + p_constraint + "'";
+  }
   return query;
 }
 

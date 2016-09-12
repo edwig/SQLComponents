@@ -82,6 +82,13 @@ SQLInfoPostgreSQL::IsCatalogUpper () const
   return false;
 }
 
+// System catalog supports full ISO schemas (same tables per schema)
+bool
+SQLInfoPostgreSQL::GetUnderstandsSchemas() const
+{
+  return true;
+}
+
 // Ondersteund database/ODBCdriver commentaar in sql
 bool 
 SQLInfoPostgreSQL::SupportsDatabaseComments() const
@@ -811,16 +818,84 @@ SQLInfoPostgreSQL::GetSQLTableIndexes(CString& p_user,CString& p_tableName) cons
 
 // Geef de query om de referential constaints uit de catalogus te lezen.
 CString 
-SQLInfoPostgreSQL::GetSQLTableReferences(CString& p_tablename) const
+SQLInfoPostgreSQL::GetSQLTableReferences(CString p_schema
+                                        ,CString p_tablename
+                                        ,CString p_constraint /*=""*/
+                                        ,int     p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
 {
-  CString lowerName(p_tablename);
-  lowerName.MakeLower();
-  CString query = "SELECT con.conname\n"
-                  "      ,cla.relname\n"
-                  "  FROM pg_constraint con, pg_class cla\n"
-                  " WHERE con.contype = 'f'\n"
-                  "   AND con.conrelid = cla.oid\n"
-                  "   AND cla.relname  = '" + lowerName + "'";
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  p_constraint.MakeLower();
+
+  CString query;
+
+  for(int ind = 1; ind <= p_maxColumns; ++ind)
+  {
+    CString part;
+    part.Format("SELECT con.conname       as constraint_name\n"
+                "      ,sch.nspname       as schema\n"
+                "      ,cla.relname       as table_name\n"
+                "      ,att.attname       as column_name\n"
+                "      ,pri.relname       as primary_table_name\n"
+                "      ,fky.attname       AS primary_column_name\n"
+                "      ,con.condeferrable as deferrable\n"
+                "      ,con.condeferred   as initially_deferred\n"
+                "      ,0                 as enabled\n"
+                "      ,case con.confmatchtype WHEN 's' THEN 1\n"
+                "                              WHEN 'f' THEN 1\n"
+                "                              ELSE  0\n"
+                "                              END as match_option\n"
+                "      ,case con.confdeltype   WHEN 'r' THEN 0\n"
+                "                              WHEN 'c' THEN 1\n"
+                "                              WHEN 'n' THEN 2\n"
+                "                              WHEN 'd' THEN 3\n"
+                "                              WHEN 'a' THEN 4\n"
+                "                              ELSE  0\n"
+                "                              END as update_rule\n"
+                "      ,case con.confupdtype   WHEN 'r' THEN 0\n"
+                "                              WHEN 'c' THEN 1\n"
+                "                              WHEN 'n' THEN 2\n"
+                "                              WHEN 'd' THEN 3\n"
+                "                              WHEN 'a' THEN 4\n"
+                "                              ELSE  0\n"
+                "                              END as delete_rule\n"
+                "  FROM pg_constraint con\n"
+                "      ,pg_class      cla\n"
+                "      ,pg_attribute  att\n"
+                "      ,pg_namespace  sch\n"
+                "      ,pg_class      pri\n"
+                "      ,pg_attribute  fky\n"
+                " WHERE con.contype      = 'f'\n"
+                "   AND con.conrelid     = cla.oid\n"
+                "   and cla.relnamespace = sch.oid\n"
+                "   and con.confrelid    = pri.oid\n"
+                "   and att.attrelid     = cla.oid\n"
+                "   and att.attnum       = con.conkey[%d]\n"
+                "   and fky.attrelid     = pri.oid\n"
+                "   and fky.attnum       = con.confkey[%d]\n"
+                "   AND cla.relname      = 'part'"
+               ,ind
+               ,ind);
+    if(!p_schema.IsEmpty())
+    {
+      part += "\n   AND sch.nspname = '" + p_schema + "'";
+    }
+    if(!p_tablename.IsEmpty())
+    {
+      part += "\n   AND cla.relname = '" + p_tablename + "'";
+    }
+    if(!p_constraint.IsEmpty())
+    {
+      part += "\n   AND con.conname = '" + p_constraint + "'";
+    }
+
+    // Append to query, multiple for multiple columns
+    if(!query.IsEmpty())
+    {
+      query += "\nUNION ALL\n";
+    }
+    query += part;
+  }
   return query;
 }
 
