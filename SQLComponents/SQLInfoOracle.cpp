@@ -304,7 +304,8 @@ SQLInfoOracle::GetIdentityString(CString& p_tablename,CString p_postfix /*="_seq
 CString 
 SQLInfoOracle::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_select) const
 {
-  return "CREATE GLOBAL TEMPORARY TABLE " + p_tablename + "\nAS " + p_select;
+  return "CREATE GLOBAL TEMPORARY TABLE " + p_tablename + "\nAS " + p_select + 
+         "ON COMMIT PRESERVE ROWS";
 }
 
 // Get the query to remove a temporary table indefinetly

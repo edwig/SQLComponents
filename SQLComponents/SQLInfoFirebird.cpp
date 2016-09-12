@@ -34,9 +34,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// Verwijderen na volledige implementatie
-#pragma warning (disable: 4100)
-
 // Constructor.
 SQLInfoFirebird::SQLInfoFirebird(SQLDatabase* p_database)
                 :SQLInfoDB(p_database)
@@ -285,9 +282,8 @@ SQLInfoFirebird::GetIdentityString(CString& p_tablename,CString p_postfix /*="_s
 CString 
 SQLInfoFirebird::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_select) const
 {
-  // return "CREATE TABLE " + p_tablename + "\nAS " + p_select;
-  // Firebird ondersteunt dit niet!
-  return "";
+  return "CREATE GLOBAL TEMPORARY TABLE " + p_tablename + "\nAS " + p_select +
+         "ON COMMIT PRESERVE ROWS";
 }
 
 // Geef de query om een tijdelijke tabel definitief te verwijderen
@@ -303,8 +299,7 @@ SQLInfoFirebird::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) 
 CString 
 SQLInfoFirebird::GetSQLSelectIntoTemp(CString& p_tablename,CString& p_select) const
 {
-  // Firebird ondersteunt dit niet!
-  return "";
+  return "INSERT INTO " + p_tablename + "\n" + p_select + ";\n";
 }
 
 // Vervang de OID kolom door een sequence.nextval
@@ -332,14 +327,14 @@ SQLInfoFirebird::GetReplaceColumnOIDbySequence(CString p_columns,CString p_table
 
 // Geef opslagruimte clausule voor tabellen
 CString 
-SQLInfoFirebird::GetTablesTablespace(CString p_tablespace /*=""*/) const
+SQLInfoFirebird::GetTablesTablespace(CString /*p_tablespace =""*/) const
 {
   return "";
 }
 
 // Geef opslagruimte clausule voor indexen
 CString 
-SQLInfoFirebird::GetIndexTablespace(CString p_tablespace /*=""*/) const
+SQLInfoFirebird::GetIndexTablespace(CString /*p_tablespace =""*/) const
 {
   return "";
 }
@@ -405,7 +400,7 @@ SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) c
 
 // Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
 CString
-SQLInfoFirebird::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool p_temporary) const
+SQLInfoFirebird::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool /*p_temporary*/) const
 {
   return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")";
 }
@@ -716,7 +711,7 @@ SQLInfoFirebird::GetSQLTableExists(CString p_tablename) const
 
 // Geef de query die de kolommen van een tabel uit de catalogus haalt
 CString 
-SQLInfoFirebird::GetSQLGetColumns(CString& p_user,CString& p_tableName) const
+SQLInfoFirebird::GetSQLGetColumns(CString& /*p_user*/,CString& p_tableName) const
 {
   CString upperName(p_tableName);
   upperName.MakeUpper();
@@ -753,7 +748,7 @@ SQLInfoFirebird::GetSQLGetConstraintsForTable(CString& p_tableName) const
 
 // Lees de bestaande indexen van een tabel
 CString 
-SQLInfoFirebird::GetSQLTableIndexes(CString& p_user,CString& p_tableName) const
+SQLInfoFirebird::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) const
 {
   CString upperName(p_tableName);
   upperName.MakeUpper(); 
@@ -780,7 +775,7 @@ CString
 SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
                                       ,CString p_tablename
                                       ,CString p_constraint /*=""*/
-                                      ,int     p_maxColumns /*= SQLINFO_MAX_COLUMNS*/) const
+                                      ,int     /*p_maxColumns = SQLINFO_MAX_COLUMNS*/) const
 {
   p_tablename.MakeUpper();
   p_constraint.MakeUpper();
@@ -843,7 +838,7 @@ SQLInfoFirebird::GetSQLMakeSynonym(CString& /*p_objectName*/) const
 
 // Firebird doesn't use synonyms
 CString
-SQLInfoFirebird::GetSQLDropSynonym(CString& p_objectName) const
+SQLInfoFirebird::GetSQLDropSynonym(CString& /*p_objectName*/) const
 {
   return "";
 }
@@ -970,10 +965,19 @@ SQLInfoFirebird::GetSQLSearchSession(const CString& /*p_databaseName*/,const CSt
 
 // Kijk of tabel/kolom combinatie bestaat
 bool   
-SQLInfoFirebird::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const
+SQLInfoFirebird::DoesColumnExistsInTable(CString& /*p_owner*/,CString& p_tableName,CString& p_column) const
 {
-  // Nog te implementeren
-  return 0;
+  CString table(p_tableName);
+  CString column(p_column);
+  table.MakeUpper();
+  column.MakeUpper();
+  
+  CString query = "SELECT COUNT(*)\n"
+                  "  FROM rdb$relation_fields\n"
+                  " WHERE rdb$relation_name = '" + p_tableName + "'\n"
+                  "   AND rdb$field_name    = '" + p_column + "'";
+  SQLQuery qry(m_database);
+  return qry.DoSQLStatementScalar(query)->GetAsBoolean();
 }
 
 // Query om te bepalen of de tabel al een primary key heeft
@@ -983,9 +987,9 @@ SQLInfoFirebird::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) con
   CString table(p_tableName);
   table.MakeUpper();
   CString query = "select count(*)\n"
-                 "  from rdb$indices\n"
-                 " where rdb$relation_name = '" + table + "'\n"
-                 "   and rdb$index_name = 'PK_" + table + "'";
+                  "  from rdb$indices\n"
+                  " where rdb$relation_name = '" + table + "'\n"
+                  "   and rdb$index_name = 'PK_" + table + "'";
   return query;
 }
 
@@ -996,18 +1000,19 @@ SQLInfoFirebird::DoesConstraintExist(CString p_constraintName) const
   return false;
 }
 
-// Geeft een lock-table query
+// returns a lock table statement
 CString 
-SQLInfoFirebird::GetSQLLockTable(CString& p_tableName,bool p_exclusive) const
+SQLInfoFirebird::GetSQLLockTable(CString& /*p_tableName*/,bool /*p_exclusive*/) const
 {
-  // Firebird kent geen LOCK-TABLE statement
+  // Firebird does NOT have a LOCK-TABLE statement
   return "";
 }
 
-// Geef query om de statistics te optimaliseren / analyseren
+// Query to optimize a table
 CString 
-SQLInfoFirebird::GetSQLOptimizeTable(CString& p_owner,CString& p_tableName,int& p_number)
+SQLInfoFirebird::GetSQLOptimizeTable(CString& /*p_owner*/,CString& /*p_tableName*/,int& /*p_number*/)
 {
+  // Firebird has no SQL for this, it uses "gfix -sweep <database>"
   return "";
 }
 
@@ -1132,8 +1137,15 @@ SQLInfoFirebird::DoDropColumn(CString p_tableName,CString p_columName)
 bool
 SQLInfoFirebird::DoesViewExists(CString& p_viewName)
 {
-  // To be implemented
-  return true;
+  CString view(p_viewName);
+  view.MakeUpper();
+
+  CString sql = "SELECT count(*)\n"
+                "  FROM rdb$relations\n"
+                " WHERE rdb$relation_name = '" + view + "'\n"
+                "   AND rdb$relation_type = 1";
+  SQLQuery query(m_database);
+  return query.DoSQLStatementScalar(sql)->GetAsBoolean();
 }
 
 // Creeer tijdelijke klassen runtime
@@ -1143,38 +1155,33 @@ SQLInfoFirebird::GetMustMakeTemptablesAtRuntime() const
   return true;
 }
 
-// Creeer een tijdelijke tabel op een geoptimaliseerde manier vanuit een meegegeven info
+// Creates a temporary table 
 void
-SQLInfoFirebird::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const
+SQLInfoFirebird::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& /*p_indexColumn*/) const
 {
   // @EH Firebird
   // Firebird kent geen echte 'tijdelijke' tabellen
   // Support voor beheer van temp-dbspaces nog te bouwen
   SQLQuery sql(m_database);
-  CString create = "CREATE TABLE " + p_tableName + GetStorageSpaceNameForTempTables(p_tableName) + p_content;
+  CString create = "CREATE GLOBAL TEMPORARY TABLE " + p_tableName + p_content;
   try
   {
     sql.DoSQLStatement(create);
   }
-  catch(...)
+  catch(CString& error)
   {
-    // Kan geen tijdelijke tabel maken: %s
-    throw CString("Cannot create temporary table: " + p_tableName);
+    // throw error if not succeeded
+    throw CString("Cannot create temporary table: " + p_tableName + " : " + error);
   }
 }
 
-// Verwijder tijdelijke tabel weer
+// Removal of the temporary table
 void
 SQLInfoFirebird::DoRemoveTemporaryTable(CString& p_tableName) const
 {
   SQLQuery query(m_database);
-  // Als de tijdelijke tabel er niet is, dan is het niet erg.
+  // If table is not there, no error...
   query.TryDoSQLStatement("DROP TABLE " + p_tableName);
-
-  // Voor de zekerheid: Bestand eerst wissen in de temp-tablespace
-  // Negeer eventuele foutcode. Is immers niet erg als het bestand er niet is
-  CString file = GetStorageSpaceNameForTempTables(p_tableName);
-  DeleteFile(file);
 }
 
 // Indien de tabel een tijdelijke tabel is, verwijder hem
@@ -1213,9 +1220,9 @@ SQLInfoFirebird::DoMakeProcedure(CString& p_procName,CString p_table,bool /*p_no
   DoCommitDDLcommands();
 }
 
-// Wijze van de database om een tabel van naam te veranderen
+// Not supported by Firebird
 void
-SQLInfoFirebird::DoRenameTable(CString& p_oldName,CString& p_newName) const
+SQLInfoFirebird::DoRenameTable(CString& /*p_oldName*/,CString& /*p_newName*/) const
 {
   throw CString("Changing database tablenames is not supported by this database type.");
 }
@@ -1357,8 +1364,9 @@ SQLInfoFirebird::GetSQLDateString(int p_year,int p_month,int p_day) const
 CString 
 SQLInfoFirebird::GetSQLTimeString(int p_hour,int p_minute,int p_second) const
 {
-  // To be implemented
-  return "";
+  CString time;
+  time.Format("%2.2d:%2.2d:%2.2d",p_hour,p_minute,p_second);
+  return time;
 }
 
 CString 
@@ -1390,7 +1398,7 @@ SQLInfoFirebird::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,i
 }
 
 CString 
-SQLInfoFirebird::GetSPLSourcecodeFromDatabase(const CString& p_owner,const CString& p_procName) const
+SQLInfoFirebird::GetSPLSourcecodeFromDatabase(const CString& /*p_owner*/,const CString& /*p_procName*/) const
 {
   // @EH Nog implementeren
   return "";
@@ -1426,7 +1434,7 @@ SQLInfoFirebird::GetSPLCursorFound(CString& p_cursorName) const
 
 // Get the SPL cursor row-count variable
 CString 
-SQLInfoFirebird::GetSPLCursorRowCount(CString& p_variable) const
+SQLInfoFirebird::GetSPLCursorRowCount(CString& /*p_variable*/) const
 {
   // Not supported
   return "";
@@ -1434,7 +1442,7 @@ SQLInfoFirebird::GetSPLCursorRowCount(CString& p_variable) const
 
 // Get the SPL datatype for a declaration of a row-variable
 CString 
-SQLInfoFirebird::GetSPLCursorRowDeclaration(CString& p_cursorName,CString& p_variableName) const
+SQLInfoFirebird::GetSPLCursorRowDeclaration(CString& /*p_cursorName*/,CString& /*p_variableName*/) const
 {
   // TODO: Check
   return "";
