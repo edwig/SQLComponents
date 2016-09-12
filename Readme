@@ -1,10 +1,8 @@
 SQL Components
 ==============
 
-
 General ODBC components to work with SQL Databases and all gory details therein.
 The 'standard' proces to work with these components is:
-
 
 // Define a database
 SQLDatabase database;
@@ -36,3 +34,17 @@ if(database.IsOpen())
 // Go close it
 // Or don't and just go out of scope
 database.Close();
+
+
+DATABASE INDEPENDENT
+====================
+You can use the following database types through the DBInfoDB class
+- IBM Informix
+- Oracle
+- Microsoft SQL Server
+- Microsoft Access (Jet engine)
+- Firebird
+- PostgreSQL
+- Generic ODBC database
+
+To do this, use the methods of "database->GetSQLInfo->SomeMethod()"
