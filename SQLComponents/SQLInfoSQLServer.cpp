@@ -340,36 +340,6 @@ SQLInfoSQLServer::GetReplaceColumnOIDbySequence(CString p_columns,CString p_tabl
   return p_columns;
 }
 
-// Get the tablespace for the tables
-CString
-SQLInfoSQLServer::GetTablesTablespace(CString p_tablespace /*=""*/) const
-{
-  return "";
-}
-
-// Get the tablespace for the indexes
-// If no default is givven, fallbacks to the DEFAULT tablespace
-CString
-SQLInfoSQLServer::GetIndexTablespace(CString p_tablespace /*=""*/) const
-{
-  return "";
-}
-
-// Get the storage name for indici
-CString 
-SQLInfoSQLServer::GetStorageSpaceNameForIndexes() const
-{
-  return "INDEX"; // Settings::OpslagRuimte::OracleIndexTablespace;
-}
-
-// Get the storage space for temporary tables
-CString
-SQLInfoSQLServer::GetStorageSpaceNameForTempTables(CString p_tablename) const
-{
-  // MS_SQLServer uses implicit TEMP TABLESPACE for the user
-  return "";
-}
-
 // Remove catalog dependencies for stored procedures
 // To be run after a 'DROP PROCEDURE' or 'DROP FUNCTION'
 CString 
@@ -394,14 +364,65 @@ SQLInfoSQLServer::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary
   // The primary key constraint is not directly generated after the column
   // to ensure it wil use the named index in the correct tablespace
   // Otherwise the index name and tablespace cannot be definied and will be auto-generated
-  return GetPrimaryKeyType() + " NOT NULL\n";
+  return GetPrimaryKeyType() + " NOT NULL CONSTRAINT pk_" + p_tableName + " PRIMARY KEY\n";
 }
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString
-SQLInfoSQLServer::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool /*p_temporary*/) const
+SQLInfoSQLServer::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
 {
-  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")";
+  return "ALTER TABLE " + p_tablename + "\n"
+         "  ADD CONSTRAINT pk_" + p_tablename + "\n"
+         "      PRIMARY KEY (" + p_primary + ")";
+}
+
+// Get the sql to add a foreign key to a table
+CString 
+SQLInfoSQLServer::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
+{
+  // Construct the correct tablenames
+  CString table  (p_foreign.m_tablename);
+  CString primary(p_foreign.m_primaryTable);
+  if(!p_foreign.m_schema.IsEmpty())
+  {
+    table   = p_foreign.m_schema + "." + table;
+    primary = p_foreign.m_schema + "." + primary;
+  }
+
+  // The base foreign key command
+  CString query = "ALTER TABLE " + table + "\n"
+                  "  ADD CONSTRAINT " + p_foreign.m_constraintname + "\n"
+                  "      FOREIGN KEY (" + p_foreign.m_column + ")\n"
+                  "      REFERENCES " + primary + "(" + p_foreign.m_primaryColumn + ")";
+  switch(p_foreign.m_updateRule)
+  {
+    case 1: query += "\n      ON UPDATE CASCADE";     break;
+    case 2: query += "\n      ON UPDATE SET NULL";    break;
+    case 3: query += "\n      ON UPDATE SET DEFAULT"; break;
+    case 4: query += "\n      ON UPDATE NO ACTION";   break;
+    default:// In essence: ON UPDATE RESTRICT, but that's already the default
+    case 0: break;
+  }
+  switch(p_foreign.m_deleteRule)
+  {
+    case 1: query += "\n      ON DELETE CASCADE";     break;
+    case 2: query += "\n      ON DELETE SET NULL";    break;
+    case 3: query += "\n      ON DELETE SET DEFAULT"; break;
+    case 4: query += "\n      ON DELETE NO ACTION";   break;
+    default:// In essence: ON DELETE RESTRICT, but that's already the default
+    case 0: break;
+  }
+  return query;
+}
+
+// Get the sql (if possible) to change the foreign key constraint
+CString 
+SQLInfoSQLServer::GetSQLAlterForeignKey(DBForeign& /*p_origin*/,DBForeign& /*p_requested*/) const
+{
+  // MS-SQL Server cannot alter a foreign-key constraint.
+  // You must drop and then re-create your foreign key constraint
+  // So return an empty string to signal this!
+  return "";
 }
 
 // Performance parameters to be added to the database
@@ -445,49 +466,6 @@ unsigned long
 SQLInfoSQLServer::GetMaxStatementLength() const
 {
   return 0;		// No limit
-}
-
-// Prefix for an add constraint DDL command in SQLAtlerTableGenerator
-CString 
-SQLInfoSQLServer::GetAddConstraintPrefix(CString p_constraintName) const
-{
-  return "ADD CONSTRAINT " + p_constraintName + " ";
-}
-
-// Suffix for an add constraint DDL command in SQLAtlerTableGenerator
-CString 
-SQLInfoSQLServer::GetAddConstraintSuffix(CString /*p_constraintName*/) const
-{
-  return "";
-}
-
-// Get the prefix for a drop constraint DDL command in the SQLAlterTableGenerator
-CString 
-SQLInfoSQLServer::GetDropConstraintPrefix() const
-{
-  return "DROP CONSTRAINT ";
-}
-
-// Get the suffix for a drop constraint DDL commando in the SQLAlterTableGenerator
-CString 
-SQLInfoSQLServer::GetDropConstraintSuffix() const
-{
-  return "";
-}
-
-// Clause separator between two ADD or DROP clauses in an ALTER TABLE
-CString 
-SQLInfoSQLServer::GetAlterTableClauseSeparator() const
-{
-  return ", ";
-}
-
-// Grouping of more than one column possible in an ADD/MODIFY/DROP clause
-bool   
-SQLInfoSQLServer::GetClauseGroupingPossible() const
-{
-  // Kan meerdere ADD (kolomdef ,.... ) doen
-  return true;
 }
 
 // Gets the prefix needed for altering the datatype of a column in a MODIFY/ALTER
@@ -753,16 +731,17 @@ SQLInfoSQLServer::GetSQLGetConstraintsForTable(CString& p_tableName) const
   return contabel;
 }
 
-// Get SQL to read all indici for a table
+// Get SQL to read all indices for a table
 CString 
-SQLInfoSQLServer::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) const
+SQLInfoSQLServer::GetSQLTableIndices(CString /*p_user*/,CString p_tableName) const
 {
+  p_tableName.MakeLower();
   CString query = "SELECT idx.name\n"
-                  "      ,indexproperty(obj.Id, idx.name, 'IsClustered')\n"
-                  "      ,indexproperty(obj.Id, idx.name, 'IsUnique')\n"
-                  "      ,ixk.keyno\n"
                   "      ,col.name\n"
+                  "      ,ixk.keyno\n"
+                  "      ,indexproperty(obj.Id, idx.name, 'IsUnique')\n"
                   "      ,indexkey_property(obj.Id, idx.indid, ixk.keyno, 'IsDescending')\n"
+                  "      ,'' as index_source"
                   "  FROM dbo.sysindexes idx\n"
                   "      ,dbo.sysindexkeys ixk\n"
                   "      ,dbo.sysobjects obj\n"
@@ -778,6 +757,45 @@ SQLInfoSQLServer::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) c
                   " ORDER BY idx.name\n"
                   "         ,ixk.keyno\n";
   return query;
+}
+
+// Get SQL to create an index for a table
+CString 
+SQLInfoSQLServer::GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* p_index) const
+{
+  CString sql("CREATE ");
+  if(p_index->m_unique)
+  {
+    sql += "UNIQUE ";
+  }
+  sql += " INDEX ON ";
+  sql += p_user + ".";
+  sql += p_tableName + "(";
+
+  int column = 0;
+  while(!p_index->m_indexName.IsEmpty())
+  {
+    if(column)
+    {
+      sql += ",";
+    }
+    sql += p_index->m_column;
+    sql += (p_index->m_descending) ? " DESC" : " ASC";
+    // Next column
+    ++column;
+    ++p_index;
+  }
+  sql += ")";
+
+  return sql;
+}
+
+// Get SQL to drop an index
+CString 
+SQLInfoSQLServer::GetSQLDropIndex(CString p_user,CString p_indexName) const
+{
+  CString sql = "DROP INDEX " + p_user + "." + p_indexName;
+  return sql;
 }
 
 // Get SQL to read the referential constaints from the catalog
@@ -832,36 +850,60 @@ SQLInfoSQLServer::GetSQLTableReferences(CString p_schema
   return query;
 }
 
-// Get the SQL Query to create a synonym
-CString
-SQLInfoSQLServer::GetSQLMakeSynonym(CString& /*p_objectName*/) const
-{
-  return "";
-}
-
-// Get SQL to drop the synonym
+// Get the SQL to determine the sequence state in the database
 CString 
-SQLInfoSQLServer::GetSQLDropSynonym(CString& /*p_objectName*/) const
+SQLInfoSQLServer::GetSQLSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
 {
-  return "";
+  CString sequence = p_tablename + p_postfix;
+  sequence.MakeLower();
+  p_schema.MakeLower();
+  CString sql = "SELECT name as sequence_name\n"
+                "      ,current_value\n"
+                "      ,decode(is_cycling,0,1,0) *\n"
+                "       decode(is_cached, 0,1,0) as is_correct"
+                "  FROM sys.sequences seq\n"
+                "      ,sys.schemas   sch\n"
+                " WHERE sch.object_id = seq.schema_id\n"
+                "   AND seq.name = '" + sequence + "'\n"
+                "   AND sch.name = '" + p_schema + "'";
+  return sql;
 }
 
 // Create a sequence in the database
-void 
-SQLInfoSQLServer::DoCreateSequence(CString& /*p_sequenceName*/,int /*p_startpos*/) 
+CString 
+SQLInfoSQLServer::GetSQLCreateSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/,int p_startpos) const
 {
+  CString sql("CREATE SEQUENCE ");
+
+  if(!p_schema.IsEmpty())
+  {
+    sql += p_schema + ".";
+  }
+  sql += p_tablename + p_postfix;
+  sql.AppendFormat(" START WITH %d",p_startpos);
+  sql += " NO CYCLE NO CACHE";
+  return sql;
 }
 
 // Remove a sequence from the database
-void
-SQLInfoSQLServer::DoRemoveSequence(CString& /*p_sequenceName*/) const
+CString 
+SQLInfoSQLServer::GetSQLDropSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
 {
+  CString sql;
+  sql = "DROP SEQUENCE " + p_schema + "." + p_tablename + p_postfix;
+  return sql;
 }
 
-// Re-Creates a sequence in a database from the OID column
-void 
-SQLInfoSQLServer::DoCreateNextSequence(const CString& /*p_tableName*/,CString /*p_postfix /*="_seq"*/)
+// Gets the SQL for the rights on the sequence
+CString
+SQLInfoSQLServer::GetSQLSequenceRights(CString p_schema,CString p_tableName,CString p_postfix /*="_seq"*/) const
 {
+  CString sequence = p_tableName + p_postfix;
+  if(!p_schema.IsEmpty())
+  {
+    sequence = p_schema + "." + sequence;
+  }
+  return "GRANT SELECT ON " + sequence + " TO " + GetGrantedUsers();
 }
 
 // Remove a stored procedure from the database
@@ -870,13 +912,7 @@ SQLInfoSQLServer::DoRemoveProcedure(CString& p_procedureName) const
 {
   SQLQuery query(m_database);
   query.DoSQLStatement("DROP PROCEDURE " + p_procedureName);
-}
 
-// Gets the SQL for the rights on the sequence
-CString 
-SQLInfoSQLServer::GetSQLSequenceRights(const CString& /*p_tableName*/,CString /*p_postfix /*="_seq"*/) const
-{
-  return "";
 }
 
 // Get SQL for your session and controling terminal

@@ -38,7 +38,8 @@ SQLInfoDB::SQLInfoDB(SQLDatabase* p_database)
 {
   // Granted users.
   // Comma separated list of granted users
-  // e.g. "IDBA, MDBA, KDBA, PRONTO"
+  // e.g. "meta3", "meta2", "meta1", "model" and "data"
+
   // Must be 'PUBLIC' for an ANSI-compliant database
   m_grantedUsers = "PUBLIC";
 }

@@ -124,6 +124,19 @@ SQLQuery::Close()
         }
       }
     }
+
+    // Some databases require to ALWAYS call commit after any statement
+    // Namely databases with Multi-Generational-Architecture.
+    // Even after a SELECT query!!
+    if(m_database)
+    {
+      ::SQLEndTran(SQL_HANDLE_DBC,m_database->GetDBHandle(),SQL_COMMIT);
+    }
+    else
+    {
+      ::SQLEndTran(SQL_HANDLE_DBC,m_connection,SQL_COMMIT);
+    }
+
     // Free the statement and drop alle associated info
     // And all cursors on the database engine
     m_retCode = SQLDatabase::FreeSQLHandle(&m_hstmt,SQL_DROP);
@@ -209,7 +222,7 @@ SQLQuery::Open()
     throw CString("No database connection at SQLQUery::Open function");
   }
   // DISABLED!!
-  // Without escae scanning other things will go wrong.
+  // Without escape scanning other things will go wrong.
   // For instance if a query ends on a "? " : So "<Placeholder><space>"
 
   // SPEED: Do not look for ODBC escapes sequences
@@ -239,7 +252,7 @@ SQLQuery::Open()
     }
   }
   // Solving formatting for various databases (Oracle / MS-Access)
-  // Numeric and Decimal formats can be mangled by disbehaving ODCBC drivers
+  // Numeric and Decimal formats can be mangled by disbehaving ODBC drivers
   // So they must be set or gotten in a predefined format (e.g. Oracle needs DOUBLE for a NUMERIC column)
   // Also see method "SQLType2CType" for the use of the rebind maps
   if(m_database)
@@ -467,7 +480,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
   // in the processing of the query-strings which crashes it in CharNexW
-  // by a missing NUL-Terminator. By changing the length of the statement
+  // by a missing NULL-Terminator. By changing the length of the statement
   // _including_ the terminating NUL, it won't crash at all
   SQLINTEGER lengthStatement = statement.GetLength() + 1;
 

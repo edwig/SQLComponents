@@ -143,18 +143,6 @@ public:
   // Replace the Identity column OID by a sequence.nextval
   CString GetReplaceColumnOIDbySequence(CString p_columns,CString p_tablename,CString p_postfix = "_seq") const;
 
-  // Get the tablespace for the tables
-  CString GetTablesTablespace(CString p_tablespace = "") const;
-
-  // Get the tablespace for the indexes
-  CString GetIndexTablespace(CString p_tablespace = "") const;
-
-  // Get the storage name for indici
-  CString GetStorageSpaceNameForIndexes() const;
-
-  // Get the storage space for temporary tables
-  CString GetStorageSpaceNameForTempTables(CString p_tablename) const;
-
   // Remove catalog dependencies for stored procedures
   CString GetSQLRemoveProcedureDependencies(CString p_procname) const;
 
@@ -165,8 +153,14 @@ public:
   CString GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) const;
 
   // Get the constraint form of a primary key to be added to a table after creation of that table
-  CString GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool p_temporary) const;
+  CString GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const;
   
+  // Get the sql to add a foreign key to a table
+  CString GetSQLForeignKeyConstraint(DBForeign& p_foreign) const;
+
+  // Get the sql (if possible) to change the foreign key constraint
+  CString GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested) const;
+
   // Performance parameters to be added to the database
   CString GetSQLPerformanceSettings() const;
 
@@ -181,24 +175,6 @@ public:
   
   // Gets the maximum length of an SQL statement
   unsigned long GetMaxStatementLength() const;
-
-  // Prefix for an add constraint DDL command in SQLAtlerTableGenerator
-  CString GetAddConstraintPrefix(CString p_constraintName) const;
-
-  // Suffix for an add constraint DDL command in SQLAtlerTableGenerator
-  CString GetAddConstraintSuffix(CString p_constraintName) const;
-
-  // Get the prefix for a drop constraint DDL command in the SQLAlterTableGenerator
-  CString GetDropConstraintPrefix() const;
-
-  // Get the suffix for a drop constraint DDL commando in the SQLAlterTableGenerator
-  CString GetDropConstraintSuffix() const;
-
-  // Clause separator between two ADD or DROP clauses in an ALTER TABLE
-  CString GetAlterTableClauseSeparator() const;
-
-  // Grouping of more than one column possible in an ADD/MODIFY/DROP clause
-  bool    GetClauseGroupingPossible() const;
 
   // Gets the prefix needed for altering the datatype of a column in a MODIFY/ALTER
   CString GetModifyDatatypePrefix() const;
@@ -292,32 +268,32 @@ public:
   // Get SQL to select all constraints on a table from the catalog
   CString GetSQLGetConstraintsForTable(CString& p_tableName) const;
 
-  // Get SQL to read all indici for a table
-  CString GetSQLTableIndexes(CString& p_user,CString& p_tableName) const;
+  // Get SQL to read all indices for a table
+  CString GetSQLTableIndices(CString p_user,CString p_tableName) const;
+
+  // Get SQL to create an index for a table
+  CString GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* p_index) const;
+
+  // Get SQL to drop an index
+  CString GetSQLDropIndex(CString p_user,CString p_indexName) const;
 
   // Get SQL to read the referential constaints from the catalog
   CString GetSQLTableReferences(CString p_schema,CString p_tablename,CString p_constraint = "",int p_maxColumns = SQLINFO_MAX_COLUMNS) const;
 
-  // Get the SQL Query to create a synonym
-  CString GetSQLMakeSynonym(CString& p_objectName) const;
-
-  // Get SQL to drop the synonym
-  CString GetSQLDropSynonym(CString& p_objectname) const;
+  // Get the SQL to determine the sequence state in the database
+  CString GetSQLSequence(CString p_schema,CString p_tablename,CString p_postfix = "_seq") const;
 
   // Create a sequence in the database
-  void    DoCreateSequence(CString& p_sequenceName,int p_startpos);
+  CString GetSQLCreateSequence(CString p_schema,CString p_tablename,CString p_postfix = "_seq",int p_startpos = 1) const;
 
   // Remove a sequence from the database
-  void    DoRemoveSequence(CString& p_sequenceName) const;
+  CString GetSQLDropSequence(CString p_schema,CString p_tablename,CString p_postfix = "_seq") const;
+
+  // Gets the SQL for the rights on the sequence
+  CString GetSQLSequenceRights(CString p_schema,CString p_tableName,CString p_postfix = "_seq") const;
 
   // Remove a stored procedure from the database
   void    DoRemoveProcedure(CString& p_procedureName) const;
-
-  // Re-Creates a sequence in a database from the OID column
-  void    DoCreateNextSequence(const CString& p_tableName,CString p_postfix = "_seq");
-
-  // Gets the SQL for the rights on the sequence
-  CString GetSQLSequenceRights(const CString& p_tableName,CString p_postfix = "_seq") const;
 
   // Get SQL for your session and controling terminal
   CString GetSQLSessionAndTerminal() const;

@@ -325,46 +325,6 @@ SQLInfoFirebird::GetReplaceColumnOIDbySequence(CString p_columns,CString p_table
   return p_columns;
 }
 
-// Geef opslagruimte clausule voor tabellen
-CString 
-SQLInfoFirebird::GetTablesTablespace(CString /*p_tablespace =""*/) const
-{
-  return "";
-}
-
-// Geef opslagruimte clausule voor indexen
-CString 
-SQLInfoFirebird::GetIndexTablespace(CString /*p_tablespace =""*/) const
-{
-  return "";
-}
-
-// Get the storage name for indici
-CString 
-SQLInfoFirebird::GetStorageSpaceNameForIndexes() const
-{
-  return "INDEX"; // Settings::OpslagRuimte::OracleIndexTablespace;
-}
-
-// Geef de opslagruimte voor tijdelijke tabellen
-// Dit is de manier van Firebird om een tijdelijke tabel aan te maken
-// buiten de database om en zonder logging.
-CString
-SQLInfoFirebird::GetStorageSpaceNameForTempTables(CString p_tablename) const
-{
-  CString tempTablePath = "C:\\TMP\\";
-//   if (m_temptabelPad == "")
-//   {
-//     m_temptabelPad = acc->GeefInstellingString(INI_FirebirdTempTables); // Default "C:\\TMP"
-//     if(m_temptabelPad.Right(1) != "\\")
-//     {
-//       m_temptabelPad += "\\";
-//     }
-//   }
-   
-  return "EXTERNAL FILE '" + tempTablePath + p_tablename + ".fb";
-}
-
 // Verwijder catalog afhankelijkheden
 CString 
 SQLInfoFirebird::GetSQLRemoveProcedureDependencies(CString p_procname) const
@@ -400,10 +360,62 @@ SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) c
 
 // Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
 CString
-SQLInfoFirebird::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool /*p_temporary*/) const
+SQLInfoFirebird::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
 {
-  return "ADD CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")";
+  return "ALTER TABLE " + p_tablename + "\n"
+         "  ADD CONSTRAINT pk_" + p_tablename + "\n"
+         "      PRIMARY KEY (" + p_primary + ")";
 }
+
+// Get the sql to add a foreign key to a table
+CString 
+SQLInfoFirebird::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
+{
+  // Construct the correct tablenames
+  CString table  (p_foreign.m_tablename);
+  CString primary(p_foreign.m_primaryTable);
+  if(!p_foreign.m_schema.IsEmpty())
+  {
+    table   = p_foreign.m_schema + "." + table;
+    primary = p_foreign.m_schema + "." + primary;
+  }
+
+  // The base foreign key command
+  CString query = "ALTER TABLE " + table + "\n"
+                  "  ADD CONSTRAINT " + p_foreign.m_constraintname + "\n"
+                  "      FOREIGN KEY (" + p_foreign.m_column + ")\n"
+                  "      REFERENCES " + primary + "(" + p_foreign.m_primaryColumn + ")";
+  // Add all relevant options
+  switch(p_foreign.m_updateRule)
+  {
+    case 1: query += "\n      ON UPDATE CASCADE";     break;
+    case 2: query += "\n      ON UPDATE SET NULL";    break;
+    case 3: query += "\n      ON UPDATE SET DEFAULT"; break;
+    case 4: query += "\n      ON UPDATE NO ACTION";   break;
+    default:// In essence: ON UPDATE RESTRICT, but that's already the default
+    case 0: break;
+  }
+  switch(p_foreign.m_deleteRule)
+  {
+    case 1: query += "\n      ON DELETE CASCADE";     break;
+    case 2: query += "\n      ON DELETE SET NULL";    break;
+    case 3: query += "\n      ON DELETE SET DEFAULT"; break;
+    case 4: query += "\n      ON DELETE NO ACTION";   break;
+    default:// In essence: ON DELETE RESTRICT, but that's already the default
+    case 0: break;
+  }
+  return query;
+}
+
+// Get the sql (if possible) to change the foreign key constraint
+CString 
+SQLInfoFirebird::GetSQLAlterForeignKey(DBForeign& /*p_origin*/,DBForeign& /*p_requested*/) const
+{
+  // Firebird cannot alter a foreign-key constraint.
+  // You must drop and then re-create your foreign key constraint
+  // So return an empty string to signal this!
+  return "";
+} 
 
 // Performance parameters in de database zetten
 CString
@@ -446,49 +458,6 @@ unsigned long
 SQLInfoFirebird::GetMaxStatementLength() const
 {
   return 0;		//	Geen limiet
-}
-
-// Prefix voor een add constraint DDL commando voor SQLAtlerTableGenerator
-CString 
-SQLInfoFirebird::GetAddConstraintPrefix(CString p_constraintName) const
-{
-  return "ADD CONSTRAINT " + p_constraintName + " ";
-}
-
-// Suffix voor een add constraint DDL commando voor SQLAtlerTableGenerator
-CString 
-SQLInfoFirebird::GetAddConstraintSuffix(CString p_constraintName) const
-{
-  return "";
-}
-
-// Prefix voor een drop constraint DDL commando voor SQLAlterTableGenerator
-CString 
-SQLInfoFirebird::GetDropConstraintPrefix() const
-{
-  return "DROP CONSTRAINT ";
-}
-
-// Suffix voor een drop constraint DDL commando voor SQLAlterTableGenerator
-CString 
-SQLInfoFirebird::GetDropConstraintSuffix() const
-{
-  return ",";
-}
-
-// Clausule separator tussen twee ADD of DROP clausules in een ALTER TABLE
-CString 
-SQLInfoFirebird::GetAlterTableClauseSeparator() const
-{
-  return ",";
-}
-
-// Groupering van meerdere kolommen in een ADD/MODIFY/DROP clausule
-bool   
-SQLInfoFirebird::GetClauseGroupingPossible() const
-{
-  // Alle kolomdefs moeten apart staan ADD kolomdef, ADD kolomdef etc
-  return false;
 }
 
 // Geeft de prefix voor het wijzigen van het datatype in MODIFY/ALTER
@@ -746,28 +715,63 @@ SQLInfoFirebird::GetSQLGetConstraintsForTable(CString& p_tableName) const
   return contabel;
 }
 
-// Lees de bestaande indexen van een tabel
+// Read all existing indices of a table
 CString 
-SQLInfoFirebird::GetSQLTableIndexes(CString& /*p_user*/,CString& p_tableName) const
+SQLInfoFirebird::GetSQLTableIndices(CString /*p_user*/,CString p_tableName) const
 {
-  CString upperName(p_tableName);
-  upperName.MakeUpper(); 
+  p_tableName.MakeUpper();
   CString query = "SELECT idx.rdb$index_name\n"
-                  "      ,idx.rdb$unique_flag\n" // 1 if unique, null if not
                   "      ,col.rdb$field_name\n"
-                  "      ,idx.rdb$index_type\n"  // 1 if descending, null on ascending
                   "      ,col.rdb$field_position\n"
+                  "      ,idx.rdb$unique_flag\n" // 1 if unique, null if not
+                  "      ,idx.rdb$index_type\n"  // 1 if descending, null,0 on ascending
+                  "      ,idx.rdb$expression_source\n"
                   "  FROM rdb$indices idx\n"
                   "      ,rdb$index_segments col\n"
                   " WHERE idx.rdb$index_name    = col.rdb$index_name\n"
-                  "   AND idx.rdb$relation_name = '" + upperName + "'\n"
-                  "   AND idx.rdb$index_name NOT IN\n"
-                  "     ( SELECT con.rdb$index_name\n"
-                  "         FROM rdb$relation_constraints con\n"
-                  "        WHERE con.rdb$relation_name = idx.rdb$relation_name\n"
-                  "          AND con.rdb$index_name IS NOT NULL)\n"
+                  "   AND idx.rdb$relation_name = '" + p_tableName + "'\n"
+                  "   AND idx.rdb$system_flag   = 0\n"
                   " ORDER BY 1,5";
   return query;
+}
+
+// Get SQL to create an index for a table
+CString 
+SQLInfoFirebird::GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* p_index) const
+{
+  CString sql("CREATE ");
+  if(p_index->m_unique)
+  {
+    sql += "UNIQUE ";
+  }
+  sql += (p_index->m_descending) ? "DESC" : "ASC";
+  sql += " INDEX ON ";
+  sql += p_user + ".";
+  sql += p_tableName + "(";
+
+  int column = 0;
+  while(!p_index->m_indexName.IsEmpty())
+  {
+    if(column)
+    {
+      sql += ",";
+    }
+    sql += p_index->m_column;
+    // Next column
+    ++column;
+    ++p_index;
+  }
+  sql += ")";
+
+  return sql;
+}
+
+// Get SQL to drop an index
+CString 
+SQLInfoFirebird::GetSQLDropIndex(CString p_user,CString p_indexName) const
+{
+  CString sql = "DROP INDEX " + p_indexName;
+  return sql;
 }
 
 // Geef de query om de referential constaints uit de catalogus te lezen.
@@ -787,7 +791,7 @@ SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
                   "      ,psg.rdb$field_name              AS primary_key_column\n"
                   "      ,case con.rdb$deferrable         WHEN 'YES'  THEN 1 ELSE 0 END as deferrable\n"
                   "      ,case con.rdb$initially_deferred WHEN 'YES'  THEN 1 ELSE 0 END as initially_deferred\n"
-                  "      ,0                               as disabled\n"
+                  "      ,1                               as enabled\n"
                   "      ,case ref.rdb$match_option       WHEN 'FULL' THEN 1 ELSE 0 END as match_option\n"
                   "      ,case ref.rdb$update_rule        WHEN 'RESTRICT'     THEN 0\n"
                   "                                       WHEN 'CASCADE'      THEN 1\n"
@@ -827,45 +831,49 @@ SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
   return query;
 }
 
-
-
-// Firebird doesn't use synonyms
+// Get the SQL to determine the sequence state in the database
 CString 
-SQLInfoFirebird::GetSQLMakeSynonym(CString& /*p_objectName*/) const
+SQLInfoFirebird::GetSQLSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
 {
-  return "";
+  CString sequence = p_tablename + p_postfix;
+  sequence.MakeUpper();
+
+  CString sql = "SELECT rdb$generator_name as sequence_name\n" 
+                "      ,rdb$initial_value as current_value\n"
+                "      ,decode(rdb$generator_increment,1,1,0) as is_correct\n"
+                "  FROM rdb$generators\n"
+                " WHERE rdb$system_flag    = 0\n"
+                "   AND rdb$generator_name = '" + sequence + "'";
+  return sql;
 }
 
-// Firebird doesn't use synonyms
+// Create a sequence in the database
+CString 
+SQLInfoFirebird::GetSQLCreateSequence(CString /*p_schema*/,CString p_tablename,CString p_postfix /*= "_seq"*/,int p_startpos /*=1*/) const
+{
+  CString sequence = p_tablename + p_postfix;
+  CString sql;
+  sql.Format("CREATE SEQUENCE %s START WITH %d",sequence,p_startpos);
+  return sql;
+}
+
+// Remove a sequence from the database
+CString 
+SQLInfoFirebird::GetSQLDropSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
+{
+  CString sequence = p_tablename + p_postfix;
+  CString sql = "DROP SEQUENCE " + sequence;
+  return sql;
+}
+
+// Grant rights on the sequence
 CString
-SQLInfoFirebird::GetSQLDropSynonym(CString& /*p_objectName*/) const
+SQLInfoFirebird::GetSQLSequenceRights(CString /*p_schema*/,CString p_tableName,CString p_postfix /*="_seq"*/) const
 {
-  return "";
-}
-
-void 
-SQLInfoFirebird::DoCreateSequence(CString& p_sequenceName,int p_startpos) 
-{
-  // Rechtstreeks uit de systeemtabellen verwijderen omdat er geen
-  // DROP GENERATOR statement bestaat
-  SQLQuery sql(m_database);
-  DoRemoveSequence(p_sequenceName);
-  // Creeer een verse generator
-  CString pos;
-  pos.Format("%d",p_startpos);
-  sql.TryDoSQLStatement("CREATE GENERATOR " + p_sequenceName + " TO " + pos);
-}
-
-// Verwijder een sequence
-void
-SQLInfoFirebird::DoRemoveSequence(CString& p_sequenceName) const
-{
-  CString upperNaam = p_sequenceName;
-  upperNaam.MakeUpper();
-  CString query = "DELETE FROM RDB$GENERATORS\n"
-    " WHERE RDB$GENERATOR_NAME = '" + upperNaam + "'"; 
-  SQLQuery sql(m_database);
-  sql.TryDoSQLStatement(query);
+  CString sql;
+  CString sequence = p_tableName + p_postfix;
+  sql.Format("GRANT USAGE ON %s TO %s",sequence,GetGrantedUsers());
+  return sql;
 }
 
 // Geef de query om een stored procedure te verwijderen
@@ -876,70 +884,30 @@ SQLInfoFirebird::DoRemoveProcedure(CString& p_procedureName) const
   query.TryDoSQLStatement("DROP PROCEDURE " + p_procedureName);
 }
 
-void 
-SQLInfoFirebird::DoCreateNextSequence(const CString& p_tableName,CString p_postfix /*="_seq"*/)
-{
-  // In Firebird worden de oid's gegenereerd uit een GENERATOR. Deze moet eerst worden
-  // aangemaakt. Niet meer droppen, want dan zijn er al oid's uitgegeven
-  long maxOid  = 0;
-  SQLQuery sql(m_database);
-  CString exists = GetSQLTableExists(p_tableName);
-  sql.DoSQLStatement(exists);
-  if(sql.GetRecord() && sql.GetColumn(1)->GetAsSLong() == 1)
-  {
-    // We zoeken het maximum oid in de tabel plus 1 als beginwaarde.
-    CString query = "SELECT MAX(oid) FROM " + p_tableName;
-
-    try
-    {
-      sql.DoSQLStatement(query);
-      if(sql.GetRecord())
-      {
-        maxOid = sql.GetColumn(1)->GetAsSLong();
-      }
-    }
-    catch(CString& s)
-    {
-      // Dit kan op de een of andere manier nog mis gaan indien de tabel een op 
-      // dit moment niet aanwezige temptable is. We negeren deze fouten.
-      throw CString("Unknown table: " + s);
-    }
-  }
-  ++maxOid;
-  // Hoogste oid meegeven aan de create sequence als start pos.
-  {
-    // Deze mag fout gaan (als hij niet bestaat)
-    CString tableName(p_tableName);
-    tableName.MakeUpper();
-    DoCreateSequence(tableName,maxOid);
-    DoCommitDDLcommands();
-  }
-}
-
-// Geef de query om rechten op een sequence toe te kennen
-CString 
-SQLInfoFirebird::GetSQLSequenceRights(const CString& /*p_tableName*/,CString /*p_postfix /*="_seq"*/) const 
-{
-  // In Firebird hoeven geen sequence rechten te worden toegeken
-  return "";
-}
-
 CString
 SQLInfoFirebird::GetSQLSessionAndTerminal() const
 {
-  CString query = "SELECT current_connection\n"
-                  "      ,'PC'\n"
-                  "  FROM rdb$relations\n"
-                  " WHERE rdb$relation_name = 'RDB$RELATIONS'";
+  CString query = "SELECT mon.mon$attachment_id\n"
+                  "      ,mon.mon$timestamp\n"
+                  "      ,mon.mon$remote_address\n"
+                  "      ,mon.mon$remote_host\n"
+                  "      ,mon.mon$remote_process\n"
+                  "      ,mon.mon$remote_pid\n"
+                  "      ,mon.mon$remote_os_user\n"
+                  "  FROM mon$attachments mon\n"
+                  " WHERE mon$attachment_id = current_connection";
   return query;
 }
 
 // Get SQL to check if sessionnumber exists
 CString 
-SQLInfoFirebird::GetSQLSessionExists(CString sessieId) const
+SQLInfoFirebird::GetSQLSessionExists(CString p_sessionID) const
 {
-  // To be implemented
-  return "";
+  CString query;
+  query.Format("SELECT COUNT(*)\n"
+               "  FROM mon$attachments\n"
+               " WHERE mon$attachment_id = %d",p_sessionID);
+  return query;
 }
 
 // Geef query voor uniek sessie id.
@@ -1159,9 +1127,6 @@ SQLInfoFirebird::GetMustMakeTemptablesAtRuntime() const
 void
 SQLInfoFirebird::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& /*p_indexColumn*/) const
 {
-  // @EH Firebird
-  // Firebird kent geen echte 'tijdelijke' tabellen
-  // Support voor beheer van temp-dbspaces nog te bouwen
   SQLQuery sql(m_database);
   CString create = "CREATE GLOBAL TEMPORARY TABLE " + p_tableName + p_content;
   try

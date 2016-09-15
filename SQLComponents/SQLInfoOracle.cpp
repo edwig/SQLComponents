@@ -353,45 +353,6 @@ SQLInfoOracle::GetReplaceColumnOIDbySequence(CString p_columns,CString p_tablena
   return p_columns;
 }
 
-// Get the tablespace for the tables
-CString 
-SQLInfoOracle::GetTablesTablespace(CString p_tablespace /*=""*/) const
-{
-  if(!p_tablespace.IsEmpty())
-  {
-    return "TABLESPACE " + p_tablespace;
-  }
-  return "TABLESPACE DATA";
-}
-
-// Get the tablespace for the indexes
-// If no default is givven, fallbacks to the DEFAULT tablespace
-CString 
-SQLInfoOracle::GetIndexTablespace(CString p_tablespace /*=""*/) const
-{
-  if(!p_tablespace.IsEmpty())
-  {
-    return "TABLESPACE " + p_tablespace;
-  }
-  return " TABLESPACE INDEX";
-  // Settings::OpslagRuimte::OracleIndexTablespace; // Default "INDEX"
-}
-
-// Get the storage name for indici
-CString 
-SQLInfoOracle::GetStorageSpaceNameForIndexes() const
-{
-  return "INDEX"; // Settings::OpslagRuimte::OracleIndexTablespace;
-}
-
-// Get the storage space for temporary tables
-CString 
-SQLInfoOracle::GetStorageSpaceNameForTempTables(CString p_tablename) const
-{
-  // Oracle implicitly uses TEMP TABLESPACE of the current user
-  return "";
-}
-
 // Remove catalog dependencies for stored procedures
 // To be run after a 'DROP PROCEDURE' or 'DROP FUNCTION'
 CString 
@@ -417,15 +378,92 @@ SQLInfoOracle::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/)
   // The primary key constraint is not directly generated after the column
   // to ensure it wil use the named index in the correct tablespace
   // Otherwise the index name and tablespace cannot be definied and will be auto-generated
-  return GetPrimaryKeyType() + " NOT NULL\n";
+  return GetPrimaryKeyType() + " NOT NULL CONSTRAINT pk_" + p_tableName + " PRIMARY KEY\n";
 }
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString 
-SQLInfoOracle::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary,bool p_temporary) const
+SQLInfoOracle::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
 {
-  return "ADD (CONSTRAINT pk_" + p_tablename + " PRIMARY KEY(" + p_primary + ")\n" +
-         (p_temporary ?  ")" : ("USING INDEX " + GetStorageSpaceNameForIndexes() + ")\n"));
+  return "ALTER TABLE " + p_tablename + "\n"
+         "  ADD CONSTRAINT pk_" + p_tablename + "\n"
+         "      PRIMARY KEY (" + p_primary + ")";
+}
+
+// Get the sql to add a foreign key to a table
+CString 
+SQLInfoOracle::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
+{
+  // Construct the correct tablenames
+  CString table  (p_foreign.m_tablename);
+  CString primary(p_foreign.m_primaryTable);
+  if(!p_foreign.m_schema.IsEmpty())
+  {
+    table   = p_foreign.m_schema + "." + table;
+    primary = p_foreign.m_schema + "." + primary;
+  }
+
+  // The base foreign key command
+  CString query = "ALTER TABLE " + table + "\n"
+                  "  ADD CONSTRAINT " + p_foreign.m_constraintname + "\n"
+                  "      FOREIGN KEY (" + p_foreign.m_column + ")\n"
+                  "      REFERENCES " + primary + "(" + p_foreign.m_primaryColumn + ")";
+  // Add all relevant options
+  if(p_foreign.m_deferrable)
+  {
+    query += "\n      DEFERRABLE";
+  }
+  if(p_foreign.m_initiallyDeffered)
+  {
+    query += "\n      INITIALLY DEFERRED";
+  }
+  switch(p_foreign.m_deleteRule)
+  {
+    case 1: query += "\n      ON DELETE CASCADE";     break;
+    case 2: query += "\n      ON DELETE SET NULL";    break;
+    default:// In essence: ON DELETE RESTRICT, but that's already the default
+    case 0: break;
+  }
+  return query;
+}
+
+// Get the sql (if possible) to change the foreign key constraint
+CString 
+SQLInfoOracle::GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested) const
+{
+  // Construct the correct tablenames
+  CString table(p_origin.m_tablename);
+  if(!p_origin.m_schema.IsEmpty())
+  {
+    table = p_origin.m_schema + "." + table;
+  }
+
+  // The base foreign key command
+  CString query = "ALTER TABLE " + table + "\n"
+                  "MODIFY CONSTRAINT " + p_origin.m_constraintname + "\n";
+
+  // Add all relevant options
+  if(p_origin.m_deferrable != p_requested.m_deferrable)
+  {
+    query.AppendFormat("\n      %sDEFERRABLE",p_requested.m_deferrable == 0 ? "NOT " : "");
+  }
+  if(p_origin.m_initiallyDeffered != p_requested.m_initiallyDeffered)
+  {
+    query += "\n      INITIALLY ";
+    query += p_requested.m_initiallyDeffered ? "DEFERRED" : "IMMEDIATE";
+  }
+  if(p_origin.m_deleteRule != p_requested.m_deleteRule)
+  {
+    switch(p_requested.m_deleteRule)
+    {
+      case 1: query += "\n      ON DELETE CASCADE";     break;
+      case 2: query += "\n      ON DELETE SET NULL";    break;
+      default:// In essence: ON DELETE RESTRICT, 
+              // But Oracle cannot do that, so return an empty string and drop the constraint
+      case 0: query.Empty();
+    }
+  }
+  return query;
 }
 
 // Performance parameters to be added to the database
@@ -474,49 +512,6 @@ unsigned long
 SQLInfoOracle::GetMaxStatementLength() const
 {
   return 0;		// No limit in Oracle
-}
-
-// Prefix for an add constraint DDL command in SQLAtlerTableGenerator
-CString 
-SQLInfoOracle::GetAddConstraintPrefix(CString p_constraintName) const
-{
-  return "ADD (CONSTRAINT " + p_constraintName + " ";
-}
-
-// Suffix for an add constraint DDL command in SQLAtlerTableGenerator
-CString 
-SQLInfoOracle::GetAddConstraintSuffix(CString p_constraintName) const
-{
-  return ")";
-}
-
-// Get the prefix for a drop constraint DDL command in the SQLAlterTableGenerator
-CString 
-SQLInfoOracle::GetDropConstraintPrefix() const
-{
-  return "DROP CONSTRAINT ";
-}
-
-// Get the suffix for a drop constraint DDL commando in the SQLAlterTableGenerator
-CString 
-SQLInfoOracle::GetDropConstraintSuffix() const
-{
-  return "";
-}
-
-// Clause separator between two ADD or DROP clauses in an ALTER TABLE
-CString 
-SQLInfoOracle::GetAlterTableClauseSeparator() const
-{
-  return "";
-}
-
-// Grouping of more than one column possible in an ADD/MODIFY/DROP clause
-bool    
-SQLInfoOracle::GetClauseGroupingPossible() const
-{
-  // can do ADD (columndef ,.... )
-  return true;
 }
 
 // Gets the prefix needed for altering the datatype of a column in a MODIFY/ALTER
@@ -796,34 +791,72 @@ SQLInfoOracle::GetSQLGetConstraintsForTable(CString& p_tableName) const
   return contabel;
 }
 
-// Get SQL to read all indici for a table
+// Get SQL to read all indices for a table
 CString 
-SQLInfoOracle::GetSQLTableIndexes(CString& p_user,CString& p_tableName) const
+SQLInfoOracle::GetSQLTableIndices(CString p_user,CString p_tableName) const
 {
-  CString upperName(p_tableName);
-  upperName.MakeUpper();
-  CString owner(p_user);
-  owner.MakeUpper();
+  p_user.MakeUpper();
+  p_tableName.MakeUpper();
 
   // Query runs on the 'all_' variant, so owner name must be taken into account
   // for performance reasons on the system table
   CString query = "SELECT idx.index_name\n"
-                  "      ,idx.index_type\n"
-                  "      ,idx.uniqueness\n"
                   "      ,col.column_name\n"
-                  "      ,col.descend\n"
                   "      ,col.column_position\n"
+//                  "      ,idx.index_type\n"
+                  "      ,idx.uniqueness\n"
+                  "      ,col.descend\n"
+                  "      ,'' as column_source"
                   "  FROM all_indexes     idx\n"
                   "      ,all_ind_columns col\n"
                   " WHERE idx.index_name  = col.index_name\n"
                   "   AND idx.table_name  = col.table_name\n"
                   "   AND idx.table_owner = col.table_owner\n"
                   "   AND idx.generated   = 'N'\n"
-                  "   AND idx.table_name  = '" + upperName + "'\n"
-                  "   AND idx.table_owner = '" + owner + "'"
+                  "   AND idx.table_name  = '" + p_tableName + "'\n"
+                  "   AND idx.table_owner = '" + p_user + "'"
                   " ORDER BY index_name\n"
                   "         ,column_position\n";
   return query;
+}
+
+// Get SQL to create an index for a table
+CString 
+SQLInfoOracle::GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* p_index) const
+{
+  CString sql("CREATE ");
+  if(p_index->m_unique)
+  {
+    sql += "UNIQUE ";
+  }
+  sql += " INDEX ON ";
+  sql += p_user + ".";
+  sql += p_tableName + "(";
+
+  int column = 0;
+  while(!p_index->m_indexName.IsEmpty())
+  {
+    if(column)
+    {
+      sql += ",";
+    }
+    sql += p_index->m_column;
+    sql += (p_index->m_descending) ? " DESC" : " ASC";
+    // Next column
+    ++column;
+    ++p_index;
+  }
+  sql += ")";
+
+  return sql;
+}
+
+// Get SQL to drop an index
+CString 
+SQLInfoOracle::GetSQLDropIndex(CString p_user,CString p_indexName) const
+{
+  CString sql = "DROP INDEX " + p_user + "." + p_indexName;
+  return sql;
 }
 
 // Get SQL to read the referential constaints from the catalog
@@ -849,6 +882,7 @@ SQLInfoOracle::GetSQLTableReferences(CString p_schema
                   "      ,con.table_name       AS table_name\n"
                   "      ,col.column_name      AS column_name\n"
                   "      ,pri.table_name       AS primary_table_name\n"
+                  "      ,pky.column_name      AS primary_column_name\n"
                   "      ,CASE con.deferrable  WHEN 'NOT DEFERRABLE' THEN 0\n"
                   "                            WHEN 'DEFERRABLE'     THEN 1\n"
                   "                            ELSE 0 END AS DEFERRABLE\n"
@@ -889,44 +923,63 @@ SQLInfoOracle::GetSQLTableReferences(CString p_schema
   return query;
 }
 
-// Get the SQL Query to create a synonym
+// Get the SQL to determine the sequence state in the database
 CString 
-SQLInfoOracle::GetSQLMakeSynonym(CString& p_objectName) const
+SQLInfoOracle::GetSQLSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
 {
-  // Beware: public synonym without qualifier, for qualifier.objectname
-  return "CREATE PUBLIC SYNONYM " + p_objectName + " FOR " + p_objectName;
-}
+  p_schema.MakeUpper();
+  CString sequence = p_tablename + p_postfix;
+  sequence.MakeUpper();
 
-// Get SQL to drop the synonym
-CString 
-SQLInfoOracle::GetSQLDropSynonym(CString& p_objectName) const
-{
-  return "DROP PUBLIC SYNONYM " + p_objectName;
+  CString sql = "SELECT sequence_name\n"
+                "      ,last_number AS current_value\n"
+                "      ,Decode(min_value,   1,1,0) *\n"
+                "       Decode(increment_by,1,1,0) *\n"
+                "       Decode(cycle_flag,'N',1,0) *\n"
+                "       Decode(cache_size,  0,1,0) AS is_correct\n"
+                "  FROM dba_sequences\n"
+                " WHERE sequence_owner = '" + p_schema + "'\n"
+                "   AND sequence_name  = '" + sequence + "'";
+  return sql;
 }
 
 // Create a sequence in the database
-void
-SQLInfoOracle::DoCreateSequence(CString& p_sequenceName,int p_startpos) 
+CString 
+SQLInfoOracle::GetSQLCreateSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/,int p_startpos) const
 {
-  DoRemoveSequence(p_sequenceName);
-  SQLQuery query(m_database);
-  CString create = "CREATE SEQUENCE " + p_sequenceName;
-  if(p_startpos)
+  CString sql("CREATE SEQUENCE ");
+
+  if(!p_schema.IsEmpty())
   {
-    create.AppendFormat(" START WITH %d",p_startpos);
+    sql += p_schema + ".";
   }
-  query.DoSQLStatement(create);
-  query.DoSQLStatement(GetSQLMakeSynonym(p_sequenceName));
-  query.DoSQLStatement("GRANT SELECT, ALTER ON " + p_sequenceName + " TO " +  GetGrantedUsers());
+  sql += p_tablename + p_postfix;
+  sql.AppendFormat(" START WITH %d",p_startpos);
+  sql += " NOCYCLE NOCACHE ORDER";
+  return sql;
 }
 
 // Remove a sequence from the database
-void
-SQLInfoOracle::DoRemoveSequence(CString& p_sequenceName) const
+CString 
+SQLInfoOracle::GetSQLDropSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
 {
-  SQLQuery query(m_database);
-  query.TryDoSQLStatement(GetSQLDropSynonym(p_sequenceName));
-  query.TryDoSQLStatement("DROP SEQUENCE " + p_sequenceName);
+  CString sql;
+  CString sequence = p_tablename + p_postfix;
+
+  sql = "DROP SEQUENCE " + p_schema + "." + sequence;
+  return sql;
+}
+
+// Gets the SQL for the rights on the sequence
+CString
+SQLInfoOracle::GetSQLSequenceRights(CString p_schema,CString p_tableName,CString p_postfix /*="_seq"*/) const
+{
+  CString sequence = p_tableName + p_postfix;
+  if(!p_schema.IsEmpty())
+  {
+    sequence = p_schema + "." + sequence;
+  }
+  return "GRANT SELECT, ALTER ON " + sequence + " TO " + GetGrantedUsers();
 }
 
 // Remove a stored procedure from the database
@@ -935,44 +988,6 @@ SQLInfoOracle::DoRemoveProcedure(CString& p_procedureName) const
 {
   SQLQuery query(m_database);
   query.TryDoSQLStatement("DROP FUNCTION " + p_procedureName);
-  query.TryDoSQLStatement(GetSQLDropSynonym(p_procedureName));
-}
-
-// Re-Creates a sequence in a database from the OID column
-void    
-SQLInfoOracle::DoCreateNextSequence(const CString& p_tableName,CString p_postfix /*="_seq"*/)
-{
-  CString sequence = p_tableName + p_postfix;
-
-  SQLQuery qry(m_database);
-  qry.TryDoSQLStatement(GetSQLDropSynonym(sequence));
-  DoRemoveSequence(sequence);
-  long maxOid  = 0;
-  try
-  {
-    // Look for the maximum of the OID column + 1
-    CString query = "SELECT + MAX(oid) FROM " + p_tableName;
-
-    qry.DoSQLStatement(query);
-    if(qry.GetRecord())
-    {
-      maxOid = qry.GetColumn(1)->GetAsSLong();
-    }
-    ++maxOid;
-  }
-  catch (...) {}
-  // Pass highest OID to the create-sequence generator
-  DoCreateSequence(sequence,maxOid);
-  // Nu nog rechten en synoniemen:
-  qry.TryDoSQLStatement(GetSQLSequenceRights(p_tableName));
-  qry.TryDoSQLStatement(GetSQLMakeSynonym(sequence));
-}
-
-// Gets the SQL for the rights on the sequence
-CString 
-SQLInfoOracle::GetSQLSequenceRights(const CString& p_tableName,CString p_postfix /*="_seq"*/) const
-{
-  return "GRANT SELECT, ALTER ON " + p_tableName + p_postfix + " TO " + GetGrantedUsers();
 }
 
 // Get SQL for your session and controling terminal
