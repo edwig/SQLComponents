@@ -483,9 +483,14 @@ SQLInfoInformix::GetCodeTempTableWithNoLog() const
 
 // Granting all rights on a table (In a NON-ANSI database)
 CString
-SQLInfoInformix::GetSQLGrantAllOnTable(CString /*p_tableName*/)
+SQLInfoInformix::GetSQLGrantAllOnTable(CString /*p_schema*/,CString p_tableName,bool p_grantOption /*= false*/)
 {
-  return "";
+  CString sql = "GRANT ALL ON " + p_tableName + " TO " + GetGrantedUsers();
+  if(p_grantOption)
+  {
+    sql += " WITH GRANT OPTION";
+  }
+  return sql;
 }
 
 // Code prefix for a select-into-temp
@@ -1079,6 +1084,14 @@ SQLInfoInformix::GetCreateColumn(CString p_tablename,CString p_columnName,CStrin
   return sql;
 }
 
+// Drop a column from a table
+CString 
+SQLInfoInformix::GetSQLDropColumn(CString /*p_schema*/,CString p_tablename,CString p_columnName) const
+{
+  return "ALTER TABLE " + p_tablename + "\n"
+         " DROP COLUMN " + p_columnName;
+}
+
 // Add a foreign key to a table
 CString 
 SQLInfoInformix::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
@@ -1106,6 +1119,20 @@ SQLInfoInformix::GetModifyColumnNull(CString p_tablename,CString p_columnName,bo
   return sql;
 }
 
+// Get the SQL to drop a view. If precursor is filled: run that SQL first!
+CString 
+SQLInfoInformix::GetSQLDropView(CString /*p_schema*/,CString p_view,CString& p_precursor)
+{
+  p_precursor.Empty();
+  return "DROP VIEW " + p_view;
+}
+
+// Create or replace a database view
+CString 
+SQLInfoInformix::GetSQLCreateOrReplaceView(CString /*p_schema*/,CString p_view,CString p_asSelect) const
+{
+  return "CREATE VIEW " + p_view + "\n" + p_asSelect;
+}
 
 // SQL DDL ACTIONS
 // ====================================================================
@@ -1125,23 +1152,6 @@ SQLInfoInformix::DoCommitDMLcommands() const
 {
   // Does NOTHING in INFOMRIX and cannot do something
   // Commit follows from a BEGIN/COMMIT transaction by AUTOCOMMIT from the driver
-}
-
-// Create a view from the select code and the name
-void 
-SQLInfoInformix::DoCreateOrReplaceView(CString p_code,CString p_viewName)
-{
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement(p_code);
-  sql.DoSQLStatement("GRANT ALL ON " + p_viewName + " TO " + GetGrantedUsers());
-}
-
-// Remove a view from the database
-void 
-SQLInfoInformix::DoDropView(CString p_viewName)
-{
-  SQLQuery sql(m_database);
-  sql.TryDoSQLStatement("DROP VIEW " + p_viewName);
 }
 
 // Remove a column from a table

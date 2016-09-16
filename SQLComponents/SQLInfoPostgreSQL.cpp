@@ -532,9 +532,14 @@ SQLInfoPostgreSQL::GetCodeTempTableWithNoLog() const
 
 // Code om alle rechten op de tabel open te zetten (NON-ANSI database)
 CString 
-SQLInfoPostgreSQL::GetSQLGrantAllOnTable(CString p_tableName)
+SQLInfoPostgreSQL::GetSQLGrantAllOnTable(CString p_schema,CString p_tableName,bool p_grantOption /*= false*/)
 {
-  return "GRANT ALL ON " + p_tableName + " TO " + GetGrantedUsers();
+  CString sql = "GRANT ALL ON " + p_schema + "." + p_tableName + " TO " + GetGrantedUsers();
+  if(p_grantOption)
+  {
+    sql += " WITH GRANT OPTION";
+  }
+  return sql;
 }
 
 
@@ -1164,6 +1169,14 @@ SQLInfoPostgreSQL::GetCreateColumn(CString p_tablename,CString p_columnName,CStr
   return sql;
 }
 
+// Drop a column from a table
+CString 
+SQLInfoPostgreSQL::GetSQLDropColumn(CString p_schema,CString p_tablename,CString p_columnName) const
+{
+  return "ALTER TABLE " + p_schema + "." + p_tablename + "\n"
+         " DROP COLUMN " + p_columnName;
+}
+
 // Add a foreign key to a table
 CString
 SQLInfoPostgreSQL::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
@@ -1192,6 +1205,21 @@ SQLInfoPostgreSQL::GetModifyColumnNull(CString p_tablename,CString p_columnName,
   return sql;
 }
 
+// Get the SQL to drop a view. If precursor is filled: run that SQL first!
+CString 
+SQLInfoPostgreSQL::GetSQLDropView(CString p_schema,CString p_view,CString& p_precursor)
+{
+  p_precursor.Empty();
+  return "DROP VIEW " + p_schema + "." + p_view;
+}
+
+// Create or replace a database view
+CString 
+SQLInfoPostgreSQL::GetSQLCreateOrReplaceView(CString p_schema,CString p_view,CString p_asSelect) const
+{
+  return "CREATE OR REPLACE VIEW " + p_schema + "." + p_view + "\n" + p_asSelect;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 
@@ -1210,24 +1238,6 @@ SQLInfoPostgreSQL::DoCommitDMLcommands() const
 {
   SQLQuery sql(m_database);
   sql.DoSQLStatement("commit");
-}
-
-// Creeer een view op een geoptimaliseerde manier vanuit een bestaande tabel
-void 
-SQLInfoPostgreSQL::DoCreateOrReplaceView(CString p_code,CString p_viewName)
-{
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement(p_code);
-  sql.DoSQLStatement("GRANT SELECT ON " + p_viewName + " TO " + GetGrantedUsers());
-}
-
-// Verwijder een view uit de database
-void 
-SQLInfoPostgreSQL::DoDropView(CString p_viewName)
-{
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement("DROP VIEW " + p_viewName);
-  DoCommitDDLcommands();
 }
 
 // Remove a column from a table

@@ -545,12 +545,17 @@ SQLInfoGenericODBC::GetCodeTempTableWithNoLog() const
   return "";
 }
 
-// Granting all rights on a table (In a NON-ANSI database)
+// Granting all rights on a table
 CString 
-SQLInfoGenericODBC::GetSQLGrantAllOnTable(CString p_tableName)
+SQLInfoGenericODBC::GetSQLGrantAllOnTable(CString p_schema,CString p_tableName,bool p_grantOption /*= false*/)
 {
   // General ISO SQL syntax
-  return "GRANT ALL ON " + p_tableName + " TO " + GetGrantedUsers() + " WITH GRANT OPTION;\n";
+  CString sql = "GRANT ALL ON " + p_schema + "." + p_tableName + " TO " + GetGrantedUsers();
+  if(p_grantOption)
+  {
+    sql += " WITH GRANT OPTION;\n";
+  }
+  return sql;
 }
 
 // Code prefix for a select-into-temp
@@ -997,6 +1002,15 @@ SQLInfoGenericODBC::GetCreateColumn(CString p_tablename,CString p_columnName,CSt
   return sql;
 }
 
+// Drop a column from a table
+CString 
+SQLInfoGenericODBC::GetSQLDropColumn(CString p_schema,CString p_tablename,CString p_columnName) const
+{
+  return "ALTER TABLE " + p_schema + "." + p_tablename + "\n"
+         " DROP COLUMN " + p_columnName;
+}
+
+
 // Add a foreign key to a table
 CString 
 SQLInfoGenericODBC::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
@@ -1024,6 +1038,20 @@ SQLInfoGenericODBC::GetModifyColumnNull(CString p_tablename,CString p_columnName
   return sql;
 }
 
+// Get the SQL to drop a view. If precursor is filled: run that SQL first!
+CString 
+SQLInfoGenericODBC::GetSQLDropView(CString p_schema,CString p_view,CString& p_precursor)
+{
+  p_precursor.Empty();
+  return "DROP VIEW " + p_schema + "." + p_view;
+}
+
+// Create or replace a database view
+CString 
+SQLInfoGenericODBC::GetSQLCreateOrReplaceView(CString p_schema,CString p_view,CString p_asSelect) const
+{
+  return "CREATE VIEW " + p_schema + "." + p_view + "\n" + p_asSelect;
+}
 
 // SQL DDL ACTIONS
 // ===================================================================
@@ -1042,23 +1070,6 @@ void
 SQLInfoGenericODBC::DoCommitDMLcommands() const
 {
 }
-
-// Create a view from the select code and the name
-void
-SQLInfoGenericODBC::DoCreateOrReplaceView(CString p_code,CString p_viewName)
-{
-  SQLQuery query(m_database);
-  query.DoSQLStatement(p_code);
-}
-
-// Remove a view from the database
-void
-SQLInfoGenericODBC::DoDropView(CString p_viewName)
-{
-  SQLQuery query(m_database);
-  query.TryDoSQLStatement("DROP VIEW " + p_viewName);
-}
-
 
 // Remove a column from a table
 void    

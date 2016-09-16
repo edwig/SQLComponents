@@ -483,9 +483,14 @@ SQLInfoAccess::GetCodeTempTableWithNoLog() const
 
 // Granting all rights on a table (In a NON-ANSI database)
 CString 
-SQLInfoAccess::GetSQLGrantAllOnTable(CString p_tableName)
+SQLInfoAccess::GetSQLGrantAllOnTable(CString /*p_schema*/,CString p_tableName,bool p_grantOption /*= false*/)
 {
-  return "GRANT ALL ON " + p_tableName + " TO " + GetGrantedUsers() + " WITH GRANT OPTION;\n";
+  CString sql = "GRANT ALL ON " + p_tableName + " TO " + GetGrantedUsers();
+  if(p_grantOption)
+  {
+    sql += " WITH GRANT OPTION;\n";
+  }
+  return sql;
 }
 
 
@@ -914,6 +919,15 @@ SQLInfoAccess::GetCreateColumn(CString p_tablename,CString p_columnName,CString 
   return sql;
 }
 
+// Drop a column from a table
+CString 
+SQLInfoAccess::GetSQLDropColumn(CString /*p_schema*/,CString p_tablename,CString p_columnName) const
+{
+  return "ALTER TABLE " + p_tablename + "\n"
+         " DROP COLUMN " + p_columnName;
+}
+
+
 // Add a foreign key to a table
 CString 
 SQLInfoAccess::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
@@ -941,6 +955,21 @@ SQLInfoAccess::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool
   return sql;
 }
 
+// Get the SQL to drop a view. If precursor is filled: run that SQL first!
+CString 
+SQLInfoAccess::GetSQLDropView(CString /*p_schema*/,CString p_view,CString& p_precursor)
+{
+  p_precursor.Empty();
+  return "DROP VIEW " + p_view;
+}
+
+// Create or replace a database view
+CString 
+SQLInfoAccess::GetSQLCreateOrReplaceView(CString /*p_schema*/,CString p_view,CString p_asSelect) const
+{
+  return "CREATE VIEW " + p_view + "\n" + p_asSelect;
+}
+
 // SQL DDL ACTIONS
 // ===================================================================
 
@@ -957,25 +986,7 @@ SQLInfoAccess::DoCommitDDLcommands() const
 void
 SQLInfoAccess::DoCommitDMLcommands() const
 {
-  //   SQLQuery query(m_database);
-  //   query.DoSQLStatement("COMMIT WORK");
-}
-
-// Create a view from the select code and the name
-void 
-SQLInfoAccess::DoCreateOrReplaceView(CString p_code,CString p_viewName)
-{
-  SQLQuery query(m_database);
-  query.DoSQLStatement(p_code);
-  query.DoSQLStatement("GRANT SELECT ON " + p_viewName + " TO PUBLIC");
-}
-
-// Remove a view from the database
-void 
-SQLInfoAccess::DoDropView(CString p_viewName)
-{
-  SQLQuery query(m_database);
-  query.TryDoSQLStatement("DROP VIEW " + p_viewName);
+  // Not needed in MS-Access
 }
 
 // Remove a column from a table

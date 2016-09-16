@@ -73,7 +73,7 @@ public:
 
   // DB INTERFACE
 
-  void    SetGrantedUsers(CString& p_users);
+  void    SetGrantedUsers(CString p_users);
   CString GetGrantedUsers() const;
 
   // PURE VIRTUAL INTERFACE
@@ -233,7 +233,7 @@ public:
   virtual CString GetCodeTempTableWithNoLog() const = 0;
 
   // Granting all rights on a table (In a NON-ANSI database)
-  virtual CString GetSQLGrantAllOnTable(CString p_tableName) = 0;
+  virtual CString GetSQLGrantAllOnTable(CString p_schema,CString p_tableName,bool p_grantOption = false) = 0;
 
   // Code prefix for a select-into-temp
   virtual CString GetSelectIntoTempClausePrefix(CString p_tableName) const = 0;
@@ -375,12 +375,21 @@ public:
   // Add a column to a table
   virtual CString GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull) = 0;
 
+  // Drop a column from a table
+  virtual CString GetSQLDropColumn(CString p_schema,CString p_tablename,CString p_columnName) const = 0;
+
   // Add a foreign key to a table
   virtual CString GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary) = 0;
 
   // Modify a column's definition in a table
   virtual CString GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition) = 0;
   virtual CString GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull) = 0;
+
+  // Get the SQL to drop a view. If precursor is filled: run that SQL first!
+  virtual CString GetSQLDropView(CString p_schema,CString p_view,CString& p_precursor) = 0;
+
+  // Create or replace a database view
+  virtual CString GetSQLCreateOrReplaceView(CString p_schema,CString p_view,CString p_asSelect) const = 0;
 
   // SQL DDL OPERATIONS
   // ==================
@@ -390,15 +399,6 @@ public:
 
   // Do the commit for the DML commands in the database
   virtual void    DoCommitDMLcommands() const = 0;
-
-  // Create a view from the select code and the name
-  virtual void    DoCreateOrReplaceView(CString p_code,CString p_viewName) = 0;
-
-  // Remove a view from the database
-  virtual void    DoDropView(CString p_viewName) = 0;
-
-  // Remove a column from a table
-  virtual void    DoDropColumn(CString p_tableName,CString p_columName) = 0;
 
   // Does the named view exists in the database
   virtual bool    DoesViewExists(CString& p_viewName) = 0;
@@ -516,7 +516,7 @@ private:
 };
 
 inline void    
-SQLInfoDB::SetGrantedUsers(CString& p_users) 
+SQLInfoDB::SetGrantedUsers(CString p_users) 
 {
   m_grantedUsers = p_users;
 }

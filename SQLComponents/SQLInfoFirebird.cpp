@@ -492,9 +492,14 @@ SQLInfoFirebird::GetCodeTempTableWithNoLog() const
 
 // Code om alle rechten op de tabel open te zetten (NON-ANSI database)
 CString 
-SQLInfoFirebird::GetSQLGrantAllOnTable(CString p_tableName)
+SQLInfoFirebird::GetSQLGrantAllOnTable(CString /*p_schema*/,CString p_tableName,bool p_grantOption /*= false*/)
 {
-  return "GRANT ALL ON "+ p_tableName + " TO" + GetGrantedUsers() + " WITH GRANT OPTION;\n";
+  CString sql = "GRANT ALL ON "+ p_tableName + " TO" + GetGrantedUsers();
+  if(p_grantOption)
+  {
+    sql += " WITH GRANT OPTION;\n";
+  }
+  return sql;
 }
 
 // Code voor de select into temp
@@ -779,7 +784,7 @@ CString
 SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
                                       ,CString p_tablename
                                       ,CString p_constraint /*=""*/
-                                      ,int     /*p_maxColumns = SQLINFO_MAX_COLUMNS*/) const
+                                      ,int     /* p_maxColumns /*= SQLINFO_MAX_COLUMNS*/) const
 {
   p_tablename.MakeUpper();
   p_constraint.MakeUpper();
@@ -1012,6 +1017,14 @@ SQLInfoFirebird::GetCreateColumn(CString p_tablename,CString p_columnName,CStrin
   return sql;
 }
 
+// Drop a column from a table
+CString 
+SQLInfoFirebird::GetSQLDropColumn(CString p_schema,CString p_tablename,CString p_columnName) const
+{
+  return "ALTER TABLE " + p_tablename + "\n"
+         " DROP COLUMN " + p_columnName;
+}
+
 CString
 SQLInfoFirebird::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
 {
@@ -1039,6 +1052,29 @@ SQLInfoFirebird::GetModifyColumnNull(CString p_tablename,CString p_columnName,bo
   return sql;
 }
 
+// Get the SQL to drop a view. If precursor is filled: run that SQL first!
+CString 
+SQLInfoFirebird::GetSQLDropView(CString /*p_schema*/,CString p_view,CString& p_precursor)
+{
+  p_view.MakeUpper();
+
+  // Firebird cannot drop a view if dependencies from stored procedures or functions
+  // still exist in the dependencies table. After Firebird 3.0 we need modification
+  // rights on this system catalog table!!
+  // Changes being that we re-create the view rigth away after the drop.
+  p_precursor = "DELETE FROM rdb$dependencies\n"
+                " WHERE rdb$depended_on_name = '" + p_view + "'\n"
+                "   AND rdb$depended_on_type = 0";
+  return "DROP VIEW " + p_view;
+}
+
+// Create or replace a database view
+CString 
+SQLInfoFirebird::GetSQLCreateOrReplaceView(CString /*p_schema*/,CString p_view,CString p_asSelect) const
+{
+  return "RECREATE VIEW " + p_view + "\n" + p_asSelect;
+}
+
 // SQL DDL ACTIONS
 // ====================================================================
 
@@ -1064,30 +1100,6 @@ SQLInfoFirebird::DoCommitDMLcommands() const
 {
   SQLQuery sql(m_database);
   sql.DoSQLStatement("COMMIT");
-}
-
-// Creeer een view op een geoptimaliseerde manier vanuit een bestaande tabel
-void 
-SQLInfoFirebird::DoCreateOrReplaceView(CString p_code,CString p_viewName)
-{
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement(p_code);
-  sql.DoSQLStatement("GRANT ALL ON " + p_viewName + " TO " + GetGrantedUsers());
-}
-
-// Verwijder een view uit de database
-void 
-SQLInfoFirebird::DoDropView(CString p_viewName)
-{
-  p_viewName.MakeUpper();
-  SQLQuery sql(m_database);
-  // Eerst dependencies wegwerken. In Firebird willen dependencies op allerlei views
-  // (bijvoorbeeld van een cascaderende del_proc van een andere klasse op de _g-view
-  // van een historische klasse) nog wel eens het genereren breken.
-  sql.TryDoSQLStatement("DELETE FROM rdb$dependencies\n"
-                        " WHERE rdb$depended_on_name = '" + p_viewName + "'\n"
-                        "   AND rdb$depended_on_type = 0");
-  sql.TryDoSQLStatement("DROP VIEW " + p_viewName);
 }
 
 // Remove a column from a table
