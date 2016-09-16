@@ -17,7 +17,7 @@ echo .
 echo Ready cleaning up
 echo .
 echo Getting the archive from the cloud
-copy C:\Users\%USERNAME%\OneDrive\Documenten\SQLComponents.rar .
+robocopy C:\Users\%USERNAME%\OneDrive\Documenten . SQLComponents.rar /xo
 echo .
 echo Ready getting the RAR archive
 echo .

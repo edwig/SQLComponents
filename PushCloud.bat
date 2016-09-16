@@ -17,6 +17,8 @@ rmdir /q /s SQLComponents\Debug
 rmdir /q /s SQLComponents\Release
 rmdir /q /s SQLComponents\x64
 
+call prune.cmd
+
 echo .
 echo Ready cleaning up
 echo .
@@ -26,7 +28,7 @@ echo .
 echo .
 echo Ready making a RAR archive
 echo .
-copy SQLComponents.rar C:\Users\%USERNAME%\OneDrive\Documenten
+robocopy . C:\Users\%USERNAME%\OneDrive\Documenten SQLComponents.rar /xo
 echo .
 echo Ready copying the archive to the cloud (OneDrive/SkyDrive)
 pause
