@@ -21,8 +21,8 @@ void TestConnection()
   try
   {
     // Set options for the database
-    dbs.SetLoginTimeout(0);
-    dbs.SetMARS(false);
+    //dbs.SetLoginTimeout(0);
+    dbs.SetMARS(true);
     // dbs.AddConnectOption("FBS","600000");
 
     if(dbs.Open(g_dsn,g_user,g_password))

@@ -195,6 +195,7 @@
     <ClCompile Include="TestConnection.cpp" />
     <ClCompile Include="TestDataSet.cpp" />
     <ClCompile Include="TestFormatting.cpp" />
+    <ClCompile Include="TestNULL.cpp" />
     <ClCompile Include="TestSQL.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -13,3 +13,4 @@ extern void TestConnection();
 extern void TestClosingCursor();
 extern void TestFormatting();
 extern void TestDataSet();
+extern void TestNULL();
