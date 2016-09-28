@@ -351,7 +351,7 @@ SQLInfoPostgreSQL::GetSQLRemoveFieldDependencies(CString p_tablename) const
 
 // Geeft de tabeldefinitie-vorm van een primary key en constraint
 CString 
-SQLInfoPostgreSQL::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/) const
+SQLInfoPostgreSQL::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // Primary key-constraint niet direct genereren: deze wordt apart gegenereerd,
   // zodat de bijbehorende index in de juiste tablespace terechtkomt.
@@ -360,9 +360,9 @@ SQLInfoPostgreSQL::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporar
 
 // Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
 CString
-SQLInfoPostgreSQL::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
+SQLInfoPostgreSQL::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const
 {
-  return "ALTER TABLE " + p_tablename + "\n"
+  return "ALTER TABLE " + p_schema + "." + p_tablename + "\n"
          "  ADD CONSTRAINT pk_" + p_tablename + "\n"
          "      PRIMARY KEY (" + p_primary + ")";
 }
@@ -711,13 +711,16 @@ SQLInfoPostgreSQL::GetSQLConstraintsImmediate() const
 
 // Geef de query die controleert of de tabel al bestaat in de database
 CString 
-SQLInfoPostgreSQL::GetSQLTableExists(CString p_tablename) const
+SQLInfoPostgreSQL::GetSQLTableExists(CString p_schema,CString p_tablename) const
 {
-  CString lowerName(p_tablename);
-  lowerName.MakeLower();
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
   CString query = "SELECT count(*)\n"
-                  "  FROM pg_class\n"
-                  " WHERE relname = '" + lowerName + "'";
+                  "  FROM pg_class cl\n"
+                  "      ,pg_namespace ns"
+                  " WHERE cl.relnamespace = ns.oid\n"
+                  "   AND cl.name = '" + p_schema    + "'\n"
+                  "   AND relname = '" + p_tablename + "'";
   return query;
 }
 
@@ -1107,15 +1110,20 @@ SQLInfoPostgreSQL::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName
 
 // Query om te bepalen of de tabel al een primary key heeft
 CString
-SQLInfoPostgreSQL::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const
+SQLInfoPostgreSQL::GetSQLPrimaryKeyConstraintInformation(CString p_schema,CString p_tableName) const
 {
-  CString table(p_tableName);
-  table.MakeLower();
+  p_schema.MakeLower();
+  p_tableName.MakeLower();
+
   CString query = "SELECT count(*)\n"
-                  "  FROM pg_class a, pg_constraint b\n"
-                  " WHERE a.relname = '" + table + "'\n"
-                  "   AND a.oid = b.conrelid\n"
-                  "   AND b.contype = 'p'";
+                  "  FROM pg_class a\n"
+                  "      ,pg_constraint b\n"
+                  "      ,pg_namespaces n\n"
+                  " WHERE a.relnamespace = n.oid\n"
+                  "   AND a.oid     = b.conrelid\n"
+                  "   AND b.contype = 'p'"
+                  "   AND n.name    = '" + p_schema    + "'\n"
+                  "   AND a.relname = '" + p_tableName + "'\n";
   return query;
 }
 
@@ -1158,9 +1166,9 @@ SQLInfoPostgreSQL::GetOnlyOneUserSession()
 // ==================
 
 CString
-SQLInfoPostgreSQL::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+SQLInfoPostgreSQL::GetCreateColumn(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
 {
-  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+  CString sql  = "ALTER TABLE "  + p_schema + "." + p_tablename  + "\n";
                  "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
   if(p_notNull)
   {
@@ -1189,18 +1197,18 @@ SQLInfoPostgreSQL::GetCreateForeignKey(CString p_tablename,CString p_constraintn
 }
 
 CString 
-SQLInfoPostgreSQL::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+SQLInfoPostgreSQL::GetModifyColumnType(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition)
 {
-  CString sql = "ALTER TABLE "    + p_tablename + "\n"
+  CString sql = "ALTER TABLE "   + p_schema + "." + p_tablename + "\n"
                 " ALTER COLUMN " + p_columnName + 
                 " SET DATA TYPE " + p_typeDefinition;
   return sql;
 }
 
 CString 
-SQLInfoPostgreSQL::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+SQLInfoPostgreSQL::GetModifyColumnNull(CString p_schema,CString p_tablename,CString p_columnName,bool p_notNull)
 {
-  CString sql = "ALTER TABLE  " + p_tablename + "\n"
+  CString sql = "ALTER TABLE  " + p_schema + "." + p_tablename + "\n"
                 "ALTER COLUMN " + p_columnName + (p_notNull ? " SET " : " DROP ") + "NOT NULL";
   return sql;
 }
@@ -1315,34 +1323,6 @@ SQLInfoPostgreSQL::DoRemoveTemporaryTable(CString& p_tableName) const
   sql.TryDoSQLStatement("DELETE FROM "    + p_tableName);
   sql.TryDoSQLStatement("TRUNCATE TABLE " + p_tableName);
   sql.TryDoSQLStatement("DROP TABLE "     + p_tableName);
-}
-
-// Indien de tabel een tijdelijke tabel is, verwijder hem
-void
-SQLInfoPostgreSQL::DoRemoveTemporaryTableWithCheck(CString& p_tableName) const
-{
-  CString tableName(p_tableName);
-  int number = 0;
-  tableName.MakeLower();
-
-  CString query = "SELECT count(*)\n"
-                  "  FROM pg_class cl\n"
-                  "      ,pg_namespace ns\n"
-                  " WHERE cl.relnamespace = ns.oid\n"
-                  "   AND cl.relname = '" + tableName + "'\n"
-                  "   AND ns.nspname like like_escape('pg!_temp!_%','!')";
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement(query);
-  if(sql.GetRecord())
-  {
-    number = sql.GetColumn(1)->GetAsSLong();
-  }
-  // Als de tabel WEL voorkomt in de catalog, dan mag je hem proberen te droppen
-  // Als hij NIET voorkomt, dan bestaat hij niet, en hoeft hij niet gedropped te worden
-  if(number == 1)
-  {
-    DoRemoveTemporaryTable(p_tableName);
-  }
 }
 
 // Maak een procedure aan in de database

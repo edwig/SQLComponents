@@ -345,7 +345,7 @@ SQLInfoAccess::GetSQLRemoveFieldDependencies(CString p_tablename) const
 
 // Gets the table definition-form of a primary key
 CString 
-SQLInfoAccess::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/) const
+SQLInfoAccess::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // The primary key constraint is not directly generated after the column
   // to ensure it wil use the named index in the correct tablespace
@@ -355,7 +355,7 @@ SQLInfoAccess::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/)
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString
-SQLInfoAccess::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
+SQLInfoAccess::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablename,CString p_primary) const
 {
   return "ALTER TABLE " + p_tablename + "\n"
          "  ADD CONSTRAINT pk_" + p_tablename + "\n"
@@ -675,7 +675,7 @@ SQLInfoAccess::GetSQLConstraintsImmediate() const
 
 // Get SQL to check if a table already exists in the database
 CString 
-SQLInfoAccess::GetSQLTableExists(CString p_tablename) const
+SQLInfoAccess::GetSQLTableExists(CString /*p_schema*/,CString /*p_tablename*/) const
 {
   // MS-Access cannot do this
   return "";
@@ -860,15 +860,10 @@ SQLInfoAccess::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CSt
 
 // Get SQL to get all the information about a Primary Key constraint
 CString
-SQLInfoAccess::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const
+SQLInfoAccess::GetSQLPrimaryKeyConstraintInformation(CString /*p_schema*/,CString /*p_tableName*/) const
 {
-  CString query = "SELECT count(*)\n"
-    "  FROM dbo.sysobjects tab, dbo.sysobjects con\n"
-    " WHERE tab.name = '" + p_tableName + "'\n"
-    "   AND tab.Id = con.parent_obj\n"
-    "   AND con.xtype = 'PK'\n"
-    "   AND con.type  = 'K '";
-  return query;
+  // MS Access cannot get this info
+  return "";
 }
 
 // Does the named constraint exist in the database
@@ -908,7 +903,7 @@ SQLInfoAccess::GetOnlyOneUserSession()
 // ==================
 
 CString
-SQLInfoAccess::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+SQLInfoAccess::GetCreateColumn(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
 {
   CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
                  "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
@@ -940,7 +935,7 @@ SQLInfoAccess::GetCreateForeignKey(CString p_tablename,CString p_constraintname,
 }
 
 CString 
-SQLInfoAccess::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+SQLInfoAccess::GetModifyColumnType(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition)
 {
   CString sql  = "ALTER TABLE  " + p_tablename  + "\n";
                  "ALTER COLUMN " + p_columnName + " " + p_typeDefinition;
@@ -948,7 +943,7 @@ SQLInfoAccess::GetModifyColumnType(CString p_tablename,CString p_columnName,CStr
 }
 
 CString 
-SQLInfoAccess::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+SQLInfoAccess::GetModifyColumnNull(CString /*p_schema*/,CString p_tablename,CString p_columnName,bool p_notNull)
 {
   CString sql  = "ALTER TABLE  " + p_tablename  + "\n";
                  "ALTER COLUMN " + p_columnName + " " + (p_notNull ? "NOT " : "") + "NULL";
@@ -1051,28 +1046,6 @@ SQLInfoAccess::DoRemoveTemporaryTable(CString& p_tableName) const
   query.TryDoSQLStatement("DELETE FROM #"    + p_tableName);
   query.TryDoSQLStatement("TRUNCATE TABLE #" + p_tableName);
   query.TryDoSQLStatement("DROP TABLE #"     + p_tableName);
-}
-
-// If the temporary table exists, remove it
-void
-SQLInfoAccess::DoRemoveTemporaryTableWithCheck(CString& p_tableName) const
-{
-  int number = 0;
-
-  CString query = "SELECT count(*)\n"
-    "  FROM tempdb.dbo.sysobjects\n"
-    " WHERE name  = '#" + p_tableName + "'\n"
-    "   AND xtype = 'U'";
-  SQLQuery qry(m_database);
-  qry.DoSQLStatement(query);
-  if(qry.GetRecord())
-  {
-    number = qry.GetColumn(1)->GetAsSLong();
-  }
-  if(number == 1)
-  {
-    DoRemoveTemporaryTable(p_tableName);
-  }
 }
 
 // Create a procedure in the database

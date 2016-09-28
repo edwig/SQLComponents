@@ -194,10 +194,10 @@ public:
   virtual CString GetSQLRemoveFieldDependencies(CString p_tablename) const = 0;
 
   // Gets the table definition-form of a primary key
-  virtual CString GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) const = 0;
+  virtual CString GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool p_temporary) const = 0;
 
   // Get the constraint form of a primary key to be added to a table after creation of that table
-  virtual CString GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const = 0;
+  virtual CString GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const = 0;
 
   // Get the sql to add a foreign key to a table
   virtual CString GetSQLForeignKeyConstraint(DBForeign& p_foreign) const = 0;
@@ -304,7 +304,7 @@ public:
   virtual CString GetSQLConstraintsImmediate() const = 0;
 
   // Get SQL to check if a table already exists in the database
-  virtual CString GetSQLTableExists(CString p_tablename) const = 0;
+  virtual CString GetSQLTableExists(CString p_schema,CString p_tablename) const = 0;
 
   // Get SQL to select all columns of a table from the catalog
   virtual CString GetSQLGetColumns(CString& p_user,CString& p_tableName) const = 0;
@@ -355,7 +355,7 @@ public:
   virtual bool    DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const = 0;
 
   // Get SQL to get all the information about a Primary Key constraint
-  virtual CString GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const = 0;
+  virtual CString GetSQLPrimaryKeyConstraintInformation(CString p_schema,CString p_tableName) const = 0;
 
   // Does the named constraint exist in the database
   virtual bool    DoesConstraintExist(CString p_constraintName) const = 0;
@@ -373,7 +373,7 @@ public:
   // ==================
 
   // Add a column to a table
-  virtual CString GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull) = 0;
+  virtual CString GetCreateColumn(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull) = 0;
 
   // Drop a column from a table
   virtual CString GetSQLDropColumn(CString p_schema,CString p_tablename,CString p_columnName) const = 0;
@@ -382,8 +382,8 @@ public:
   virtual CString GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary) = 0;
 
   // Modify a column's definition in a table
-  virtual CString GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition) = 0;
-  virtual CString GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull) = 0;
+  virtual CString GetModifyColumnType(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition) = 0;
+  virtual CString GetModifyColumnNull(CString p_schema,CString p_tablename,CString p_columnName,bool p_notNull) = 0;
 
   // Get the SQL to drop a view. If precursor is filled: run that SQL first!
   virtual CString GetSQLDropView(CString p_schema,CString p_view,CString& p_precursor) = 0;
@@ -411,9 +411,6 @@ public:
 
   // Remove a temporary table
   virtual void    DoRemoveTemporaryTable(CString& p_tableName) const = 0;
-
-  // If the temporary table exists, remove it
-  virtual void    DoRemoveTemporaryTableWithCheck(CString& p_tableName) const = 0;
 
   // Maak een procedure aan in de database
   virtual void    DoMakeProcedure(CString& p_procName,CString p_table,bool p_noParameters,CString& p_codeBlock) = 0;

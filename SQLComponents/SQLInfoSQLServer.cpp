@@ -359,7 +359,7 @@ SQLInfoSQLServer::GetSQLRemoveFieldDependencies(CString p_tablename) const
 
 // Gets the table definition-form of a primary key
 CString 
-SQLInfoSQLServer::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/) const
+SQLInfoSQLServer::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // The primary key constraint is not directly generated after the column
   // to ensure it wil use the named index in the correct tablespace
@@ -369,9 +369,9 @@ SQLInfoSQLServer::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString
-SQLInfoSQLServer::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
+SQLInfoSQLServer::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const
 {
-  return "ALTER TABLE " + p_tablename + "\n"
+  return "ALTER TABLE " + p_schema + "." + p_tablename + "\n"
          "  ADD CONSTRAINT pk_" + p_tablename + "\n"
          "      PRIMARY KEY (" + p_primary + ")";
 }
@@ -694,8 +694,10 @@ SQLInfoSQLServer::GetSQLConstraintsImmediate() const
 
 // Get SQL to check if a table already exists in the database
 CString 
-SQLInfoSQLServer::GetSQLTableExists(CString p_tablename) const
+SQLInfoSQLServer::GetSQLTableExists(CString p_schema,CString p_tablename) const
 {
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
   CString query = "SELECT count(*)\n"
                  "  FROM dbo.sysobjects\n"
                  " WHERE name = '" + p_tablename + "'";
@@ -1001,14 +1003,21 @@ SQLInfoSQLServer::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,
 
 // Get SQL to get all the information about a Primary Key constraint
 CString
-SQLInfoSQLServer::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const
+SQLInfoSQLServer::GetSQLPrimaryKeyConstraintInformation(CString p_schema,CString p_tableName) const
 {
+  p_schema.MakeLower();
+  p_tableName.MakeLower();
+
   CString query = "SELECT count(*)\n"
-                 "  FROM dbo.sysobjects tab, dbo.sysobjects con\n"
-                 " WHERE tab.name = '" + p_tableName + "'\n"
-                 "   AND tab.Id = con.parent_obj\n"
+                 "  FROM dbo.sysobjects tab\n"
+                 "      ,dbo.sysobjects con\n"
+                 "      ,dbo.sysusers   use\n"
+                 " WHERE tab.id    = con.parent_obj\n"
+                 "   AND tab.uid   = use.uid\n"
                  "   AND con.xtype = 'PK'\n"
-                 "   AND con.type  = 'K '";
+                 "   AND con.type  = 'K '"
+                 "   AND use.name  = '" + p_schema    + "'\n"
+                 "   AND tab.name  = '" + p_tableName + "'";
   return query;
 }
 
@@ -1048,9 +1057,9 @@ SQLInfoSQLServer::GetOnlyOneUserSession()
 // ==================
 
 CString
-SQLInfoSQLServer::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+SQLInfoSQLServer::GetCreateColumn(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
 {
-  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+  CString sql  = "ALTER TABLE "  + p_schema + "." + p_tablename  + "\n";
                  "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
   if(p_notNull)
   {
@@ -1079,17 +1088,17 @@ SQLInfoSQLServer::GetCreateForeignKey(CString p_tablename,CString p_constraintna
 }
 
 CString 
-SQLInfoSQLServer::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+SQLInfoSQLServer::GetModifyColumnType(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition)
 {
-  CString sql = "ALTER TABLE  " + p_tablename  + "\n"
+  CString sql = "ALTER TABLE  " + p_schema + "." + p_tablename  + "\n"
                 "ALTER COLUMN " + p_columnName + " " + p_typeDefinition;
   return sql;
 }
 
 CString 
-SQLInfoSQLServer::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+SQLInfoSQLServer::GetModifyColumnNull(CString p_schema,CString p_tablename,CString p_columnName,bool p_notNull)
 {
-  CString sql = "ALTER TABLE  " + p_tablename  + "\n"
+  CString sql = "ALTER TABLE  " + p_schema + "." + p_tablename  + "\n"
                 "ALTER COLUMN " + p_columnName + (p_notNull ? " NOT " : " ") + "NULL";
   return sql;
 }
@@ -1191,28 +1200,6 @@ SQLInfoSQLServer::DoRemoveTemporaryTable(CString& p_tableName) const
   query.TryDoSQLStatement("DELETE FROM #"    + p_tableName);
   query.TryDoSQLStatement("TRUNCATE TABLE #" + p_tableName);
   query.TryDoSQLStatement("DROP TABLE #"     + p_tableName);
-}
-
-// If the temporary table exists, remove it
-void
-SQLInfoSQLServer::DoRemoveTemporaryTableWithCheck(CString& p_tableName) const
-{
-  int number = 0;
-
-  CString query = "SELECT count(*)\n"
-                  "  FROM tempdb.dbo.sysobjects\n"
-                  " WHERE name  = '#" + p_tableName + "'\n"
-                  "   AND xtype = 'U'";
-  SQLQuery qry(m_database);
-  qry.DoSQLStatement(query);
-  if(qry.GetRecord())
-  {
-    number = qry.GetColumn(1)->GetAsSLong();
-  }
-  if(number == 1)
-  {
-    DoRemoveTemporaryTable(p_tableName);
-  }
 }
 
 // Create a procedure in the database

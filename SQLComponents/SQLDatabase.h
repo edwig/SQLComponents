@@ -112,7 +112,7 @@ typedef void (CALLBACK* LOGPRINT)(void*,const char*);
 typedef int  (CALLBACK* LOGLEVEL)(void*);
 
 // Foreward declaration
-class SQLInfo;
+class SQLInfoDB;
 class SQLInfoTree;
 class SQLTimestamp;
 
@@ -150,7 +150,7 @@ public:
   void           SetDirtyRead(); // Readmode for Informix
 
   // GETTING/CONSTRUCTING the SQLInfo object
-  SQLInfo*       GetSQLInfo();
+  SQLInfoDB*     GetSQLInfoDB();
   SQLInfoTree*   GetSQLInfoTree();
 
   // MACRO's FOR SQL TEXT
@@ -279,7 +279,7 @@ protected:
 
   // Info about the database
   DatabaseType      m_rdbmsType;            // Which RDBMS engine
-  SQLInfo*          m_info;                 // The SQLInfo object
+  SQLInfoDB*        m_info;                 // The SQLInfo object
   SQLInfoTree*      m_infoTree;             // The TREE object
   int               m_loginTimeout;         // Timeout before login fails
   bool              m_mars;                 // Multiple Active Record Sets

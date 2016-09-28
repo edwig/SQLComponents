@@ -351,7 +351,7 @@ SQLInfoFirebird::GetSQLRemoveFieldDependencies(CString p_tablename) const
 
 // Geeft de tabeldefinitie-vorm van een primary key en constraint
 CString 
-SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) const
+SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool p_temporary) const
 {
   CString keyDefinitie = GetPrimaryKeyType() + " NOT NULL\n";
   keyDefinitie += p_temporary ? CString("\n") : " CONSTRAINT pk_" + p_tableName + " PRIMARY KEY\n";
@@ -360,7 +360,7 @@ SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) c
 
 // Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
 CString
-SQLInfoFirebird::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
+SQLInfoFirebird::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablename,CString p_primary) const
 {
   return "ALTER TABLE " + p_tablename + "\n"
          "  ADD CONSTRAINT pk_" + p_tablename + "\n"
@@ -673,7 +673,7 @@ SQLInfoFirebird::GetSQLConstraintsImmediate() const
 
 // Geef de query die controleert of de tabel al bestaat in de database
 CString 
-SQLInfoFirebird::GetSQLTableExists(CString p_tablename) const
+SQLInfoFirebird::GetSQLTableExists(CString /*p_schema*/,CString p_tablename) const
 {
   CString upperName(p_tablename);
   upperName.MakeUpper();
@@ -955,7 +955,7 @@ SQLInfoFirebird::DoesColumnExistsInTable(CString& /*p_owner*/,CString& p_tableNa
 
 // Query om te bepalen of de tabel al een primary key heeft
 CString
-SQLInfoFirebird::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const
+SQLInfoFirebird::GetSQLPrimaryKeyConstraintInformation(CString /*p_schema*/,CString p_tableName) const
 {
   CString table(p_tableName);
   table.MakeUpper();
@@ -1006,7 +1006,7 @@ SQLInfoFirebird::GetOnlyOneUserSession()
 // ==================
 
 CString
-SQLInfoFirebird::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+SQLInfoFirebird::GetCreateColumn(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
 {
   CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
                  "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
@@ -1036,7 +1036,7 @@ SQLInfoFirebird::GetCreateForeignKey(CString p_tablename,CString p_constraintnam
 }
 
 CString 
-SQLInfoFirebird::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+SQLInfoFirebird::GetModifyColumnType(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition)
 {
   CString sql = "ALTER TABLE "    + p_tablename + "\n"
                 " MODIFY COLUMN " + p_columnName + "\n"
@@ -1045,7 +1045,7 @@ SQLInfoFirebird::GetModifyColumnType(CString p_tablename,CString p_columnName,CS
 }
 
 CString 
-SQLInfoFirebird::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+SQLInfoFirebird::GetModifyColumnNull(CString /*p_schema*/,CString p_tablename,CString p_columnName,bool p_notNull)
 {
   CString sql = "ALTER TABLE "    + p_tablename + "\n"
                 " MODIFY COLUMN " + p_columnName + (p_notNull ? " SET " : " DROP ") + "NOT NULL";
@@ -1159,32 +1159,6 @@ SQLInfoFirebird::DoRemoveTemporaryTable(CString& p_tableName) const
   SQLQuery query(m_database);
   // If table is not there, no error...
   query.TryDoSQLStatement("DROP TABLE " + p_tableName);
-}
-
-// Indien de tabel een tijdelijke tabel is, verwijder hem
-void
-SQLInfoFirebird::DoRemoveTemporaryTableWithCheck(CString& p_tableName) const
-{
-  CString tableName(p_tableName);
-  int number = 0;
-  tableName.MakeUpper();
-
-  CString query = "SELECT count(*)\n"
-                  "  FROM rdb$relations\n"
-                  " WHERE rdb$relation_name = '" + tableName + "'\n"
-                  "   AND rdb$external_file IS NOT NULL";
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement(query);
-  if(sql.GetRecord())
-  {
-    number = sql.GetColumn(1)->GetAsSLong();
-  }
-  // Als de tabel WEL voorkomt in de catalog, dan mag je hem proberen te droppen
-  // Als hij NIET voorkomt, dan bestaat hij niet, en hoeft hij niet gedropped te worden
-  if(number == 1)
-  {
-    DoRemoveTemporaryTable(tableName);
-  }
 }
 
 // Maak een procedure aan in de database

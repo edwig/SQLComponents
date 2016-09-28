@@ -29,6 +29,7 @@
 #include "SQLQuery.h"
 #include "SQLWrappers.h"
 #include "SQLInfoTree.h"
+#include "SQLInfoDB.h"
 #include "SQLInfoAccess.h"
 #include "SQLInfoOracle.h"
 #include "SQLInfoFirebird.h"
@@ -566,8 +567,8 @@ SQLDatabase::SetKnownRebinds()
 
 // Get the SQL Info object by database
 // SQLInfoDB Factory for subclass
-SQLInfo*
-SQLDatabase::GetSQLInfo()
+SQLInfoDB*
+SQLDatabase::GetSQLInfoDB()
 {
   if(m_info == NULL && IsOpen())
   {
@@ -622,10 +623,10 @@ SQLDatabase::RealDatabaseName()
   }
   if(databaseName.IsEmpty())
   {
-    if(GetSQLInfo())
+    if(GetSQLInfoDB())
     {
       // Get the SQLInfo<Database> implementation's name
-      databaseName = reinterpret_cast<SQLInfoDB*>(m_info)->GetFysicalDatabaseName();
+      databaseName   = m_info->GetFysicalDatabaseName();
       m_namingMethod = "Fysical database name";
     }
   }
@@ -724,7 +725,7 @@ bool
 SQLDatabase::SetReadOnly(bool p_readOnly)
 {
   SQLUINTEGER access = p_readOnly ? SQL_MODE_READ_ONLY : SQL_MODE_READ_WRITE;
-  SQLInfo* info = GetSQLInfo();
+  SQLInfoDB* info = GetSQLInfoDB();
   if(info == NULL)
   {
     return false;
@@ -1323,9 +1324,9 @@ SQLDatabase::GetTransaction()
 CString
 SQLDatabase::GetSQLTimeString(int p_hour,int p_minute,int p_second)
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLTimeString(p_hour,p_minute,p_second);
+    return m_info->GetSQLTimeString(p_hour,p_minute,p_second);
   }
   return "";
 }
@@ -1333,9 +1334,9 @@ SQLDatabase::GetSQLTimeString(int p_hour,int p_minute,int p_second)
 CString
 SQLDatabase::GetStrippedSQLTimeString(int p_hour,int p_minute,int p_second)
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLTimeString(p_hour,p_minute,p_second);
+    return m_info->GetSQLTimeString(p_hour,p_minute,p_second);
   }
   return "";
 }
@@ -1343,9 +1344,9 @@ SQLDatabase::GetStrippedSQLTimeString(int p_hour,int p_minute,int p_second)
 CString
 SQLDatabase::GetSQLDateString(int p_day, int p_month, int p_year)
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLDateString(p_year,p_month,p_day);
+    return m_info->GetSQLDateString(p_year,p_month,p_day);
   }
   return "";
 }
@@ -1353,9 +1354,9 @@ SQLDatabase::GetSQLDateString(int p_day, int p_month, int p_year)
 CString
 SQLDatabase::GetCurrentTimestampQualifier()
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetSystemDateTimeKeyword();
+    return m_info->GetSystemDateTimeKeyword();
   }
   return "";
 }
@@ -1364,9 +1365,9 @@ CString
 SQLDatabase::GetSQL_GenerateSerial(CString p_table)
 {
   CString query;
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    query = reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLGenerateSerial(p_table);
+    query = m_info->GetSQLGenerateSerial(p_table);
   }
   if(query.Left(6).CompareNoCase("SELECT") == 0)
   {
@@ -1385,9 +1386,9 @@ int
 SQLDatabase::GetSQL_EffectiveSerial(CString p_oid_string)
 {
   CString query;
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    query = reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLEffectiveSerial(p_oid_string);
+    query = m_info->GetSQLEffectiveSerial(p_oid_string);
   }
   if(query.Left(6).CompareNoCase("SELECT") == 0)
   {
@@ -1407,14 +1408,14 @@ SQLDatabase::GetSQL_EffectiveSerial(CString p_oid_string)
 CString 
 SQLDatabase::GetTimestampAsString(const SQLTimestamp& p_timestamp)
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLDateTimeString(p_timestamp.Year()
-                                                                     ,p_timestamp.Month()
-                                                                     ,p_timestamp.Day()
-                                                                     ,p_timestamp.Hour()
-                                                                     ,p_timestamp.Minute()
-                                                                     ,p_timestamp.Second());
+    return m_info->GetSQLDateTimeString(p_timestamp.Year()
+                                       ,p_timestamp.Month()
+                                       ,p_timestamp.Day()
+                                       ,p_timestamp.Hour()
+                                       ,p_timestamp.Minute()
+                                       ,p_timestamp.Second());
   }
   return "";
 }
@@ -1422,9 +1423,9 @@ SQLDatabase::GetTimestampAsString(const SQLTimestamp& p_timestamp)
 CString 
 SQLDatabase::GetTimestampAsBoundString()
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLDateTimeBoundString();
+    return m_info->GetSQLDateTimeBoundString();
   }
   return "";
 }
@@ -1432,14 +1433,14 @@ SQLDatabase::GetTimestampAsBoundString()
 CString
 SQLDatabase::GetSQLDateTimeStrippedString(const SQLTimestamp& p_timestamp)
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLDateTimeStrippedString(p_timestamp.Year()
-                                                                             ,p_timestamp.Month()
-                                                                             ,p_timestamp.Day()
-                                                                             ,p_timestamp.Hour()
-                                                                             ,p_timestamp.Minute()
-                                                                             ,p_timestamp.Second());
+    return m_info->GetSQLDateTimeStrippedString(p_timestamp.Year()
+                                               ,p_timestamp.Month()
+                                               ,p_timestamp.Day()
+                                               ,p_timestamp.Hour()
+                                               ,p_timestamp.Minute()
+                                               ,p_timestamp.Second());
   }
   return "";
 }
@@ -1447,9 +1448,9 @@ SQLDatabase::GetSQLDateTimeStrippedString(const SQLTimestamp& p_timestamp)
 CString
 SQLDatabase::GetInterval1MinuteAgo()
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetInterval1MinuteAgo();
+    return m_info->GetInterval1MinuteAgo();
   }
   return "";
 }
@@ -1457,9 +1458,9 @@ SQLDatabase::GetInterval1MinuteAgo()
 CString
 SQLDatabase::GetUpper(CString p_veld)
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetUpperFunction(p_veld);
+    return m_info->GetUpperFunction(p_veld);
   }
   return "";
 }
@@ -1467,9 +1468,9 @@ SQLDatabase::GetUpper(CString p_veld)
 CString
 SQLDatabase::GetNVLStatement(CString p_test,CString p_isnull)
 {
-  if(GetSQLInfo())
+  if(GetSQLInfoDB())
   {
-    return reinterpret_cast<SQLInfoDB*>(m_info)->GetNVLStatement(p_test,p_isnull);
+    return m_info->GetNVLStatement(p_test,p_isnull);
   }
   return "";
 }
@@ -1479,12 +1480,12 @@ void
 SQLDatabase::SetOracleResultCacheMode(const CString& p_mode)
 {
   // Check to see if we are logged in, and 
-  if(!GetSQLInfo())
+  if(!GetSQLInfoDB())
   {
     return;
   }
   // See if we've got a setting
-  CString query = reinterpret_cast<SQLInfoDB*>(m_info)->GetSQLCacheModeSetting(p_mode);
+  CString query = m_info->GetSQLCacheModeSetting(p_mode);
   if(query.IsEmpty())
   {
     return;

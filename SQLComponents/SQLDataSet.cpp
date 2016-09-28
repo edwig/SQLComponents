@@ -28,7 +28,7 @@
 #include "SQLDataSet.h"
 #include "SQLQuery.h"
 #include "SQLVariantFormat.h"
-#include "SQLInfo.h"
+#include "SQLInfoDB.h"
 #include "xml.h"
 
 #ifdef _DEBUG
@@ -917,7 +917,7 @@ SQLDataSet::GetPrimaryKeyInfo()
 {
   if(m_primaryKey.size() == 0)
   {
-    SQLInfo* info = m_database->GetSQLInfo();
+    SQLInfoDB* info = m_database->GetSQLInfoDB();
     CString primaryConstraintName;
     PrimaryMap map;
     if(info->GetPrimaryKeyInfo(m_primaryTableName,primaryConstraintName,map) == false)

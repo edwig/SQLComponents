@@ -335,7 +335,7 @@ SQLInfoGenericODBC::GetSQLRemoveFieldDependencies(CString p_tablename) const
 
 // Gets the table definition-form of a primary key
 CString 
-SQLInfoGenericODBC::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/) const
+SQLInfoGenericODBC::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // The primary key constraint is not directly generated after the column
   // to ensure it wil use the named index in the correct tablespace
@@ -345,10 +345,10 @@ SQLInfoGenericODBC::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_tempora
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString 
-SQLInfoGenericODBC::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
+SQLInfoGenericODBC::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const
 {
   // General ISO definition of a primary key
-  return "ALTER TABLE " + p_tablename + "\n"
+  return "ALTER TABLE " + p_schema + "." + p_tablename + "\n"
          "  ADD CONSTRAINT pk_" + p_tablename + "\n"
          "      PRIMARY KEY (" + p_primary + ")";
 }
@@ -753,11 +753,18 @@ SQLInfoGenericODBC::GetSQLConstraintsImmediate() const
 
 // Get SQL to check if a table already exists in the database
 CString 
-SQLInfoGenericODBC::GetSQLTableExists(CString p_tablename) const
+SQLInfoGenericODBC::GetSQLTableExists(CString p_schema,CString p_tablename) const
 {
   WordList list;
   SQLInfo* info = (SQLInfo*)this;
+  CString table(p_tablename);
 
+  // Construct compounded name
+  if(!p_schema.IsEmpty())
+  {
+    table = p_schema + "." + p_tablename;
+  }
+  // Get from SQLTables
   if(info->MakeInfoTableTablepart(&list,NULL,p_tablename))
   {
     if(!list.empty())
@@ -945,7 +952,7 @@ SQLInfoGenericODBC::DoesColumnExistsInTable(CString& p_owner,CString& p_tableNam
 
 // Get SQL to get all the information about a Primary Key constraint
 CString 
-SQLInfoGenericODBC::GetSQLPrimaryKeyConstraintInformation(CString& /*p_tableName*/) const
+SQLInfoGenericODBC::GetSQLPrimaryKeyConstraintInformation(CString /*p_schema*/,CString /*p_tableName*/) const
 {
   // To be implemented
   return "";
@@ -991,9 +998,9 @@ SQLInfoGenericODBC::GetOnlyOneUserSession()
 // ==================
 
 CString
-SQLInfoGenericODBC::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+SQLInfoGenericODBC::GetCreateColumn(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
 {
-  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+  CString sql  = "ALTER TABLE "  + p_schema + "." + p_tablename  + "\n";
                  "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
   if(p_notNull)
   {
@@ -1023,17 +1030,17 @@ SQLInfoGenericODBC::GetCreateForeignKey(CString p_tablename,CString p_constraint
 }
 
 CString 
-SQLInfoGenericODBC::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+SQLInfoGenericODBC::GetModifyColumnType(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition)
 {
-  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+  CString sql  = "ALTER TABLE "  + p_schema + "." + p_tablename  + "\n";
                  "      MODIFY " + p_columnName + " " + p_typeDefinition;
   return sql;
 }
 
 CString 
-SQLInfoGenericODBC::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+SQLInfoGenericODBC::GetModifyColumnNull(CString p_schema,CString p_tablename,CString p_columnName,bool p_notNull)
 {
-  CString sql = "ALTER TABLE " + p_tablename + "\n";
+  CString sql = "ALTER TABLE " + p_schema + "." + p_tablename + "\n";
                 "      MODIFY " + p_columnName + (p_notNull ? "NOT " : " ") + "NULL";
   return sql;
 }
@@ -1138,16 +1145,6 @@ SQLInfoGenericODBC::DoRemoveTemporaryTable(CString& p_tableName) const
   // Every error can be ignored. Can still be in use by another user and/or session
   // The table contents will then removed for this session
   query.TryDoSQLStatement("DROP TABLE " + p_tableName);
-}
-
-// If the temporary table exists, remove it
-void
-SQLInfoGenericODBC::DoRemoveTemporaryTableWithCheck(CString& p_tableName) const
-{
-  if(!GetSQLTableExists(p_tableName).IsEmpty())
-  {
-    DoRemoveTemporaryTable(p_tableName);
-  }
 }
 
 // Maak een procedure aan in de database

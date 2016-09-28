@@ -343,7 +343,7 @@ SQLInfoInformix::GetSQLRemoveFieldDependencies(CString /*p_tablename*/) const
 
 // Gets the table definition-form of a primary key
 CString
-SQLInfoInformix::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) const
+SQLInfoInformix::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool p_temporary) const
 {
   if(p_temporary)
   {
@@ -357,7 +357,7 @@ SQLInfoInformix::GetPrimaryKeyDefinition(CString p_tableName,bool p_temporary) c
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString
-SQLInfoInformix::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
+SQLInfoInformix::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablename,CString p_primary) const
 {
   return "ALTER TABLE " + p_tablename + "\n"
          "  ADD CONSTRAINT PRIMARY KEY (" + p_primary + ")\n"
@@ -665,7 +665,7 @@ SQLInfoInformix::GetSQLConstraintsImmediate() const
 
 // Get SQL to check if a table already exists in the database
 CString 
-SQLInfoInformix::GetSQLTableExists(CString p_tablename) const
+SQLInfoInformix::GetSQLTableExists(CString /*p_schema*/,CString p_tablename) const
 {
   CString lowerName(p_tablename);
   lowerName.MakeLower();
@@ -1015,7 +1015,7 @@ SQLInfoInformix::DoesColumnExistsInTable(CString& /*p_owner*/,CString& p_tableNa
 
 // Get SQL to get all the information about a Primary Key constraint
 CString
-SQLInfoInformix::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const
+SQLInfoInformix::GetSQLPrimaryKeyConstraintInformation(CString /*p_schema*/,CString p_tableName) const
 {
   CString query = "SELECT count(*)\n"
                   "  FROM systables t\n"
@@ -1073,7 +1073,7 @@ SQLInfoInformix::GetOnlyOneUserSession()
 // ==================
 
 CString
-SQLInfoInformix::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+SQLInfoInformix::GetCreateColumn(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
 {
   CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
                  "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
@@ -1104,7 +1104,7 @@ SQLInfoInformix::GetCreateForeignKey(CString p_tablename,CString p_constraintnam
 }
 
 CString 
-SQLInfoInformix::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+SQLInfoInformix::GetModifyColumnType(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition)
 {
   CString sql = "ALTER  TABLE  " + p_tablename + "\n";
                 "MODIFY COLUMN " + p_columnName + " " + p_typeDefinition;
@@ -1112,8 +1112,8 @@ SQLInfoInformix::GetModifyColumnType(CString p_tablename,CString p_columnName,CS
 }
 
 CString 
-SQLInfoInformix::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
-{
+SQLInfoInformix::GetModifyColumnNull(CString /*p_schema*/,CString p_tablename,CString p_columnName,bool p_notNull)
+ {
   CString sql = "ALTER  TABLE  " + p_tablename + "\n";
                 "MODIFY COLUMN " + p_columnName + " " + (p_notNull ? "NOT " : "") + "NULL";
   return sql;
@@ -1220,31 +1220,6 @@ SQLInfoInformix::DoRemoveTemporaryTable(CString& p_tableName) const
 {
   SQLQuery sql(m_database);
   sql.TryDoSQLStatement("DROP TABLE " + p_tableName);
-}
-
-// If the temporary table exists, remove it
-void
-SQLInfoInformix::DoRemoveTemporaryTableWithCheck(CString& p_tableName) const
-{
-  CString tabelName(p_tableName);
-  int number = 0;
-  tabelName.MakeLower();
-
-  CString query = "SELECT count(*)\n"
-                  "  FROM systables sys\n"
-                  " WHERE tabname = '" + tabelName + "'";
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement(query);
-  if(sql.GetRecord())
-  {
-    number = sql.GetColumn(1)->GetAsSLong();
-  }
-  // IF the table is NOT in the system catalog, THEN we can try to drop it
-  // If it was in the systables, it's persistent, so we can NOT drop it!!!
-  if(number == 0)
-  {
-    DoRemoveTemporaryTable(tabelName);
-  }
 }
 
 // Create a procedure in the database

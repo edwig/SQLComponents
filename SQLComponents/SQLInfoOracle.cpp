@@ -373,7 +373,7 @@ SQLInfoOracle::GetSQLRemoveFieldDependencies(CString p_tablename) const
 
 // Gets the table definition-form of a primary key
 CString 
-SQLInfoOracle::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/) const
+SQLInfoOracle::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // The primary key constraint is not directly generated after the column
   // to ensure it wil use the named index in the correct tablespace
@@ -383,9 +383,9 @@ SQLInfoOracle::GetPrimaryKeyDefinition(CString p_tableName,bool /*p_temporary*/)
 
 // Get the constraint form of a primary key to be added to a table after creation of that table
 CString 
-SQLInfoOracle::GetPrimaryKeyConstraint(CString p_tablename,CString p_primary) const
+SQLInfoOracle::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const
 {
-  return "ALTER TABLE " + p_tablename + "\n"
+  return "ALTER TABLE " + p_schema + "." + p_tablename + "\n"
          "  ADD CONSTRAINT pk_" + p_tablename + "\n"
          "      PRIMARY KEY (" + p_primary + ")";
 }
@@ -743,13 +743,14 @@ SQLInfoOracle::GetSQLConstraintsImmediate() const
 
 // Get SQL to check if a table already exists in the database
 CString 
-SQLInfoOracle::GetSQLTableExists(CString p_tablename) const
+SQLInfoOracle::GetSQLTableExists(CString p_schema,CString p_tablename) const
 {
-  CString upperName = p_tablename;
-  upperName.MakeUpper();
+  p_schema.MakeUpper();
+  p_tablename.MakeUpper();
   CString query = "SELECT COUNT(*)\n"
                   "  FROM ALL_TABLES\n"
-                  " WHERE table_name = '" + upperName + "'";
+                  " WHERE owner      = '" + p_schema    + "'\n"
+                  "   AND table_name = '" + p_tablename + "'";
   return query;
 }
 
@@ -1068,10 +1069,10 @@ SQLInfoOracle::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CSt
 
 // Get SQL to get all the information about a Primary Key constraint
 CString 
-SQLInfoOracle::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const
+SQLInfoOracle::GetSQLPrimaryKeyConstraintInformation(CString p_schema,CString p_tableName) const
 {
-  CString tableName(p_tableName);
-  tableName.MakeUpper();
+  p_schema.MakeUpper();
+  p_tableName.MakeUpper();
 
   CString query = "SELECT c.constraint_name\n"
                   "      ,c.index_name\n"
@@ -1079,7 +1080,8 @@ SQLInfoOracle::GetSQLPrimaryKeyConstraintInformation(CString& p_tableName) const
                   "          FROM all_indexes i\n"
                   "         WHERE i.index_name = c.index_name)\n"
                   "  FROM all_constraints c\n"
-                  " WHERE c.table_name      = '" + tableName + "'\n"
+                  " WHERE c.owner           = '" + p_schema    + "'\n"
+                  "   AND c.table_name      = '" + p_tableName + "'\n"
                   "   AND c.constraint_type = 'P'\n";
   return query;
 }
@@ -1133,9 +1135,9 @@ SQLInfoOracle::GetOnlyOneUserSession()
 // ==================
 
 CString
-SQLInfoOracle::GetCreateColumn(CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
+SQLInfoOracle::GetCreateColumn(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
 {
-  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
+  CString sql  = "ALTER TABLE "  + p_schema + "." + p_tablename  + "\n";
                  "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
   if(p_notNull)
   {
@@ -1164,17 +1166,17 @@ SQLInfoOracle::GetCreateForeignKey(CString p_tablename,CString p_constraintname,
 }
 
 CString 
-SQLInfoOracle::GetModifyColumnType(CString p_tablename,CString p_columnName,CString p_typeDefinition)
+SQLInfoOracle::GetModifyColumnType(CString p_schema,CString p_tablename,CString p_columnName,CString p_typeDefinition)
 {
-  CString sql = "ALTER  TABLE  " + p_tablename + "\n";
+  CString sql = "ALTER  TABLE  " + p_schema + "." + p_tablename + "\n";
                 "MODIFY COLUMN " + p_columnName + " " + p_typeDefinition;
   return sql;
 }
 
 CString 
-SQLInfoOracle::GetModifyColumnNull(CString p_tablename,CString p_columnName,bool p_notNull)
+SQLInfoOracle::GetModifyColumnNull(CString p_schema,CString p_tablename,CString p_columnName,bool p_notNull)
 {
-  CString sql = "ALTER  TABLE  " + p_tablename + "\n";
+  CString sql = "ALTER  TABLE  " + p_schema + "." + p_tablename + "\n";
                 "MODIFY COLUMN " + p_columnName + " " + (p_notNull ? "NOT " : "") + "NULL";
   return sql;
 }
@@ -1287,30 +1289,6 @@ SQLInfoOracle::DoRemoveTemporaryTable(CString& p_tableName) const
   query.TryDoSQLStatement("DELETE FROM "    + p_tableName);
   query.TryDoSQLStatement("TRUNCATE TABLE " + p_tableName);
   query.TryDoSQLStatement("DROP TABLE "     + p_tableName);
-}
-
-// If the temporary table exists, remove it
-void
-SQLInfoOracle::DoRemoveTemporaryTableWithCheck(CString& p_tableName) const
-{
-  int number = 0;
-  CString tableName(p_tableName);
-  tableName.MakeUpper();
-
-  CString query = "SELECT COUNT(*)\n"
-                  "  FROM all_tables\n"
-                  " WHERE table_name = '" + p_tableName + "'\n"
-                  "   AND temporary  = 'Y'";
-  SQLQuery qry(m_database);
-  qry.DoSQLStatement(query);
-  if(qry.GetRecord())
-  {
-    number = qry.GetColumn(1)->GetAsSLong();
-  }
-  if(number == 1)
-  {
-    DoRemoveTemporaryTable(p_tableName);
-  }
 }
 
 // Create a procedure in the database
