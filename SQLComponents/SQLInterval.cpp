@@ -82,6 +82,12 @@ SQLInterval::SQLInterval(SQLINTERVAL p_type,int p_days,int p_hours,int p_minutes
   SetInterval(p_type,p_days,p_hours,p_minutes,p_seconds,p_fraction);
 }
 
+// XTOR for a XML duration string
+SQLInterval::SQLInterval(CString p_duration)
+{
+  SetInterval(p_duration);
+}
+
 // DTOR
 SQLInterval::~SQLInterval()
 {
@@ -195,6 +201,12 @@ SQLInterval::SetInterval(SQLINTERVAL p_type,int p_days,int p_hours,int p_minutes
   // Normalise and set the structure
   Normalise();
   RecalculateValue();
+}
+
+void
+SQLInterval::SetInterval(CString p_duration)
+{
+  ParseInterval(p_duration);
 }
 
 void    
@@ -457,6 +469,28 @@ SQLInterval::GetFractionPart() const
   return 0;
 }
 
+CString 
+SQLInterval::GetTypeAsString() const
+{
+  switch(m_interval.interval_type)
+  {
+    case SQL_IS_YEAR:             return "year";
+    case SQL_IS_MONTH:            return "month";
+    case SQL_IS_DAY:              return "day";
+    case SQL_IS_HOUR:             return "hour";
+    case SQL_IS_MINUTE:           return "minute";
+    case SQL_IS_SECOND:           return "second";
+    case SQL_IS_YEAR_TO_MONTH:    return "year to month";
+    case SQL_IS_DAY_TO_HOUR:      return "day to hour";
+    case SQL_IS_DAY_TO_MINUTE:    return "day to minute";
+    case SQL_IS_DAY_TO_SECOND:    return "day to second";
+    case SQL_IS_HOUR_TO_MINUTE:   return "hour to minute";
+    case SQL_IS_HOUR_TO_SECOND:   return "hour to second";
+    case SQL_IS_MINUTE_TO_SECOND: return "minute to second";
+  }
+  return "";
+}
+
 // Now very simple to do
 // Returns months or nanoseconds!!
 InterValue 
@@ -486,7 +520,7 @@ SQLInterval::AsDatabaseDouble() const
 }
 
 CString 
-SQLInterval::AsString() const
+SQLInterval::AsString(bool p_withFraction /*= false*/) const
 {
   CString string;
 
@@ -540,6 +574,19 @@ SQLInterval::AsString() const
                                   break;
 
   }
+  // Optionally add a fraction
+  if(p_withFraction)
+  {
+    if(m_interval.interval_type == SQL_IS_SECOND           ||
+       m_interval.interval_type == SQL_IS_MINUTE_TO_SECOND ||
+       m_interval.interval_type == SQL_IS_HOUR_TO_SECOND   ||
+       m_interval.interval_type == SQL_IS_DAY_TO_SECOND)
+    {
+      string.AppendFormat(".%09d",m_interval.intval.day_second.fraction);
+      string.TrimRight('0');
+    }
+  }
+
   // If necessary, add a minus sign
   if((m_interval.interval_type >= SQL_IS_YEAR &&
       m_interval.interval_type <= SQL_IS_MINUTE_TO_SECOND) &&
@@ -552,16 +599,16 @@ SQLInterval::AsString() const
 
 // Currently implemented as a string
 CString 
-SQLInterval::AsXMLString() const
+SQLInterval::AsXMLString(bool p_withFraction /*=false*/) const
 {
-  return AsString();
+  return AsString(p_withFraction);
 }
 
 // Currently implemented as a string with quotes
 CString 
-SQLInterval::AsSQLString(SQLDatabase* /*p_database*/) const
+SQLInterval::AsSQLString(SQLDatabase* /*p_database*/,bool p_withFraction /*= false*/) const
 {
-  CString string = AsString();
+  CString string = AsString(p_withFraction);
   return CString("\'") + string + "\'";
 }
 
@@ -569,6 +616,63 @@ void
 SQLInterval::AsIntervalStruct(SQL_INTERVAL_STRUCT* p_struct) const
 {
   memcpy(p_struct,&m_interval,sizeof(SQL_INTERVAL_STRUCT));
+}
+
+CString 
+SQLInterval::AsXMLDuration() const
+{
+  CString duration;
+  // Check if NULL
+  if(IsNull())
+  {
+    return duration;
+  }
+
+  // Add sign and leading 'P'eriod marker
+  duration = m_interval.interval_sign == SQL_TRUE ? "-P" : "P";
+
+  // Add year-month-day part
+  if(m_interval.intval.year_month.year)
+  {
+    duration.AppendFormat("%dY",m_interval.intval.year_month.year);
+  }
+  if(m_interval.intval.year_month.month)
+  {
+    duration.AppendFormat("%dM",m_interval.intval.year_month.month);
+  }
+  if(m_interval.intval.day_second.day)
+  {
+    duration.AppendFormat("%dD",m_interval.intval.day_second.day);
+  }
+
+  // See if we must do the time part
+  if(m_interval.intval.day_second.hour   ||
+     m_interval.intval.day_second.minute ||
+     m_interval.intval.day_second.second ||
+     m_interval.intval.day_second.fraction)
+  {
+    duration += "T";
+
+    if(m_interval.intval.day_second.hour)
+    {
+      duration.AppendFormat("%dH",m_interval.intval.day_second.hour);
+    }
+    if(m_interval.intval.day_second.minute)
+    {
+      duration.AppendFormat("%dM",m_interval.intval.day_second.minute);
+    }
+    if(m_interval.intval.day_second.second)
+    {
+      duration.AppendFormat("%d",m_interval.intval.day_second.second);
+
+      if(m_interval.intval.day_second.fraction)
+      {
+        duration.AppendFormat(".%09d",m_interval.intval.day_second.fraction);
+      }
+      duration += "S";
+    }
+  }
+  return duration;
 }
 
 SQLINTERVAL 
@@ -745,7 +849,7 @@ SQLInterval::IsNull() const
 void
 SQLInterval::SetNull()
 {
-  memcpy(&m_interval,0,sizeof(SQL_INTERVAL_STRUCT));
+  memset(&m_interval,0,sizeof(SQL_INTERVAL_STRUCT));
   m_value = 0L;
 }
 
@@ -924,8 +1028,171 @@ SQLInterval::ParseInterval(SQLINTERVAL p_type,const CString& p_string)
     {
       m_interval.interval_sign = SQL_TRUE;
     }
+    Normalise();
+    RecalculateValue();
   }
   return retval;
+}
+
+// Parse an interval from a XML duration string
+// a la: http://www.w3.org/TR/2012/REC-xmlschema11-2-20120405/datatypes.html#duration
+bool
+SQLInterval::ParseInterval(CString p_duration)
+{
+  bool negative    = false;
+  bool didTime     = false;
+  int  value       = 0;
+  int  fraction    = 0;
+  char marker      = 0;
+  char firstMarker = 0;
+  char lastMarker  = 0;
+  SQLINTERVAL type;
+
+  // Set the current interval to NULL
+  SetNull();
+
+  // Parse the negative sign
+  p_duration.Trim();
+  if(p_duration.Left(1) == "-")
+  {
+    negative = true;
+    p_duration = p_duration.Mid(1);
+  }
+
+  // Must see a 'P' for period
+  if(p_duration.Left(1) != 'P')
+  {
+    return false; // Leave interval at NULL
+  }
+  p_duration = p_duration.Mid(1);
+
+  // Scan year/month/day/hour/min/second/fraction values
+  while(ScanDurationValue(p_duration,value,fraction,marker,didTime))
+  {
+    switch(marker)
+    {
+      case 'Y': m_interval.intval.year_month.year = value;
+                break;
+      case 'D': m_interval.intval.day_second.day  = value;
+                break;
+      case 'H': m_interval.intval.day_second.hour = value;
+                break;
+      case 'M': if(didTime)
+                {
+                  m_interval.intval.day_second.minute = value;
+                  marker = 'm'; // minutes!
+                }
+                else
+                {
+                  m_interval.intval.year_month.month = value;
+                }
+                break;
+      case 'S': m_interval.intval.day_second.second   = value;
+                m_interval.intval.day_second.fraction = fraction;
+                break;
+      default:  // Illegal string, leave interval at NULL
+                return false;
+    }
+    // Getting first/last marker
+    lastMarker = marker;
+    if(firstMarker == 0)
+    {
+      firstMarker = marker;
+    }
+  }
+
+  // Finding the interval type
+       if(firstMarker == 'Y' && lastMarker == 'Y') type = SQL_IS_YEAR;
+  else if(firstMarker == 'M' && lastMarker == 'M') type = SQL_IS_MONTH;
+  else if(firstMarker == 'D' && lastMarker == 'D') type = SQL_IS_DAY;
+  else if(firstMarker == 'H' && lastMarker == 'H') type = SQL_IS_HOUR;
+  else if(firstMarker == 'm' && lastMarker == 'm') type = SQL_IS_MINUTE;
+  else if(firstMarker == 'S' && lastMarker == 'S') type = SQL_IS_SECOND;
+  else if(firstMarker == 'Y' && lastMarker == 'M') type = SQL_IS_YEAR_TO_MONTH;
+  else if(firstMarker == 'D' && lastMarker == 'H') type = SQL_IS_DAY_TO_HOUR;
+  else if(firstMarker == 'D' && lastMarker == 'm') type = SQL_IS_DAY_TO_MINUTE;
+  else if(firstMarker == 'D' && lastMarker == 'S') type = SQL_IS_DAY_TO_SECOND;
+  else if(firstMarker == 'H' && lastMarker == 'm') type = SQL_IS_HOUR_TO_MINUTE;
+  else if(firstMarker == 'H' && lastMarker == 'S') type = SQL_IS_HOUR_TO_SECOND;
+  else if(firstMarker == 'm' && lastMarker == 'S') type = SQL_IS_MINUTE_TO_SECOND;
+  else
+  {
+    // Beware: XML duration has combinations that are NOT compatible
+    // with the SQL definition of an interval, like Month-to-Day
+    return false;  // Leave at NULL
+  }
+
+  // Found everything: wrap up
+  m_interval.interval_type = type;
+  if(negative)
+  {
+    m_interval.interval_sign = SQL_TRUE;
+  }
+  Normalise();
+  RecalculateValue();
+
+  return true;
+}
+
+bool
+SQLInterval::ScanDurationValue(CString& p_duration
+                              ,int&     p_value
+                              ,int&     p_fraction
+                              ,char&    p_marker
+                              ,bool&    p_didTime)
+{
+  // Reset values
+  p_value  = 0;
+  p_marker = 0;
+  bool found = false;
+
+  // Check for empty string
+  if(p_duration.IsEmpty())
+  {
+    return false;
+  }
+
+  // Scan for beginning of time part
+  if(p_duration.GetAt(0) == 'T')
+  {
+    p_didTime  = true;
+    p_duration = p_duration.Mid(1);
+  }
+
+  // Scan a number
+  while(isdigit(p_duration.GetAt(0)))
+  {
+    found = true;
+    p_value *= 10;
+    p_value += p_duration.GetAt(0) - '0';
+    p_duration = p_duration.Mid(1);
+  }
+
+  if(p_duration.GetAt(0) == '.')
+  {
+    p_duration = p_duration.Mid(1);
+
+    int frac = 9;
+    while(isdigit(p_duration.GetAt(0)))
+    {
+      --frac;
+      p_fraction *= 10;
+      p_fraction += p_duration.GetAt(0) - '0';
+      p_duration  = p_duration.Mid(1);
+    }
+    p_fraction *= (int) pow(10,frac);
+  }
+
+  // Scan a marker
+  if(isalpha(p_duration.GetAt(0)))
+  {
+    p_marker = p_duration.GetAt(0);
+    p_duration = p_duration.Mid(1);
+  }
+
+  // True if both found, and fraction only found for seconds
+  return (p_fraction && p_marker == 'S') ||
+         (p_fraction == 0 && found && p_marker > 0);
 }
 
 // Recalculate the total interval value
@@ -1509,8 +1776,3 @@ SQLInterval::operator<=(const SQLInterval& p_interval) const
   // Incompatible ordinal types
   return false;
 }
-
-
-
-
-

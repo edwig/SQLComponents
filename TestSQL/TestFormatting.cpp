@@ -186,6 +186,38 @@ TestNamedDates()
 }
 
 void
+TestXMLDurations()
+{
+  SQLInterval intval1("-P3Y");
+  SQLInterval intval2("-P5Y7M");
+  SQLInterval intval3("P26M");
+  SQLInterval intval4("P3D");
+  SQLInterval intval5("-PT106H");
+  SQLInterval intval6("-PT309M");
+  SQLInterval intval7("PT33.12S");
+  SQLInterval intval8("P3DT14H");
+  SQLInterval intval9("P7DT14H12M");
+  SQLInterval intval10("P8DT12H26M18S");
+  SQLInterval intval11("PT17H13M08.5S");
+  SQLInterval intval12("PT17H13M");
+  SQLInterval intval13("PT13M08.5S");
+
+  printf("Interval year             : %s\n",intval1.AsString());
+  printf("Interval year to month    : %s\n",intval2.AsString());
+  printf("Interval month            : %s\n",intval3.AsString());
+  printf("Interval day              : %s\n",intval4.AsString());
+  printf("Interval hour             : %s\n",intval5.AsString());
+  printf("Interval minute           : %s\n",intval6.AsString());
+  printf("Interval second           : %s\n",intval7.AsString(true));
+  printf("Interval day to hour      : %s\n",intval8.AsString());
+  printf("Interval day to minute    : %s\n",intval9.AsString());
+  printf("Interval day to second    : %s\n",intval10.AsString());
+  printf("Interval hour to second   : %s\n",intval11.AsString(true));
+  printf("Interval hour to minute   : %s\n",intval12.AsString());
+  printf("Interval minute to second : %s\n",intval13.AsString(true));
+}
+
+void
 TestFormatting()
 {
   TestXMLStrings();
@@ -193,4 +225,5 @@ TestFormatting()
   TestSQLFormatting();
   TestMJD();
   TestNamedDates();
+  TestXMLDurations();
 }

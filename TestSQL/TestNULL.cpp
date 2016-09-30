@@ -83,8 +83,8 @@ TestNULL()
     {
       printf("Database opened.\n");
 
-      InsertWithNULL(&dbs);
-      SelectNULL(&dbs);
+//       InsertWithNULL(&dbs);
+//       SelectNULL(&dbs);
     }
     else
     {

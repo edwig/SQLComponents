@@ -308,7 +308,7 @@ SQLDate::WeekDayName(Language p_lang /*=LN_DEFAULT*/) const
     }
     if(p_lang >= LN_DUTCH && p_lang <= LN_FRENCH)
     {
-      return g_weekdays[p_lang - 1][weekday];
+      return g_weekdays[p_lang][weekday];
     }
   }
   return "";
@@ -328,7 +328,7 @@ SQLDate::MonthName(Language p_lang /*=LN_DEFAULT*/) const
       }
       if(p_lang >= LN_DUTCH && p_lang <= LN_FRENCH)
       {
-        return g_monthnames[p_lang - 1][m_date.m_month - 1];
+        return g_monthnames[p_lang][m_date.m_month - 1];
       }
     }
   }

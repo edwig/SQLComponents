@@ -65,6 +65,9 @@ public:
   // Interval constructed from scalars (day-second)
   SQLInterval(SQLINTERVAL p_type,int p_days, int p_hours,int p_minutes,int p_seconds,int p_fraction = 0);
 
+  // Interval constructed from a XML duration string
+  SQLInterval(CString p_duration);
+
   // Destructor
  ~SQLInterval();
 
@@ -86,6 +89,8 @@ public:
   void    SetFractionPart(int p_fraction);
   // Try to set the interval type, depends on the internal values
   bool    SetIntervalType(SQLINTERVAL p_type);
+  // Set from an XML duration string
+  void    SetInterval(CString p_duration);
 
   // GETTERS
 
@@ -96,11 +101,13 @@ public:
   int     GetMinutes() const;
   int     GetSeconds() const;
   int     GetFractionPart() const;
+  CString GetTypeAsString() const;
 
   double  AsDatabaseDouble() const;
-  CString AsString() const;
-  CString AsXMLString() const;
-  CString AsSQLString(SQLDatabase* p_database) const;
+  CString AsString(bool p_withFraction = false) const;
+  CString AsXMLString(bool p_withFraction = false) const;
+  CString AsXMLDuration() const;
+  CString AsSQLString(SQLDatabase* p_database,bool p_withFraction = false) const;
   void    AsIntervalStruct(SQL_INTERVAL_STRUCT* p_struct) const;
 
   // CALCULATIONS
@@ -154,8 +161,13 @@ public:
   bool        GetIsNegative() const;
 
 private:
-  // Parsing from a string
+  // Parsing from a (database) string
   bool ParseInterval(SQLINTERVAL p_type,const CString& p_string);
+  // Parsing from a XML duration string
+  bool ParseInterval(CString p_duration);
+  // Parsing/scanning one value of a XML duration string
+  bool ScanDurationValue(CString& p_duraction,int& p_value,int& p_fraction,char& p_marker,bool& p_didTime);
+
   // Recalculate the total interval value
   void RecalculateValue();
   // Normalise the field values
