@@ -32,7 +32,7 @@ public :
   SQLStatement();
   SQLStatement(int p_number,char* p_statement,int p_minimum,int p_maximum);
  ~SQLStatement();
-  void    CheckRecords(int p_records);
+  bool    CheckRecords(int p_records);
   void    AddToStatement(CString& p_statement);
 
   // SETTERS
