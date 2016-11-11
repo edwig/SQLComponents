@@ -302,7 +302,7 @@ CString
 SQLDataSet::ParseSelection(SQLQuery& p_query)
 {
   CString sql("SELECT ");
-  sql += m_selection;
+  sql += m_selection.IsEmpty() ? "*" : m_selection;
   sql += "\n  FROM ";
   sql += m_primaryTableName;
 
@@ -326,7 +326,7 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
 }
 
 bool
-SQLDataSet::Open(bool p_stopIfNoColumns /*= false*/)
+SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
 {
   bool   result = false;
   CString query = m_query;
@@ -461,6 +461,7 @@ SQLDataSet::Append()
     SQLTransaction trans(m_database,m_name);
 
     // Use the parameters (if any)
+    qr.ResetParameters();
     for(unsigned ind = 0;ind < m_parameters.size();++ind)
     {
       qr.SetParameter(ind + 1,&m_parameters[ind].m_value);
@@ -869,7 +870,7 @@ SQLDataSet::Aggregate(int p_num,AggregateInfo& p_info)
 
 // Insert / Update / delete records from the database
 bool
-SQLDataSet::Synchronize()
+SQLDataSet::Synchronize(int p_mutationID /*=0*/)
 {
   // Needs the primary table name of the dataset
   if(m_primaryTableName.IsEmpty())
@@ -891,22 +892,45 @@ SQLDataSet::Synchronize()
     // Not all primary key columns are present
     return false;
   }
-  // Do all operations or throw
-  if(m_status & SQL_Record_Deleted)
-  {
-    Deletes();
-  }
-  if(m_status & SQL_Record_Updated)
-  {
-    Updates();
-  }
-  if(m_status & SQL_Record_Insert)
-  {
-    Inserts();
-  }
-  // Reset the status field
-  m_status = m_records.size() > 0 ? SQL_Selections : 0;
 
+  // Save status before a possible throw
+  int oldStatus = m_status;
+
+  try
+  {
+    // Transaction on the stack for all mutations
+    // Defer all constraint checking to the 'real' commit
+    SQLTransaction trans(m_database,m_name);
+    trans.SetTransactionDeferred();
+
+    // Do all operations or throw
+    if(m_status & SQL_Record_Deleted)
+    {
+      Deletes(p_mutationID);
+    }
+    if(m_status & SQL_Record_Updated)
+    {
+      Updates(p_mutationID);
+    }
+    if(m_status & SQL_Record_Insert)
+    {
+      Inserts(p_mutationID);
+    }
+
+    // Commit the changes to the database
+    trans.Commit();
+
+    // After the commit we throw away our changes
+    Reduce(p_mutationID);
+  }
+  catch(CString& error)
+  {
+    // Automatic rollback will be done now
+    m_database->LogPrint(1,"Database synchronize stopped: " + error);
+    // Restore original status of the dataset, reduce never done
+    m_status = oldStatus;
+    return false;
+  }
   // Ready
   return true;
 }
@@ -962,87 +986,172 @@ SQLDataSet::CheckPrimaryKeyColumns()
 }
 
 void
-SQLDataSet::Deletes()
+SQLDataSet::Deletes(int p_mutationID)
 {
   RecordSet::iterator it = m_records.begin();
-  SQLTransaction trans(m_database,m_name);
-  SQLQuery       query(m_database);
+  SQLQuery query(m_database);
+  int total   = 0;
+  int deletes = 0;
 
   // Loop through all the records
   while(it != m_records.end())
   {
+    CString sql;
     SQLRecord* record = *it;
     if(record->GetStatus() & SQL_Record_Deleted)
     {
-      CString sql = GetSQLDelete(&query,record);
-      query.DoSQLStatement(sql);
-      query.ResetParameters();
-
-      // Delete this record, continuing to the next
-      delete record;
-      it = m_records.erase(it);
+      ++total;
+      MutType type = record->MixedMutations(p_mutationID);
+      switch(type)
+      {
+        case MUT_NoMutation: // Fall through: do nothing with record
+        case MUT_OnlyOthers: ++it;
+                             break;
+        case MUT_Mixed:      throw CString("Mixed mutations");
+        case MUT_MyMutation: sql = GetSQLDelete(&query,record);
+                             query.DoSQLStatement(sql);
+                             // Delete this record, continuing to the next
+                             delete record;
+                             it = m_records.erase(it);
+                             ++deletes;
+                             break;
+      }
     }
     else
     {
       ++it;
     }
   }
-  trans.Commit();
 
   // Adjust the current record if neccesary
   if(m_current > (int)m_records.size())
   {
     m_current = (int)m_records.size();
   }
+
+  // If we did all records, no more deletes are present
+  if(total == deletes)
+  {
+    m_status &= ~SQL_Deletions;
+  }
 }
 
 void
-SQLDataSet::Updates()
+SQLDataSet::Updates(int p_mutationID)
 {
   RecordSet::iterator it;
-  SQLTransaction trans(m_database,m_name);
-  SQLQuery       query(m_database);
+  SQLQuery query(m_database);
+  int total  = 0;
+  int update = 0;
 
   for(it = m_records.begin();it != m_records.end();++it)
   {
     SQLRecord* record = *it;
     if(record->GetStatus() & SQL_Record_Updated)
     {
-      CString sql = GetSQLUpdate(&query,record);
-      query.DoSQLStatement(sql);
-      query.ResetParameters();
-
-      record->Reduce();
+      ++total;
+      CString sql;
+      MutType type = record->MixedMutations(p_mutationID);
+      switch(type)
+      {
+        case MUT_NoMutation: // Fall through: do nothing
+        case MUT_OnlyOthers: break;
+        case MUT_Mixed:      throw CString("Mixed mutations");
+        case MUT_MyMutation: sql = GetSQLUpdate(&query,record);
+                             query.DoSQLStatement(sql);
+                             ++update;
+                             break;
+      }
     }
   }
-  trans.Commit();
+
+  // If we did all records, no more updates are present
+  if(total == update)
+  {
+    m_status &= ~SQL_Updates;
+  }
 }
 
 void
-SQLDataSet::Inserts()
+SQLDataSet::Inserts(int p_mutationID)
 {
   RecordSet::iterator it;
-  SQLTransaction trans(m_database,m_name);
-  SQLQuery       query(m_database);
+  SQLQuery query(m_database);
+  int total  = 0;
+  int insert = 0;
 
   for(it = m_records.begin();it != m_records.end();++it)
   {
     SQLRecord* record = *it;
     if(record->GetStatus() & SQL_Record_Insert)
     {
-      CString sql = GetSQLInsert(&query,record);
-      query.DoSQLStatement(sql);
-      query.ResetParameters();
-
-      record->Reduce();
+      ++total;
+      CString sql;
+      MutType type = record->MixedMutations(p_mutationID);
+      switch(type)
+      {
+        case MUT_NoMutation: // Fall through: Do nothing
+        case MUT_OnlyOthers: break;
+        case MUT_Mixed:      throw CString("Mixed mutations");
+        case MUT_MyMutation: sql = GetSQLInsert(&query,record);
+                             query.DoSQLStatement(sql);
+                             ++insert;
+                             break;
+      }
     }
   }
-  trans.Commit();
+
+  // If we did all records, no more inserts are present
+  if(total == insert)
+  {
+    m_status &= ~SQL_Insertions;
+  }
+}
+
+// Throws away my changes from the dataset
+// Call only after all database synchronization has been done!
+void
+SQLDataSet::Reduce(int p_mutationID)
+{
+  RecordSet::iterator it;
+  for(it = m_records.begin(); it != m_records.end(); ++it)
+  {
+    SQLRecord* record = *it;
+    if(record->GetStatus() & (SQL_Record_Insert | SQL_Record_Deleted | SQL_Record_Updated))
+    {
+      MutType type = record->MixedMutations(p_mutationID);
+      switch(type)
+      {
+        case MUT_NoMutation: break;
+        case MUT_OnlyOthers: break;
+        case MUT_Mixed:      break;
+        case MUT_MyMutation: record->Reduce();
+                             break;
+      }
+    }
+  }
+}
+
+// In case synchronize doesn't work, ask for mixed mutations
+int
+SQLDataSet::AllMixedMutations(MutationIDS& p_list,int p_mutationID)
+{
+  int total = 0;
+  RecordSet::iterator it;
+  for(it = m_records.begin(); it != m_records.end(); ++it)
+  {
+    SQLRecord* record = *it;
+    total += record->AllMixedMutations(p_list,p_mutationID);
+  }
+  return total;
 }
 
 CString
 SQLDataSet::GetSQLDelete(SQLQuery* p_query,SQLRecord* p_record)
 {
+  // New set of parameters
+  p_query->ResetParameters();
+
   CString sql("DELETE FROM " + m_primaryTableName + "\n");
   int parameter = 1;
   sql += GetWhereClause(p_query,p_record,parameter);
@@ -1054,6 +1163,9 @@ SQLDataSet::GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record)
 {
   int parameter = 1;
   CString sql("UPDATE " + m_primaryTableName + "\n");
+
+  // New set of parameters
+  p_query->ResetParameters();
 
   // Check for all fields
   bool first = true;
@@ -1091,6 +1203,10 @@ SQLDataSet::GetSQLInsert(SQLQuery* p_query,SQLRecord* p_record)
   CString fields("(");
   CString params("(");
 
+  // New set of parameters
+  p_query->ResetParameters();
+
+  // Do for all fields in the record
   for(unsigned ind = 0;ind < m_names.size(); ++ind)
   {
     SQLVariant* value = p_record->GetField(ind);
@@ -1145,7 +1261,7 @@ SQLDataSet::GetWhereClause(SQLQuery* p_query,SQLRecord* p_record,int& p_paramete
 
 //////////////////////////////////////////////////////////////////////////
 //
-// Store in XBDF format
+// Store in XML format
 //
 //////////////////////////////////////////////////////////////////////////
 

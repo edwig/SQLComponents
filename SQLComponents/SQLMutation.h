@@ -27,7 +27,18 @@
 #pragma once
 
 #include "SQLVariant.h"
+#include <vector>
 #include <list>
+
+// Status of mutation against the mutationID
+typedef enum _mutType
+{
+  MUT_NoMutation   = 0
+ ,MUT_MyMutation   = 1
+ ,MUT_OnlyOthers   = 2
+ ,MUT_Mixed        = 4 // My mutations and other mutations
+}
+MutType;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -52,6 +63,7 @@ inline Mutation::Mutation()
 // The mutation stack is a list: a limited number of mutations may exist at any one time
 // So the list is two-sided reachable and searchable
 typedef std::list<Mutation*> MutationStack;
+typedef std::vector<int>     MutationIDS;
 
 class SQLMutation
 {
@@ -78,8 +90,12 @@ public:
   bool        IsOriginal();
   // Contains mutations
   bool        IsMutated();
+  // Contains mixed mutations
+  MutType     MixedMutations(int p_mutationID);
   // Reduce the mutations, after a database synchronisation
   void        Reduce();
+  // For reporting/analysis purposes: all mutationID's on the stack
+  int         AllMixedMutations(MutationIDS& p_list,int p_mutationID);
 
 private:
   MutationStack m_stack;

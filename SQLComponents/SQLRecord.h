@@ -65,6 +65,10 @@ public:
   void        Rollback();
   // Cancel the mutations of specified id
   bool        CancelMutation(int p_mutationID);
+  // Has mixed mutationID mutations
+  MutType     MixedMutations(int p_mutationID);
+  // For reporting/analysis purposes: all mutationID's on the stack
+  int         AllMixedMutations(MutationIDS& p_list,int p_mutationID);
 
   // XML Saving and reading
   void        XMLSave(XmlElement* p_records);

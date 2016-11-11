@@ -27,6 +27,8 @@
 #include "stdafx.h"
 #include "SQLTransaction.h"
 #include "SQLDatabase.h"
+#include "SQLInfoDB.h"
+#include "SQLQuery.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -174,4 +176,42 @@ SQLTransaction::AfterRollback()
   m_active    = false;
   m_name      = "";
   m_savepoint = "";
+}
+
+// Setting a transaction in a deferred state
+// so that constraints get only committed at the end
+bool 
+SQLTransaction::SetTransactionDeferred()
+{
+  if(m_database == nullptr)
+  {
+    return false;
+  }
+  CString sql = m_database->GetSQLInfoDB()->GetSQLDeferConstraints();
+  if(!sql.IsEmpty())
+  {
+    SQLQuery query(m_database);
+    query.DoSQLStatementNonQuery(sql);
+    return true;
+  }
+  return false;
+}
+
+// Setting a transaction in an immediate state
+// So that the constraints (uptil now) get checked immediatly
+bool 
+SQLTransaction::SetTransactionImmediate()
+{
+  if(m_database == nullptr)
+  {
+    return false;
+  }
+  CString sql = m_database->GetSQLInfoDB()->GetSQLConstraintsImmediate();
+  if(!sql.IsEmpty())
+  {
+    SQLQuery query(m_database);
+    query.DoSQLStatementNonQuery(sql);
+    return true;
+  }
+  return false;
 }

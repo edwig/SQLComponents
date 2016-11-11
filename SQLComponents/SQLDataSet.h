@@ -127,7 +127,9 @@ public:
   // Cancel the mutations of this mutation ID
   void         CancelMutation(int p_mutationID);
   // Insert / Update / delete records from the database
-  bool         Synchronize();
+  bool         Synchronize(int p_mutationID = 0);
+  // In case synchronize doesn't work, ask for mixed mutations
+  int          AllMixedMutations(MutationIDS& p_list,int p_mutationID);
   // Forget the records
   bool         Forget(bool p_force = false);
   // Find the object record of a primary key
@@ -211,14 +213,16 @@ private:
 
   // WRITEBACK OPERATIONS
 
-  void         Deletes();
-  void         Updates();
-  void         Inserts();
+  void         Deletes(int p_mutationID);
+  void         Updates(int p_mutationID);
+  void         Inserts(int p_mutationID);
+  void         Reduce (int p_mutationID);
 
   CString      GetSQLDelete  (SQLQuery* p_query,SQLRecord* p_record);
   CString      GetSQLUpdate  (SQLQuery* p_query,SQLRecord* p_record);
   CString      GetSQLInsert  (SQLQuery* p_query,SQLRecord* p_record);
   CString      GetWhereClause(SQLQuery* p_query,SQLRecord* p_record,int& p_parameter);
+  void         SetTransactionDeferred();
 
   // Private data of the dataset
 

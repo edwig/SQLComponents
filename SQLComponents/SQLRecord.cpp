@@ -203,7 +203,6 @@ SQLRecord::IsModified(int p_num)
   return m_fields[p_num]->IsMutated();
 }
 
-
 void
 SQLRecord::Reduce()
 {
@@ -241,6 +240,49 @@ SQLRecord::CancelMutation(int p_mutationID)
     m_status &= ~(SQL_Record_Insert | SQL_Record_Updated | SQL_Record_Deleted);
   }
   return mutated;
+}
+
+// Has mixed mutationID mutations
+MutType
+SQLRecord::MixedMutations(int p_mutationID)
+{
+  MutType type = MUT_NoMutation;
+
+  for(unsigned ind = 0; ind < m_fields.size(); ++ind)
+  {
+    MutType mut = m_fields[ind]->MixedMutations(p_mutationID);
+    switch(mut)
+    {
+      case MUT_NoMutation: break;
+      case MUT_MyMutation: if(type == MUT_OnlyOthers)
+                           {
+                             return MUT_Mixed;
+                           }
+                           type = mut;
+                           break;
+      case MUT_OnlyOthers: if(type == MUT_MyMutation)
+                           {
+                             return MUT_Mixed;
+                           }
+                           type = mut;
+                           break;
+      case MUT_Mixed:      return mut;
+    }
+  }
+  // Record has only these mutations or none at all
+  return type;
+}
+
+// For reporting/analysis purposes: all mutationID's on the stack
+int
+SQLRecord::AllMixedMutations(MutationIDS& p_list,int p_mutationID)
+{
+  int total = 0;
+  for(unsigned ind = 0; ind < m_fields.size(); ++ind)
+  {
+    total += m_fields[ind]->AllMixedMutations(p_list,p_mutationID);
+  }
+  return total;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -57,6 +57,13 @@ public:
   SQLDatabase* GeefDatabase() const;
   // Name of the savepoint in the database
   CString GetSavePoint() const;
+  // Setting a transaction in a deferred state
+  // so that constraints get only committed at the end
+  bool SetTransactionDeferred();
+  // Setting a transaction in an immediate state
+  // So that the constraints (uptil now) get checked immediatly
+  bool SetTransactionImmediate();
+
 private:
   friend class SQLDatabase;
   // To do after a rollback
