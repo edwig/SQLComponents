@@ -1,3 +1,14 @@
+////////////////////////////////////////////////////////////////////////
+//
+// File: XML.cpp
+//
+// This is basically a branch of the TinyXML project
+// As found on: https://sourceforge.net/projects/tinyxml/
+// Only with some light adaptions not found in that project
+//
+// Last Revision:   11-11-2016
+// Version number:  1.2.0
+//
 #include "stdafx.h"
 #include <ctype.h>
 #include <stddef.h>

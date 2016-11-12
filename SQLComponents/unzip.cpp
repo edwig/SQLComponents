@@ -1,12 +1,3 @@
-#include <windows.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <tchar.h>
-#include "unzip.h"
-
-#pragma warning (disable: 4996)
-
 // THIS FILE is almost entirely based upon code by Jean-loup Gailly
 // and Mark Adler. It has been modified by Lucian Wischik.
 // The modifications were: incorporate the bugfixes of 1.1.4, allow
@@ -69,10 +60,18 @@
 // for more info about .ZIP format, see ftp://ftp.cdrom.com/pub/infozip/doc/appnote-970311-iz.zip
 //   PkWare has also a specification at ftp://ftp.pkware.com/probdesc.zip
 
+#include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <tchar.h>
+#include "unzip.h"
+
+#pragma warning (disable: 4996)
+
 #define ZIP_HANDLE   1
 #define ZIP_FILENAME 2
 #define ZIP_MEMORY   3
-
 
 #define zmalloc(len) malloc(len)
 

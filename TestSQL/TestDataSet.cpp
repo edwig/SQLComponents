@@ -24,7 +24,7 @@ TestAppend(SQLDatabase* p_dbs,long p_master)
 
   if(details.Open())
   {
-    printf("Dataset details (mast_id = %d) openend. Rows: %d\n",p_master,details.GetNumberOfRecords());
+    printf("Dataset details (mast_id = %d) opened. Rows: %d\n",p_master,details.GetNumberOfRecords());
   }
   else
   {

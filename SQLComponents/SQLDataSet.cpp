@@ -2,7 +2,7 @@
 //
 // File: SQLDataSet.cpp
 //
-// Copyright (c) 1998- 2014 ir. W.E. Huisman
+// Copyright (c) 1998-2016 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   01-01-2015
-// Version number:  1.1.0
+// Last Revision:   11-11-2016
+// Version number:  1.2.0
 //
 #include "stdafx.h"
 #include "SQLDataSet.h"
@@ -432,7 +432,7 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
 // Append (read extra) into the dataset
 // Precondition: Dataset must already be opened by 'Open()'
 // Precondition: Different parameter values set to read different data
-// Precondition: Results must be of same resultset (columns and datatypes)
+// Precondition: Results must be of same result set (columns and datatypes)
 bool 
 SQLDataSet::Append()
 {
@@ -443,7 +443,7 @@ SQLDataSet::Append()
   {
     return false;
   }
-  // Test if possibly modifiable if primary table name and key are givven
+  // Test if possibly modifiable if primary table name and key are given
   bool modifiable = false;
   if(!m_primaryTableName.IsEmpty() && m_primaryKey.size())
   {
@@ -666,7 +666,7 @@ SQLDataSet::FindObjectRecNum(VariantSet& p_primary)
         }
         else
         {
-          // Value found, get on to the next searchfield
+          // Value found, get on to the next search field
           break;
         }
       }
@@ -709,7 +709,7 @@ SQLDataSet::FindObjectRecord(VariantSet& p_primary)
         }
         else
         {
-          // Value found, get on to the next searchfield
+          // Value found, get on to the next search field
           break;
         }
       }
@@ -864,7 +864,7 @@ SQLDataSet::Aggregate(int p_num,AggregateInfo& p_info)
 
 //////////////////////////////////////////////////////////////////////////
 //
-// THE SYNCHRONIZE PROCESS
+// THE SYNCHRONIZATION PROCESS
 //
 //////////////////////////////////////////////////////////////////////////
 
@@ -872,24 +872,17 @@ SQLDataSet::Aggregate(int p_num,AggregateInfo& p_info)
 bool
 SQLDataSet::Synchronize(int p_mutationID /*=0*/)
 {
-  // Needs the primary table name of the dataset
-  if(m_primaryTableName.IsEmpty())
-  {
-    return false;
-  }
+  // Check if we have mutations
   if((m_status & (SQL_Record_Insert | SQL_Record_Deleted | SQL_Record_Updated)) == 0)
   {
     // Nothing to do: all OK.
     return true;
   }
-  if(!GetPrimaryKeyInfo())
+  // Check preliminary conditions
+  if(m_primaryTableName.IsEmpty() ||    // Needs the primary table name of the dataset
+     !GetPrimaryKeyInfo()         ||    // Needs primary key info for doing updates/deletes
+     !CheckPrimaryKeyColumns()    )     // Needs all of the primary key columns
   {
-    // No primary key, cannot do updates/deletes
-    return false;
-  }
-  if(!CheckPrimaryKeyColumns())
-  {
-    // Not all primary key columns are present
     return false;
   }
 
@@ -926,7 +919,7 @@ SQLDataSet::Synchronize(int p_mutationID /*=0*/)
   catch(CString& error)
   {
     // Automatic rollback will be done now
-    m_database->LogPrint(1,"Database synchronize stopped: " + error);
+    m_database->LogPrint(1,"Database synchronization stopped: " + error);
     // Restore original status of the dataset, reduce never done
     m_status = oldStatus;
     return false;
@@ -946,7 +939,7 @@ SQLDataSet::GetPrimaryKeyInfo()
     PrimaryMap map;
     if(info->GetPrimaryKeyInfo(m_primaryTableName,primaryConstraintName,map) == false)
     {
-      // No primary key givven, and cannot get it from the ODBC driver
+      // No primary key given, and cannot get it from the ODBC driver
       return false;
     }
     // Remember the primary key info
@@ -959,7 +952,7 @@ SQLDataSet::GetPrimaryKeyInfo()
   return m_primaryKey.size() > 0;
 }
 
-// Check that all primary key colums are in the dataset
+// Check that all primary key columns are in the dataset
 bool
 SQLDataSet::CheckPrimaryKeyColumns()
 {
@@ -981,7 +974,7 @@ SQLDataSet::CheckPrimaryKeyColumns()
       return false;
     }
   }
-  // All keyparts found
+  // All key parts found
   return true;
 }
 
@@ -1023,7 +1016,7 @@ SQLDataSet::Deletes(int p_mutationID)
     }
   }
 
-  // Adjust the current record if neccesary
+  // Adjust the current record if necessary
   if(m_current > (int)m_records.size())
   {
     m_current = (int)m_records.size();
@@ -1188,7 +1181,7 @@ SQLDataSet::GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record)
       }
     }
   }
-  // WHERE clausule toevoegen
+  // Adding the WHERE clause
   sql += GetWhereClause(p_query,p_record,parameter);
 
   return sql;
@@ -1274,7 +1267,7 @@ SQLDataSet::XMLSave(XmlElement* p_dataset)
   p_dataset->LinkEndChild(naam);
   naam->LinkEndChild(ntext);
 
-  // Fieldstructure of the dataset
+  // Field structure of the dataset
   XmlElement* structur = new XmlElement(DATASET_STRUCTURE);
   p_dataset->LinkEndChild(structur);
 

@@ -2,7 +2,7 @@
 //
 // File: SQLTransaction.h
 //
-// Copyright (c) 1998- 2014 ir. W.E. Huisman
+// Copyright (c) 1998-2016 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   01-01-2015
-// Version number:  1.1.0
+// Last Revision:   11-11-2016
+// Version number:  1.2.0
 //
 #pragma once
 #include <sqltypes.h>
@@ -49,7 +49,7 @@ public:
   void Start(CString p_name,bool p_startSubtransaction = false);
   // Commit the transaction
   void Commit();
-  // Rollback the transction
+  // Rollback the transaction
   void Rollback();
   // Is the transaction (still) active
   bool IsActive() const;
@@ -61,7 +61,7 @@ public:
   // so that constraints get only committed at the end
   bool SetTransactionDeferred();
   // Setting a transaction in an immediate state
-  // So that the constraints (uptil now) get checked immediatly
+  // So that the constraints (uptil now) get checked immediately
   bool SetTransactionImmediate();
 
 private:
@@ -75,7 +75,6 @@ private:
   CString       m_name;
   CString       m_savepoint;
   bool          m_active;
-
 };
 
 inline bool 
