@@ -170,17 +170,17 @@ public:
    // Comparison operators
    bool        operator ==(SQLVariant& p_right);
    bool        operator !=(SQLVariant& p_right);
-// bool        operator  >(const SQLVariant& p_right);
-// bool        operator >=(const SQLVariant& p_right);
-// bool        operator  <(const SQLVariant& p_right);
-// bool        operator <=(const SQLVariant& p_right);
+   bool        operator  >(SQLVariant& p_right);
+   bool        operator  <(SQLVariant& p_right);
+// bool        operator >=(SQLVariant& p_right);
+// bool        operator <=(SQLVariant& p_right);
 // 
 // // Arithmetic operators
-// SQLVariant  operator  +(const SQLVariant& p_right);
-// SQLVariant  operator  -(const SQLVariant& p_right);
-// SQLVariant  operator  *(const SQLVariant& p_right);
-// SQLVariant  operator  /(const SQLVariant& p_right);
-// SQLVariant  operator  %(const SQLVariant& p_right);
+// SQLVariant  operator  +(SQLVariant& p_right);
+// SQLVariant  operator  -(SQLVariant& p_right);
+// SQLVariant  operator  *(SQLVariant& p_right);
+// SQLVariant  operator  /(SQLVariant& p_right);
+// SQLVariant  operator  %(SQLVariant& p_right);
 
 private:
    // Total internal reset (type and data store)
@@ -204,8 +204,10 @@ private:
    // and for the operators where both sides have different types
 #include "SQLVariantTrim.h"
 
-   // Internals for the == and the != operators
+   // Internals for the operators
 #include "SQLVariantOperatorEqual.h"
+#include "SQLVariantOperatorGreater.h"
+#include "SQLVariantOperatorSmaller.h"
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX

@@ -27,6 +27,7 @@
 
 // BEWARE
 // THE CONTENTS OF THIS FILE IS PART (INCLUDED) OF THE DEFINITION OF SQLVariant
+// This is the part of the class that takes care of the == operator
 
 
    // Arrays with comparison functions for the operators
