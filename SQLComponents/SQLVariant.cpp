@@ -2885,6 +2885,46 @@ SQLVariant::DoubleToFloat(double p_value)
   return (float) p_value;
 }
 
+float
+SQLVariant::BIGINTToFloat(SQLBIGINT p_value)
+{
+  if(p_value > FLT_MAX || p_value < -FLT_MAX)
+  {
+    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_FLOAT);
+  }
+  return (float)p_value;
+}
+
+float
+SQLVariant::UBIGINTToFloat(SQLUBIGINT p_value)
+{
+  if(p_value > FLT_MAX)
+  {
+    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_FLOAT);
+  }
+  return (float)p_value;
+}
+
+double
+SQLVariant::BIGINTToDouble(SQLBIGINT p_value)
+{
+  if(p_value > DBL_MAX || p_value < -DBL_MAX)
+  {
+    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_DOUBLE);
+  }
+  return (double)p_value;
+}
+
+double
+SQLVariant::UBIGINTToDouble(SQLUBIGINT p_value)
+{
+  if(p_value > DBL_MAX)
+  {
+    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_DOUBLE);
+  }
+  return (double)p_value;
+}
+
 SQLBIGINT
 SQLVariant::FloatToBIGINT(float p_value)
 {

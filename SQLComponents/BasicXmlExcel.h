@@ -44,11 +44,11 @@ class BasicXmlExcel;
 // Type of cells
 typedef enum _celltype
 {
-  CT_EMPTY
- ,CT_INTEGER
- ,CT_DOUBLE
- ,CT_STRING
- ,CT_FORMULA
+  XCT_EMPTY
+ ,XCT_INTEGER
+ ,XCT_DOUBLE
+ ,XCT_STRING
+ ,XCT_FORMULA
 }
 CellType;
 
