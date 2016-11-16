@@ -1140,5 +1140,5 @@ bool
 SQLVariant::OperIntDSSmallerIntDS(SQLVariant& p_right)
 {
   // Relies on the calculation of seconds in SQLInterval
-  return GetAsSQLInterval().AsDatabaseDouble() > p_right.GetAsSQLInterval().AsDatabaseDouble();
+  return GetAsSQLInterval().AsDatabaseDouble() < p_right.GetAsSQLInterval().AsDatabaseDouble();
 }

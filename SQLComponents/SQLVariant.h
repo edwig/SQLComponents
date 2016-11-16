@@ -165,17 +165,17 @@ public:
    SQLInterval          GetAsSQLInterval();
 
    // Assignment operator
-   SQLVariant& operator  =(const SQLVariant& p_origineel);
+   SQLVariant& operator  =(const SQLVariant& p_original);
 
    // Comparison operators
    bool        operator ==(SQLVariant& p_right);
    bool        operator !=(SQLVariant& p_right);
    bool        operator  >(SQLVariant& p_right);
    bool        operator  <(SQLVariant& p_right);
-// bool        operator >=(SQLVariant& p_right);
-// bool        operator <=(SQLVariant& p_right);
-// 
-// // Arithmetic operators
+   bool        operator >=(SQLVariant& p_right);
+   bool        operator <=(SQLVariant& p_right);
+ 
+   // Arithmetic operators
 // SQLVariant  operator  +(SQLVariant& p_right);
 // SQLVariant  operator  -(SQLVariant& p_right);
 // SQLVariant  operator  *(SQLVariant& p_right);
@@ -207,7 +207,9 @@ private:
    // Internals for the operators
 #include "SQLVariantOperatorEqual.h"
 #include "SQLVariantOperatorGreater.h"
+#include "SQLVariantOperatorGreatEqual.h"
 #include "SQLVariantOperatorSmaller.h"
+#include "SQLVariantOperatorSmallEqual.h"
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX

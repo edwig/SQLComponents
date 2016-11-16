@@ -75,35 +75,35 @@ SQLConciseType SQLTypeToConciseType(int p_datatype)
 
 // Assignment operator for a new SQLVariant
 SQLVariant&
-SQLVariant::operator=(const SQLVariant& p_origineel)
+SQLVariant::operator=(const SQLVariant& p_original)
 {
   // Check for assignment to self
-  if(this == &p_origineel)
+  if(this == &p_original)
   {
     return *this;
   }
 
   // Copy the members
-  m_datatype        = p_origineel.m_datatype;
-  m_sqlDatatype     = p_origineel.m_sqlDatatype;
-  m_binaryLength    = p_origineel.m_binaryLength;
-  m_binaryPieceSize = p_origineel.m_binaryPieceSize;
-  m_columnNumber    = p_origineel.m_columnNumber;
-  m_paramType       = p_origineel.m_paramType;
-  m_useAtExec       = p_origineel.m_useAtExec;
-  m_indicator       = p_origineel.m_indicator;
+  m_datatype        = p_original.m_datatype;
+  m_sqlDatatype     = p_original.m_sqlDatatype;
+  m_binaryLength    = p_original.m_binaryLength;
+  m_binaryPieceSize = p_original.m_binaryPieceSize;
+  m_columnNumber    = p_original.m_columnNumber;
+  m_paramType       = p_original.m_paramType;
+  m_useAtExec       = p_original.m_useAtExec;
+  m_indicator       = p_original.m_indicator;
 
   // Copy the data
   if(m_datatype == SQL_C_CHAR  || m_datatype == SQL_C_BINARY )
   {
     // Make a new buffer and copy it
     m_data.m_dataBINARY = (unsigned char*) malloc(m_binaryLength + 1);
-    memcpy(m_data.m_dataBINARY,p_origineel.m_data.m_dataBINARY,m_binaryLength + 1);
+    memcpy(m_data.m_dataBINARY,p_original.m_data.m_dataBINARY,m_binaryLength + 1);
   }
   else
   {
-    // Copy the data member
-    memcpy(&m_data.m_dataBIT,&p_origineel.m_data.m_dataBIT,sizeof(m_data));
+    // Copy the data member for ALL OTHER DATATYPES!
+    memcpy(&m_data.m_dataBIT,&p_original.m_data.m_dataBIT,sizeof(m_data));
   }
   return *this;
 }
