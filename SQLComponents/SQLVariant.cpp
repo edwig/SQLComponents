@@ -150,13 +150,6 @@ SQLVariant::SQLVariant(CString& p_data)
   SetData(SQL_C_CHAR,(const char*)p_data);
 }
 
-// XTOR SQL_C_VARBOOKMARK
-SQLVariant::SQLVariant(unsigned char* p_bookmark)
-{
-  Init();
-  SetData(SQL_C_VARBOOKMARK,(const char*)p_bookmark);
-}
-
 // XTOR SQL_C_SHORT / SQL_C_SSHORT
 SQLVariant::SQLVariant(short p_short)
 {
@@ -733,7 +726,6 @@ SQLVariant::GetAsString(CString& result)
   {
     case SQL_C_CHAR:                      result = m_data.m_dataCHAR;
                                           break;
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_BINARY:                    pointer = (unsigned char*)result.GetBufferSetLength(m_binaryLength * 2 + 2);
                                           BinaryToString(pointer,m_binaryLength*2 + 2);
                                           result.ReleaseBuffer();
@@ -746,7 +738,6 @@ SQLVariant::GetAsString(CString& result)
     case SQL_C_LONG:                      // Fall through
     case SQL_C_SLONG:                     result.Format("%li",m_data.m_dataLONG);
                                           break;
-  //case SQL_C_BOOKMARK:                  // Fall through
     case SQL_C_ULONG:                     result.Format("%lu",m_data.m_dataULONG);
                                           break;
     case SQL_C_FLOAT:                     result.Format("%.7g",m_data.m_dataFLOAT);
@@ -874,7 +865,6 @@ SQLVariant::GetDataPointer()
   {
     case SQL_C_CHAR:                      data = (void*)m_data.m_dataCHAR;
                                           break;
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_BINARY:                    data = (void*)m_data.m_dataBINARY;
                                           break;
     case SQL_C_SHORT:                     // Fall through
@@ -885,7 +875,6 @@ SQLVariant::GetDataPointer()
     case SQL_C_LONG:                      // Fall through
     case SQL_C_SLONG:                     data = (void*)&m_data.m_dataLONG;
                                           break;
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_ULONG:                     data = (void*)&m_data.m_dataULONG;
                                           break;
     case SQL_C_FLOAT:                     data = (void*)&m_data.m_dataFLOAT;
@@ -941,14 +930,12 @@ SQLVariant::GetDataSize()
   switch(m_datatype)
   {
     case SQL_C_CHAR:                      // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_BINARY:                    return m_binaryLength;
     case SQL_C_SHORT:                     // Fall through
     case SQL_C_SSHORT:                    return sizeof(short);
     case SQL_C_USHORT:                    return sizeof(unsigned short);
     case SQL_C_LONG:                      // Fall through
     case SQL_C_SLONG:                     return sizeof(long);
-  //case SQL_C_BOOKMARK:                  // Fall through
     case SQL_C_ULONG:                     return sizeof(unsigned long);
     case SQL_C_FLOAT:                     return sizeof(float);
     case SQL_C_DOUBLE:                    return sizeof(double);
@@ -1043,7 +1030,6 @@ SQLVariant::GetAsSShort()
     case SQL_C_CHAR:     return (short)atoi(m_data.m_dataCHAR);
     case SQL_C_SHORT:    return m_data.m_dataSHORT;
     case SQL_C_USHORT:   return UShortToShort(m_data.m_dataUSHORT);
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return SLongToShort(m_data.m_dataLONG);
     case SQL_C_ULONG:    return ULongToShort(m_data.m_dataULONG);
@@ -1060,7 +1046,6 @@ SQLVariant::GetAsSShort()
                          return SLongToShort(atoi(num));
                        }
                        break;
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_BINARY:                    // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
@@ -1099,7 +1084,6 @@ SQLVariant::GetAsUShort()
     case SQL_C_CHAR:     return SLongToUShort(atoi(m_data.m_dataCHAR));
     case SQL_C_SHORT:    return ShortToUShort(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return m_data.m_dataUSHORT;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return SLongToUShort(m_data.m_dataLONG);
     case SQL_C_ULONG:    return ULongToUShort(m_data.m_dataULONG);
@@ -1118,7 +1102,6 @@ SQLVariant::GetAsUShort()
                          break;
 
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1156,7 +1139,6 @@ SQLVariant::GetAsSLong()
     case SQL_C_CHAR:     return (long)atoi(m_data.m_dataCHAR);
     case SQL_C_SHORT:    return (long)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (long)m_data.m_dataUSHORT;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return m_data.m_dataLONG;
     case SQL_C_ULONG:    return ULongToLong(m_data.m_dataULONG);
@@ -1175,7 +1157,6 @@ SQLVariant::GetAsSLong()
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1213,7 +1194,6 @@ SQLVariant::GetAsULong()
     case SQL_C_CHAR:     return LongToULong(atoi(m_data.m_dataCHAR));
     case SQL_C_SHORT:    return ShortToULong(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return (unsigned long)m_data.m_dataUSHORT;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return LongToULong(m_data.m_dataLONG);
     case SQL_C_ULONG:    return m_data.m_dataULONG;
@@ -1232,7 +1212,6 @@ SQLVariant::GetAsULong()
                          break;
 
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1270,7 +1249,6 @@ SQLVariant::GetAsFloat()
     case SQL_C_CHAR:     return DoubleToFloat(atof(m_data.m_dataCHAR));
     case SQL_C_SHORT:    return (float)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (float)m_data.m_dataUSHORT;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return (float)m_data.m_dataLONG;
     case SQL_C_ULONG:    return (float)m_data.m_dataULONG;
@@ -1287,7 +1265,6 @@ SQLVariant::GetAsFloat()
                          return DoubleToFloat(atof(num));
                        }
                        break;
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_BINARY:                    // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
@@ -1326,7 +1303,6 @@ SQLVariant::GetAsDouble()
     case SQL_C_CHAR:     return atof(m_data.m_dataCHAR);
     case SQL_C_SHORT:    return (double)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (double)m_data.m_dataUSHORT;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return (double)m_data.m_dataLONG;
     case SQL_C_ULONG:    return (double)m_data.m_dataULONG;
@@ -1344,7 +1320,6 @@ SQLVariant::GetAsDouble()
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1382,7 +1357,6 @@ SQLVariant::GetAsBit()
     case SQL_C_CHAR:     return m_data.m_dataCHAR[0]  != 0;
     case SQL_C_SHORT:    return m_data.m_dataSHORT    != 0;
     case SQL_C_USHORT:   return m_data.m_dataUSHORT   != 0;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return m_data.m_dataLONG     != 0;
     case SQL_C_ULONG:    return m_data.m_dataULONG    != 0;
@@ -1401,7 +1375,6 @@ SQLVariant::GetAsBit()
                          break;
 
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1439,7 +1412,6 @@ SQLVariant::GetAsSTinyInt()
     case SQL_C_CHAR:     return SLongToTinyInt(atoi(m_data.m_dataCHAR));
     case SQL_C_SHORT:    return ShortToTinyInt(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return UShortToTinyInt(m_data.m_dataUSHORT);
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return SLongToTinyInt(m_data.m_dataLONG);
     case SQL_C_ULONG:    return ULongToTinyInt(m_data.m_dataULONG);
@@ -1458,7 +1430,6 @@ SQLVariant::GetAsSTinyInt()
                          break;
 
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1496,7 +1467,6 @@ SQLVariant::GetAsUTinyInt()
     case SQL_C_CHAR:     return SLongToUTinyInt(atoi(m_data.m_dataCHAR));
     case SQL_C_SHORT:    return ShortToUTinyInt(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return UShortToUTinyInt(m_data.m_dataUSHORT);
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return SLongToUTinyInt(m_data.m_dataLONG);
     case SQL_C_ULONG:    return ULongToUTinyInt(m_data.m_dataULONG);
@@ -1514,7 +1484,6 @@ SQLVariant::GetAsUTinyInt()
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1552,7 +1521,6 @@ SQLVariant::GetAsSBigInt()
     case SQL_C_CHAR:     return (SQLBIGINT)atoi(m_data.m_dataCHAR);
     case SQL_C_SHORT:    return (SQLBIGINT)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (SQLBIGINT)m_data.m_dataUSHORT;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return (SQLBIGINT)m_data.m_dataLONG;
     case SQL_C_ULONG:    return (SQLBIGINT)(m_data.m_dataULONG);
@@ -1570,7 +1538,6 @@ SQLVariant::GetAsSBigInt()
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1608,7 +1575,6 @@ SQLVariant::GetAsUBigInt()
     case SQL_C_CHAR:     return LongToUBIGINT(atoi(m_data.m_dataCHAR));
     case SQL_C_SHORT:    return ShortToUBIGINT(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return (SQLUBIGINT)m_data.m_dataUSHORT;
-  //case SQL_C_BOOKMARK: // fall through
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return LongToUBIGINT(m_data.m_dataLONG);
     case SQL_C_ULONG:    return (SQLUBIGINT)(m_data.m_dataULONG);
@@ -1626,7 +1592,6 @@ SQLVariant::GetAsUBigInt()
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
     case SQL_C_TYPE_DATE:                 // Fall through
@@ -1969,7 +1934,6 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           strcpy_s(m_data.m_dataCHAR,m_binaryLength,p_data);
                                           m_indicator = dataLen > 0 ? SQL_NTS : SQL_NULL_DATA;
                                           break;
-  //case SQL_C_VARBOOKMARK:               // Fall through
     case SQL_C_BINARY:                    m_binaryLength = (int)(dataLen / 2);
                                           m_indicator    = m_binaryLength > 0 ? m_binaryLength : SQL_NULL_DATA;
                                           m_data.m_dataBINARY = (unsigned char*) malloc(2 + m_binaryLength);
@@ -1983,7 +1947,6 @@ SQLVariant::SetData(int p_type,const char* p_data)
     case SQL_C_LONG:                      // Fall through
     case SQL_C_SLONG:                     m_data.m_dataLONG = (long)atoi(p_data);
                                           break;
-  //case SQL_C_BOOKMARK:                  // Fall through
     case SQL_C_ULONG:                     scannum = sscanf(p_data,"%lu",&m_data.m_dataULONG);
                                           if(scannum != 1)
                                           {

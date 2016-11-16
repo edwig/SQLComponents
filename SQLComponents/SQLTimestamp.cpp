@@ -498,8 +498,8 @@ SQLTimestamp::DaysInMonth(int p_year,int p_month) const
 {
   if(Valid())
   {
-    bool leapYear = ((p_year & 3) == 0) && // als (jaar & 3) == 0 dan is jaar deelbaar
-                    ((p_year % 100) != 0 || (p_year % 400) == 0);  // door 4 (binaire vergelijking).
+    bool leapYear = ((p_year & 3) == 0) && // if (year & 3) == 0 then the year can be divided
+                    ((p_year % 100) != 0 || (p_year % 400) == 0);  // by 4 (binairy).
 
     return g_daysInTheMonth[p_month] - g_daysInTheMonth[p_month-1] +
                         ((leapYear && p_month == 2) ? 1 : 0);
@@ -518,9 +518,9 @@ SQLTimestamp::AddYears(int p_number) const
     }
     catch(CString& s)
     {
-      if (Month() == 2 && Day() == 29) // Correctie voor schrikkeljaar
+      if (Month() == 2 && Day() == 29) // Correction for leap year
       {
-        // 29-2-1968 plus 1 jaar wordt 28-2-1969
+        // 29-2-1968 plus 1 year becomes 28-2-1969
         return SQLTimestamp(Year() + p_number, Month(), Day() - 1, Hour(), Minute(), Second());
       }
       // Throw on our error (something else went wrong)
@@ -663,7 +663,7 @@ SQLTimestamp::ParseMoment(const CString& p_string)
 
   if(isalpha(CurrentDate.GetAt(0)))
   {
-    // Speed optimisation. only if alpha chars found parsed moet worden
+    // Speed optimisation. only if alpha chars found parsed 
     if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CURRENT]) == 0 ||
         CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_NOW])     == 0 ) 
     {
@@ -733,7 +733,7 @@ SQLTimestamp::ParseMoment(const CString& p_string)
   if(pos1 > 0 || pos2 > 0)
   {
     // Position comes from 'T' (leftover from XML string)
-    // Let op: yy-mm-dd is anders dan dd-mm-yyyy
+    // Beware: yy-mm-dd is different than dd-mm-yyyy
     if(pos1 < 0) 
     {
       pos1 = pos2;

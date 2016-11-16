@@ -30,7 +30,6 @@
 #include <iostream>
 #include <set>
 
-class COleDateTime;
 class SQLTime;
 class SQLDate;
 class SQLInterval;
@@ -170,15 +169,15 @@ private:
   void    ParseMoment(const CString& p_string);
   // Named timestamp with short or long monthnames
   bool    ParseNamedDate(const CString& p_string);
-  // Bereken de MomentWaarde uit een MomentOpslag
+  // Calculate value from a StampStorage
   void    RecalculateValue();
-  // Bereken de MomentOpslag uit een MomentWaarde
+  // Calculate StampStorage from a value
   void    Normalise();
-  // Zet de momentwaarde op een expliciete waarde
+  // Set StampValue to an explicit value
   void    SetValue(StampValue dubbel);
-  // Berekent het huidige aantal dagen in de maand
+  // Calculates the number of days in a month
   int     DaysInMonth(int p_year,int p_month) const;
-  // Bereken een moment uit een interface string en extra operanden
+  // Calculates a timestamp from an interface string with extra operands
   static bool GetVirtualMoment(CString Sign
                               ,CString ExtraTime
                               ,int    interval
@@ -193,7 +192,7 @@ private:
   // datamembers
   //
   StampStorage m_timestamp; // year/month/second/hour/minute/day
-  StampValue   m_value;		  // Seconds since MJD
+  StampValue   m_value;		  // Seconds since MJD Epoch
   int          m_fraction;  // 0 - 999.999.999 nanoseconds
 };
 

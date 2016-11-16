@@ -68,7 +68,6 @@ public:
    // Type constructors
    SQLVariant(const char* p_data);            // SQL_C_CHAR
    SQLVariant(CString& p_data);               // SQL_C_CHAR
-   SQLVariant(unsigned char* p_bookmark);     // SQL_C_VARBOOKMARK / SQL_C_BINARY
    SQLVariant(short p_short);                 // SQL_C_SHORT / SQL_C_SSHORT
    SQLVariant(unsigned short p_short);        // SQL_C_USHORT
    SQLVariant(long p_long);                   // SQL_C_LONG / SQL_C_SLONG
@@ -225,7 +224,6 @@ private:
       // POINTER TYPES
       char*                           m_dataCHAR;         // SQL_C_CHAR               SQL_CHAR
 //    wchar*                          m_dataWCHAR;        // SQL_C_WCHAR              SQL_WCHAR
-      unsigned char*                  m_dataVARBOOKMARK;  // SQL_C_VARBOOKMARK        SQL_VARBOOKMARK
       void*                           m_dataBINARY;       // SQL_C_BINARY             SQL_BINARY
       // STORAGE TYPES
       short                           m_dataSHORT;        // SQL_C_SHORT              SQL_SMALLINT
@@ -243,7 +241,6 @@ private:
       SQLBIGINT                       m_dataSBIGINT;      // SQL_C_SBIGINT            SQL_BIGINT
       SQLUBIGINT                      m_dataUBIGINT;      // SQL_C_UBIGINT            SQL_UBIGINT
       SQL_NUMERIC_STRUCT              m_dataNUMERIC;      // SQL_C_NUMERIC            SQL_NUMERIC
-      unsigned long                   m_dataBOOKMARK;     // SQL_C_BOOKMARK           SQL_BOOKMARK
       SQLGUID                         m_dataGUID;         // SQL_C_GUID               SQL_GUID
       DATE_STRUCT                     m_dataDATE;         // SQL_C_DATE               SQL_DATE
       TIME_STRUCT                     m_dataTIME;         // SQL_C_TIME               SQL_TIME
