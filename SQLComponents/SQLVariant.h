@@ -201,7 +201,7 @@ public:
  
    // Arithmetic operators
    SQLVariant  operator  +(SQLVariant& p_right);
-// SQLVariant  operator  -(SQLVariant& p_right);
+   SQLVariant  operator  -(SQLVariant& p_right);
 // SQLVariant  operator  *(SQLVariant& p_right);
 // SQLVariant  operator  /(SQLVariant& p_right);
 // SQLVariant  operator  %(SQLVariant& p_right);
@@ -235,6 +235,7 @@ private:
 #include "SQLVariantOperatorSmaller.h"
 #include "SQLVariantOperatorSmallEqual.h"
 #include "SQLVariantOperatorAdd.h"
+#include "SQLVariantOperatorSub.h"
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX

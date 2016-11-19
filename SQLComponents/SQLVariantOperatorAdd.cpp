@@ -484,7 +484,7 @@ SQLVariant
 SQLVariant::OperFloatAddSLong(SQLVariant& p_right)
 {
   float result = GetAsFloat();
-  result = p_right.GetAsFloat();
+  result += p_right.GetAsFloat();
   return SQLVariant(result);
 }
 
@@ -626,7 +626,7 @@ SQLVariant
 SQLVariant::OperSTinyAddULong(SQLVariant& p_right)
 {
   char result = GetAsSTinyInt();
-  result = p_right.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
   return SQLVariant(result);
 }
 
@@ -1569,6 +1569,7 @@ SQLVariant::OperIntDSAddStamp(SQLVariant& p_right)
 }
 
 // TYPE == INTERVAL_YEAR_MONTH
+#pragma warning (disable: 4239)
 
 SQLVariant 
 SQLVariant::OperIntYMAddIntYM(SQLVariant& p_right)

@@ -183,6 +183,7 @@
     <ClCompile Include="SQLVariantOperatorGreater.cpp" />
     <ClCompile Include="SQLVariantOperatorSmallEqual.cpp" />
     <ClCompile Include="SQLVariantOperatorSmaller.cpp" />
+    <ClCompile Include="SQLVariantOperatorSub.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -241,6 +242,7 @@
     <ClInclude Include="SQLVariantOperatorGreater.h" />
     <ClInclude Include="SQLVariantOperatorSmallEqual.h" />
     <ClInclude Include="SQLVariantOperatorSmaller.h" />
+    <ClInclude Include="SQLVariantOperatorSub.h" />
     <ClInclude Include="SQLVariantTrim.h" />
     <ClInclude Include="SQLWrappers.h" />
     <ClInclude Include="stdafx.h" />
