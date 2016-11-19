@@ -46,7 +46,7 @@ extern DataTypes allTypes[];
 extern DataTypes allOther[];
 extern DataTypes allParams[];
 
-// Forewared declarations
+// Forwarded declarations
 class SQLDate;
 class SQLTime;
 class SQLTimestamp;
@@ -165,6 +165,31 @@ public:
 
    // Assignment operator
    SQLVariant& operator  =(const SQLVariant& p_original);
+   // Assignment operator from original data
+   SQLVariant& operator  =(const char* p_data);              // SQL_C_CHAR
+   SQLVariant& operator  =(CString& p_data);                 // SQL_C_CHAR
+   SQLVariant& operator  =(short p_data);                    // SQL_C_SHORT / SQL_C_SSHORT
+   SQLVariant& operator  =(unsigned short p_data);           // SQL_C_USHORT
+   SQLVariant& operator  =(long p_data);                     // SQL_C_LONG  / SQL_C_SLONG
+   SQLVariant& operator  =(unsigned long p_data);            // SQL_C_ULONG
+   SQLVariant& operator  =(float p_data);                    // SQL_C_FLOAT
+   SQLVariant& operator  =(double p_data);                   // SQL_C_DOUBLE
+   SQLVariant& operator  =(bool p_data);                     // SQL_C_BIT
+   SQLVariant& operator  =(char p_data);                     // SQL_C_TINYINT / SQL_C_STINYINT
+   SQLVariant& operator  =(unsigned char p_data);            // SQL_C_UTINYINT
+   SQLVariant& operator  =(__int64 p_data);                  // SQL_C_BIGINT / SQL_C_SBIGINT
+   SQLVariant& operator  =(unsigned __int64 p_data);         // SQL_C_UBIGINT
+   SQLVariant& operator  =(SQL_NUMERIC_STRUCT* p_data);      // SQL_C_NUMERIC
+   SQLVariant& operator  =(SQLGUID* p_data);                 // SQL_C_GUID
+   SQLVariant& operator  =(DATE_STRUCT* p_data);             // SQL_C_DATE / SQL_C_TYPE_DATE
+   SQLVariant& operator  =(TIME_STRUCT* p_data);             // SQL_C_TIME / SQL_C_TYPE_TIME
+   SQLVariant& operator  =(TIMESTAMP_STRUCT* p_data);        // SQL_C_TIMESTAMP / SQL_C_TYPE_TIMESTAMP
+   SQLVariant& operator  =(SQL_INTERVAL_STRUCT* p_data);     // SQL_C_INTERVAL_YEAR -> SQL_C_INTERVAL_DAY_TO_SECOND
+   // Assignments from complex constructors
+   SQLVariant& operator  =(SQLDate& p_data);                 // SQLDate
+   SQLVariant& operator  =(SQLTime& p_data);                 // SQLTime
+   SQLVariant& operator  =(SQLTimestamp& p_data);            // SQLTimestamp
+   SQLVariant& operator  =(SQLInterval& p_data);             // SQLInterval
 
    // Comparison operators
    bool        operator ==(SQLVariant& p_right);
@@ -175,7 +200,7 @@ public:
    bool        operator <=(SQLVariant& p_right);
  
    // Arithmetic operators
-// SQLVariant  operator  +(SQLVariant& p_right);
+   SQLVariant  operator  +(SQLVariant& p_right);
 // SQLVariant  operator  -(SQLVariant& p_right);
 // SQLVariant  operator  *(SQLVariant& p_right);
 // SQLVariant  operator  /(SQLVariant& p_right);
@@ -209,6 +234,7 @@ private:
 #include "SQLVariantOperatorGreatEqual.h"
 #include "SQLVariantOperatorSmaller.h"
 #include "SQLVariantOperatorSmallEqual.h"
+#include "SQLVariantOperatorAdd.h"
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX

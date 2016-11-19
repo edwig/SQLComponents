@@ -52,7 +52,10 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
   }
   else
   {
-    // Test connection first
+    // Test operators
+    TestOperators();
+
+    // Test connection
     TestConnection();
     
     TestClosingCursor();

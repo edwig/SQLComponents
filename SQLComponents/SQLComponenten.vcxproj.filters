@@ -135,6 +135,9 @@
     <ClCompile Include="SQLVariantOperatorSmallEqual.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SQLVariantOperatorAdd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Locker.h">
@@ -276,6 +279,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SQLVariantOperatorSmallEqual.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLVariantOperatorAdd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

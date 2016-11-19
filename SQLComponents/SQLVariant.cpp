@@ -742,7 +742,7 @@ SQLVariant::GetAsString(CString& result)
                                           break;
     case SQL_C_FLOAT:                     result.Format("%.7g",m_data.m_dataFLOAT);
                                           break;
-    case SQL_C_DOUBLE:                    // Standaard Oracle ODBC kan maximaal 15 decimalen ophalen
+    case SQL_C_DOUBLE:                    // Standard Oracle ODBC can get a maximum of 15 decimals
                                           result.Format("%.15lg",m_data.m_dataDOUBLE);
                                           break;
     case SQL_C_BIT:                       result.Format("%d",(int)m_data.m_dataBIT);
@@ -988,7 +988,7 @@ SQLVariant::GetAsChar()
     return (char*)m_data.m_dataBINARY;
   }
   // Should be: GetErrorDatatype(SQL_C_CHAR);
-  // Sometimes we come her unexpectedley in various programs
+  // Sometimes we come her unexpectedly in various programs
   // This is a non-multi-treaded solution as an after-thought
   // IT IS NOT SAFE. REWRITE YOUR PROGRAM!!
   TRACE("ALARM: Rewrite your program. Use 'GetAsString' instead\n");
@@ -1027,7 +1027,8 @@ SQLVariant::GetAsSShort()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return (short)atoi(m_data.m_dataCHAR);
+    case SQL_C_CHAR:     return SLongToShort(atoi(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return m_data.m_dataSHORT;
     case SQL_C_USHORT:   return UShortToShort(m_data.m_dataUSHORT);
     case SQL_C_LONG:     // fall through
@@ -1082,6 +1083,7 @@ SQLVariant::GetAsUShort()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return SLongToUShort(atoi(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return ShortToUShort(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
@@ -1137,6 +1139,7 @@ SQLVariant::GetAsSLong()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return (long)atoi(m_data.m_dataCHAR);
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return (long)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (long)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
@@ -1192,6 +1195,7 @@ SQLVariant::GetAsULong()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return LongToULong(atoi(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return ShortToULong(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return (unsigned long)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
@@ -1247,6 +1251,7 @@ SQLVariant::GetAsFloat()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return DoubleToFloat(atof(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return (float)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (float)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
@@ -1301,6 +1306,7 @@ SQLVariant::GetAsDouble()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return atof(m_data.m_dataCHAR);
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return (double)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (double)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
@@ -1355,6 +1361,7 @@ SQLVariant::GetAsBit()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return m_data.m_dataCHAR[0]  != 0;
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return m_data.m_dataSHORT    != 0;
     case SQL_C_USHORT:   return m_data.m_dataUSHORT   != 0;
     case SQL_C_LONG:     // fall through
@@ -1410,6 +1417,7 @@ SQLVariant::GetAsSTinyInt()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return SLongToTinyInt(atoi(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return ShortToTinyInt(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return UShortToTinyInt(m_data.m_dataUSHORT);
     case SQL_C_LONG:     // fall through
@@ -1465,6 +1473,7 @@ SQLVariant::GetAsUTinyInt()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return SLongToUTinyInt(atoi(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return ShortToUTinyInt(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return UShortToUTinyInt(m_data.m_dataUSHORT);
     case SQL_C_LONG:     // fall through
@@ -1519,6 +1528,7 @@ SQLVariant::GetAsSBigInt()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return (SQLBIGINT)atoi(m_data.m_dataCHAR);
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return (SQLBIGINT)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (SQLBIGINT)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
@@ -1573,6 +1583,7 @@ SQLVariant::GetAsUBigInt()
   switch(m_datatype)
   {
     case SQL_C_CHAR:     return LongToUBIGINT(atoi(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return ShortToUBIGINT(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return (SQLUBIGINT)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
@@ -1628,7 +1639,7 @@ SQLVariant::GetAsNumeric()
   {
     return &m_data.m_dataNUMERIC;
   }
-  // Sometimes we come her unexpectedley in various programs
+  // Sometimes we come her unexpectedly in various programs
   // This is a non-multi-treaded solution as an after-thought
   // IT IS NOT SAFE. REWRITE YOUR PROGRAM!!
   TRACE("ALARM: Rewrite your program. Use 'GetAs<cardinal>' instead\n");
@@ -1636,6 +1647,7 @@ SQLVariant::GetAsNumeric()
   static SQL_NUMERIC_STRUCT val;
   switch(m_datatype)
   {
+    case SQL_C_SSHORT:    // fall through
     case SQL_C_SHORT:     // Fall through
     case SQL_C_USHORT:    // Fall through
     case SQL_C_LONG:      // Fall through

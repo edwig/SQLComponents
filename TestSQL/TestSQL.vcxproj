@@ -196,6 +196,7 @@
     <ClCompile Include="TestDataSet.cpp" />
     <ClCompile Include="TestFormatting.cpp" />
     <ClCompile Include="TestNULL.cpp" />
+    <ClCompile Include="TestOperators.cpp" />
     <ClCompile Include="TestSQL.cpp" />
   </ItemGroup>
   <ItemGroup>

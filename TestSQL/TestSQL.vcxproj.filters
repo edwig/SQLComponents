@@ -36,6 +36,9 @@
     <ClCompile Include="TestNULL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TestOperators.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">

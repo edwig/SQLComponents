@@ -27,7 +27,11 @@
 #include "stdafx.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
+#include "SQLDate.h"
 
+// The concise datatype is used to scale the ODBC datatypes to a short integer
+// that can be used in the arrays of functions for the comparison and mathematical operators
+//
 SQLConciseType SQLTypeToConciseType(int p_datatype)
 {
   switch(p_datatype)
@@ -108,3 +112,303 @@ SQLVariant::operator=(const SQLVariant& p_original)
   return *this;
 }
 
+SQLVariant& 
+SQLVariant::operator=(const char* p_data)
+{
+  SetData(SQL_C_CHAR,p_data);
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(CString& p_data)
+{
+  SetData(SQL_C_CHAR,p_data.GetString());
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(short p_data)
+{
+  Init();
+  m_datatype    = SQL_C_SSHORT;
+  m_sqlDatatype = SQL_INTEGER;
+  m_indicator   = 0;
+  m_data.m_dataSSHORT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(unsigned short p_data)
+{
+  Init();
+  m_datatype    = SQL_C_USHORT;
+  m_sqlDatatype = SQL_INTEGER;
+  m_indicator   = 0;
+  m_data.m_dataUSHORT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(long p_data)
+{
+  Init();
+  m_datatype    = SQL_C_SLONG;
+  m_sqlDatatype = SQL_INTEGER;
+  m_indicator   = 0;
+  m_data.m_dataSLONG = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(unsigned long p_data)
+{
+  Init();
+  m_datatype    = SQL_C_ULONG;
+  m_sqlDatatype = SQL_BIGINT;
+  m_indicator   = 0;
+  m_data.m_dataULONG = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(float p_data)
+{
+  Init();
+  m_datatype    = SQL_C_FLOAT;
+  m_sqlDatatype = SQL_FLOAT;
+  m_indicator   = 0;
+  m_data.m_dataFLOAT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(double p_data)
+{
+  Init();
+  m_datatype    = SQL_C_DOUBLE;
+  m_sqlDatatype = SQL_DOUBLE;
+  m_indicator   = 0;
+  m_data.m_dataDOUBLE = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(bool p_data)
+{
+  Init();
+  m_datatype    = SQL_C_BIT;
+  m_sqlDatatype = SQL_BIT;
+  m_indicator   = 0;
+  m_data.m_dataBIT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(char p_data)
+{
+  Init();
+  m_datatype    = SQL_C_STINYINT;
+  m_sqlDatatype = SQL_TINYINT;
+  m_indicator   = 0;
+  m_data.m_dataSTINYINT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(unsigned char p_data)
+{
+  Init();
+  m_datatype    = SQL_C_UTINYINT;
+  m_sqlDatatype = SQL_TINYINT;
+  m_indicator   = 0;
+  m_data.m_dataUTINYINT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(__int64 p_data)
+{
+  Init();
+  m_datatype    = SQL_C_SBIGINT;
+  m_sqlDatatype = SQL_BIGINT;
+  m_indicator   = 0;
+  m_data.m_dataSBIGINT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(unsigned __int64 p_data)
+{
+  Init();
+  m_datatype    = SQL_C_UBIGINT;
+  m_sqlDatatype = SQL_BIGINT;
+  m_indicator   = 0;
+  m_data.m_dataUBIGINT = p_data;
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(SQL_NUMERIC_STRUCT* p_data)
+{
+  Init();
+  m_datatype    = SQL_C_NUMERIC;
+  m_sqlDatatype = SQL_NUMERIC;
+  m_indicator   = 0;
+  memcpy(&m_data.m_dataNUMERIC,p_data,sizeof(SQL_NUMERIC_STRUCT));
+
+  return* this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(SQLGUID* p_data)
+{
+  Init();
+  m_datatype    = SQL_C_GUID;
+  m_sqlDatatype = SQL_GUID;
+  m_indicator   = 0;
+  memcpy(&m_data.m_dataGUID,p_data,sizeof(SQLGUID));
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(DATE_STRUCT* p_data)
+{
+  Init();
+  m_datatype    = SQL_C_DATE;
+  m_sqlDatatype = SQL_DATE;
+  m_indicator   = 0;
+  memcpy(&m_data.m_dataDATE,p_data,sizeof(DATE_STRUCT));
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(TIME_STRUCT* p_data)
+{
+  Init();
+  m_datatype    = SQL_C_TIME;
+  m_sqlDatatype = SQL_TIME;
+  m_indicator   = 0;
+  memcpy(&m_data.m_dataTIME,p_data,sizeof(TIME_STRUCT));
+
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(TIMESTAMP_STRUCT* p_data)
+{
+  Init();
+  m_datatype    = SQL_C_TIMESTAMP;
+  m_sqlDatatype = SQL_TIMESTAMP;
+  m_indicator   = 0;
+  memcpy(&m_data.m_dataTIMESTAMP,p_data,sizeof(TIMESTAMP_STRUCT));
+
+  return *this;
+}
+SQLVariant& 
+SQLVariant::operator=(SQL_INTERVAL_STRUCT* p_data)
+{
+  Init();
+  m_datatype    = p_data->interval_type;
+  m_sqlDatatype = p_data->interval_type;
+  m_indicator   = 0;
+  if(IsIntervalType() == false)
+  {
+    m_datatype    = SQL_C_INTERVAL_DAY_TO_SECOND;
+    m_sqlDatatype = SQL_INTERVAL_DAY_TO_SECOND;
+  }
+  memcpy(&m_data.m_dataINTERVAL,p_data,sizeof(SQL_INTERVAL_STRUCT));
+
+  return *this;
+}
+
+// Assignments from complex constructors
+
+SQLVariant& 
+SQLVariant::operator=(SQLDate& p_data)
+{
+  Init();
+  m_datatype = SQL_C_DATE;
+  m_sqlDatatype = SQL_DATE;
+
+  if(p_data.IsNull())
+  {
+    m_indicator = SQL_NULL_DATA;
+  }
+  else
+  {
+    m_indicator = 0;
+    p_data.AsDateStruct(&m_data.m_dataDATE);
+  }
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(SQLTime& p_data)
+{
+  Init();
+  m_datatype = SQL_C_TIME;
+  m_sqlDatatype = SQL_TIME;
+
+  if(p_data.IsNull())
+  {
+    m_indicator = SQL_NULL_DATA;
+  }
+  else
+  {
+    m_indicator = 0;
+    p_data.AsTimeStruct(&m_data.m_dataTIME);
+  }
+  return *this;
+}
+
+
+SQLVariant& 
+SQLVariant::operator=(SQLTimestamp& p_data)
+{
+  Init();
+  m_datatype = SQL_C_TIMESTAMP;
+  m_sqlDatatype = SQL_TIMESTAMP;
+
+  if(p_data.IsNull())
+  {
+    m_indicator = SQL_NULL_DATA;
+  }
+  else
+  {
+    m_indicator = 0;
+    p_data.AsTimeStampStruct(&m_data.m_dataTIMESTAMP);
+  }
+  return *this;
+}
+
+SQLVariant& 
+SQLVariant::operator=(SQLInterval& p_data)
+{
+  Init();
+  m_datatype    = p_data.GetIntervalType();
+  m_sqlDatatype = m_datatype;
+
+  if(p_data.IsNull())
+  {
+    m_indicator = SQL_NULL_DATA;
+  }
+  else
+  {
+    m_indicator = 0;
+    p_data.AsIntervalStruct(&m_data.m_dataINTERVAL);
+  }
+  return *this;
+}
