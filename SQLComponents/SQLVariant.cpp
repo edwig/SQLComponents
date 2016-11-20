@@ -389,7 +389,7 @@ SQLVariant::SQLVariant(SQLTimestamp* p_stamp)
 SQLVariant::SQLVariant(SQLInterval* p_interval)
 {
   Init();
-  m_datatype    = p_interval->GetIntervalType();
+  m_datatype    = p_interval->GetSQLDatatype();
   m_sqlDatatype = m_datatype;
 
   if(p_interval->IsNull())

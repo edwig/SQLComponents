@@ -157,6 +157,7 @@ public:
   // Internals
   InterValue  AsValue() const;
   SQLINTERVAL GetIntervalType() const;
+  int         GetSQLDatatype()  const;
   bool        GetIsYearMonthType() const;
   bool        GetIsDaySecondType() const;
   bool        GetIsTimeType() const;

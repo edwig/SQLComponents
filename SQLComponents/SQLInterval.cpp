@@ -681,10 +681,32 @@ SQLInterval::GetIntervalType() const
   return m_interval.interval_type;
 }
 
+int 
+SQLInterval::GetSQLDatatype() const
+{
+  switch(m_interval.interval_type)
+  {
+    case SQL_IS_YEAR:             return SQL_C_INTERVAL_YEAR;
+    case SQL_IS_MONTH:            return SQL_C_INTERVAL_MONTH;
+    case SQL_IS_DAY:              return SQL_C_INTERVAL_DAY;
+    case SQL_IS_HOUR:             return SQL_C_INTERVAL_HOUR;
+    case SQL_IS_MINUTE:           return SQL_C_INTERVAL_MINUTE;
+    case SQL_IS_SECOND:           return SQL_C_INTERVAL_SECOND;
+    case SQL_IS_YEAR_TO_MONTH:    return SQL_C_INTERVAL_YEAR_TO_MONTH;
+    case SQL_IS_DAY_TO_HOUR:      return SQL_C_INTERVAL_DAY_TO_HOUR;
+    case SQL_IS_DAY_TO_MINUTE:    return SQL_C_INTERVAL_DAY_TO_MINUTE;
+    case SQL_IS_DAY_TO_SECOND:    return SQL_C_INTERVAL_DAY_TO_SECOND;
+    case SQL_IS_HOUR_TO_MINUTE:   return SQL_C_INTERVAL_HOUR_TO_MINUTE;
+    case SQL_IS_HOUR_TO_SECOND:   return SQL_C_INTERVAL_HOUR_TO_SECOND;
+    case SQL_IS_MINUTE_TO_SECOND: return SQL_C_INTERVAL_MINUTE_TO_SECOND;
+  }
+  return 0;
+}
+
 bool
 SQLInterval::GetIsYearMonthType() const
 {
-  // distinquish between year-month and day-second intervals
+  // distinguish between year-month and day-second intervals
   return (m_interval.interval_type == SQL_IS_MONTH       ||
           m_interval.interval_type == SQL_IS_YEAR        ||
           m_interval.interval_type == SQL_IS_YEAR_TO_MONTH);
