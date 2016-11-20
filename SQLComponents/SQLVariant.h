@@ -202,9 +202,9 @@ public:
    // Arithmetic operators
    SQLVariant  operator  +(SQLVariant& p_right);
    SQLVariant  operator  -(SQLVariant& p_right);
-// SQLVariant  operator  *(SQLVariant& p_right);
-// SQLVariant  operator  /(SQLVariant& p_right);
-// SQLVariant  operator  %(SQLVariant& p_right);
+   SQLVariant  operator  *(SQLVariant& p_right);
+   SQLVariant  operator  /(SQLVariant& p_right);
+   SQLVariant  operator  %(SQLVariant& p_right);
 
 private:
    // Total internal reset (type and data store)
@@ -236,6 +236,9 @@ private:
 #include "SQLVariantOperatorSmallEqual.h"
 #include "SQLVariantOperatorAdd.h"
 #include "SQLVariantOperatorSub.h"
+#include "SQLVariantOperatorMul.h"
+#include "SQLVariantOperatorDiv.h"
+#include "SQLVariantOperatorMod.h"
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX

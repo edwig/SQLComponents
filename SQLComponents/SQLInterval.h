@@ -135,6 +135,8 @@ public:
   SQLInterval   operator* (double p_number) const;
   SQLInterval   operator/ (int    p_number) const;
   SQLInterval   operator/ (double p_number) const;
+  SQLInterval   operator% (int    p_number) const;
+  SQLInterval   operator% (double p_number) const;
   SQLInterval&  operator*=(int    p_number);
   SQLInterval&  operator*=(double p_number);
   SQLInterval&  operator/=(int    p_number);

@@ -178,9 +178,12 @@
     <ClCompile Include="SQLVariantFormat.cpp" />
     <ClCompile Include="SQLVariantOperator.cpp" />
     <ClCompile Include="SQLVariantOperatorAdd.cpp" />
+    <ClCompile Include="SQLVariantOperatorDiv.cpp" />
     <ClCompile Include="SQLVariantOperatorEqual.cpp" />
     <ClCompile Include="SQLVariantOperatorGreatEqual.cpp" />
     <ClCompile Include="SQLVariantOperatorGreater.cpp" />
+    <ClCompile Include="SQLVariantOperatorMod.cpp" />
+    <ClCompile Include="SQLVariantOperatorMul.cpp" />
     <ClCompile Include="SQLVariantOperatorSmallEqual.cpp" />
     <ClCompile Include="SQLVariantOperatorSmaller.cpp" />
     <ClCompile Include="SQLVariantOperatorSub.cpp" />
@@ -237,9 +240,12 @@
     <ClInclude Include="SQLVariantFormat.h" />
     <ClInclude Include="SQLVariantOperator.h" />
     <ClInclude Include="SQLVariantOperatorAdd.h" />
+    <ClInclude Include="SQLVariantOperatorDiv.h" />
     <ClInclude Include="SQLVariantOperatorEqual.h" />
     <ClInclude Include="SQLVariantOperatorGreatEqual.h" />
     <ClInclude Include="SQLVariantOperatorGreater.h" />
+    <ClInclude Include="SQLVariantOperatorMod.h" />
+    <ClInclude Include="SQLVariantOperatorMul.h" />
     <ClInclude Include="SQLVariantOperatorSmallEqual.h" />
     <ClInclude Include="SQLVariantOperatorSmaller.h" />
     <ClInclude Include="SQLVariantOperatorSub.h" />

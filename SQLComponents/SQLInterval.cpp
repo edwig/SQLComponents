@@ -1630,6 +1630,44 @@ SQLInterval::operator/(double p_number) const
   return interval;
 }
 
+SQLInterval
+SQLInterval::operator%(int p_number) const
+{
+  // Check for NULL status
+  if(IsNull())
+  {
+    SQLInterval intval;
+    return intval;
+  }
+  // Calculate new value
+  InterValue value = AsValue() % static_cast<InterValue>(p_number);
+  SQLInterval interval;
+  interval.SetIntervalType(GetIntervalType());
+  interval.m_value = value;
+  interval.RecalculateInterval();
+
+  return interval;
+}
+
+SQLInterval
+SQLInterval::operator%(double p_number) const
+{
+  // Check for NULL status
+  if(IsNull())
+  {
+    SQLInterval intval;
+    return intval;
+  }
+  // Calculate new value
+  InterValue value = AsValue() % static_cast<InterValue>(p_number);
+  SQLInterval interval;
+  interval.SetIntervalType(GetIntervalType());
+  interval.m_value = value;
+  interval.RecalculateInterval();
+
+  return interval;
+}
+
 SQLInterval&
 SQLInterval::operator*=(int p_number)
 {
