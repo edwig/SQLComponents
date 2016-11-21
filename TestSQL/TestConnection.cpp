@@ -20,9 +20,11 @@ void TestConnection()
 
   try
   {
-    // Set options for the database
-    //dbs.SetLoginTimeout(0);
-    dbs.SetMARS(true);
+    // Set options for the MS-Access database
+    dbs.SetLoginTimeout(0);
+    dbs.SetMARS(false);
+
+    // ORACLE OPTIONS
     // dbs.AddConnectOption("FBS","600000");
 
     if(dbs.Open(g_dsn,g_user,g_password))

@@ -79,7 +79,7 @@ typedef std::map<int,PrimKeyInfo>   PrimaryMap;
 typedef std::map<CString,TypeInfo*> DataTypeMap;
 typedef std::list<CString>          WordList;
 
-class SQLInfo : public CObject
+class SQLInfo 
 {
 public:
    SQLInfo(SQLDatabase* p_database);

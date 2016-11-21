@@ -79,6 +79,8 @@ TestNULL()
   {
     // Set options for the database
     dbs.SetLoginTimeout(0);
+    dbs.SetMARS(false);
+
     if(dbs.Open(g_dsn,g_user,g_password))
     {
       printf("Database opened.\n");

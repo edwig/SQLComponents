@@ -15,6 +15,7 @@ void TestClosingCursor()
   printf("========================\n");
 
   SQLDatabase dbs;
+  // Do not log: we want clean output of open/close
   // dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
 
   long beginTime = clock();
@@ -29,20 +30,17 @@ void TestClosingCursor()
     if(dbs.Open(g_dsn,g_user,g_password))
     {
       printf("Database opened.\n");
-      
-      
       for(unsigned ind = 1;ind <= 1500; ++ind)
       {
         SQLQuery query(&dbs);
         CString sql("SELECT COUNT(*) FROM DUAL");
         query.DoSQLStatement(sql);
         printf(".");
-        if(ind % 200 == 0)
+        if(ind % 50 == 0)
         {
-          printf("\n%d\n",ind);
+          printf(" - %d\n",ind);
         }
       }
-      printf("\n");
     }
     else
     {

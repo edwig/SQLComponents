@@ -48,52 +48,14 @@ static char THIS_FILE[] = __FILE__;
 
 SQLDatabase::SQLDatabase()
             :m_info(NULL)
-            ,m_infoTree(NULL)
 {
-  m_rdbmsType         = RDBMS_UNKNOWN;
-  m_loginTimeout      = LOGIN_TIMEOUT;
-  m_async_possible    = 0;
-  m_canDoTransactions = 0;
-  m_odbcVersion       = 0;
-  m_driverMainVersion = 0;
-  m_lastAction        = 0;
-  m_needLongDataLen   = false;
-  m_mars              = true;
-  m_readOnly          = false;
-  m_henv              = SQL_NULL_HANDLE;
-  m_hdbc              = SQL_NULL_HANDLE;
-  m_logLevel          = NULL;
-  m_logPrinter        = NULL;
-  m_logContext        = NULL;
-  m_loggingLevel      = 0;
-  m_schemaAction      = SCHEMA_NO_ACTION;
-  
   // Initialise locking
   InitializeCriticalSection(&m_databaseLock);
 }
 
 SQLDatabase::SQLDatabase(HDBC p_hdbc)
             :m_hdbc(p_hdbc)
-            ,m_henv(NULL)
-            ,m_info(NULL)
-            ,m_infoTree(NULL)
 {
-  m_rdbmsType         = RDBMS_UNKNOWN;
-  m_loginTimeout      = LOGIN_TIMEOUT;
-  m_async_possible    = 0;
-  m_canDoTransactions = 0;
-  m_odbcVersion       = 0;
-  m_driverMainVersion = 0;
-  m_lastAction        = 0;
-  m_needLongDataLen   = false;
-  m_mars              = true;
-  m_readOnly          = false;
-  m_logLevel          = NULL;
-  m_logPrinter        = NULL;
-  m_logContext        = NULL;
-  m_loggingLevel      = 0;
-  m_schemaAction      = SCHEMA_NO_ACTION;
-  
   // Initialise locking
   InitializeCriticalSection(&m_databaseLock);
 
@@ -386,7 +348,7 @@ SQLDatabase::SetAttributesAfterConnect(bool p_readOnly)
       // Afterwards, after statements have occured, it cannot be turned on or off.
       // See Microsoft KB169469 article for confirmation. It's and ODBC 3.x issue for MS-Access
       // All insert/updates/deletes **must** be transactions
-      // Se we work in autocommitmode = off
+      // So we work in autocommitmode = off
       // Programs **MUST** put SQLTransaction on the stack to modify the database
       SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_OFF,SQL_IS_UINTEGER);
     }
@@ -934,7 +896,7 @@ SQLDatabase::ODBCNativeSQL(CString& p_sql)
 //////////////////////////////////////////////////////////////////////////
 
 CString 
-SQLDatabase::GetErrorString(HSTMT statement)
+SQLDatabase::GetErrorString(SQL_HANDLE statement)
 {
   CString errors;
   int     number;
@@ -979,7 +941,7 @@ SQLDatabase::GetErrorString(HSTMT statement)
 }
 
 int    
-SQLDatabase::GetErrorNumber(HSTMT statement)
+SQLDatabase::GetErrorNumber(SQL_HANDLE statement)
 {
   CString text;
   int     number;
