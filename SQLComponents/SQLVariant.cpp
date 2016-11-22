@@ -733,7 +733,7 @@ SQLVariant::GetAsString(CString& result)
     case SQL_C_SHORT:                     // Fall through
     case SQL_C_SSHORT:                    result.Format("%i",(int)m_data.m_dataSHORT);
                                           break;
-    case SQL_C_USHORT:                    result.Format("%ui",(unsigned)m_data.m_dataUSHORT);
+    case SQL_C_USHORT:                    result.Format("%i",(int)m_data.m_dataUSHORT);
                                           break;
     case SQL_C_LONG:                      // Fall through
     case SQL_C_SLONG:                     result.Format("%li",m_data.m_dataLONG);
@@ -758,7 +758,7 @@ SQLVariant::GetAsString(CString& result)
                                           break;
     case SQL_C_NUMERIC:                   NumericToString(&m_data.m_dataNUMERIC,result);
                                           break;
-    case SQL_C_GUID:                      result.Format("{%LX-%X-%X-%X%X-%X%X%X%X%X%X}"
+    case SQL_C_GUID:                      result.Format("{%04X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}"
                                                        ,m_data.m_dataGUID.Data1
                                                        ,m_data.m_dataGUID.Data2
                                                        ,m_data.m_dataGUID.Data3
