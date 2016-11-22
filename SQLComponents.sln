@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{9496
 		Readme = Readme
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OperatorUnitTest", "OperatorUnitTest\OperatorUnitTest.vcxproj", "{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -36,6 +38,14 @@ Global
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968}.Release|Win32.Build.0 = Release|Win32
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968}.Release|x64.ActiveCfg = Release|x64
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968}.Release|x64.Build.0 = Release|x64
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Debug|Win32.Build.0 = Debug|Win32
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Debug|x64.ActiveCfg = Debug|x64
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Debug|x64.Build.0 = Debug|x64
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Release|Win32.ActiveCfg = Release|Win32
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Release|Win32.Build.0 = Release|Win32
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Release|x64.ActiveCfg = Release|x64
+		{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
