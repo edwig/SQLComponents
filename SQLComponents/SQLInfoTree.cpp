@@ -914,6 +914,7 @@ SQLInfoTree::WordListToTree(WordList& p_list,CTreeCtrl* p_tree,HTREEITEM p_item)
 }
 
 // All table info to a treecontrol
+// HINT: Call in advance: CWaitCursor take_a_deep_sigh;
 void
 SQLInfoTree::MakeTableInfo(CTreeCtrl* tree,CString& table)
 {
@@ -933,7 +934,6 @@ SQLInfoTree::MakeTableInfo(CTreeCtrl* tree,CString& table)
   {
     return;
   }
-  CWaitCursor take_a_deep_sigh;
 
   // This outperforms the DeleteAllItems of the treecontrol BY FAR!!!
   // Just search all items and delete them individually

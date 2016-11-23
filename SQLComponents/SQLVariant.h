@@ -65,6 +65,7 @@ public:
    SQLVariant();                              // Generic
    SQLVariant(int p_type,int p_space);        // ODBC driver reserve precision
    SQLVariant(SQLVariant* p_var);             // From another SQLVariant
+   SQLVariant(const SQLVariant& p_var);       // From another SQLVariant reference
    // Type constructors
    SQLVariant(const char* p_data);            // SQL_C_CHAR
    SQLVariant(CString& p_data);               // SQL_C_CHAR

@@ -35,6 +35,7 @@
 
    // Comparison functions for the EQUAL operator
    bool   OperVarEqualsChar     (SQLVariant& p_right);  // TYPE == CHAR
+   bool   OperBitEqualsChar     (SQLVariant& p_right);
    bool   OperGuidEqualsChar    (SQLVariant& p_right);
    bool   OperSShortEqualsSShort(SQLVariant& p_right);  // TYPE == SSHORT
    bool   OperUShortEqualsSShort(SQLVariant& p_right);
@@ -104,7 +105,8 @@
    bool   OperSBigEqualsDouble  (SQLVariant& p_right);
    bool   OperUBigEqualsDouble  (SQLVariant& p_right);
    bool   OperNumEqualsDouble   (SQLVariant& p_right);
-   bool   OperSShortEqualsBit   (SQLVariant& p_right);  // TYPE == BIT
+   bool   OperVarEqualsBit      (SQLVariant& p_right);  // TYPE == BIT
+   bool   OperSShortEqualsBit   (SQLVariant& p_right);
    bool   OperUShortEqualsBit   (SQLVariant& p_right);
    bool   OperSLongEqualsBit    (SQLVariant& p_right);
    bool   OperULongEqualsBit    (SQLVariant& p_right);

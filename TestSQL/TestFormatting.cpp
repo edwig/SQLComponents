@@ -3,6 +3,7 @@
 #include "SQLDatabase.h"
 #include "SQLTimestamp.h"
 #include "SQLDate.h"
+#include "SQLVariant.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -36,6 +37,70 @@ TestXMLStrings()
 
   printf("As UTC XML string: %s\n",stamp1.AsXMLStringUTC());
 }
+
+void
+TestXMLPeriods()
+{
+  printf("Testing XML duriation period to SQL Interval\n");
+  printf("============================================\n");
+
+  CString period("P20578DT14H22M8S");
+
+  SQLInterval intval(period);
+  SQLVariant one(&intval);
+  CString oneString;
+  one.GetAsString(oneString);
+
+  printf("XML Duration period is: %s\n",period);
+  printf("Converted SQLInterval : %s\n",oneString);
+  printf("Expected  SQLInterval : 20578 14:22:08\n");
+}
+
+void
+TestGUIDs()
+{
+  printf("Testing SQLGUID strings in SQLVariants\n");
+  printf("======================================\n");
+
+  CString guidString = "{AABBCCDD-0899-6677-1122-030455667788}";
+  SQLGUID guid;
+  guid.Data1 = 0xAABBCCDD;
+  guid.Data2 = 0x0899;    // Check that this 0 comes through
+  guid.Data3 = 0x6677;
+  guid.Data4[0] = 0x11;
+  guid.Data4[1] = 0x22;
+  guid.Data4[2] = 0x03;   // Check that this 0 comes through
+  guid.Data4[3] = 0x04;   // Check that this 0 comes through
+  guid.Data4[4] = 0x55;
+  guid.Data4[5] = 0x66;
+  guid.Data4[6] = 0x77;
+  guid.Data4[7] = 0x88;
+
+  // Testing SQLGUID to SQLVariant
+  SQLVariant one(&guid);
+  CString oneString;
+  one.GetAsString(oneString);
+
+  printf("String to be converted to GUID : %s\n",guidString);
+  printf("SQLVariant GUID from SQLGUID   : %s\n",oneString);
+
+  if(guidString.CompareNoCase(oneString))
+  {
+    printf("ERROR: Conversion SQLGUID -> SQLVariant\n");
+  }
+
+  // Testing string to SQLVariant
+  SQLVariant two;
+  two.SetData(SQL_C_GUID,guidString);
+  two.GetAsString(oneString);
+
+  printf("SQLVariant GUID from CString   : %s\n",oneString);
+  if(guidString.CompareNoCase(oneString))
+  {
+    printf("ERROR: Conversion CString -> SQLVariant\n");
+  }
+}
+
 
 void
 TestSQLFormatting()
@@ -221,6 +286,8 @@ void
 TestFormatting()
 {
   TestXMLStrings();
+  TestXMLPeriods();
+  TestGUIDs();
   TestingNames();
   TestSQLFormatting();
   TestMJD();

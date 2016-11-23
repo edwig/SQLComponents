@@ -1097,7 +1097,11 @@ SQLInterval::ParseInterval(CString p_duration)
                 break;
       case 'D': m_interval.intval.day_second.day  = value;
                 break;
-      case 'H': m_interval.intval.day_second.hour = value;
+      case 'H': if(!didTime)
+                {
+                  throw CString("Illegal duriation period (hours without a 'T')");
+                }
+                m_interval.intval.day_second.hour = value;
                 break;
       case 'M': if(didTime)
                 {
@@ -1109,7 +1113,11 @@ SQLInterval::ParseInterval(CString p_duration)
                   m_interval.intval.year_month.month = value;
                 }
                 break;
-      case 'S': m_interval.intval.day_second.second   = value;
+      case 'S': if(!didTime)
+                {
+                  throw CString("Illegal duration period (seconds without a 'T')");
+                }
+                m_interval.intval.day_second.second   = value;
                 m_interval.intval.day_second.fraction = fraction;
                 break;
       default:  // Illegal string, leave interval at NULL
@@ -1141,7 +1149,9 @@ SQLInterval::ParseInterval(CString p_duration)
   {
     // Beware: XML duration has combinations that are NOT compatible
     // with the SQL definition of an interval, like Month-to-Day
-    return false;  // Leave at NULL
+    CString error;
+    error.Format("XML duration period not compatible with SQL (%c to %c)",firstMarker,lastMarker);
+    throw error;
   }
 
   // Found everything: wrap up

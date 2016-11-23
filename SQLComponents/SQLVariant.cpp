@@ -124,16 +124,24 @@ SQLVariant::SQLVariant()
   Init();
 }
 
+// XTOR reserving space for a string
 SQLVariant::SQLVariant(int p_type,int p_space)
 {
   Init();
   ReserveSpace(p_type,p_space);
 }
 
+// XTOR from SQLVariant pointer
 SQLVariant::SQLVariant(SQLVariant* that)
 {
   // Use assignment operator
   *this = *that;
+}
+
+// XTOR From another SQLVariant reference
+SQLVariant::SQLVariant(const SQLVariant& p_var)
+{
+  *this = p_var;
 }
 
 // XTOR SQL_C_CHAR
@@ -453,7 +461,7 @@ bool
 SQLVariant::IsEmpty()
 {
   int len = 0;
-  unsigned char* data = (unsigned char*)m_data.m_dataSHORT;
+  unsigned char* data = (unsigned char*)&m_data.m_dataSHORT;
   switch(m_datatype)
   {
     case SQL_C_CHAR:    return ((m_data.m_dataCHAR == NULL) || (m_data.m_dataCHAR != NULL && m_data.m_dataCHAR[0] == 0));
@@ -1999,7 +2007,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
     case SQL_C_NUMERIC:                   StringToNumeric(p_data,&m_data.m_dataNUMERIC);
                                           break;
     case SQL_C_GUID:                      //aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee 
-                                          scannum = scanf("{%lX-%hX-%hX-%2hhX%2hhX-%2hhX%2hhX%2hhX%2hhX%2hhX%2hhX}"
+                                          scannum = sscanf(p_data,"{%lX-%hX-%hX-%2hhX%2hhX-%2hhX%2hhX%2hhX%2hhX%2hhX%2hhX}"
                                                           ,&m_data.m_dataGUID.Data1 
                                                           ,&m_data.m_dataGUID.Data2 
                                                           ,&m_data.m_dataGUID.Data3 
@@ -2923,7 +2931,7 @@ SQLVariant::DoubleToBIGINT(double p_value)
 SQLBIGINT 
 SQLVariant::UBIGINTToBIGINT(SQLUBIGINT p_value)
 {
-  if(p_value > LLONG_MAX || p_value < LLONG_MIN)
+  if(p_value > LLONG_MAX)
   {
     ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_SBIGINT);
   }
