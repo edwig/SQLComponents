@@ -29,6 +29,7 @@
 #include "SQLDate.h"
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
+#include "bcd.h"
 #include <math.h>
 #include <float.h>
 #include <limits.h>
@@ -409,6 +410,23 @@ SQLVariant::SQLVariant(SQLInterval* p_interval)
     m_indicator = 0;
     p_interval->AsIntervalStruct(&m_data.m_dataINTERVAL);
   }
+}
+
+SQLVariant::SQLVariant(bcd* p_bcd,unsigned p_precision /*=36*/,unsigned p_scale /*=2*/)
+{
+  Init();
+  m_datatype    = SQL_C_NUMERIC;
+  m_sqlDatatype = SQL_NUMERIC;
+  m_indicator   = 0;
+  if(p_precision > SQLNUM_MAX_PREC)
+  {
+    p_precision = SQLNUM_MAX_PREC;
+  }
+  if(p_scale > p_precision)
+  {
+    p_scale = p_precision - 1;
+  }
+  p_bcd->AsNumeric(&m_data.m_dataNUMERIC,p_precision,p_scale);
 }
 
 // GENERAL DTOR
@@ -1872,9 +1890,61 @@ SQLVariant::GetFraction()
   {
     case SQL_C_TIMESTAMP:       // Fall through
     case SQL_C_TYPE_TIMESTAMP:  return 6;
-    case SQL_C_NUMERIC:         return m_data.m_dataNUMERIC.precision;
+    case SQL_C_NUMERIC:         return m_data.m_dataNUMERIC.scale;
   }
   return 0;
+}
+
+bcd
+SQLVariant::GetAsBCD()
+{
+  switch(m_datatype)
+  {
+    case SQL_C_CHAR:     return bcd(atoi(m_data.m_dataCHAR));
+    case SQL_C_SSHORT:   // fall through
+    case SQL_C_SHORT:    return bcd(m_data.m_dataSHORT);
+    case SQL_C_USHORT:   return bcd(m_data.m_dataUSHORT);
+    case SQL_C_LONG:     // fall through
+    case SQL_C_SLONG:    return bcd(m_data. m_dataLONG);
+    case SQL_C_ULONG:    return bcd((int64) m_data.m_dataULONG);
+    case SQL_C_FLOAT:    return bcd((double)m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return bcd(m_data.m_dataDOUBLE);
+    case SQL_C_BIT:      return bcd((short) m_data.m_dataBIT);
+    case SQL_C_TINYINT:  // fall through
+    case SQL_C_STINYINT: return bcd(m_data.m_dataTINYINT);
+    case SQL_C_UTINYINT: return bcd((short)m_data.m_dataUTINYINT);
+    case SQL_C_SBIGINT:  return bcd(m_data.m_dataSBIGINT);
+    case SQL_C_UBIGINT:  return bcd(m_data.m_dataUBIGINT);
+    case SQL_C_NUMERIC:  return bcd(&m_data.m_dataNUMERIC);
+
+    case SQL_C_BINARY:                    // Fall through
+    case SQL_C_GUID:                      // Fall through
+    case SQL_C_DATE:                      // Fall through
+    case SQL_C_TYPE_DATE:                 // Fall through
+    case SQL_C_TIME:                      // Fall through
+    case SQL_C_TYPE_TIME:                 // Fall through
+    case SQL_C_TIMESTAMP:                 // Fall through
+    case SQL_C_TYPE_TIMESTAMP:            // Fall through
+    case SQL_C_INTERVAL_YEAR:             // Fall through
+    case SQL_C_INTERVAL_MONTH:            // Fall through
+    case SQL_C_INTERVAL_DAY:              // Fall through
+    case SQL_C_INTERVAL_HOUR:             // Fall through
+    case SQL_C_INTERVAL_MINUTE:           // Fall through
+    case SQL_C_INTERVAL_SECOND:           // Fall through
+    case SQL_C_INTERVAL_YEAR_TO_MONTH:    // Fall through
+    case SQL_C_INTERVAL_DAY_TO_HOUR:      // Fall through
+    case SQL_C_INTERVAL_DAY_TO_MINUTE:    // Fall through
+    case SQL_C_INTERVAL_DAY_TO_SECOND:    // Fall through
+    case SQL_C_INTERVAL_HOUR_TO_MINUTE:   // Fall through
+    case SQL_C_INTERVAL_HOUR_TO_SECOND:   // Fall through
+    case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
+    default:                              break;
+  }
+  ThrowErrorDatatype(SQL_C_NUMERIC);
+  // We never come here, but this is to prevent 
+  // Warning C4715 not all control paths return a value
+  // In various versions of the MSC++ compiler
+  return NULL; 
 }
 
 // Some databases (Oracle) need to know the size of the data member

@@ -143,6 +143,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="BasicXmlExcel.cpp" />
+    <ClCompile Include="bcd.cpp">
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Level4</WarningLevel>
+    </ClCompile>
     <ClCompile Include="SQLAssociation.cpp" />
     <ClCompile Include="SQLColumnInfo.cpp" />
     <ClCompile Include="SQLDatabase.cpp" />
@@ -205,6 +208,7 @@
   <ItemGroup>
     <ClInclude Include="BasicExcel.h" />
     <ClInclude Include="BasicXmlExcel.h" />
+    <ClInclude Include="bcd.h" />
     <ClInclude Include="ExcelFormat.h" />
     <ClInclude Include="Locker.h" />
     <ClInclude Include="SQLAssociation.h" />

@@ -318,6 +318,14 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("Testing the InfoTree function:");
       Logger::WriteMessage("==============================");
       CTreeCtrl ctrl;
+      CRect rect(0,0,0,0);
+      CWnd* wnd = CWnd::FromHandle(GetDesktopWindow());
+
+      if(!ctrl.Create(WS_CHILD | WS_TABSTOP | TVS_LINESATROOT | TVS_HASBUTTONS | TVS_HASLINES | TVS_SHOWSELALWAYS
+                     ,rect,wnd,1004))
+      {
+        Assert::Fail(L"Cannot create tree control");
+      }
 
       SQLDatabase dbs;
       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");

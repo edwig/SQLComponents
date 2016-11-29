@@ -33,6 +33,10 @@
 #define SQLNUM_TRUNC_WHOLE 2
 // Max length of a NUMERIC in a char buffer
 #define SQLNUM_MAXLEN      65
+// Max precision of a NUMERIC as a bcd (Binary Coded Decimal)
+#define SQLNUM_MAX_PREC    36
+// The default scaling of a NUMERIC
+#define SQLNUM_DEF_SCALE    2
 
 typedef struct _types
 {
@@ -47,6 +51,7 @@ extern DataTypes allOther[];
 extern DataTypes allParams[];
 
 // Forwarded declarations
+class bcd;
 class SQLDate;
 class SQLTime;
 class SQLTimestamp;
@@ -92,6 +97,7 @@ public:
    SQLVariant(SQLTime* p_time);               // SQLTime
    SQLVariant(SQLTimestamp* p_stamp);         // SQLTimestamp
    SQLVariant(SQLInterval* p_interval);       // SQLInterval
+   SQLVariant(bcd* p_bcd,unsigned p_precision = SQLNUM_MAX_PREC,unsigned p_scale = SQLNUM_DEF_SCALE);  // Binary Coded Decimal
    // Destructor
   ~SQLVariant();
    void Init(); // Init empty
@@ -163,6 +169,7 @@ public:
    SQLTime              GetAsSQLTime();
    SQLTimestamp         GetAsSQLTimestamp();
    SQLInterval          GetAsSQLInterval();
+   bcd                  GetAsBCD();
 
    // Assignment operator
    SQLVariant& operator  =(const SQLVariant& p_original);

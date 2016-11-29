@@ -150,6 +150,9 @@
     <ClCompile Include="SQLVariantOperatorMod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bcd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Locker.h">
@@ -306,6 +309,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SQLVariantOperatorMod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bcd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
