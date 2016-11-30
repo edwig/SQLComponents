@@ -210,6 +210,18 @@
    SQLVariant OperNumMulUBig     (SQLVariant& p_right);
    SQLVariant OperIntYMMulUBig   (SQLVariant& p_right);
    SQLVariant OperIntDSMulUBig   (SQLVariant& p_right);
-   SQLVariant OperVarMulNum      (SQLVariant& p_right);  // TYPE == NUMERIC
-   SQLVariant OperIntYMMulNum    (SQLVariant& p_right);
-   SQLVariant OperIntDSMulNum    (SQLVariant& p_right);
+   SQLVariant OperCharMulNum     (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperSShortMulNum   (SQLVariant& p_right);
+   SQLVariant OperUShortMulNum   (SQLVariant& p_right);
+   SQLVariant OperSLongMulNum    (SQLVariant& p_right);
+   SQLVariant OperULongMulNum    (SQLVariant& p_right);
+   SQLVariant OperFloatMulNum    (SQLVariant& p_right);
+   SQLVariant OperDoubleMulNum   (SQLVariant& p_right);
+   SQLVariant OperBitMulNum      (SQLVariant& p_right);
+   SQLVariant OperSTinyMulNum    (SQLVariant& p_right);
+   SQLVariant OperUTinyMulNum    (SQLVariant& p_right);
+   SQLVariant OperSBigMulNum     (SQLVariant& p_right);
+   SQLVariant OperUBigMulNum     (SQLVariant& p_right);
+   SQLVariant OperNumMulNum      (SQLVariant& p_right);
+   SQLVariant OperIntYMMulNum    (SQLVariant& p_right);  // TYPE == Interval YEAR-MONTH
+   SQLVariant OperIntDSMulNum    (SQLVariant& p_right);  // TYPE == Interval DAY-SECOND

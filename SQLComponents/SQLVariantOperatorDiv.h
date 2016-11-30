@@ -210,6 +210,18 @@
    SQLVariant OperNumDivUBig     (SQLVariant& p_right);
    SQLVariant OperIntYMDivUBig   (SQLVariant& p_right);
    SQLVariant OperIntDSDivUBig   (SQLVariant& p_right);
-   SQLVariant OperVarDivNum      (SQLVariant& p_right);  // TYPE == NUMERIC
-   SQLVariant OperIntYMDivNum    (SQLVariant& p_right);
+   SQLVariant OperCharDivNum     (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperSShortDivNum   (SQLVariant& p_right);
+   SQLVariant OperUShortDivNum   (SQLVariant& p_right);
+   SQLVariant OperSLongDivNum    (SQLVariant& p_right);
+   SQLVariant OperULongDivNum    (SQLVariant& p_right);
+   SQLVariant OperFloatDivNum    (SQLVariant& p_right);
+   SQLVariant OperDoubleDivNum   (SQLVariant& p_right);
+   SQLVariant OperBitDivNum      (SQLVariant& p_right);
+   SQLVariant OperSTinyDivNum    (SQLVariant& p_right);
+   SQLVariant OperUTinyDivNum    (SQLVariant& p_right);
+   SQLVariant OperSBigDivNum     (SQLVariant& p_right);
+   SQLVariant OperUBigDivNum     (SQLVariant& p_right);
+   SQLVariant OperNumDivNum      (SQLVariant& p_right);
+   SQLVariant OperIntYMDivNum    (SQLVariant& p_right);  
    SQLVariant OperIntDSDivNum    (SQLVariant& p_right);

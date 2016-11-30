@@ -28,6 +28,7 @@
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
+#include "bcd.h"
 
 // The concise datatype is used to scale the ODBC datatypes to a short integer
 // that can be used in the arrays of functions for the comparison and mathematical operators
@@ -340,7 +341,7 @@ SQLVariant&
 SQLVariant::operator=(SQLDate& p_data)
 {
   Init();
-  m_datatype = SQL_C_DATE;
+  m_datatype    = SQL_C_DATE;
   m_sqlDatatype = SQL_DATE;
 
   if(p_data.IsNull())
@@ -359,7 +360,7 @@ SQLVariant&
 SQLVariant::operator=(SQLTime& p_data)
 {
   Init();
-  m_datatype = SQL_C_TIME;
+  m_datatype    = SQL_C_TIME;
   m_sqlDatatype = SQL_TIME;
 
   if(p_data.IsNull())
@@ -379,7 +380,7 @@ SQLVariant&
 SQLVariant::operator=(SQLTimestamp& p_data)
 {
   Init();
-  m_datatype = SQL_C_TIMESTAMP;
+  m_datatype    = SQL_C_TIMESTAMP;
   m_sqlDatatype = SQL_TIMESTAMP;
 
   if(p_data.IsNull())
@@ -410,5 +411,30 @@ SQLVariant::operator=(SQLInterval& p_data)
     m_indicator = 0;
     p_data.AsIntervalStruct(&m_data.m_dataINTERVAL);
   }
+  return *this;
+}
+
+// Binary Coded Decimal
+SQLVariant& 
+SQLVariant::operator=(bcd& p_bcd)
+{
+  Init();
+  m_datatype    = SQL_C_NUMERIC;
+  m_sqlDatatype = SQL_NUMERIC;
+  m_indicator   = 0;
+
+  int prec  = p_bcd.GetExponent() + 1;  // Exponent 0 = 1 digit before the decimal point
+  int scale = p_bcd.GetPrecision();     // Digits after the decimal point
+
+  // At least 1 digit before the decimal point
+  if(prec < 1)
+  {
+    prec = 1;
+  }
+  // precision scaling of a numeric = prec + scale
+  prec += scale;
+
+  p_bcd.AsNumeric(&m_data.m_dataNUMERIC,prec,scale);
+
   return *this;
 }

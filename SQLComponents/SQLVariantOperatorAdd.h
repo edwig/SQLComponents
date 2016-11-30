@@ -190,7 +190,19 @@
    SQLVariant OperSBigAddUBig    (SQLVariant& p_right);
    SQLVariant OperUBigAddUBig    (SQLVariant& p_right);
    SQLVariant OperNumAddUBig     (SQLVariant& p_right);
-   SQLVariant OperVarAddNum      (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperCharAddNum     (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperSShortAddNum   (SQLVariant& p_right);
+   SQLVariant OperUShortAddNum   (SQLVariant& p_right);
+   SQLVariant OperSLongAddNum    (SQLVariant& p_right);
+   SQLVariant OperULongAddNum    (SQLVariant& p_right);
+   SQLVariant OperFloatAddNum    (SQLVariant& p_right);
+   SQLVariant OperDoubleAddNum   (SQLVariant& p_right);
+   SQLVariant OperBitAddNum      (SQLVariant& p_right);
+   SQLVariant OperSTinyAddNum    (SQLVariant& p_right);
+   SQLVariant OperUTinyAddNum    (SQLVariant& p_right);
+   SQLVariant OperSBigAddNum     (SQLVariant& p_right);
+   SQLVariant OperUBigAddNum     (SQLVariant& p_right);
+   SQLVariant OperNumAddNum      (SQLVariant& p_right);
    SQLVariant OperTimeAddDate    (SQLVariant& p_right);  // TYPE == DATE
    SQLVariant OperIntDSAddDate   (SQLVariant& p_right); 
    SQLVariant OperDateAddTime    (SQLVariant& p_right);  // TYPE == TIME

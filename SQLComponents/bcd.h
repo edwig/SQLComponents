@@ -102,6 +102,9 @@ public:
   // Assignment-constructor of class bcd.
   bcd(const CString& p_string,bool p_fromDB = false);
 
+  // BCD From a character string
+  bcd(const char* p_string,bool p_fromDB = false);
+
   // BCD from a SQL_NUMERIC_STRUCT
   bcd(const SQL_NUMERIC_STRUCT* p_numeric);
 
@@ -212,6 +215,8 @@ public:
   long    AsLong() const;
   // Get as a 64bits long
   int64   AsInt64() const;
+  // Get as an unsigned 64 bits long
+  uint64  AsUInt64() const;
   // Get as a mathematical string
   CString AsString(int p_format = Bookkeeping,bool p_printPositive = false) const;
   // Get as a display string (by desktop locale)

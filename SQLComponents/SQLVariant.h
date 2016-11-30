@@ -29,8 +29,8 @@
 #include "SQLVariantOperator.h"
 
 // Truncation types in SQL_NUMERIC_STRUCT conversions
-#define SQLNUM_TRUNC_FRAC  1
-#define SQLNUM_TRUNC_WHOLE 2
+#define SQLNUM_TRUNC_FRAC   1
+#define SQLNUM_TRUNC_WHOLE  2
 // Max length of a NUMERIC in a char buffer
 #define SQLNUM_MAXLEN      65
 // Max precision of a NUMERIC as a bcd (Binary Coded Decimal)
@@ -38,6 +38,7 @@
 // The default scaling of a NUMERIC
 #define SQLNUM_DEF_SCALE    2
 
+// Translation list of SQL datatype constants and names
 typedef struct _types
 {
   char*  name;
@@ -198,6 +199,7 @@ public:
    SQLVariant& operator  =(SQLTime& p_data);                 // SQLTime
    SQLVariant& operator  =(SQLTimestamp& p_data);            // SQLTimestamp
    SQLVariant& operator  =(SQLInterval& p_data);             // SQLInterval
+   SQLVariant& operator  =(bcd& p_bcd);                      // Binary Coded Decimal
 
    // Comparison operators
    bool        operator ==(SQLVariant& p_right);
@@ -220,17 +222,7 @@ private:
    // Internal conversions
    bool    StringToBinary (const char* p_data);
    bool    BinaryToString (unsigned char* buffer,int buflen);
-   void    StringToNumeric(const char* p_data,SQL_NUMERIC_STRUCT* p_numeric);
-   void    NumericToString(SQL_NUMERIC_STRUCT* p_numeric,CString& p_string);
-   void    StringToNumericMantissa(const char*         numstr
-                                  ,SQL_NUMERIC_STRUCT* sqlnum
-                                  ,int*                overflow_ptr);
-   void    NumericToStringMantissa(SQL_NUMERIC_STRUCT* sqlnum
-                                  ,SQLCHAR*            numstr
-                                  ,SQLCHAR**           numbegin
-                                  ,SQLCHAR             reqprec
-                                  ,SQLSCHAR            reqscale
-                                  ,int*                truncptr);
+
    // Internal conversion and trimming
    // Used for requesting a value as another type
    // and for the operators where both sides have different types

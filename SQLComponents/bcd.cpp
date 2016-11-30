@@ -19,6 +19,12 @@
 #include "bcd.h"
 #include <math.h> // Still needed for conversions of double
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CONSTRUCTORS OF BCD
@@ -103,6 +109,16 @@ bcd::bcd(const double p_value)
 //              p_fromDB -> Input comes from a database (always American format)
 bcd::bcd(const CString& p_string,bool p_fromDB /*= false*/)
 {
+  SetValueString(p_string,p_fromDB);
+}
+
+// BCD From a character string
+// Description: Assignment-constructor from an elementary character data pointer
+// Parameters:  p_string -> Input character pointer (containing a number)
+//              p_fromDB -> Input comes from a  database (always American format)
+bcd::bcd(const char* p_string,bool p_fromDB /*= false*/)
+{
+  CString str(p_string);
   SetValueString(p_string,p_fromDB);
 }
 
@@ -1577,6 +1593,50 @@ bcd::AsInt64() const
   {
     result2 = -result2;
   }
+  return result2;
+}
+
+// Get as an unsigned 64 bits long
+uint64  
+bcd::AsUInt64() const
+{
+  // Check for negative
+  if(m_sign == Negative)
+  {
+    throw CString("BCD: Cannot convert a negative number to an unsigned 64 bits integer");
+  }
+  // Quick optimization for really small numbers
+  if(m_exponent < 0)
+  {
+    return 0L;
+  }
+  uint64 carry   = 0L;
+  uint64 result1 = 0L;
+  uint64 result2 = 0L;
+  int exponent   = 4 * bcdDigits - m_exponent - 1;
+  uint64 base2   = (uint64)bcdBase * ((uint64)bcdBase);
+  uint64 base    = base2 / 10;
+
+  // Get from the mantissa
+  result1 = ((uint64)m_mantissa[0] * bcdBase) + ((uint64)m_mantissa[1]);
+  result2 = ((uint64)m_mantissa[2] * bcdBase) + ((uint64)m_mantissa[3]);
+
+  // Adjust to exponent
+  while(exponent--)
+  {
+    carry    = result1 %10;
+    result1 /= 10;
+    result2 /= 10;
+    result2 += carry * base;
+  }
+
+  // Take care of overflow
+  if(result1 > (ULLONG_MAX / base2))
+  {
+    throw CString("BCD: Overflow in conversion to 64 bits unsigned integer number.");
+  }
+  result2 += (result1 * base2);
+
   return result2;
 }
 

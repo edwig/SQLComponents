@@ -28,34 +28,35 @@
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
+#include "bcd.h"
 
 #pragma warning (disable: 4239)
 
 CalculateFunctionArray
 SQLVariant::OperatorMul[CT_LAST][CT_LAST] =
 {
-                         // CT_CHAR                        CT_SSHORT                        CT_USHORT                        CT_SLONG                        CT_ULONG                        CT_FLOAT                        CT_DOUBLE                        CT_BIT                        CT_STINYINT                     CT_UTINYINT                     CT_SBIGINT                     CT_UBIGINT                     CT_NUMERIC                   CT_GUID  CT_BINARY CT_DATE  CT_TIME  CT_TIMESTAMP CT_INTERVAL_YM CT_INTERVAL_DS
-                         // ------------------------------ -------------------------------- -------------------------------- ------------------------------- ------------------------------- ------------------------------- -------------------------------- ----------------------------- ------------------------------- ------------------------------- ------------------------------ ------------------------------ ---------------------------- -------- --------- -------- -------- ------------ -------------- --------------
-  /* CT_CHAR        */   {  nullptr                       ,&SQLVariant::OperCharMulSShort  ,&SQLVariant::OperCharMulUShort  ,&SQLVariant::OperCharMulSLong  ,&SQLVariant::OperCharMulULong  ,&SQLVariant::OperCharMulFloat  ,&SQLVariant::OperCharMulDouble  ,&SQLVariant::OperCharMulBit  ,&SQLVariant::OperCharMulSTiny  ,&SQLVariant::OperCharMulUTiny  ,&SQLVariant::OperCharMulSBig  ,&SQLVariant::OperCharMulUBig  ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_SSHORT      */  ,{  &SQLVariant::OperSShortMulChar,&SQLVariant::OperSShortMulSShort,&SQLVariant::OperSShortMulUShort,&SQLVariant::OperSShortMulSLong,&SQLVariant::OperSShortMulULong,&SQLVariant::OperSShortMulFloat,&SQLVariant::OperSShortMulDouble,&SQLVariant::OperSShortMulBit,&SQLVariant::OperSShortMulSTiny,&SQLVariant::OperSShortMulUTiny,&SQLVariant::OperSShortMulSBig,&SQLVariant::OperSShortMulUBig,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_USHORT      */  ,{  &SQLVariant::OperUShortMulChar,&SQLVariant::OperUShortMulSShort,&SQLVariant::OperUShortMulUShort,&SQLVariant::OperUShortMulSLong,&SQLVariant::OperUShortMulULong,&SQLVariant::OperUShortMulFloat,&SQLVariant::OperUShortMulDouble,&SQLVariant::OperUShortMulBit,&SQLVariant::OperUShortMulSTiny,&SQLVariant::OperUShortMulUTiny,&SQLVariant::OperUShortMulSBig,&SQLVariant::OperUShortMulUBig,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_SLONG       */  ,{  &SQLVariant::OperSLongMulChar ,&SQLVariant::OperSLongMulSShort ,&SQLVariant::OperSLongMulUShort ,&SQLVariant::OperSLongMulSLong ,&SQLVariant::OperSLongMulULong ,&SQLVariant::OperSLongMulFloat ,&SQLVariant::OperSLongMulDouble ,&SQLVariant::OperSLongMulBit ,&SQLVariant::OperSLongMulSTiny ,&SQLVariant::OperSLongMulUTiny ,&SQLVariant::OperSLongMulSBig ,&SQLVariant::OperSLongMulUBig ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_ULONG       */  ,{  &SQLVariant::OperULongMulChar ,&SQLVariant::OperULongMulSShort ,&SQLVariant::OperUlongMulUShort ,&SQLVariant::OperULongMulSLong ,&SQLVariant::OperULongMulULong ,&SQLVariant::OperULongMulFloat ,&SQLVariant::OperULongMulDouble ,&SQLVariant::OperULongMulBit ,&SQLVariant::OperULongMulSTiny ,&SQLVariant::OperULongMulUTiny ,&SQLVariant::OperULongMulSBig ,&SQLVariant::OperULongMulUBig ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_FLOAT       */  ,{  &SQLVariant::OperFloatMulChar ,&SQLVariant::OperFloatMulSShort ,&SQLVariant::OperFloatMulUShort ,&SQLVariant::OperFloatMulSLong ,&SQLVariant::OperFloatMulULong ,&SQLVariant::OperFloatMulFloat ,&SQLVariant::OperFloatMulDouble ,&SQLVariant::OperFloatMulBit ,&SQLVariant::OperFloatMulSTiny ,&SQLVariant::OperFloatMulUTiny ,&SQLVariant::OperFloatMulSBig ,&SQLVariant::OperFloatMulUBig ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_DOUBLE      */  ,{  &SQLVariant::OperDoubleMulChar,&SQLVariant::OperDoubleMulSShort,&SQLVariant::OperDoubleMulUShort,&SQLVariant::OperDoubleMulSLong,&SQLVariant::OperDoubleMulULong,&SQLVariant::OperDoubleMulFloat,&SQLVariant::OperDoubleMulDouble,&SQLVariant::OperDoubleMulBit,&SQLVariant::OperDoubleMulSTiny,&SQLVariant::OperDoubleMulUTiny,&SQLVariant::OperDoubleMulSBig,&SQLVariant::OperDoubleMulUBig,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_BIT         */  ,{  &SQLVariant::OperBitMulChar   ,&SQLVariant::OperBitMulSShort   ,&SQLVariant::OperBitMulUShort   ,&SQLVariant::OperBitMulSLong   ,&SQLVariant::OperBitMulULong   ,&SQLVariant::OperBitMulFloat   ,&SQLVariant::OperBitMulDouble   ,&SQLVariant::OperBitMulBit   ,&SQLVariant::OperBitMulSTiny   ,&SQLVariant::OperBitMulUTiny   ,&SQLVariant::OperBitMulSBig   ,&SQLVariant::OperBitMulUBig   ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_STINYINT    */  ,{  &SQLVariant::OperSTinyMulChar ,&SQLVariant::OperSTinyMulSShort ,&SQLVariant::OperSTinyMulUShort ,&SQLVariant::OperSTinyMulSLong ,&SQLVariant::OperSTinyMulULong ,&SQLVariant::OperSTinyMulFloat ,&SQLVariant::OperSTinyMulDouble ,&SQLVariant::OperSTinyMulBit ,&SQLVariant::OperSTinyMulSTiny ,&SQLVariant::OperSTinyMulUTiny ,&SQLVariant::OperSTinyMulSBig ,&SQLVariant::OperSTinyMulUBig ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_UTINYINT    */  ,{  &SQLVariant::OperUTinyMulChar ,&SQLVariant::OperUTinyMulSShort ,&SQLVariant::OperUTinyMulUShort ,&SQLVariant::OperUTinyMulSLong ,&SQLVariant::OperUTinyMulULong ,&SQLVariant::OperUTinyMulFloat ,&SQLVariant::OperUTinyMulDouble ,&SQLVariant::OperUTinyMulBit ,&SQLVariant::OperUTinyMulSTiny ,&SQLVariant::OperUTinyMulUTiny ,&SQLVariant::OperUTinyMulSBig ,&SQLVariant::OperUTinyMulUBig ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_SBIGINT     */  ,{  &SQLVariant::OperSBigMulChar  ,&SQLVariant::OperSBigMulSShort  ,&SQLVariant::OperSBigMulUShort  ,&SQLVariant::OperSBigMulSLong  ,&SQLVariant::OperSBigMulULong  ,&SQLVariant::OperSBigMulFloat  ,&SQLVariant::OperSBigMulDouble  ,&SQLVariant::OperSBigMulBit  ,&SQLVariant::OperSBigMulSTiny  ,&SQLVariant::OperSBigMulUTiny  ,&SQLVariant::OperSBigMulSBig  ,&SQLVariant::OperSBigMulUBig  ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_UBIGINT     */  ,{  &SQLVariant::OperUBigMulChar  ,&SQLVariant::OperUBigMulSShort  ,&SQLVariant::OperUBigMulUShort  ,&SQLVariant::OperUBigMulSLong  ,&SQLVariant::OperUBigMulULong  ,&SQLVariant::OperUBigMulFloat  ,&SQLVariant::OperUBigMulDouble  ,&SQLVariant::OperUBigMulBit  ,&SQLVariant::OperUBigMulSTiny  ,&SQLVariant::OperUBigMulUTiny  ,&SQLVariant::OperUBigMulSBig  ,&SQLVariant::OperUBigMulUBig  ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_NUMERIC     */  ,{  &SQLVariant::OperNumMulChar   ,&SQLVariant::OperNumMulSShort   ,&SQLVariant::OperNumMulUShort   ,&SQLVariant::OperNumMulSLong   ,&SQLVariant::OperNumMulULong   ,&SQLVariant::OperNumMulFloat   ,&SQLVariant::OperNumMulDouble   ,&SQLVariant::OperNumMulBit   ,&SQLVariant::OperNumMulSTiny   ,&SQLVariant::OperNumMulUTiny   ,&SQLVariant::OperNumMulSBig   ,&SQLVariant::OperNumMulUBig   ,&SQLVariant::OperVarMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_GUID        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                     ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_BINARY      */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                     ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_DATE        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                     ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_TIME        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                     ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_TIMESTAMP   */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                     ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_INTERVAL_YM */  ,{  nullptr                       ,&SQLVariant::OperIntYMMulSShort ,&SQLVariant::OperIntYMMulUShort ,&SQLVariant::OperIntYMMulSLong ,&SQLVariant::OperIntYMMulULong ,&SQLVariant::OperIntYMMulFloat ,&SQLVariant::OperIntYMMulDouble ,&SQLVariant::OperIntYMMulBit ,&SQLVariant::OperIntYMMulSTiny ,&SQLVariant::OperIntYMMulUTiny ,&SQLVariant::OperIntYMMulSBig ,&SQLVariant::OperIntYMMulUBig ,&SQLVariant::OperIntYMMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_INTERVAL_DS */  ,{  nullptr                       ,&SQLVariant::OperIntDSMulSShort ,&SQLVariant::OperIntDSMulUShort ,&SQLVariant::OperIntDSMulSLong ,&SQLVariant::OperIntDSMulULong ,&SQLVariant::OperIntDSMulFloat ,&SQLVariant::OperIntDSMulDouble ,&SQLVariant::OperIntDSMulBit ,&SQLVariant::OperIntDSMulSTiny ,&SQLVariant::OperIntDSMulUTiny ,&SQLVariant::OperIntDSMulSBig ,&SQLVariant::OperIntDSMulUBig ,&SQLVariant::OperIntDSMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+                         // CT_CHAR                        CT_SSHORT                        CT_USHORT                        CT_SLONG                        CT_ULONG                        CT_FLOAT                        CT_DOUBLE                        CT_BIT                        CT_STINYINT                     CT_UTINYINT                     CT_SBIGINT                     CT_UBIGINT                     CT_NUMERIC                    CT_GUID  CT_BINARY CT_DATE  CT_TIME  CT_TIMESTAMP CT_INTERVAL_YM CT_INTERVAL_DS
+                         // ------------------------------ -------------------------------- -------------------------------- ------------------------------- ------------------------------- ------------------------------- -------------------------------- ----------------------------- ------------------------------- ------------------------------- ------------------------------ ------------------------------ ----------------------------- -------- --------- -------- -------- ------------ -------------- --------------
+  /* CT_CHAR        */   {  nullptr                       ,&SQLVariant::OperCharMulSShort  ,&SQLVariant::OperCharMulUShort  ,&SQLVariant::OperCharMulSLong  ,&SQLVariant::OperCharMulULong  ,&SQLVariant::OperCharMulFloat  ,&SQLVariant::OperCharMulDouble  ,&SQLVariant::OperCharMulBit  ,&SQLVariant::OperCharMulSTiny  ,&SQLVariant::OperCharMulUTiny  ,&SQLVariant::OperCharMulSBig  ,&SQLVariant::OperCharMulUBig  ,&SQLVariant::OperCharMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_SSHORT      */  ,{  &SQLVariant::OperSShortMulChar,&SQLVariant::OperSShortMulSShort,&SQLVariant::OperSShortMulUShort,&SQLVariant::OperSShortMulSLong,&SQLVariant::OperSShortMulULong,&SQLVariant::OperSShortMulFloat,&SQLVariant::OperSShortMulDouble,&SQLVariant::OperSShortMulBit,&SQLVariant::OperSShortMulSTiny,&SQLVariant::OperSShortMulUTiny,&SQLVariant::OperSShortMulSBig,&SQLVariant::OperSShortMulUBig,&SQLVariant::OperSShortMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_USHORT      */  ,{  &SQLVariant::OperUShortMulChar,&SQLVariant::OperUShortMulSShort,&SQLVariant::OperUShortMulUShort,&SQLVariant::OperUShortMulSLong,&SQLVariant::OperUShortMulULong,&SQLVariant::OperUShortMulFloat,&SQLVariant::OperUShortMulDouble,&SQLVariant::OperUShortMulBit,&SQLVariant::OperUShortMulSTiny,&SQLVariant::OperUShortMulUTiny,&SQLVariant::OperUShortMulSBig,&SQLVariant::OperUShortMulUBig,&SQLVariant::OperUShortMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_SLONG       */  ,{  &SQLVariant::OperSLongMulChar ,&SQLVariant::OperSLongMulSShort ,&SQLVariant::OperSLongMulUShort ,&SQLVariant::OperSLongMulSLong ,&SQLVariant::OperSLongMulULong ,&SQLVariant::OperSLongMulFloat ,&SQLVariant::OperSLongMulDouble ,&SQLVariant::OperSLongMulBit ,&SQLVariant::OperSLongMulSTiny ,&SQLVariant::OperSLongMulUTiny ,&SQLVariant::OperSLongMulSBig ,&SQLVariant::OperSLongMulUBig ,&SQLVariant::OperSLongMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_ULONG       */  ,{  &SQLVariant::OperULongMulChar ,&SQLVariant::OperULongMulSShort ,&SQLVariant::OperUlongMulUShort ,&SQLVariant::OperULongMulSLong ,&SQLVariant::OperULongMulULong ,&SQLVariant::OperULongMulFloat ,&SQLVariant::OperULongMulDouble ,&SQLVariant::OperULongMulBit ,&SQLVariant::OperULongMulSTiny ,&SQLVariant::OperULongMulUTiny ,&SQLVariant::OperULongMulSBig ,&SQLVariant::OperULongMulUBig ,&SQLVariant::OperULongMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_FLOAT       */  ,{  &SQLVariant::OperFloatMulChar ,&SQLVariant::OperFloatMulSShort ,&SQLVariant::OperFloatMulUShort ,&SQLVariant::OperFloatMulSLong ,&SQLVariant::OperFloatMulULong ,&SQLVariant::OperFloatMulFloat ,&SQLVariant::OperFloatMulDouble ,&SQLVariant::OperFloatMulBit ,&SQLVariant::OperFloatMulSTiny ,&SQLVariant::OperFloatMulUTiny ,&SQLVariant::OperFloatMulSBig ,&SQLVariant::OperFloatMulUBig ,&SQLVariant::OperFloatMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_DOUBLE      */  ,{  &SQLVariant::OperDoubleMulChar,&SQLVariant::OperDoubleMulSShort,&SQLVariant::OperDoubleMulUShort,&SQLVariant::OperDoubleMulSLong,&SQLVariant::OperDoubleMulULong,&SQLVariant::OperDoubleMulFloat,&SQLVariant::OperDoubleMulDouble,&SQLVariant::OperDoubleMulBit,&SQLVariant::OperDoubleMulSTiny,&SQLVariant::OperDoubleMulUTiny,&SQLVariant::OperDoubleMulSBig,&SQLVariant::OperDoubleMulUBig,&SQLVariant::OperDoubleMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_BIT         */  ,{  &SQLVariant::OperBitMulChar   ,&SQLVariant::OperBitMulSShort   ,&SQLVariant::OperBitMulUShort   ,&SQLVariant::OperBitMulSLong   ,&SQLVariant::OperBitMulULong   ,&SQLVariant::OperBitMulFloat   ,&SQLVariant::OperBitMulDouble   ,&SQLVariant::OperBitMulBit   ,&SQLVariant::OperBitMulSTiny   ,&SQLVariant::OperBitMulUTiny   ,&SQLVariant::OperBitMulSBig   ,&SQLVariant::OperBitMulUBig   ,&SQLVariant::OperBitMulNum   ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_STINYINT    */  ,{  &SQLVariant::OperSTinyMulChar ,&SQLVariant::OperSTinyMulSShort ,&SQLVariant::OperSTinyMulUShort ,&SQLVariant::OperSTinyMulSLong ,&SQLVariant::OperSTinyMulULong ,&SQLVariant::OperSTinyMulFloat ,&SQLVariant::OperSTinyMulDouble ,&SQLVariant::OperSTinyMulBit ,&SQLVariant::OperSTinyMulSTiny ,&SQLVariant::OperSTinyMulUTiny ,&SQLVariant::OperSTinyMulSBig ,&SQLVariant::OperSTinyMulUBig ,&SQLVariant::OperSTinyMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_UTINYINT    */  ,{  &SQLVariant::OperUTinyMulChar ,&SQLVariant::OperUTinyMulSShort ,&SQLVariant::OperUTinyMulUShort ,&SQLVariant::OperUTinyMulSLong ,&SQLVariant::OperUTinyMulULong ,&SQLVariant::OperUTinyMulFloat ,&SQLVariant::OperUTinyMulDouble ,&SQLVariant::OperUTinyMulBit ,&SQLVariant::OperUTinyMulSTiny ,&SQLVariant::OperUTinyMulUTiny ,&SQLVariant::OperUTinyMulSBig ,&SQLVariant::OperUTinyMulUBig ,&SQLVariant::OperUTinyMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_SBIGINT     */  ,{  &SQLVariant::OperSBigMulChar  ,&SQLVariant::OperSBigMulSShort  ,&SQLVariant::OperSBigMulUShort  ,&SQLVariant::OperSBigMulSLong  ,&SQLVariant::OperSBigMulULong  ,&SQLVariant::OperSBigMulFloat  ,&SQLVariant::OperSBigMulDouble  ,&SQLVariant::OperSBigMulBit  ,&SQLVariant::OperSBigMulSTiny  ,&SQLVariant::OperSBigMulUTiny  ,&SQLVariant::OperSBigMulSBig  ,&SQLVariant::OperSBigMulUBig  ,&SQLVariant::OperSBigMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_UBIGINT     */  ,{  &SQLVariant::OperUBigMulChar  ,&SQLVariant::OperUBigMulSShort  ,&SQLVariant::OperUBigMulUShort  ,&SQLVariant::OperUBigMulSLong  ,&SQLVariant::OperUBigMulULong  ,&SQLVariant::OperUBigMulFloat  ,&SQLVariant::OperUBigMulDouble  ,&SQLVariant::OperUBigMulBit  ,&SQLVariant::OperUBigMulSTiny  ,&SQLVariant::OperUBigMulUTiny  ,&SQLVariant::OperUBigMulSBig  ,&SQLVariant::OperUBigMulUBig  ,&SQLVariant::OperUBigMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_NUMERIC     */  ,{  &SQLVariant::OperNumMulChar   ,&SQLVariant::OperNumMulSShort   ,&SQLVariant::OperNumMulUShort   ,&SQLVariant::OperNumMulSLong   ,&SQLVariant::OperNumMulULong   ,&SQLVariant::OperNumMulFloat   ,&SQLVariant::OperNumMulDouble   ,&SQLVariant::OperNumMulBit   ,&SQLVariant::OperNumMulSTiny   ,&SQLVariant::OperNumMulUTiny   ,&SQLVariant::OperNumMulSBig   ,&SQLVariant::OperNumMulUBig   ,&SQLVariant::OperNumMulNum   ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_GUID        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_BINARY      */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_DATE        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_TIME        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_TIMESTAMP   */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_INTERVAL_YM */  ,{  nullptr                       ,&SQLVariant::OperIntYMMulSShort ,&SQLVariant::OperIntYMMulUShort ,&SQLVariant::OperIntYMMulSLong ,&SQLVariant::OperIntYMMulULong ,&SQLVariant::OperIntYMMulFloat ,&SQLVariant::OperIntYMMulDouble ,&SQLVariant::OperIntYMMulBit ,&SQLVariant::OperIntYMMulSTiny ,&SQLVariant::OperIntYMMulUTiny ,&SQLVariant::OperIntYMMulSBig ,&SQLVariant::OperIntYMMulUBig ,&SQLVariant::OperIntYMMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+  /* CT_INTERVAL_DS */  ,{  nullptr                       ,&SQLVariant::OperIntDSMulSShort ,&SQLVariant::OperIntDSMulUShort ,&SQLVariant::OperIntDSMulSLong ,&SQLVariant::OperIntDSMulULong ,&SQLVariant::OperIntDSMulFloat ,&SQLVariant::OperIntDSMulDouble ,&SQLVariant::OperIntDSMulBit ,&SQLVariant::OperIntDSMulSTiny ,&SQLVariant::OperIntDSMulUTiny ,&SQLVariant::OperIntDSMulSBig ,&SQLVariant::OperIntDSMulUBig ,&SQLVariant::OperIntDSMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
 };
 
 // Multiplication operator for SQLVariant
@@ -186,14 +187,8 @@ SQLVariant::OperUBigMulChar(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulChar(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsChar());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -300,14 +295,8 @@ SQLVariant::OperUBigMulSShort(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulSShort(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsSShort());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -431,14 +420,8 @@ SQLVariant::OperUBigMulUShort(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulUShort(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd((long)p_right.GetAsUShort());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -560,14 +543,8 @@ SQLVariant::OperUBigMulSLong(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulSLong(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsSLong());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -689,14 +666,8 @@ SQLVariant::OperUBigMulULong(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulULong(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd((int64)p_right.GetAsULong());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -818,14 +789,8 @@ SQLVariant::OperUBigMulFloat(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulFloat(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd((double)p_right.GetAsFloat());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -947,14 +912,8 @@ SQLVariant::OperUBigMulDouble(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulDouble(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsDouble());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -1110,17 +1069,8 @@ SQLVariant::OperUBigMulBit(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulBit(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  if(p_right.GetAsBit() == 0)
-  {
-    result = 0.0;
-  }
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsBit());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -1252,14 +1202,8 @@ SQLVariant::OperUBigMulSTiny(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulSTiny(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsSTinyInt());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -1381,14 +1325,8 @@ SQLVariant::OperUBigMulUTiny(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulUTiny(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd((short)p_right.GetAsUTinyInt());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -1511,14 +1449,8 @@ SQLVariant::OperUBigMulSBig(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulSBig(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsSBigInt());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -1640,14 +1572,8 @@ SQLVariant::OperUBigMulUBig(SQLVariant& p_right)
 SQLVariant 
 SQLVariant::OperNumMulUBig(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
-
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
-
+  bcd num = GetAsBCD() * bcd(p_right.GetAsUBigInt());
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 
@@ -1668,16 +1594,106 @@ SQLVariant::OperIntDSMulUBig(SQLVariant& p_right)
 // TYPE == NUMERIC
 
 SQLVariant 
-SQLVariant::OperVarMulNum(SQLVariant& p_right)
+SQLVariant::OperCharMulNum(SQLVariant& p_right)
 {
-  double result = GetAsDouble();
-  result *= p_right.GetAsDouble();
-  CString resString;
-  resString.Format("%.16lf",result);
+  bcd num = bcd(GetAsChar()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
 
-  SQLVariant var(this);
-  var.SetData(SQL_C_NUMERIC,resString);
+SQLVariant 
+SQLVariant::OperSShortMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd(GetAsSShort()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
 
+SQLVariant 
+SQLVariant::OperUShortMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd((long)GetAsUShort()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperSLongMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd(GetAsSLong()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperULongMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd((int64)GetAsULong()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperFloatMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd((double)GetAsFloat()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperDoubleMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd(GetAsDouble()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperBitMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd(GetAsBit()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperSTinyMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd(GetAsSTinyInt()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperUTinyMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd((short)GetAsUTinyInt()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperSBigMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd(GetAsSBigInt()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperUBigMulNum(SQLVariant& p_right)
+{
+  bcd num = bcd(GetAsUBigInt()) * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
+  return var;
+}
+
+SQLVariant 
+SQLVariant::OperNumMulNum(SQLVariant& p_right)
+{
+  bcd num = GetAsBCD() * p_right.GetAsBCD();
+  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
   return var;
 }
 

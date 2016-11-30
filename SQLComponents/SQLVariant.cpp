@@ -42,12 +42,6 @@ static char THIS_FILE[] = __FILE__;
 
 #pragma warning (disable : 4996)
 
-// Internal NUMERIC conversion routines
-static void sqlnum_scale(int *ary, int s);
-static void sqlnum_unscale_le(int *ary);
-static void sqlnum_unscale_be(int *ary, int start);
-static void sqlnum_carry(int *ary);
-
 DataTypes allTypes[] = 
 {
    { "<NO TYPE>",                  0                               }
@@ -782,7 +776,9 @@ SQLVariant::GetAsString(CString& result)
                                           break;
     case SQL_C_UBIGINT:                   result.Format("%I64u",m_data.m_dataUBIGINT);
                                           break;
-    case SQL_C_NUMERIC:                   NumericToString(&m_data.m_dataNUMERIC,result);
+    case SQL_C_NUMERIC:                   { bcd num(&m_data.m_dataNUMERIC);
+                                            result = num.AsString();
+                                          }
                                           break;
     case SQL_C_GUID:                      result.Format("{%04X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}"
                                                        ,m_data.m_dataGUID.Data1
@@ -1068,11 +1064,10 @@ SQLVariant::GetAsSShort()
     case SQL_C_UTINYINT: return (short)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return BIGINTToShort(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return UBIGINTToShort(m_data.m_dataUBIGINT);
-    case SQL_C_NUMERIC:{ CString num; 
-                         GetAsString(num); 
-                         return SLongToShort(atoi(num));
-                       }
-                       break;
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return SLongToShort(num.AsLong());
+                         }
+                         break;
     case SQL_C_BINARY:                    // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
@@ -1123,9 +1118,8 @@ SQLVariant::GetAsUShort()
     case SQL_C_UTINYINT: return (unsigned short)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return BIGINTToUShort(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return UBIGINTToUShort(m_data.m_dataUBIGINT);
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return DoubleToUShort(atof(num));
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return SLongToUShort(num.AsLong());
                          }
                          break;
 
@@ -1179,10 +1173,8 @@ SQLVariant::GetAsSLong()
     case SQL_C_UTINYINT: return (long)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return BIGINTToLong(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return UBIGINTToLong(m_data.m_dataUBIGINT);
-    case SQL_C_NUMERIC:  {
-                           CString num; 
-                           GetAsString(num); 
-                           return (long)atoi(num);
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return num.AsLong();
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
@@ -1235,9 +1227,8 @@ SQLVariant::GetAsULong()
     case SQL_C_UTINYINT: return (unsigned long)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return BIGINTToULong(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return UBIGINTToULong(m_data.m_dataUBIGINT);
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return DoubleToULong(atof(num));
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return BIGINTToULong(num.AsInt64());
                          }
                          break;
 
@@ -1291,11 +1282,10 @@ SQLVariant::GetAsFloat()
     case SQL_C_UTINYINT: return (float)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return (float)m_data.m_dataSBIGINT;
     case SQL_C_UBIGINT:  return (float)m_data.m_dataUBIGINT;
-    case SQL_C_NUMERIC:{ CString num; 
-                         GetAsString(num); 
-                         return DoubleToFloat(atof(num));
-                       }
-                       break;
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC); 
+                           return (float)num.AsDouble();
+                         }
+                         break;
     case SQL_C_BINARY:                    // Fall through
     case SQL_C_GUID:                      // Fall through
     case SQL_C_DATE:                      // Fall through
@@ -1346,9 +1336,8 @@ SQLVariant::GetAsDouble()
     case SQL_C_UTINYINT: return (double)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return (double)m_data.m_dataSBIGINT;
     case SQL_C_UBIGINT:  return (double)m_data.m_dataUBIGINT;
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return atof(num);
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return num.AsDouble();
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
@@ -1401,9 +1390,8 @@ SQLVariant::GetAsBit()
     case SQL_C_UTINYINT: return m_data.m_dataUTINYINT != 0;
     case SQL_C_SBIGINT:  return m_data.m_dataSBIGINT  != 0L;
     case SQL_C_UBIGINT:  return m_data.m_dataUBIGINT  != 0L;
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return atof(num) != 0.0;
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return num.AsLong() != 0;
                          }
                          break;
 
@@ -1457,9 +1445,8 @@ SQLVariant::GetAsSTinyInt()
     case SQL_C_UTINYINT: return UTinyIntToTinyInt(m_data.m_dataUTINYINT);
     case SQL_C_SBIGINT:  return SBIGINTToTinyInt(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return UBIGINTToTinyInt(m_data.m_dataUBIGINT);
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return DoubleToTinyInt(atof(num));
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return SLongToTinyInt(num.AsLong());
                          }
                          break;
 
@@ -1513,9 +1500,8 @@ SQLVariant::GetAsUTinyInt()
     case SQL_C_UTINYINT: return m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SBIGINTToUTinyInt(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return UBIGINTToUTinyInt(m_data.m_dataUBIGINT);
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return DoubleToUTinyInt(atof(num));
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return SLongToUTinyInt(num.AsLong());
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
@@ -1568,9 +1554,8 @@ SQLVariant::GetAsSBigInt()
     case SQL_C_UTINYINT: return (SQLBIGINT)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return m_data.m_dataSBIGINT;
     case SQL_C_UBIGINT:  return UBIGINTToBIGINT(m_data.m_dataUBIGINT);
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return DoubleToBIGINT(atof(num));
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return num.AsInt64();
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
@@ -1623,9 +1608,8 @@ SQLVariant::GetAsUBigInt()
     case SQL_C_UTINYINT: return (SQLUBIGINT)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SBIGINTToUBIGINT(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return m_data.m_dataUBIGINT;
-    case SQL_C_NUMERIC:  { CString num;
-                           GetAsString(num); 
-                           return DoubleToUBIGINT(atof(num));
+    case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
+                           return num.AsUInt64();
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
@@ -1673,22 +1657,64 @@ SQLVariant::GetAsNumeric()
   static SQL_NUMERIC_STRUCT val;
   switch(m_datatype)
   {
-    case SQL_C_SSHORT:    // fall through
-    case SQL_C_SHORT:     // Fall through
-    case SQL_C_USHORT:    // Fall through
+    case SQL_C_SSHORT:    // Fall through
+    case SQL_C_SHORT:     { bcd num(m_data.m_dataSHORT);
+                            num.AsNumeric(&val,5,0);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_USHORT:    { bcd num((int)m_data.m_dataUSHORT);
+                            num.AsNumeric(&val,5,0);
+                            return &val;
+                          }
+                          break;
     case SQL_C_LONG:      // Fall through
-    case SQL_C_SLONG:     // Fall through
-    case SQL_C_ULONG:     // Fall through
-    case SQL_C_FLOAT:     // Fall through
-    case SQL_C_DOUBLE:    // Fall through
-    case SQL_C_BIT:       // Fall through
+    case SQL_C_SLONG:     { bcd num(m_data.m_dataLONG);
+                            num.AsNumeric(&val,11,0);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_ULONG:     { bcd num((int64)m_data.m_dataULONG);
+                            num.AsNumeric(&val,11,0);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_FLOAT:     { bcd num((double)m_data.m_dataFLOAT);
+                            num.AsNumeric(&val,16,8);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_DOUBLE:    { bcd num(m_data.m_dataDOUBLE);
+                            num.AsNumeric(&val,32,16);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_BIT:       { bcd num(m_data.m_dataBIT);
+                            num.AsNumeric(&val,1,0);
+                            return &val;
+                          }
+                          break;
     case SQL_C_TINYINT:   // Fall through
-    case SQL_C_STINYINT:  // Fall through
-    case SQL_C_UTINYINT:  // Fall through
-    case SQL_C_SBIGINT:   // Fall through
-    case SQL_C_UBIGINT:   GetAsString(number);
-                          StringToNumeric(number,&val);
-                          return &val;
+    case SQL_C_STINYINT:  { bcd num(m_data.m_dataSTINYINT);
+                            num.AsNumeric(&val,3,0);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_UTINYINT:  { bcd num(m_data.m_dataUTINYINT);
+                            num.AsNumeric(&val,3,0);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_SBIGINT:   { bcd num(m_data.m_dataSBIGINT);
+                            num.AsNumeric(&val,24,0);
+                            return &val;
+                          }
+                          break;
+    case SQL_C_UBIGINT:   { bcd num(m_data.m_dataUBIGINT);
+                            num.AsNumeric(&val,24,0);
+                            return &val;
+                          }
+                          break;
   }
   // Other datatypes cannot convert
   ThrowErrorDatatype(SQL_C_NUMERIC);
@@ -2074,7 +2100,9 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                             m_data.m_dataUBIGINT = NULL;
                                           }
                                           break;
-    case SQL_C_NUMERIC:                   StringToNumeric(p_data,&m_data.m_dataNUMERIC);
+    case SQL_C_NUMERIC:                   {  bcd num(p_data);
+                                             num.AsNumeric(&m_data.m_dataNUMERIC,SQLNUM_MAX_PREC,SQLNUM_DEF_SCALE);
+                                          }
                                           break;
     case SQL_C_GUID:                      //aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee 
                                           scannum = sscanf(p_data,"{%lX-%hX-%hX-%2hhX%2hhX-%2hhX%2hhX%2hhX%2hhX%2hhX%2hhX}"
@@ -2336,470 +2364,6 @@ SQLVariant::StringToBinary(const char* p_data)
     --binlen;
   }
   return true;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
-//  SQL_NUMERIC_STRUCT and conversions
-//
-//////////////////////////////////////////////////////////////////////////
-
-void
-SQLVariant::StringToNumeric(const char* p_data,SQL_NUMERIC_STRUCT* p_numeric)
-{
-  int   len = (int) strlen(p_data);
-  const char* pos = strchr(p_data,'.');
-  int precision = len;
-  int scale     = 0;
-  if(pos)
-  {
-    --precision;
-    scale = len - (int)(pos - p_data) - 1;
-  }
-  if(scale > 32)
-  {
-    // SQL_NUMERIC cannot handle more than 32 digits precision
-    // in the fraction portion of the number
-    scale = 32;
-    *((char *)(pos + scale + 1)) = 0;
-  }
-  // Must set precision/scale beforehand
-  p_numeric->precision = (char)precision;
-  p_numeric->scale     = (char)scale;
-
-  int overflow = 0;
-  StringToNumericMantissa(p_data,p_numeric,&overflow);
-  if(overflow)
-  {
-    memset(&m_data.m_dataNUMERIC,0,sizeof(SQL_NUMERIC_STRUCT));
-  }
-}
-
-// Retrieve a SQL_NUMERIC_STRUCT from a string. The requested scale
-// and precision are first read from sqlnum, and then updated values
-// are written back at the end.
-// 
-// @param[in] numstr       String representation of number to convert
-// @param[in] sqlnum       Destination struct
-// @param[in] overflow_ptr Whether or not whole-number overflow occurred.
-//                         This indicates failure, and the result of sqlnum
-//                         is undefined.
-void 
-SQLVariant::StringToNumericMantissa(const char*         numstr
-                                   ,SQL_NUMERIC_STRUCT* sqlnum
-                                   ,int*                overflow_ptr)
-{
-  /*
-  We use 16 bits of each integer to convert the
-  current segment of the number leaving extra bits
-  to multiply/carry
-  */
-  int build_up[8], tmp_prec_calc[8];
-  /* current segment as integer */
-  unsigned int curnum;
-  /* current segment digits copied for strtoul() */
-  char curdigs[5];
-  /* number of digits in current segment */
-  int usedig;
-  int i;
-  int len;
-  char *decpt = (char*)strchr(numstr, '.');
-  int overflow= 0;
-  SQLSCHAR reqscale = sqlnum->scale;
-  SQLCHAR  reqprec  = sqlnum->precision;
-
-  memset(&sqlnum->val, 0, sizeof(sqlnum->val));
-  memset(build_up, 0, sizeof(build_up));
-
-  /* handle sign */
-  sqlnum->sign = !(*numstr == '-');
-  if (sqlnum->sign == 0)
-  {
-    numstr++;
-  }
-  len= (int) strlen(numstr);
-  sqlnum->precision = (SQLCHAR) len;
-  sqlnum->scale     = 0;
-
-  /* process digits in groups of <=4 */
-  for (i= 0; i < len; i += usedig)
-  {
-    if (i + 4 < len)
-    {
-      usedig = 4;
-    }
-    else
-    {
-      usedig = len - i;
-    }
-    // if we have the decimal point, ignore it by setting it to the
-    // last char (will be ignored by strtoul)
-    if (decpt && decpt >= numstr + i && decpt < numstr + i + usedig)
-    {
-      usedig = (int) (decpt - (numstr + i) + 1);
-      sqlnum->scale = (SQLSCHAR)(len - (i + usedig));
-      sqlnum->precision--;
-      decpt= NULL;
-    }
-    /* terminate prematurely if we can't do anything else */
-    /*if (overflow && !decpt)
-    break;
-    else */if (overflow)
-      /*continue;*/goto end;
-    /* grab just this piece, and convert to int */
-    memcpy(curdigs, numstr + i, usedig);
-    curdigs[usedig]= 0;
-    curnum= strtoul(curdigs, NULL, 10);
-    if (curdigs[usedig - 1] == '.')
-    {
-      sqlnum_scale(build_up, usedig - 1);
-    }
-    else
-    {
-      sqlnum_scale(build_up, usedig);
-    }
-    /* add the current number */
-    build_up[0] += curnum;
-    sqlnum_carry(build_up);
-    if (build_up[7] & ~0xffff)
-    {
-      overflow = 1;
-    }
-  }
-  /* scale up to SQL_DESC_SCALE */
-  if (reqscale > 0 && reqscale > sqlnum->scale)
-  {
-    while (reqscale > sqlnum->scale)
-    {
-      sqlnum_scale(build_up, 1);
-      sqlnum_carry(build_up);
-      sqlnum->scale++;
-    }
-  }
-  /* scale back, truncating decimals */
-  else if (reqscale < sqlnum->scale)
-  {
-    while (reqscale < sqlnum->scale && sqlnum->scale > 0)
-    {
-      sqlnum_unscale_le(build_up);
-      build_up[0] /= 10;
-      sqlnum->precision--;
-      sqlnum->scale--;
-    }
-  }
-  /* scale back whole numbers while there's no significant digits */
-  if (reqscale < 0)
-  {
-    memcpy(tmp_prec_calc, build_up, sizeof(build_up));
-    while (reqscale < sqlnum->scale)
-    {
-      sqlnum_unscale_le(tmp_prec_calc);
-      if (tmp_prec_calc[0] % 10)
-      {
-        overflow= 1;
-        goto end;
-      }
-      sqlnum_unscale_le(build_up);
-      tmp_prec_calc[0] /= 10;
-      build_up[0] /= 10;
-      sqlnum->precision--;
-      sqlnum->scale--;
-    }
-  }
-  /* calculate minimum precision */
-  memcpy(tmp_prec_calc, build_up, sizeof(build_up));
-  do
-  {
-    sqlnum_unscale_le(tmp_prec_calc);
-    i= tmp_prec_calc[0] % 10;
-    tmp_prec_calc[0] /= 10;
-    if (i == 0)
-    {
-      sqlnum->precision--;
-    }
-  } 
-  while (i == 0 && sqlnum->precision > 0);
-
-  /* detect precision overflow */
-  if (sqlnum->precision > reqprec)
-  {
-    overflow= 1;
-  }
-  else
-  {
-    sqlnum->precision = reqprec;
-  }
-  /* compress results into SQL_NUMERIC_STRUCT.val */
-  for (i= 0; i < 8; ++i)
-  {
-    int elem= 2 * i;
-    sqlnum->val[elem]   =  build_up[i] & 0xff;
-    sqlnum->val[elem+1] = (build_up[i] >> 8) & 0xff;
-  }
-end:
-  if (overflow_ptr)
-  {
-    *overflow_ptr = overflow;
-  }
-}
-
-// Scale an int[] representing SQL_C_NUMERIC
-// 
-// @param[in] ary   Array in little endian form
-// @param[in] s     Scale
-static void 
-sqlnum_scale(int *ary, int s)
-{
-  /* multiply out all pieces */
-  while (s--)
-  {
-    ary[0] *= 10;
-    ary[1] *= 10;
-    ary[2] *= 10;
-    ary[3] *= 10;
-    ary[4] *= 10;
-    ary[5] *= 10;
-    ary[6] *= 10;
-    ary[7] *= 10;
-  }
-}
-
-// Unscale an int[] representing SQL_C_NUMERIC. This
-// leaves the last element (0) with the value of the
-// last digit.
-// 
-// @param[in] ary   Array in little endian form
-static void 
-sqlnum_unscale_le(int *ary)
-{
-  int i;
-  for (i= 7; i > 0; --i)
-  {
-    ary[i - 1] += (ary[i] % 10) << 16;
-    ary[i] /= 10;
-  }
-}
-
-// Unscale an int[] representing SQL_C_NUMERIC. This
-// leaves the last element (7) with the value of the
-// last digit.
-// 
-// @param[in] ary   Array in big endian form
-static void 
-sqlnum_unscale_be(int *ary, int start)
-{
-  int i;
-  for (i= start; i < 7; ++i)
-  {
-    ary[i + 1] += (ary[i] % 10) << 16;
-    ary[i] /= 10;
-  }
-}
-
-// Perform the carry to get all elements below 2^16.
-// Should be called right after sqlnum_scale().
-// 
-// @param[in] ary   Array in little endian form
-static void 
-sqlnum_carry(int *ary)
-{
-  int i;
-  /* carry over rest of structure */
-  for (i= 0; i < 7; ++i)
-  {
-    ary[i+1] += ary[i] >> 16;
-    ary[i] &= 0xffff;
-  }
-}
-
-// AND BACK TO A STRING
-
-void
-SQLVariant::NumericToString(SQL_NUMERIC_STRUCT* p_numeric,CString& p_string)
-{
-  SQLCHAR  buffer[SQLNUM_MAXLEN+1];
-  SQLCHAR* numbegin = NULL;
-  int truncate = 0;
-  int scale = p_numeric->scale;
-  scale = (scale == -127) ? 16 : scale;
-  memset(buffer,0,SQLNUM_MAXLEN+1);
-  NumericToStringMantissa(p_numeric
-                         ,&buffer[SQLNUM_MAXLEN]
-                         ,&numbegin
-                         ,p_numeric->precision
-                         ,(char)scale
-                         ,&truncate);
-  if(truncate == SQLNUM_TRUNC_WHOLE)
-  {
-    p_string = "ERROR truncation";
-  }
-  else if(numbegin)
-  {
-    p_string = (char*)numbegin;
-    if(truncate == SQLNUM_TRUNC_FRAC)
-    {
-      p_string += " FRACTION!!";
-    }
-  }
-}
-
-// Convert a SQL_NUMERIC_STRUCT to a string. Only val and sign are
-// read from the struct. precision and scale will be updated on the
-// struct with the final values used in the conversion.
-// 
-// @param[in] sqlnum       Source struct
-// @param[in] numstr       Buffer to convert into string. Note that you
-//                         MUST use numbegin to read the result string.
-//                         This should point to the LAST byte available.
-//                         (We fill in digits backwards.)
-// @param[in] numbegin     String pointer that will be set to the start of
-//                         the result string.
-// @param[in] reqprec      Requested precision
-// @param[in] reqscale     Requested scale
-// @param[in] truncptr     Pointer to set the truncation type encountered.
-//                         If SQLNUM_TRUNC_WHOLE, this indicates a failure
-//                         and the contents of numstr are undefined and
-//                         numbegin will not be written to.
-void 
-SQLVariant::NumericToStringMantissa(SQL_NUMERIC_STRUCT* sqlnum
-                                   ,SQLCHAR*            numstr
-                                   ,SQLCHAR**           numbegin
-                                   ,SQLCHAR             reqprec
-                                   ,SQLSCHAR            reqscale
-                                   ,int*                truncptr)
-{
-  int expanded[8];
-  int i, j;
-  int max_space= 0;
-  int calcprec= 0;
-  int trunc= 0; /* truncation indicator */
-
-  *numstr--= 0;
-
-  /*
-  it's expected to have enough space
-  (~at least min(39, max(prec, scale+2)) + 3)
-  */
-
-  /*
-  expand the packed sqlnum->val so we have space to divide through
-  expansion happens into an array in big-endian form
-  */
-  for (i= 0; i < 8; ++i)
-  {
-    expanded[7 - i] = (sqlnum->val[(2 * i) + 1] << 8) | sqlnum->val[2 * i];
-  }
-  /* max digits = 39 = log_10(2^128)+1 */
-  for (j= 0; j < 39; ++j)
-  {
-    /* skip empty prefix */
-    while (!expanded[max_space])
-    {
-      max_space++;
-    }
-    /* if only the last piece has a value, it's the end */
-    if (max_space >= 7)
-    {
-      i= 7;
-      if (!expanded[7])
-      {
-        /* special case for zero, we'll end immediately */
-        if (!*(numstr + 1))
-        {
-          *numstr--= '0';
-          calcprec= 1;
-        }
-        break;
-      }
-    }
-    else
-    {
-      /* extract the next digit */
-      sqlnum_unscale_be(expanded, max_space);
-    }
-    *numstr--= '0' + (expanded[7] % 10);
-    expanded[7] /= 10;
-    calcprec++;
-    if (j == reqscale - 1)
-    {
-      *numstr--= '.';
-    }
-  }
-  sqlnum->scale= reqscale;
-  /* add <- dec pt */
-  if (calcprec < reqscale)
-  {
-    while (calcprec < reqscale)
-    {
-      *numstr--= '0';
-      reqscale--;
-    }
-    *numstr--= '.';
-    *numstr--= '0';
-  }
-  /* handle fractional truncation */
-  if (calcprec > reqprec && reqscale > 0)
-  {
-    SQLCHAR *end= numstr + strlen((char *)numstr) - 1;
-    while (calcprec > reqprec && reqscale)
-    {
-      *end--= 0;
-      calcprec--;
-      reqscale--;
-    }
-    if (calcprec > reqprec && reqscale == 0)
-    {
-      trunc = SQLNUM_TRUNC_WHOLE;
-      goto end;
-    }
-    if (*end == '.')
-    {
-      *end--= 0;
-    }
-    else
-    {
-      /* move the dec pt-- ??? */
-      /*
-      char c2, c= numstr[calcprec - reqscale];
-      numstr[calcprec - reqscale]= '.';
-      while (reqscale)
-      {
-      c2= numstr[calcprec + 1 - reqscale];
-      numstr[calcprec + 1 - reqscale]= c;
-      c= c2;
-      reqscale--;
-      }
-      */
-    }
-    trunc = SQLNUM_TRUNC_FRAC;
-  }
-  /* add zeros for negative scale */
-  if (reqscale < 0)
-  {
-    int ind = 0;
-    reqscale *= -1;
-    for (ind = 1; ind <= calcprec; ++i)
-    {
-      *(numstr + ind - reqscale) = *(numstr + ind);
-    }
-    numstr -= reqscale;
-    memset(numstr + calcprec + 1, '0', reqscale);
-  }
-  sqlnum->precision = (SQLCHAR)calcprec;
-
-  /* finish up, handle auxiliary fix-ups */
-  if (!sqlnum->sign)
-  {
-    *numstr--= '-';
-  }
-  numstr++;
-  *numbegin= numstr;
-
-end:
-  if (truncptr)
-  {
-    *truncptr= trunc;
-  }
 }
 
 //////////////////////////////////////////////////////////////////////////

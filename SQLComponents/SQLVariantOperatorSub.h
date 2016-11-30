@@ -188,7 +188,19 @@
    SQLVariant OperSBigSubUBig    (SQLVariant& p_right);
    SQLVariant OperUBigSubUBig    (SQLVariant& p_right);
    SQLVariant OperNumSubUBig     (SQLVariant& p_right);
-   SQLVariant OperVarSubNum      (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperCharSubNum     (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperSShortSubNum   (SQLVariant& p_right);
+   SQLVariant OperUShortSubNum   (SQLVariant& p_right);
+   SQLVariant OperSLongSubNum    (SQLVariant& p_right);
+   SQLVariant OperULongSubNum    (SQLVariant& p_right);
+   SQLVariant OperFloatSubNum    (SQLVariant& p_right);
+   SQLVariant OperDoubleSubNum   (SQLVariant& p_right);
+   SQLVariant OperBitSubNum      (SQLVariant& p_right);
+   SQLVariant OperSTinySubNum    (SQLVariant& p_right);
+   SQLVariant OperUTinySubNum    (SQLVariant& p_right);
+   SQLVariant OperSBigSubNum     (SQLVariant& p_right);
+   SQLVariant OperUBigSubNum     (SQLVariant& p_right);
+   SQLVariant OperNumSubNum      (SQLVariant& p_right);
    SQLVariant OperDateSubDate    (SQLVariant& p_right);  // TYPE == DATE
    SQLVariant OperTimeSubTime    (SQLVariant& p_right);  // TYPE == TIME
    SQLVariant OperStampSubStamp  (SQLVariant& p_right);  // TYPE == TIMESTAMP
