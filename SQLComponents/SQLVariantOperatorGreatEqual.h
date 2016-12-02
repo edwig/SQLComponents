@@ -47,6 +47,7 @@ bool   OperSTinyGreatEQSShort (SQLVariant& p_right);
 bool   OperUTinyGreatEQSShort (SQLVariant& p_right);
 bool   OperSBigGreatEQSShort  (SQLVariant& p_right);
 bool   OperUBigGreatEQSShort  (SQLVariant& p_right);
+bool   OperNumGreatEQSShort   (SQLVariant& p_right);
 bool   OperSShortGreatEQUShort(SQLVariant& p_right);  // TYPE == USHORT
 bool   OperUShortGreatEQUShort(SQLVariant& p_right);
 bool   OperSLongGreatEQUShort (SQLVariant& p_right);
@@ -58,6 +59,7 @@ bool   OperSTinyGreatEQUShort (SQLVariant& p_right);
 bool   OperUTinyGreatEQUShort (SQLVariant& p_right);
 bool   OperSBigGreatEQUShort  (SQLVariant& p_right);
 bool   OperUBigGreatEQUShort  (SQLVariant& p_right);
+bool   OperNumGreatEQUShort   (SQLVariant& p_right);
 bool   OperSShortGreatEQSLong (SQLVariant& p_right);  // TYPE == SLONG
 bool   OperUShortGreatEQSLong (SQLVariant& p_right);
 bool   OperSLongGreatEQSLong  (SQLVariant& p_right);
@@ -69,6 +71,7 @@ bool   OperSTinyGreatEQSLong  (SQLVariant& p_right);
 bool   OperUTinyGreatEQSLong  (SQLVariant& p_right);
 bool   OperSBigGreatEQSLong   (SQLVariant& p_right);
 bool   OperUBigGreatEQSLong   (SQLVariant& p_right);
+bool   OperNumGreatEQSLong    (SQLVariant& p_right);
 bool   OperSShortGreatEQULong (SQLVariant& p_right);  // TYPE == ULONG
 bool   OperUShortGreatEQULong (SQLVariant& p_right);
 bool   OperSLongGreatEQULong  (SQLVariant& p_right);
@@ -80,6 +83,7 @@ bool   OperSTinyGreatEQULong  (SQLVariant& p_right);
 bool   OperUTinyGreatEQULong  (SQLVariant& p_right);
 bool   OperSBigGreatEQULong   (SQLVariant& p_right);
 bool   OperUBigGreatEQULong   (SQLVariant& p_right);
+bool   OperNumGreatEQULong    (SQLVariant& p_right);
 bool   OperSShortGreatEQFloat (SQLVariant& p_right);  // TYPE == FLOAT
 bool   OperUShortGreatEQFloat (SQLVariant& p_right);
 bool   OperSLongGreatEQFloat  (SQLVariant& p_right);

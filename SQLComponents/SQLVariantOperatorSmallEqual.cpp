@@ -28,6 +28,7 @@
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
+#include "bcd.h"
 
 CompareFunctionArray
 SQLVariant::OperatorSmallerEqual[CT_LAST][CT_LAST] =
@@ -46,7 +47,7 @@ SQLVariant::OperatorSmallerEqual[CT_LAST][CT_LAST] =
   /* CT_UTINYINT    */  ,{  &SQLVariant::OperVarSmallEQChar ,&SQLVariant::OperUTinySmallEQSShort ,&SQLVariant::OperUTinySmallEQUShort ,&SQLVariant::OperUTinySmallEQSLong  ,&SQLVariant::OperUTinySmallEQULong ,&SQLVariant::OperUTinySmallEQFloat ,&SQLVariant::OperUTinySmallEQDouble ,&SQLVariant::OperUTinySmallEQBit ,&SQLVariant::OperUTinySmallEQSTiny ,&SQLVariant::OperUTinySmallEQUTiny ,&SQLVariant::OperUTinySmallEQSBig ,&SQLVariant::OperUTinySmallEQUBig ,&SQLVariant::OperUTinySmallEQNum ,nullptr                         ,nullptr                             ,nullptr                          ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
   /* CT_SBIGINT     */  ,{  &SQLVariant::OperVarSmallEQChar ,&SQLVariant::OperSBigSmallEQSShort  ,&SQLVariant::OperSBigSmallEQUShort  ,&SQLVariant::OperSBigSmallEQSLong   ,&SQLVariant::OperSBigSmallEQULong  ,&SQLVariant::OperSBigSmallEQFloat  ,&SQLVariant::OperSBigSmallEQDouble  ,&SQLVariant::OperSBigSmallEQBit  ,&SQLVariant::OperSBigSmallEQSTiny  ,&SQLVariant::OperSBigSmallEQUTiny  ,&SQLVariant::OperSBigSmallEQSBig  ,&SQLVariant::OperSBigSmallEQUBig  ,&SQLVariant::OperSBigSmallEQNum  ,nullptr                         ,nullptr                             ,nullptr                          ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
   /* CT_UBIGINT     */  ,{  &SQLVariant::OperVarSmallEQChar ,&SQLVariant::OperUBigSmallEQSShort  ,&SQLVariant::OperUBigSmallEQUShort  ,&SQLVariant::OperUBigSmallEQSLong   ,&SQLVariant::OperUBigSmallEQULong  ,&SQLVariant::OperUBigSmallEQFloat  ,&SQLVariant::OperUBigSmallEQDouble  ,&SQLVariant::OperUBigSmallEQBit  ,&SQLVariant::OperUBigSmallEQSTiny  ,&SQLVariant::OperUBigSmallEQUTiny  ,&SQLVariant::OperUBigSmallEQSBig  ,&SQLVariant::OperUBigSmallEQUBig  ,&SQLVariant::OperUBigSmallEQNum  ,nullptr                         ,nullptr                             ,nullptr                          ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
-  /* CT_NUMERIC     */  ,{  &SQLVariant::OperVarSmallEQChar ,&SQLVariant::OperVarSmallEQChar     ,&SQLVariant::OperVarSmallEQChar     ,&SQLVariant::OperVarSmallEQChar     ,&SQLVariant::OperVarSmallEQChar    ,&SQLVariant::OperNumSmallEQFloat   ,&SQLVariant::OperNumSmallEQDouble   ,&SQLVariant::OperNumSmallEQBit   ,&SQLVariant::OperNumSmallEQSTiny   ,&SQLVariant::OperNumSmallEQUTiny   ,&SQLVariant::OperNumSmallEQSBig   ,&SQLVariant::OperNumSmallEQUBig   ,&SQLVariant::OperNumSmallEQNum   ,nullptr                         ,nullptr                             ,nullptr                          ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
+  /* CT_NUMERIC     */  ,{  &SQLVariant::OperVarSmallEQChar ,&SQLVariant::OperNumSmallEQSShort   ,&SQLVariant::OperNumSmallEQUShort   ,&SQLVariant::OperNumSmallEQSLong    ,&SQLVariant::OperNumSmallEQULong   ,&SQLVariant::OperNumSmallEQFloat   ,&SQLVariant::OperNumSmallEQDouble   ,&SQLVariant::OperNumSmallEQBit   ,&SQLVariant::OperNumSmallEQSTiny   ,&SQLVariant::OperNumSmallEQUTiny   ,&SQLVariant::OperNumSmallEQSBig   ,&SQLVariant::OperNumSmallEQUBig   ,&SQLVariant::OperNumSmallEQNum   ,nullptr                         ,nullptr                             ,nullptr                          ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
   /* CT_GUID        */  ,{  &SQLVariant::OperGuidSmallEQChar,nullptr                             ,nullptr                             ,nullptr                             ,nullptr                            ,nullptr                            ,nullptr                             ,nullptr                          ,nullptr                            ,nullptr                            ,nullptr                           ,nullptr                           ,nullptr                          ,&SQLVariant::OperGuidSmallEQGuid,nullptr                             ,nullptr                          ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
   /* CT_BINARY      */  ,{  nullptr                         ,nullptr                             ,nullptr                             ,nullptr                             ,nullptr                            ,nullptr                            ,nullptr                             ,nullptr                          ,nullptr                            ,nullptr                            ,nullptr                           ,nullptr                           ,nullptr                          ,nullptr                         ,&SQLVariant::OperBinarySmallEQBinary,nullptr                          ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
   /* CT_DATE        */  ,{  &SQLVariant::OperVarSmallEQChar ,nullptr                             ,nullptr                             ,nullptr                             ,nullptr                            ,nullptr                            ,nullptr                             ,nullptr                          ,nullptr                            ,nullptr                            ,nullptr                           ,nullptr                           ,nullptr                          ,nullptr                         ,nullptr                             ,&SQLVariant::OperDateSmallEQDate ,nullptr                          ,nullptr                           ,nullptr                           ,nullptr                            }
@@ -190,6 +191,12 @@ SQLVariant::OperUBigSmallEQSShort(SQLVariant& p_right)
   return UBIGINTToShort(GetAsUBigInt()) <= p_right.GetAsSShort();
 }
 
+bool
+SQLVariant::OperNumSmallEQSShort(SQLVariant& p_right)
+{
+  return SLongToShort(GetAsBCD().AsLong()) <= p_right.GetAsSShort();
+}
+
 // UNSIGNED SHORT
 
 bool   
@@ -256,6 +263,12 @@ bool
 SQLVariant::OperUBigSmallEQUShort(SQLVariant& p_right)
 {
   return UBIGINTToUShort(GetAsUBigInt()) <= p_right.GetAsUShort();
+}
+
+bool   
+SQLVariant::OperNumSmallEQUShort(SQLVariant& p_right)
+{
+  return SLongToUShort(GetAsBCD().AsLong()) <= p_right.GetAsUShort();
 }
 
 // SIGNED LONG
@@ -326,6 +339,12 @@ SQLVariant::OperUBigSmallEQSLong(SQLVariant& p_right)
   return UBIGINTToLong(GetAsUBigInt()) <= p_right.GetAsSLong();
 }
 
+bool
+SQLVariant::OperNumSmallEQSLong(SQLVariant& p_right)
+{
+  return GetAsBCD().AsLong() <= p_right.GetAsSLong();
+}
+
 // UNSIGNED LONG
 
 bool   
@@ -392,6 +411,12 @@ bool
 SQLVariant::OperUBigSmallEQULong(SQLVariant& p_right)
 {
   return UBIGINTToULong(GetAsUBigInt()) <= p_right.GetAsULong();
+}
+
+bool
+SQLVariant::OperNumSmallEQULong(SQLVariant& p_right)
+{
+  return BIGINTToULong(GetAsBCD().AsInt64()) <= p_right.GetAsULong();
 }
 
 // FLOAT
@@ -465,11 +490,7 @@ SQLVariant::OperUBigSmallEQFloat(SQLVariant& p_right)
 bool
 SQLVariant::OperNumSmallEQFloat(SQLVariant& p_right)
 {
-  CString left;
-  GetAsString(left);
-  double lfdouble = atof(left);
-
-  return DoubleToFloat(lfdouble) <= p_right.GetAsFloat();
+  return GetAsBCD().AsDouble() <= (double) p_right.GetAsFloat();
 }
 
 // DOUBLE
@@ -543,10 +564,7 @@ SQLVariant::OperUBigSmallEQDouble(SQLVariant& p_right)
 bool
 SQLVariant::OperNumSmallEQDouble(SQLVariant& p_right)
 {
-  CString left;
-  GetAsString(left);
-  double lfdouble = atof(left);
-  return lfdouble <= p_right.GetAsDouble();
+  return GetAsBCD().AsDouble() <= p_right.GetAsDouble();
 }
 
 // BIT
@@ -694,11 +712,7 @@ SQLVariant::OperUBigSmallEQSTiny(SQLVariant& p_right)
 bool
 SQLVariant::OperNumSmallEQSTiny(SQLVariant& p_right)
 {
-  CString left;
-  GetAsString(left);
-  int lf = atoi(left);
-
-  return SLongToTinyInt(lf) <= p_right.GetAsSTinyInt();
+  return SLongToTinyInt(GetAsBCD().AsLong()) <= p_right.GetAsSTinyInt();
 }
 
 // UNSIGNED TINYINT
@@ -772,11 +786,7 @@ SQLVariant::OperUBigSmallEQUTiny(SQLVariant& p_right)
 bool
 SQLVariant::OperNumSmallEQUTiny(SQLVariant& p_right)
 {
-  CString left;
-  GetAsString(left);
-  int lf = atoi(left);
-
-  return SLongToUTinyInt(lf) <= p_right.GetAsUTinyInt();
+  return SLongToUTinyInt(GetAsBCD().AsLong()) <= p_right.GetAsUTinyInt();
 }
 
 // SIGNED BIGINT
@@ -850,11 +860,7 @@ SQLVariant::OperUBigSmallEQSBig(SQLVariant& p_right)
 bool   
 SQLVariant::OperNumSmallEQSBig(SQLVariant& p_right)
 {
-  CString left;
-  GetAsString(left);
-  SQLBIGINT lf = _atoi64(left);
-
-  return lf <= p_right.GetAsSBigInt();
+  return GetAsBCD().AsInt64() <= p_right.GetAsSBigInt();
 }
 
 // UNSIGNED BIGINT
@@ -928,11 +934,7 @@ SQLVariant::OperUBigSmallEQUBig(SQLVariant& p_right)
 bool
 SQLVariant::OperNumSmallEQUBig(SQLVariant& p_right)
 {
-  CString left;
-  GetAsString(left);
-  SQLBIGINT lf = _atoi64(left);
-
-  return lf <= UBIGINTToBIGINT(p_right.GetAsUBigInt());
+  return GetAsBCD().AsUInt64() <= p_right.GetAsUBigInt();
 }
 
 // NUMERIC
@@ -940,120 +942,73 @@ SQLVariant::OperNumSmallEQUBig(SQLVariant& p_right)
 bool
 SQLVariant::OperSShortSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  short ri = SLongToShort(atoi(right));
-
-  return GetAsSShort() <= ri;
+  return GetAsSShort() <= SLongToShort(p_right.GetAsBCD().AsLong());
 }
 
 bool
 SQLVariant::OperUShortSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  unsigned short ri = SLongToUShort(atoi(right));
-
-  return GetAsUShort() <= ri;
+  return GetAsUShort() <= SLongToUShort(p_right.GetAsBCD().AsLong());
 }
 
 bool
 SQLVariant::OperSLongSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  long ri = atoi(right);
-
-  return GetAsSLong() <= ri;
+  return GetAsSLong() <= p_right.GetAsBCD().AsLong();
 }
 
 bool
 SQLVariant::OperULongSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  unsigned long ri = LongToULong(atoi(right));
-
-  return GetAsULong() <= ri;
+  return GetAsULong() <= BIGINTToULong(p_right.GetAsBCD().AsInt64());
 }
 
 bool
 SQLVariant::OperFloatSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  float ri = DoubleToFloat(atof(right));
-
-  return GetAsFloat() <= ri;
+  return GetAsFloat() <= (float) p_right.GetAsBCD().AsDouble();
 }
 
 bool
 SQLVariant::OperDoubleSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  double ri = atof(right);
-
-  return GetAsFloat() <= ri;
+  return GetAsDouble() <= p_right.GetAsBCD().AsDouble();
 }
 
 bool
 SQLVariant::OperBitSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  int ri = atoi(right);
-
-  return ri != 0;
+  return !p_right.GetAsBCD().IsNull();
 }
 
 bool
 SQLVariant::OperSTinySmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  long ri = atoi(right);
-
-  return GetAsSTinyInt() <= SLongToTinyInt(ri);
+  return GetAsSTinyInt() <= SLongToTinyInt(p_right.GetAsBCD().AsLong());
 }
 
 bool
 SQLVariant::OperUTinySmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  long ri = atoi(right);
-
-  return GetAsUTinyInt() <= SLongToUTinyInt(ri);
+  return GetAsUTinyInt() <= SLongToUTinyInt(p_right.GetAsBCD().AsLong());
 }
 
 bool
 SQLVariant::OperSBigSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  SQLBIGINT ri = _atoi64(right);
-
-  return GetAsSBigInt() <= ri;
+  return GetAsSBigInt() <= p_right.GetAsBCD().AsInt64();
 }
 
 bool
 SQLVariant::OperUBigSmallEQNum(SQLVariant& p_right)
 {
-  CString right;
-  p_right.GetAsString(right);
-  SQLUBIGINT ri = SBIGINTToUBIGINT(_atoi64(right));
-
-  return GetAsUBigInt() <= ri;
+  return GetAsUBigInt() <= p_right.GetAsBCD().AsUInt64();
 }
 
 bool
 SQLVariant::OperNumSmallEQNum(SQLVariant& p_right)
 {
-  SQL_NUMERIC_STRUCT* left  = GetAsNumeric();
-  SQL_NUMERIC_STRUCT* right = p_right.GetAsNumeric();
-
-  return memcmp(left,right,sizeof(SQL_NUMERIC_STRUCT)) <= 0;
+  return GetAsBCD() <= p_right.GetAsBCD();
 }
 
 // TYPE == GUID

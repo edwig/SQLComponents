@@ -47,6 +47,7 @@
    bool   OperUTinySmallerSShort (SQLVariant& p_right);
    bool   OperSBigSmallerSShort  (SQLVariant& p_right);
    bool   OperUBigSmallerSShort  (SQLVariant& p_right);
+   bool   OperNumSmallerSShort   (SQLVariant& p_right);
    bool   OperSShortSmallerUShort(SQLVariant& p_right);  // TYPE == USHORT
    bool   OperUShortSmallerUShort(SQLVariant& p_right);
    bool   OperSLongSmallerUShort (SQLVariant& p_right);
@@ -58,6 +59,7 @@
    bool   OperUTinySmallerUShort (SQLVariant& p_right);
    bool   OperSBigSmallerUShort  (SQLVariant& p_right);
    bool   OperUBigSmallerUShort  (SQLVariant& p_right);
+   bool   OperNumSmallerUShort   (SQLVariant& p_right);
    bool   OperSShortSmallerSLong (SQLVariant& p_right);  // TYPE == SLONG
    bool   OperUShortSmallerSLong (SQLVariant& p_right);
    bool   OperSLongSmallerSLong  (SQLVariant& p_right);
@@ -69,6 +71,7 @@
    bool   OperUTinySmallerSLong  (SQLVariant& p_right);
    bool   OperSBigSmallerSLong   (SQLVariant& p_right);
    bool   OperUBigSmallerSLong   (SQLVariant& p_right);
+   bool   OperNumSmallerSLong    (SQLVariant& p_right);
    bool   OperSShortSmallerULong (SQLVariant& p_right);  // TYPE == ULONG
    bool   OperUShortSmallerULong (SQLVariant& p_right);
    bool   OperSLongSmallerULong  (SQLVariant& p_right);
@@ -80,6 +83,7 @@
    bool   OperUTinySmallerULong  (SQLVariant& p_right);
    bool   OperSBigSmallerULong   (SQLVariant& p_right);
    bool   OperUBigSmallerULong   (SQLVariant& p_right);
+   bool   OperNumSmallerULong    (SQLVariant& p_right);
    bool   OperSShortSmallerFloat (SQLVariant& p_right);  // TYPE == FLOAT
    bool   OperUShortSmallerFloat (SQLVariant& p_right);
    bool   OperSLongSmallerFloat  (SQLVariant& p_right);

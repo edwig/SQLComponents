@@ -210,6 +210,18 @@
    SQLVariant OperNumModUBig     (SQLVariant& p_right);
    SQLVariant OperIntYMModUBig   (SQLVariant& p_right);
    SQLVariant OperIntDSModUBig   (SQLVariant& p_right);
-   SQLVariant OperVarModNum      (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperCharModNum     (SQLVariant& p_right);  // TYPE == NUMERIC
+   SQLVariant OperSShortModNum   (SQLVariant& p_right);
+   SQLVariant OperUShortModNum   (SQLVariant& p_right);
+   SQLVariant OperSLongModNum    (SQLVariant& p_right);
+   SQLVariant OperULongModNum    (SQLVariant& p_right);
+   SQLVariant OperFloatModNum    (SQLVariant& p_right);
+   SQLVariant OperDoubleModNum   (SQLVariant& p_right);
+   SQLVariant OperBitModNum      (SQLVariant& p_right);
+   SQLVariant OperSTinyModNum    (SQLVariant& p_right);
+   SQLVariant OperUTinyModNum    (SQLVariant& p_right);
+   SQLVariant OperSBigModNum     (SQLVariant& p_right);
+   SQLVariant OperUBigModNum     (SQLVariant& p_right);
+   SQLVariant OperNumModNum      (SQLVariant& p_right);
    SQLVariant OperIntYMModNum    (SQLVariant& p_right);
    SQLVariant OperIntDSModNum    (SQLVariant& p_right);

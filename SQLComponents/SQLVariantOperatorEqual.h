@@ -48,6 +48,7 @@
    bool   OperUTinyEqualsSShort (SQLVariant& p_right);
    bool   OperSBigEqualsSShort  (SQLVariant& p_right);
    bool   OperUBigEqualsSShort  (SQLVariant& p_right);
+   bool   OperNumEqualsSShort   (SQLVariant& p_right);
    bool   OperSShortEqualsUShort(SQLVariant& p_right);  // TYPE == USHORT
    bool   OperUShortEqualsUShort(SQLVariant& p_right);
    bool   OperSLongEqualsUShort (SQLVariant& p_right);
@@ -59,6 +60,7 @@
    bool   OperUTinyEqualsUShort (SQLVariant& p_right);
    bool   OperSBigEqualsUShort  (SQLVariant& p_right);
    bool   OperUBigEqualsUShort  (SQLVariant& p_right);
+   bool   OperNumEqualsUShort   (SQLVariant& p_right);
    bool   OperSShortEqualsSLong (SQLVariant& p_right);  // TYPE == SLONG
    bool   OperUShortEqualsSLong (SQLVariant& p_right);
    bool   OperSLongEqualsSLong  (SQLVariant& p_right);
@@ -70,6 +72,7 @@
    bool   OperUTinyEqualsSLong  (SQLVariant& p_right);
    bool   OperSBigEqualsSLong   (SQLVariant& p_right);
    bool   OperUBigEqualsSLong   (SQLVariant& p_right);
+   bool   OperNumEqualsSLong    (SQLVariant& p_right);
    bool   OperSShortEqualsULong (SQLVariant& p_right);  // TYPE == ULONG
    bool   OperUShortEqualsULong (SQLVariant& p_right);
    bool   OperSLongEqualsULong  (SQLVariant& p_right);
@@ -81,6 +84,7 @@
    bool   OperUTinyEqualsULong  (SQLVariant& p_right);
    bool   OperSBigEqualsULong   (SQLVariant& p_right);
    bool   OperUBigEqualsULong   (SQLVariant& p_right);
+   bool   OperNumEqualsULong    (SQLVariant& p_right);
    bool   OperSShortEqualsFloat (SQLVariant& p_right);  // TYPE == FLOAT
    bool   OperUShortEqualsFloat (SQLVariant& p_right);
    bool   OperSLongEqualsFloat  (SQLVariant& p_right);
