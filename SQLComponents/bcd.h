@@ -26,6 +26,8 @@ const int bcdPrecision = bcdDigits * bcdLength;
 
 // Handy typedefs of used basic datatypes
 using uchar  = unsigned char;
+using ushort = unsigned short;
+using ulong  = unsigned long;
 #ifndef int64
 using int64  = __int64;
 using uint64 = unsigned __int64;
@@ -211,8 +213,14 @@ public:
 
   // Get as a double
   double  AsDouble() const;
+  // Get as a short
+  short   AsShort() const;
+  // Get as an unsigned short
+  ushort  AsUShort() const;
   // Get as a long
   long    AsLong() const;
+  // Get as an unsigned long
+  ulong   AsULong() const;
   // Get as a 64bits long
   int64   AsInt64() const;
   // Get as an unsigned 64 bits long

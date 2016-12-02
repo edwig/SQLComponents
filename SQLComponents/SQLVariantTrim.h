@@ -24,72 +24,72 @@
 // Last Revision:   11-11-2016
 // Version number:  1.2.0
 //
-
-// BEWARE
-// THE CONTENTS OF THIS FILE IS PART (INCLUDED) OF THE DEFINITION OF SQLVariant
+#pragma once
 
 // Internal conversion and trimming
-long           ULongToLong(unsigned long p_value);
-long           FloatToLong(float p_value);
-long           DoubleToLong(double p_value);
-long           BIGINTToLong(SQLBIGINT p_value);
-long           UBIGINTToLong(SQLUBIGINT p_value);
-short          UShortToShort(unsigned short p_value);
-short          SLongToShort(long p_value);
-short          ULongToShort(unsigned long p_value);
-short          FloatToShort(float p_value);
-short          DoubleToShort(double p_value);
-short          BIGINTToShort(SQLBIGINT p_value);
-short          UBIGINTToShort(SQLUBIGINT p_value);
-float          DoubleToFloat(double p_value);
-float          BIGINTToFloat(SQLBIGINT p_value);
-float          UBIGINTToFloat(SQLUBIGINT p_value);
-double         BIGINTToDouble(SQLBIGINT p_value);
-double         UBIGINTToDouble(SQLUBIGINT p_value);
-SQLBIGINT      FloatToBIGINT(float p_value);
-SQLBIGINT      DoubleToBIGINT(double p_value);
-SQLBIGINT      UBIGINTToBIGINT(SQLUBIGINT p_value);
-char           ShortToTinyInt(short p_value);
-char           UShortToTinyInt(unsigned short p_value);
-char           SLongToTinyInt(long p_value);
-char           ULongToTinyInt(long p_value);
-char           FloatToTinyInt(float p_value);
-char           DoubleToTinyInt(double p_value);
-char           UTinyIntToTinyInt(unsigned char p_value);
-char           SBIGINTToTinyInt(SQLBIGINT p_value);
-char           UBIGINTToTinyInt(SQLUBIGINT p_value);
-unsigned long  ShortToULong(short p_value);
-unsigned long  LongToULong(long p_value);
-unsigned long  FloatToULong(float p_value);
-unsigned long  DoubleToULong(double p_value);
-unsigned long  TinyIntToULong(char p_value);
-unsigned long  BIGINTToULong(SQLBIGINT p_value);
-unsigned long  UBIGINTToULong(SQLUBIGINT p_value);
-SQLUBIGINT     ShortToUBIGINT(short p_value);
-SQLUBIGINT     LongToUBIGINT(long p_value);
-SQLUBIGINT     FloatToUBIGINT(float p_value);
-SQLUBIGINT     DoubleToUBIGINT(double p_value);
-SQLUBIGINT     TinyIntToUBIGINT(char p_value);
-SQLUBIGINT     SBIGINTToUBIGINT(SQLBIGINT p_value);
-unsigned short ShortToUShort(short p_value);
-unsigned short SLongToUShort(long p_value);
-unsigned short ULongToUShort(unsigned long p_value);
-unsigned short FloatToUShort(float p_value);
-unsigned short DoubleToUShort(double p_value);
-unsigned short TinyIntToUShort(char p_value);
-unsigned short BIGINTToUShort(SQLBIGINT p_value);
-unsigned short UBIGINTToUShort(SQLUBIGINT p_value);
-unsigned char  ShortToUTinyInt(short p_value);
-unsigned char  UShortToUTinyInt(short p_value);
-unsigned char  SLongToUTinyInt(long p_value);
-unsigned char  ULongToUTinyInt(unsigned long p_value);
-unsigned char  FloatToUTinyInt(float p_value);
-unsigned char  DoubleToUTinyInt(double p_value);
-unsigned char  TinyIntToUTinyInt(char p_value);
-unsigned char  SBIGINTToUTinyInt(SQLBIGINT p_value);
-unsigned char  UBIGINTToUTinyInt(SQLUBIGINT p_value);
+// Used for requesting a value as another type
+// and for the operators where both sides have different types
 
 // Throw error as a result of internal trimming
-void  ThrowErrorDatatype(int p_getas);
-void  ThrowErrorTruncate(int p_from,int p_to);
+void           SQL_ThrowErrorTruncate(int p_from,int p_to);
 
+// Internal conversion and trimming
+long           SQL_ULongToLong(unsigned long p_value);
+long           SQL_FloatToLong(float p_value);
+long           SQL_DoubleToLong(double p_value);
+long           SQL_BIGINTToLong(SQLBIGINT p_value);
+long           SQL_UBIGINTToLong(SQLUBIGINT p_value);
+short          SQL_UShortToShort(unsigned short p_value);
+short          SQL_SLongToShort(long p_value);
+short          SQL_ULongToShort(unsigned long p_value);
+short          SQL_FloatToShort(float p_value);
+short          SQL_DoubleToShort(double p_value);
+short          SQL_BIGINTToShort(SQLBIGINT p_value);
+short          SQL_USQL_BIGINTToShort(SQLUBIGINT p_value);
+float          SQL_DoubleToFloat(double p_value);
+float          SQL_BIGINTToFloat(SQLBIGINT p_value);
+float          SQL_UBIGINTToFloat(SQLUBIGINT p_value);
+double         SQL_BIGINTToDouble(SQLBIGINT p_value);
+double         SQL_UBIGINTToDouble(SQLUBIGINT p_value);
+SQLBIGINT      SQL_FloatToBIGINT(float p_value);
+SQLBIGINT      SQL_DoubleToBIGINT(double p_value);
+SQLBIGINT      SQL_UBIGINTToBIGINT(SQLUBIGINT p_value);
+char           SQL_ShortToTinyInt(short p_value);
+char           SQL_UShortToTinyInt(unsigned short p_value);
+char           SQL_SLongToTinyInt(long p_value);
+char           SQL_ULongToTinyInt(long p_value);
+char           SQL_FloatToTinyInt(float p_value);
+char           SQL_DoubleToTinyInt(double p_value);
+char           SQL_UTinyIntToTinyInt(unsigned char p_value);
+char           SQL_SBIGINTToTinyInt(SQLBIGINT p_value);
+char           SQL_UBIGINTToTinyInt(SQLUBIGINT p_value);
+unsigned long  SQL_ShortToULong(short p_value);
+unsigned long  SQL_LongToULong(long p_value);
+unsigned long  SQL_FloatToULong(float p_value);
+unsigned long  SQL_DoubleToULong(double p_value);
+unsigned long  SQL_TinyIntToULong(char p_value);
+unsigned long  SQL_BIGINTToULong(SQLBIGINT p_value);
+unsigned long  SQL_UBIGINTToULong(SQLUBIGINT p_value);
+SQLUBIGINT     SQL_ShortToUBIGINT(short p_value);
+SQLUBIGINT     SQL_LongToUBIGINT(long p_value);
+SQLUBIGINT     SQL_FloatToUBIGINT(float p_value);
+SQLUBIGINT     SQL_DoubleToUBIGINT(double p_value);
+SQLUBIGINT     SQL_TinyIntToUBIGINT(char p_value);
+SQLUBIGINT     SQL_SBIGINTToUBIGINT(SQLBIGINT p_value);
+unsigned short SQL_ShortToUShort(short p_value);
+unsigned short SQL_SLongToUShort(long p_value);
+unsigned short SQL_ULongToUShort(unsigned long p_value);
+unsigned short SQL_FloatToUShort(float p_value);
+unsigned short SQL_DoubleToUShort(double p_value);
+unsigned short SQL_TinyIntToUShort(char p_value);
+unsigned short SQL_BIGINTToUShort(SQLBIGINT p_value);
+unsigned short SQL_UBIGINTToUShort(SQLUBIGINT p_value);
+unsigned char  SQL_ShortToUTinyInt(short p_value);
+unsigned char  SQL_UShortToUTinyInt(short p_value);
+unsigned char  SQL_SLongToUTinyInt(long p_value);
+unsigned char  SQL_ULongToUTinyInt(unsigned long p_value);
+unsigned char  SQL_FloatToUTinyInt(float p_value);
+unsigned char  SQL_DoubleToUTinyInt(double p_value);
+unsigned char  SQL_TinyIntToUTinyInt(char p_value);
+unsigned char  SQL_SBIGINTToUTinyInt(SQLBIGINT p_value);
+unsigned char  SQL_UBIGINTToUTinyInt(SQLUBIGINT p_value);

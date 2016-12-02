@@ -26,6 +26,7 @@
 //
 #include "StdAfx.h"
 #include "SQLVariant.h"
+#include "SQLVariantTrim.h"
 #include "SQLDate.h"
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
@@ -1049,23 +1050,23 @@ SQLVariant::GetAsSShort()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return SLongToShort(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_SLongToShort(atoi(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return m_data.m_dataSHORT;
-    case SQL_C_USHORT:   return UShortToShort(m_data.m_dataUSHORT);
+    case SQL_C_USHORT:   return SQL_UShortToShort(m_data.m_dataUSHORT);
     case SQL_C_LONG:     // fall through
-    case SQL_C_SLONG:    return SLongToShort(m_data.m_dataLONG);
-    case SQL_C_ULONG:    return ULongToShort(m_data.m_dataULONG);
-    case SQL_C_FLOAT:    return FloatToShort(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToShort(m_data.m_dataDOUBLE);
+    case SQL_C_SLONG:    return SQL_SLongToShort(m_data.m_dataLONG);
+    case SQL_C_ULONG:    return SQL_ULongToShort(m_data.m_dataULONG);
+    case SQL_C_FLOAT:    return SQL_FloatToShort(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToShort(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (short)m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
     case SQL_C_STINYINT: return (short)m_data.m_dataTINYINT;
     case SQL_C_UTINYINT: return (short)m_data.m_dataUTINYINT;
-    case SQL_C_SBIGINT:  return BIGINTToShort(m_data.m_dataSBIGINT);
-    case SQL_C_UBIGINT:  return UBIGINTToShort(m_data.m_dataUBIGINT);
+    case SQL_C_SBIGINT:  return SQL_BIGINTToShort(m_data.m_dataSBIGINT);
+    case SQL_C_UBIGINT:  return SQL_USQL_BIGINTToShort(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
-                           return SLongToShort(num.AsLong());
+                           return SQL_SLongToShort(num.AsLong());
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
@@ -1103,23 +1104,23 @@ SQLVariant::GetAsUShort()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return SLongToUShort(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_SLongToUShort(atoi(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
-    case SQL_C_SHORT:    return ShortToUShort(m_data.m_dataSHORT);
+    case SQL_C_SHORT:    return SQL_ShortToUShort(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
-    case SQL_C_SLONG:    return SLongToUShort(m_data.m_dataLONG);
-    case SQL_C_ULONG:    return ULongToUShort(m_data.m_dataULONG);
-    case SQL_C_FLOAT:    return FloatToUShort(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToUShort(m_data.m_dataDOUBLE);
+    case SQL_C_SLONG:    return SQL_SLongToUShort(m_data.m_dataLONG);
+    case SQL_C_ULONG:    return SQL_ULongToUShort(m_data.m_dataULONG);
+    case SQL_C_FLOAT:    return SQL_FloatToUShort(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToUShort(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (unsigned short)m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
-    case SQL_C_STINYINT: return TinyIntToUShort(m_data.m_dataTINYINT);
+    case SQL_C_STINYINT: return SQL_TinyIntToUShort(m_data.m_dataTINYINT);
     case SQL_C_UTINYINT: return (unsigned short)m_data.m_dataUTINYINT;
-    case SQL_C_SBIGINT:  return BIGINTToUShort(m_data.m_dataSBIGINT);
-    case SQL_C_UBIGINT:  return UBIGINTToUShort(m_data.m_dataUBIGINT);
+    case SQL_C_SBIGINT:  return SQL_BIGINTToUShort(m_data.m_dataSBIGINT);
+    case SQL_C_UBIGINT:  return SQL_UBIGINTToUShort(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
-                           return SLongToUShort(num.AsLong());
+                           return SQL_SLongToUShort(num.AsLong());
                          }
                          break;
 
@@ -1164,15 +1165,15 @@ SQLVariant::GetAsSLong()
     case SQL_C_USHORT:   return (long)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return m_data.m_dataLONG;
-    case SQL_C_ULONG:    return ULongToLong(m_data.m_dataULONG);
-    case SQL_C_FLOAT:    return FloatToLong(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToLong(m_data.m_dataDOUBLE);
+    case SQL_C_ULONG:    return SQL_ULongToLong(m_data.m_dataULONG);
+    case SQL_C_FLOAT:    return SQL_FloatToLong(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToLong(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (long)m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
     case SQL_C_STINYINT: return (long)m_data.m_dataTINYINT;
     case SQL_C_UTINYINT: return (long)m_data.m_dataUTINYINT;
-    case SQL_C_SBIGINT:  return BIGINTToLong(m_data.m_dataSBIGINT);
-    case SQL_C_UBIGINT:  return UBIGINTToLong(m_data.m_dataUBIGINT);
+    case SQL_C_SBIGINT:  return SQL_BIGINTToLong(m_data.m_dataSBIGINT);
+    case SQL_C_UBIGINT:  return SQL_UBIGINTToLong(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsLong();
                          }
@@ -1212,23 +1213,23 @@ SQLVariant::GetAsULong()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return LongToULong(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_LongToULong(atoi(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
-    case SQL_C_SHORT:    return ShortToULong(m_data.m_dataSHORT);
+    case SQL_C_SHORT:    return SQL_ShortToULong(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return (unsigned long)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
-    case SQL_C_SLONG:    return LongToULong(m_data.m_dataLONG);
+    case SQL_C_SLONG:    return SQL_LongToULong(m_data.m_dataLONG);
     case SQL_C_ULONG:    return m_data.m_dataULONG;
-    case SQL_C_FLOAT:    return FloatToULong(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToULong(m_data.m_dataDOUBLE);
+    case SQL_C_FLOAT:    return SQL_FloatToULong(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToULong(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (unsigned long)m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
-    case SQL_C_STINYINT: return TinyIntToULong(m_data.m_dataTINYINT);
+    case SQL_C_STINYINT: return SQL_TinyIntToULong(m_data.m_dataTINYINT);
     case SQL_C_UTINYINT: return (unsigned long)m_data.m_dataUTINYINT;
-    case SQL_C_SBIGINT:  return BIGINTToULong(m_data.m_dataSBIGINT);
-    case SQL_C_UBIGINT:  return UBIGINTToULong(m_data.m_dataUBIGINT);
+    case SQL_C_SBIGINT:  return SQL_BIGINTToULong(m_data.m_dataSBIGINT);
+    case SQL_C_UBIGINT:  return SQL_UBIGINTToULong(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
-                           return BIGINTToULong(num.AsInt64());
+                           return SQL_BIGINTToULong(num.AsInt64());
                          }
                          break;
 
@@ -1267,7 +1268,7 @@ SQLVariant::GetAsFloat()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return DoubleToFloat(atof(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_DoubleToFloat(atof(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return (float)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (float)m_data.m_dataUSHORT;
@@ -1275,7 +1276,7 @@ SQLVariant::GetAsFloat()
     case SQL_C_SLONG:    return (float)m_data.m_dataLONG;
     case SQL_C_ULONG:    return (float)m_data.m_dataULONG;
     case SQL_C_FLOAT:    return m_data.m_dataFLOAT;
-    case SQL_C_DOUBLE:   return DoubleToFloat(m_data.m_dataDOUBLE);
+    case SQL_C_DOUBLE:   return SQL_DoubleToFloat(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (float)m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
     case SQL_C_STINYINT: return (float)m_data.m_dataTINYINT;
@@ -1430,23 +1431,23 @@ SQLVariant::GetAsSTinyInt()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return SLongToTinyInt(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_SLongToTinyInt(atoi(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
-    case SQL_C_SHORT:    return ShortToTinyInt(m_data.m_dataSHORT);
-    case SQL_C_USHORT:   return UShortToTinyInt(m_data.m_dataUSHORT);
+    case SQL_C_SHORT:    return SQL_ShortToTinyInt(m_data.m_dataSHORT);
+    case SQL_C_USHORT:   return SQL_UShortToTinyInt(m_data.m_dataUSHORT);
     case SQL_C_LONG:     // fall through
-    case SQL_C_SLONG:    return SLongToTinyInt(m_data.m_dataLONG);
-    case SQL_C_ULONG:    return ULongToTinyInt(m_data.m_dataULONG);
-    case SQL_C_FLOAT:    return FloatToTinyInt(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToTinyInt(m_data.m_dataDOUBLE);
+    case SQL_C_SLONG:    return SQL_SLongToTinyInt(m_data.m_dataLONG);
+    case SQL_C_ULONG:    return SQL_ULongToTinyInt(m_data.m_dataULONG);
+    case SQL_C_FLOAT:    return SQL_FloatToTinyInt(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToTinyInt(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
     case SQL_C_STINYINT: return m_data.m_dataTINYINT;
-    case SQL_C_UTINYINT: return UTinyIntToTinyInt(m_data.m_dataUTINYINT);
-    case SQL_C_SBIGINT:  return SBIGINTToTinyInt(m_data.m_dataSBIGINT);
-    case SQL_C_UBIGINT:  return UBIGINTToTinyInt(m_data.m_dataUBIGINT);
+    case SQL_C_UTINYINT: return SQL_UTinyIntToTinyInt(m_data.m_dataUTINYINT);
+    case SQL_C_SBIGINT:  return SQL_SBIGINTToTinyInt(m_data.m_dataSBIGINT);
+    case SQL_C_UBIGINT:  return SQL_UBIGINTToTinyInt(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
-                           return SLongToTinyInt(num.AsLong());
+                           return SQL_SLongToTinyInt(num.AsLong());
                          }
                          break;
 
@@ -1485,23 +1486,23 @@ SQLVariant::GetAsUTinyInt()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return SLongToUTinyInt(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_SLongToUTinyInt(atoi(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
-    case SQL_C_SHORT:    return ShortToUTinyInt(m_data.m_dataSHORT);
-    case SQL_C_USHORT:   return UShortToUTinyInt(m_data.m_dataUSHORT);
+    case SQL_C_SHORT:    return SQL_ShortToUTinyInt(m_data.m_dataSHORT);
+    case SQL_C_USHORT:   return SQL_UShortToUTinyInt(m_data.m_dataUSHORT);
     case SQL_C_LONG:     // fall through
-    case SQL_C_SLONG:    return SLongToUTinyInt(m_data.m_dataLONG);
-    case SQL_C_ULONG:    return ULongToUTinyInt(m_data.m_dataULONG);
-    case SQL_C_FLOAT:    return FloatToUTinyInt(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToUTinyInt(m_data.m_dataDOUBLE);
+    case SQL_C_SLONG:    return SQL_SLongToUTinyInt(m_data.m_dataLONG);
+    case SQL_C_ULONG:    return SQL_ULongToUTinyInt(m_data.m_dataULONG);
+    case SQL_C_FLOAT:    return SQL_FloatToUTinyInt(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToUTinyInt(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (unsigned char) m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
-    case SQL_C_STINYINT: return TinyIntToUTinyInt(m_data.m_dataTINYINT);
+    case SQL_C_STINYINT: return SQL_TinyIntToUTinyInt(m_data.m_dataTINYINT);
     case SQL_C_UTINYINT: return m_data.m_dataUTINYINT;
-    case SQL_C_SBIGINT:  return SBIGINTToUTinyInt(m_data.m_dataSBIGINT);
-    case SQL_C_UBIGINT:  return UBIGINTToUTinyInt(m_data.m_dataUBIGINT);
+    case SQL_C_SBIGINT:  return SQL_SBIGINTToUTinyInt(m_data.m_dataSBIGINT);
+    case SQL_C_UBIGINT:  return SQL_UBIGINTToUTinyInt(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
-                           return SLongToUTinyInt(num.AsLong());
+                           return SQL_SLongToUTinyInt(num.AsLong());
                          }
                          break;
     case SQL_C_BINARY:                    // Fall through
@@ -1546,14 +1547,14 @@ SQLVariant::GetAsSBigInt()
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return (SQLBIGINT)m_data.m_dataLONG;
     case SQL_C_ULONG:    return (SQLBIGINT)(m_data.m_dataULONG);
-    case SQL_C_FLOAT:    return FloatToBIGINT(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToBIGINT(m_data.m_dataDOUBLE);
+    case SQL_C_FLOAT:    return SQL_FloatToBIGINT(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToBIGINT(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (SQLBIGINT)m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
     case SQL_C_STINYINT: return (SQLBIGINT)m_data.m_dataTINYINT;
     case SQL_C_UTINYINT: return (SQLBIGINT)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return m_data.m_dataSBIGINT;
-    case SQL_C_UBIGINT:  return UBIGINTToBIGINT(m_data.m_dataUBIGINT);
+    case SQL_C_UBIGINT:  return SQL_UBIGINTToBIGINT(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsInt64();
                          }
@@ -1593,20 +1594,20 @@ SQLVariant::GetAsUBigInt()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return LongToUBIGINT(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_LongToUBIGINT(atoi(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
-    case SQL_C_SHORT:    return ShortToUBIGINT(m_data.m_dataSHORT);
+    case SQL_C_SHORT:    return SQL_ShortToUBIGINT(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return (SQLUBIGINT)m_data.m_dataUSHORT;
     case SQL_C_LONG:     // fall through
-    case SQL_C_SLONG:    return LongToUBIGINT(m_data.m_dataLONG);
+    case SQL_C_SLONG:    return SQL_LongToUBIGINT(m_data.m_dataLONG);
     case SQL_C_ULONG:    return (SQLUBIGINT)(m_data.m_dataULONG);
-    case SQL_C_FLOAT:    return FloatToUBIGINT(m_data.m_dataFLOAT);
-    case SQL_C_DOUBLE:   return DoubleToUBIGINT(m_data.m_dataDOUBLE);
+    case SQL_C_FLOAT:    return SQL_FloatToUBIGINT(m_data.m_dataFLOAT);
+    case SQL_C_DOUBLE:   return SQL_DoubleToUBIGINT(m_data.m_dataDOUBLE);
     case SQL_C_BIT:      return (SQLUBIGINT)m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
-    case SQL_C_STINYINT: return TinyIntToUBIGINT(m_data.m_dataTINYINT);
+    case SQL_C_STINYINT: return SQL_TinyIntToUBIGINT(m_data.m_dataTINYINT);
     case SQL_C_UTINYINT: return (SQLUBIGINT)m_data.m_dataUTINYINT;
-    case SQL_C_SBIGINT:  return SBIGINTToUBIGINT(m_data.m_dataSBIGINT);
+    case SQL_C_SBIGINT:  return SQL_SBIGINTToUBIGINT(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return m_data.m_dataUBIGINT;
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsUInt64();
@@ -1919,6 +1920,28 @@ SQLVariant::GetFraction()
     case SQL_C_NUMERIC:         return m_data.m_dataNUMERIC.scale;
   }
   return 0;
+}
+
+// Only for SQL_NUMERIC: The precision
+int     
+SQLVariant::GetNumericPrecision()
+{
+  if(m_datatype == SQL_C_NUMERIC)
+  {
+    return m_data.m_dataNUMERIC.precision;
+  }
+  throw CString("Cannot get the numeric precision of this datatype");
+}
+
+// Only for SQL_NUMERIC: The scale
+int
+SQLVariant::GetNumericScale()
+{
+  if(m_datatype == SQL_C_NUMERIC)
+  {
+    return m_data.m_dataNUMERIC.scale;
+  }
+  throw CString("Cannot get the numeric sclae of this datatype");
 }
 
 bcd
@@ -2368,622 +2391,16 @@ SQLVariant::StringToBinary(const char* p_data)
 
 //////////////////////////////////////////////////////////////////////////
 //
-// TRIMMING CONVERSION ROUTINES BEGIN HERE
-//
-//////////////////////////////////////////////////////////////////////////
-
-long
-SQLVariant::ULongToLong(unsigned long p_value)
-{
-  if(p_value > LONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_ULONG,SQL_C_SLONG);
-  }
-  return (long)p_value;
-}
-
-long
-SQLVariant::FloatToLong(float p_value)
-{
-  if(p_value > LONG_MAX || p_value < LONG_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_LONG);
-  }
-  return (long)p_value;
-}
-
-long
-SQLVariant::DoubleToLong(double p_value)
-{
-  if(p_value > LONG_MAX || p_value < LONG_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_LONG);
-  }
-  return (long)p_value;
-}
-
-long
-SQLVariant::BIGINTToLong(SQLBIGINT p_value)
-{
-  if(p_value > LONG_MAX || p_value < LONG_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_LONG);
-  }
-  return (long)p_value;
-}
-
-long
-SQLVariant::UBIGINTToLong(SQLUBIGINT p_value)
-{
-  if(p_value > LONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_LONG);
-  }
-  return (long)p_value;
-}
-
-short
-SQLVariant::UShortToShort(unsigned short p_value)
-{
-  if(p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_USHORT,SQL_C_SHORT);
-  }
-  return (short)p_value;
-}
-
-short
-SQLVariant::SLongToShort(long p_value)
-{
-  if(p_value > SHRT_MAX || p_value < SHRT_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_SLONG,SQL_C_SHORT);
-  }
-  return (short)p_value;
-}
-
-short
-SQLVariant::ULongToShort(unsigned long p_value)
-{
-  if(p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_ULONG,SQL_C_SHORT);
-  }
-  return (short)p_value;
-}
-
-short
-SQLVariant::FloatToShort(float p_value)
-{
-  if(p_value > SHRT_MAX || p_value < SHRT_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_SHORT);
-  }
-  return (short)p_value;
-}
-
-short
-SQLVariant::DoubleToShort(double p_value)
-{
-  if(p_value > SHRT_MAX || p_value < SHRT_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_SHORT);
-  }
-  return (short)p_value;
-}
-
-short
-SQLVariant::BIGINTToShort(SQLBIGINT p_value)
-{
-  if(p_value > SHRT_MAX || p_value < SHRT_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_SHORT);
-  }
-  return (short)p_value;
-}
-
-short
-SQLVariant::UBIGINTToShort(SQLUBIGINT p_value)
-{
-  if(p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_SHORT);
-  }
-  return (short)p_value;
-}
-
-float
-SQLVariant::DoubleToFloat(double p_value)
-{
-  if(p_value > FLT_MAX || p_value < -FLT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_FLOAT);
-  }
-  return (float) p_value;
-}
-
-float
-SQLVariant::BIGINTToFloat(SQLBIGINT p_value)
-{
-  if(p_value > FLT_MAX || p_value < -FLT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_FLOAT);
-  }
-  return (float)p_value;
-}
-
-float
-SQLVariant::UBIGINTToFloat(SQLUBIGINT p_value)
-{
-  if(p_value > FLT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_FLOAT);
-  }
-  return (float)p_value;
-}
-
-double
-SQLVariant::BIGINTToDouble(SQLBIGINT p_value)
-{
-  if(p_value > DBL_MAX || p_value < -DBL_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_DOUBLE);
-  }
-  return (double)p_value;
-}
-
-double
-SQLVariant::UBIGINTToDouble(SQLUBIGINT p_value)
-{
-  if(p_value > DBL_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_DOUBLE);
-  }
-  return (double)p_value;
-}
-
-SQLBIGINT
-SQLVariant::FloatToBIGINT(float p_value)
-{
-  if(p_value > LLONG_MAX || p_value < LLONG_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_SBIGINT);
-  }
-  return (SQLBIGINT) p_value;
-}
-
-SQLBIGINT
-SQLVariant::DoubleToBIGINT(double p_value)
-{
-  if(p_value > LLONG_MAX || p_value < LLONG_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_SBIGINT);
-  }
-  return (SQLBIGINT)p_value;
-}
-
-SQLBIGINT 
-SQLVariant::UBIGINTToBIGINT(SQLUBIGINT p_value)
-{
-  if(p_value > LLONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_SBIGINT);
-  }
-  return (SQLBIGINT)p_value;
-}
-
-char
-SQLVariant::ShortToTinyInt(short p_value)
-{
-  if(p_value > _I8_MAX || p_value < _I8_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_SHORT,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::UShortToTinyInt(unsigned short p_value)
-{
-  if(p_value > _I8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_USHORT,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::SLongToTinyInt(long p_value)
-{
-  if(p_value > _I8_MAX || p_value < _I8_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_SLONG,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::ULongToTinyInt(long p_value)
-{
-  if(p_value > _I8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_ULONG,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::FloatToTinyInt(float p_value)
-{
-  if(p_value > _I8_MAX || p_value < _I8_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::DoubleToTinyInt(double p_value)
-{
-  if(p_value > _I8_MAX || p_value < _I8_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::UTinyIntToTinyInt(unsigned char p_value)
-{
-  if(p_value > _I8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UTINYINT,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::SBIGINTToTinyInt(SQLBIGINT p_value)
-{
-  if(p_value > _I8_MAX || p_value < _I8_MIN)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-char
-SQLVariant::UBIGINTToTinyInt(SQLUBIGINT p_value)
-{
-  if(p_value > _I8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_STINYINT);
-  }
-  return (char)p_value;
-}
-
-unsigned long
-SQLVariant::ShortToULong(short p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_SHORT,SQL_C_ULONG);
-  }
-  return (unsigned long) p_value;
-}
-
-unsigned long
-SQLVariant::LongToULong(long p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_LONG,SQL_C_ULONG);
-  }
-  return (unsigned long) p_value;
-}
-
-unsigned long
-SQLVariant::FloatToULong(float p_value)
-{
-  if(p_value < 0.0 || p_value > ULONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_ULONG);
-  }
-  return (unsigned long) p_value;
-}
-
-unsigned long
-SQLVariant::DoubleToULong(double p_value)
-{
-  if(p_value < 0.0 || p_value > ULONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_ULONG);
-  }
-  return (unsigned long) p_value;
-}
-
-unsigned long
-SQLVariant::TinyIntToULong(char p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_STINYINT,SQL_C_ULONG);
-  }
-  return (unsigned long) p_value;
-}
-
-unsigned long
-SQLVariant::BIGINTToULong(SQLBIGINT p_value)
-{
-  if(p_value < 0 || p_value > ULONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_ULONG);
-  }
-  return (unsigned long) p_value;
-}
-
-unsigned long
-SQLVariant::UBIGINTToULong(SQLUBIGINT p_value)
-{
-  if(p_value > ULONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_ULONG);
-  }
-  return (unsigned long) p_value;
-}
-
-SQLUBIGINT
-SQLVariant::ShortToUBIGINT(short p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_SHORT,SQL_C_UBIGINT);
-  }
-  return (SQLUBIGINT) p_value;
-}
-
-SQLUBIGINT
-SQLVariant::LongToUBIGINT(long p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_LONG,SQL_C_UBIGINT);
-  }
-  return (SQLUBIGINT) p_value;
-}
-
-SQLUBIGINT
-SQLVariant::FloatToUBIGINT(float p_value)
-{
-  if(p_value < 0.0 || p_value > ULLONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_UBIGINT);
-  }
-  return (SQLUBIGINT) p_value;
-}
-
-SQLUBIGINT
-SQLVariant::DoubleToUBIGINT(double p_value)
-{
-  if(p_value < 0.0 || p_value > ULLONG_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_UBIGINT);
-  }
-  return (SQLUBIGINT) p_value;
-}
-
-SQLUBIGINT
-SQLVariant::TinyIntToUBIGINT(char p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_TINYINT,SQL_C_UBIGINT);
-  }
-  return (SQLUBIGINT) p_value;
-}
-
-SQLUBIGINT
-SQLVariant::SBIGINTToUBIGINT(SQLBIGINT p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_UBIGINT);
-  }
-  return (SQLUBIGINT) p_value;
-}
-
-unsigned short
-SQLVariant::ShortToUShort(short p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_SHORT,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned short
-SQLVariant::SLongToUShort(long p_value)
-{
-  if(p_value < 0 || p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_LONG,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned short
-SQLVariant::ULongToUShort(unsigned long p_value)
-{
-  if(p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_ULONG,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned short
-SQLVariant::FloatToUShort(float p_value)
-{
-  if(p_value < 0.0 || p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned short
-SQLVariant::DoubleToUShort(double p_value)
-{
-  if(p_value < 0.0 || p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned short
-SQLVariant::TinyIntToUShort(char p_value)
-{
-  if(p_value < 0)
-  {
-    ThrowErrorTruncate(SQL_C_STINYINT,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned short
-SQLVariant::BIGINTToUShort(SQLBIGINT p_value)
-{
-  if(p_value < 0.0 || p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned short
-SQLVariant::UBIGINTToUShort(SQLUBIGINT p_value)
-{
-  if(p_value > SHRT_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_USHORT);
-  }
-  return (unsigned short) p_value;
-}
-
-unsigned char
-SQLVariant::ShortToUTinyInt(short p_value)
-{
-  if(p_value < 0 || p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_SHORT,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::UShortToUTinyInt(short p_value)
-{
-  if(p_value < 0 || p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_SHORT,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::SLongToUTinyInt(long p_value)
-{
-  if(p_value < 0 || p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_LONG,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::ULongToUTinyInt(unsigned long p_value)
-{
-  if(p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_ULONG,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::FloatToUTinyInt(float p_value)
-{
-  if(p_value < 0.0 || p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_FLOAT,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::DoubleToUTinyInt(double p_value)
-{
-  if(p_value < 0.0 || p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_DOUBLE,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::TinyIntToUTinyInt(char p_value)
-{
-  if(p_value < 0 || p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_STINYINT,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::SBIGINTToUTinyInt(SQLBIGINT p_value)
-{
-  if(p_value < 0 || p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_SBIGINT,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-unsigned char
-SQLVariant::UBIGINTToUTinyInt(SQLUBIGINT p_value)
-{
-  if(p_value > _UI8_MAX)
-  {
-    ThrowErrorTruncate(SQL_C_UBIGINT,SQL_C_UTINYINT);
-  }
-  return (unsigned char) p_value;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//
 // GENERAL ERRORS - THROWING A CString
 //
 //////////////////////////////////////////////////////////////////////////
 
-void
+void 
 SQLVariant::ThrowErrorDatatype(int p_getas)
 {
   CString error;
-  char* type  = FindDatatype(m_datatype);
-  char* getas = FindDatatype(p_getas);
+  char* type  = SQLVariant::FindDatatype(m_datatype);
+  char* getas = SQLVariant::FindDatatype(p_getas);
   error.Format("Cannot get a %s as a %s datatype.",type,getas);
-  throw error;
-}
-
-void
-SQLVariant::ThrowErrorTruncate(int p_from,int p_to)
-{
-  CString error;
-  char* from = FindDatatype(p_from);
-  char* to   = FindDatatype(p_to);
-  error.Format("Cannot truncate %s to %s",from,to);
   throw error;
 }

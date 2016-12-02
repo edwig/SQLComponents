@@ -30,32 +30,1574 @@
 #include "SQLDate.h"
 #include "bcd.h"
 
-CalculateFunctionArray
-SQLVariant::OperatorAdd[CT_LAST][CT_LAST] =
+SQLVariant
+SQL_OperCharAddChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-                         // CT_CHAR                        CT_SSHORT                        CT_USHORT                        CT_SLONG                        CT_ULONG                        CT_FLOAT                        CT_DOUBLE                        CT_BIT                        CT_STINYINT                     CT_UTINYINT                     CT_SBIGINT                     CT_UBIGINT                     CT_NUMERIC                    CT_GUID  CT_BINARY CT_DATE                       CT_TIME                       CT_TIMESTAMP                   CT_INTERVAL_YM                 CT_INTERVAL_DS
-                         // ------------------------------ -------------------------------- -------------------------------- ------------------------------- ------------------------------- ------------------------------- -------------------------------- ----------------------------- ------------------------------- ------------------------------- ------------------------------ ------------------------------ ----------------------------- -------- --------- ----------------------------- ----------------------------- ------------------------------ ------------------------------ --------------------------------
-  /* CT_CHAR        */   {  &SQLVariant::OperCharAddChar  ,&SQLVariant::OperCharAddSShort  ,&SQLVariant::OperCharAddUShort  ,&SQLVariant::OperCharAddSLong  ,&SQLVariant::OperCharAddULong  ,&SQLVariant::OperCharAddFloat  ,&SQLVariant::OperCharAddDouble  ,&SQLVariant::OperCharAddBit  ,&SQLVariant::OperCharAddSTiny  ,&SQLVariant::OperCharAddUTiny  ,&SQLVariant::OperCharAddSBig  ,&SQLVariant::OperCharAddUBig  ,&SQLVariant::OperCharAddNum  ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_SSHORT      */  ,{  &SQLVariant::OperSShortAddChar,&SQLVariant::OperSShortAddSShort,&SQLVariant::OperSShortAddUShort,&SQLVariant::OperSShortAddSLong,&SQLVariant::OperSShortAddULong,&SQLVariant::OperSShortAddFloat,&SQLVariant::OperSShortAddDouble,&SQLVariant::OperSShortAddBit,&SQLVariant::OperSShortAddSTiny,&SQLVariant::OperSShortAddUTiny,&SQLVariant::OperSShortAddSBig,&SQLVariant::OperSShortAddUBig,&SQLVariant::OperSShortAddNum,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_USHORT      */  ,{  &SQLVariant::OperUShortAddChar,&SQLVariant::OperUShortAddSShort,&SQLVariant::OperUShortAddUShort,&SQLVariant::OperUShortAddSLong,&SQLVariant::OperUShortAddULong,&SQLVariant::OperUShortAddFloat,&SQLVariant::OperUShortAddDouble,&SQLVariant::OperUShortAddBit,&SQLVariant::OperUShortAddSTiny,&SQLVariant::OperUShortAddUTiny,&SQLVariant::OperUShortAddSBig,&SQLVariant::OperUShortAddUBig,&SQLVariant::OperUShortAddNum,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_SLONG       */  ,{  &SQLVariant::OperSLongAddChar ,&SQLVariant::OperSLongAddSShort ,&SQLVariant::OperSLongAddUShort ,&SQLVariant::OperSLongAddSLong ,&SQLVariant::OperSLongAddULong ,&SQLVariant::OperSLongAddFloat ,&SQLVariant::OperSLongAddDouble ,&SQLVariant::OperSLongAddBit ,&SQLVariant::OperSLongAddSTiny ,&SQLVariant::OperSLongAddUTiny ,&SQLVariant::OperSLongAddSBig ,&SQLVariant::OperSLongAddUBig ,&SQLVariant::OperSLongAddNum ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_ULONG       */  ,{  &SQLVariant::OperULongAddChar ,&SQLVariant::OperULongAddSShort ,&SQLVariant::OperUlongAddUShort ,&SQLVariant::OperULongAddSLong ,&SQLVariant::OperULongAddULong ,&SQLVariant::OperULongAddFloat ,&SQLVariant::OperULongAddDouble ,&SQLVariant::OperULongAddBit ,&SQLVariant::OperULongAddSTiny ,&SQLVariant::OperULongAddUTiny ,&SQLVariant::OperULongAddSBig ,&SQLVariant::OperULongAddUBig ,&SQLVariant::OperULongAddNum ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_FLOAT       */  ,{  &SQLVariant::OperFloatAddChar ,&SQLVariant::OperFloatAddSShort ,&SQLVariant::OperFloatAddUShort ,&SQLVariant::OperFloatAddSLong ,&SQLVariant::OperFloatAddULong ,&SQLVariant::OperFloatAddFloat ,&SQLVariant::OperFloatAddDouble ,&SQLVariant::OperFloatAddBit ,&SQLVariant::OperFloatAddSTiny ,&SQLVariant::OperFloatAddUTiny ,&SQLVariant::OperFloatAddSBig ,&SQLVariant::OperFloatAddUBig ,&SQLVariant::OperFloatAddNum ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_DOUBLE      */  ,{  &SQLVariant::OperDoubleAddChar,&SQLVariant::OperDoubleAddSShort,&SQLVariant::OperDoubleAddUShort,&SQLVariant::OperDoubleAddSLong,&SQLVariant::OperDoubleAddULong,&SQLVariant::OperDoubleAddFloat,&SQLVariant::OperDoubleAddDouble,&SQLVariant::OperDoubleAddBit,&SQLVariant::OperDoubleAddSTiny,&SQLVariant::OperDoubleAddUTiny,&SQLVariant::OperDoubleAddSBig,&SQLVariant::OperDoubleAddUBig,&SQLVariant::OperDoubleAddNum,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_BIT         */  ,{  &SQLVariant::OperBitAddChar   ,&SQLVariant::OperBitAddSShort   ,&SQLVariant::OperBitAddUShort   ,&SQLVariant::OperBitAddSLong   ,&SQLVariant::OperBitAddULong   ,&SQLVariant::OperBitAddFloat   ,&SQLVariant::OperBitAddDouble   ,&SQLVariant::OperBitAddBit   ,&SQLVariant::OperBitAddSTiny   ,&SQLVariant::OperBitAddUTiny   ,&SQLVariant::OperBitAddSBig   ,&SQLVariant::OperBitAddUBig   ,&SQLVariant::OperBitAddNum   ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_STINYINT    */  ,{  &SQLVariant::OperSTinyAddChar ,&SQLVariant::OperSTinyAddSShort ,&SQLVariant::OperSTinyAddUShort ,&SQLVariant::OperSTinyAddSLong ,&SQLVariant::OperSTinyAddULong ,&SQLVariant::OperSTinyAddFloat ,&SQLVariant::OperSTinyAddDouble ,&SQLVariant::OperSTinyAddBit ,&SQLVariant::OperSTinyAddSTiny ,&SQLVariant::OperSTinyAddUTiny ,&SQLVariant::OperSTinyAddSBig ,&SQLVariant::OperSTinyAddUBig ,&SQLVariant::OperSTinyAddNum ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_UTINYINT    */  ,{  &SQLVariant::OperUTinyAddChar ,&SQLVariant::OperUTinyAddSShort ,&SQLVariant::OperUTinyAddUShort ,&SQLVariant::OperUTinyAddSLong ,&SQLVariant::OperUTinyAddULong ,&SQLVariant::OperUTinyAddFloat ,&SQLVariant::OperUTinyAddDouble ,&SQLVariant::OperUTinyAddBit ,&SQLVariant::OperUTinyAddSTiny ,&SQLVariant::OperUTinyAddUTiny ,&SQLVariant::OperUTinyAddSBig ,&SQLVariant::OperUTinyAddUBig ,&SQLVariant::OperUTinyAddNum ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_SBIGINT     */  ,{  &SQLVariant::OperSBigAddChar  ,&SQLVariant::OperSBigAddSShort  ,&SQLVariant::OperSBigAddUShort  ,&SQLVariant::OperSBigAddSLong  ,&SQLVariant::OperSBigAddULong  ,&SQLVariant::OperSBigAddFloat  ,&SQLVariant::OperSBigAddDouble  ,&SQLVariant::OperSBigAddBit  ,&SQLVariant::OperSBigAddSTiny  ,&SQLVariant::OperSBigAddUTiny  ,&SQLVariant::OperSBigAddSBig  ,&SQLVariant::OperSBigAddUBig  ,&SQLVariant::OperSBigAddNum  ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_UBIGINT     */  ,{  &SQLVariant::OperUBigAddChar  ,&SQLVariant::OperUBigAddSShort  ,&SQLVariant::OperUBigAddUShort  ,&SQLVariant::OperUBigAddSLong  ,&SQLVariant::OperUBigAddULong  ,&SQLVariant::OperUBigAddFloat  ,&SQLVariant::OperUBigAddDouble  ,&SQLVariant::OperUBigAddBit  ,&SQLVariant::OperUBigAddSTiny  ,&SQLVariant::OperUBigAddUTiny  ,&SQLVariant::OperUBigAddSBig  ,&SQLVariant::OperUBigAddUBig  ,&SQLVariant::OperUBigAddNum  ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_NUMERIC     */  ,{  &SQLVariant::OperNumAddChar   ,&SQLVariant::OperNumAddSShort   ,&SQLVariant::OperNumAddUShort   ,&SQLVariant::OperNumAddSLong   ,&SQLVariant::OperNumAddULong   ,&SQLVariant::OperNumAddFloat   ,&SQLVariant::OperNumAddDouble   ,&SQLVariant::OperNumAddBit   ,&SQLVariant::OperNumAddSTiny   ,&SQLVariant::OperNumAddUTiny   ,&SQLVariant::OperNumAddSBig   ,&SQLVariant::OperNumAddUBig   ,&SQLVariant::OperNumAddNum   ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_GUID        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_BINARY      */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,nullptr                        }
-  /* CT_DATE        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr                      ,&SQLVariant::OperDateAddTime ,nullptr                       ,nullptr                       ,&SQLVariant::OperDateAddIntDS  }
-  /* CT_TIME        */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,&SQLVariant::OperTimeAddDate ,nullptr                      ,nullptr                       ,nullptr                       ,&SQLVariant::OperTimeAddIntDS  }
-  /* CT_TIMESTAMP   */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,nullptr                       ,&SQLVariant::OperStampAddIntDS }
-  /* CT_INTERVAL_YM */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,nullptr                      ,nullptr                      ,nullptr                       ,&SQLVariant::OperIntYMAddIntYM,nullptr                        }
-  /* CT_INTERVAL_DS */  ,{  nullptr                       ,nullptr                         ,nullptr                         ,nullptr                        ,nullptr                        ,nullptr                        ,nullptr                         ,nullptr                      ,nullptr                        ,nullptr                        ,nullptr                       ,nullptr                       ,nullptr                      ,nullptr ,nullptr  ,&SQLVariant::OperIntDSAddDate,&SQLVariant::OperIntDSAddTime,&SQLVariant::OperIntDSAddStamp,nullptr                       ,&SQLVariant::OperIntDSAddIntDS }
+  CString left;
+  CString right;
+
+  p_left .GetAsString(left);
+  p_right.GetAsString(right);
+
+  CString result = left + right;
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+SQLVariant 
+SQL_OperULongAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddChar(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd((const char*)p_right.GetAsChar());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == SSHORT
+
+SQLVariant 
+SQL_OperCharAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant SQL_OperSLongAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddSShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd(p_right.GetAsSShort());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == USHORT
+
+SQLVariant 
+SQL_OperCharAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+
+SQLVariant 
+SQL_OperSLongAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUlongAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddUShort(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd((long)p_right.GetAsUShort());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == SLONG
+
+SQLVariant 
+SQL_OperCharAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddSLong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd(p_right.GetAsSLong());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == ULONG
+
+SQLVariant 
+SQL_OperCharAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddULong(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd((int64)p_right.GetAsULong());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == FLOAT
+
+SQLVariant 
+SQL_OperCharAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddFloat(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd((double)p_right.GetAsFloat());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == DOUBLE
+
+SQLVariant 
+SQL_OperCharAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsUShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddDouble(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd(p_right.GetAsDouble());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == BIT
+
+SQLVariant 
+SQL_OperCharAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  if(p_right.GetAsBit()) 
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  if(p_right.GetAsBit())
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  if(p_right.GetAsBit())
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  if(p_right.GetAsBit())
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  if(p_right.GetAsBit())
+  {
+    result += 1.0;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  if(p_right.GetAsBit())
+  {
+    result += 1.0;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  if(p_right.GetAsBit())
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  if(p_right.GetAsBit())
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  if(p_right.GetAsBit())
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  if(p_right.GetAsBit())
+  {
+    ++result;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddBit(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd(p_right.GetAsBit());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == STINYINT
+
+SQLVariant 
+SQL_OperCharAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddSTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd(p_right.GetAsSTinyInt());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE = UTINYINT
+
+SQLVariant 
+SQL_OperCharAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddUTiny(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd((short)p_right.GetAsUTinyInt());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == SBIGINT
+
+SQLVariant 
+SQL_OperCharAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddSBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd(p_right.GetAsSBigInt());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == UBIGINT
+
+SQLVariant 
+SQL_OperCharAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSShortAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short result = p_left.GetAsSShort();
+  result += p_right.GetAsSShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUShortAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short result = p_left.GetAsUShort();
+  result += p_right.GetAsUShort();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSLongAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long result = p_left.GetAsSLong();
+  result += p_right.GetAsSLong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperULongAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long result = p_left.GetAsULong();
+  result += p_right.GetAsULong();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperFloatAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float result = p_left.GetAsFloat();
+  result += p_right.GetAsFloat();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperDoubleAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double result = p_left.GetAsDouble();
+  result += p_right.GetAsDouble();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperBitAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool result = false;
+  if(p_left.GetAsBit() || p_right.GetAsBit())
+  {
+    result = true;
+  }
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSTinyAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char result = p_left.GetAsSTinyInt();
+  result += p_right.GetAsSTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUTinyAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char result = p_left.GetAsUTinyInt();
+  result += p_right.GetAsUTinyInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperSBigAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLBIGINT result = p_left.GetAsSBigInt();
+  result += p_right.GetAsSBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperUBigAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLUBIGINT result = p_left.GetAsUBigInt();
+  result += p_right.GetAsUBigInt();
+  return SQLVariant(result);
+}
+
+SQLVariant 
+SQL_OperNumAddUBig(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + bcd(p_right.GetAsUBigInt());
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == NUMERIC
+
+SQLVariant 
+SQL_OperCharAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = bcd(p_left.GetAsChar()) + p_right.GetAsBCD();
+  SQLVariant var(num.AsString());
+  return var;
+}
+
+SQLVariant 
+SQL_OperSShortAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  short num = p_left.GetAsUShort() + (short)p_right.GetAsBCD().AsLong();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperUShortAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned short num = p_left.GetAsUShort() + (unsigned short)p_right.GetAsBCD().AsLong();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperSLongAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  long num = p_left.GetAsSLong() + p_right.GetAsBCD().AsLong();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperULongAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned long num = p_left.GetAsULong() + (unsigned long) p_right.GetAsBCD().AsInt64();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperFloatAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  float num = p_left.GetAsFloat() + (float)p_right.GetAsBCD().AsDouble();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperDoubleAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  double num = p_left.GetAsDouble() + p_right.GetAsBCD().AsDouble();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperBitAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bool num = false;
+  if(p_left.GetAsBit() || p_right.GetAsBCD().IsNull() == false)
+  {
+    num = true;
+  }
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperSTinyAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  char num = p_left.GetAsSTinyInt() + (char) p_right.GetAsBCD().AsLong();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperUTinyAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  unsigned char num = p_left.GetAsUTinyInt() + (unsigned char) p_right.GetAsBCD().AsLong();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperSBigAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  int64 num = p_left.GetAsSBigInt() + p_right.GetAsBCD().AsInt64();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperUBigAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  uint64 num = p_left.GetAsUBigInt() + p_right.GetAsBCD().AsUInt64();
+  SQLVariant var(num);
+  return var;
+}
+
+SQLVariant 
+SQL_OperNumAddNum(SQLVariant& p_left,SQLVariant& p_right)
+{
+  bcd num = p_left.GetAsBCD() + p_right.GetAsBCD();
+  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  return var;
+}
+
+// TYPE == DATE
+
+SQLVariant 
+SQL_OperTimeAddDate(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLTimestamp result(p_right.GetAsSQLDate(),p_left.GetAsSQLTime());
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperIntDSAddDate(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLDate result = p_right.GetAsSQLDate();
+  result = result + p_left.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+// TYPE == TIME
+
+SQLVariant 
+SQL_OperDateAddTime(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLTimestamp result(p_left.GetAsSQLDate(),p_right.GetAsSQLTime());
+  return SQLVariant(&result);
+}
+SQLVariant 
+SQL_OperIntDSAddTime(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLTime result = p_right.GetAsSQLTime();
+  result = result + p_left.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+// TYPE == TIMESTAMP
+
+SQLVariant 
+SQL_OperIntDSAddStamp(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLTimestamp result = p_right.GetAsSQLTimestamp();
+  result = result + p_left.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+// TYPE == INTERVAL_YEAR_MONTH
+#pragma warning (disable: 4239)
+
+SQLVariant 
+SQL_OperIntYMAddIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_left.GetAsSQLInterval();
+  result = result + p_right.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+// TYPE == INTERVAL_DAY_SECOND
+
+SQLVariant 
+SQL_OperDateAddIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLDate result = p_left.GetAsSQLDate();
+  result = result + p_right.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperTimeAddIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLTime result = p_left.GetAsSQLTime();
+  result = result + p_right.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperStampAddIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLTimestamp result = p_left.GetAsSQLTimestamp();
+  result = result + p_right.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperIntDSAddIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_left.GetAsSQLInterval() + p_right.GetAsSQLInterval();
+  return SQLVariant(&result);
+}
+
+// OPERATOR ARRAY
+
+static CalculateFunctionArray OperatorAdd[CT_LAST][CT_LAST] =
+{
+                         // CT_CHAR                CT_SSHORT                CT_USHORT                CT_SLONG                CT_ULONG                CT_FLOAT                CT_DOUBLE                CT_BIT                CT_STINYINT             CT_UTINYINT             CT_SBIGINT             CT_UBIGINT             CT_NUMERIC            CT_GUID  CT_BINARY CT_DATE               CT_TIME               CT_TIMESTAMP           CT_INTERVAL_YM         CT_INTERVAL_DS
+                         // ---------------------- ------------------------ ------------------------ ----------------------- ----------------------- ----------------------- ------------------------ --------------------- ----------------------- ----------------------- ---------------------- ---------------------- --------------------- -------- --------- --------------------- --------------------- ---------------------- ---------------------- ------------------------
+  /* CT_CHAR        */   {  &SQL_OperCharAddChar  ,&SQL_OperCharAddSShort  ,&SQL_OperCharAddUShort  ,&SQL_OperCharAddSLong  ,&SQL_OperCharAddULong  ,&SQL_OperCharAddFloat  ,&SQL_OperCharAddDouble  ,&SQL_OperCharAddBit  ,&SQL_OperCharAddSTiny  ,&SQL_OperCharAddUTiny  ,&SQL_OperCharAddSBig  ,&SQL_OperCharAddUBig  ,&SQL_OperCharAddNum  ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_SSHORT      */  ,{  &SQL_OperSShortAddChar,&SQL_OperSShortAddSShort,&SQL_OperSShortAddUShort,&SQL_OperSShortAddSLong,&SQL_OperSShortAddULong,&SQL_OperSShortAddFloat,&SQL_OperSShortAddDouble,&SQL_OperSShortAddBit,&SQL_OperSShortAddSTiny,&SQL_OperSShortAddUTiny,&SQL_OperSShortAddSBig,&SQL_OperSShortAddUBig,&SQL_OperSShortAddNum,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_USHORT      */  ,{  &SQL_OperUShortAddChar,&SQL_OperUShortAddSShort,&SQL_OperUShortAddUShort,&SQL_OperUShortAddSLong,&SQL_OperUShortAddULong,&SQL_OperUShortAddFloat,&SQL_OperUShortAddDouble,&SQL_OperUShortAddBit,&SQL_OperUShortAddSTiny,&SQL_OperUShortAddUTiny,&SQL_OperUShortAddSBig,&SQL_OperUShortAddUBig,&SQL_OperUShortAddNum,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_SLONG       */  ,{  &SQL_OperSLongAddChar ,&SQL_OperSLongAddSShort ,&SQL_OperSLongAddUShort ,&SQL_OperSLongAddSLong ,&SQL_OperSLongAddULong ,&SQL_OperSLongAddFloat ,&SQL_OperSLongAddDouble ,&SQL_OperSLongAddBit ,&SQL_OperSLongAddSTiny ,&SQL_OperSLongAddUTiny ,&SQL_OperSLongAddSBig ,&SQL_OperSLongAddUBig ,&SQL_OperSLongAddNum ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_ULONG       */  ,{  &SQL_OperULongAddChar ,&SQL_OperULongAddSShort ,&SQL_OperUlongAddUShort ,&SQL_OperULongAddSLong ,&SQL_OperULongAddULong ,&SQL_OperULongAddFloat ,&SQL_OperULongAddDouble ,&SQL_OperULongAddBit ,&SQL_OperULongAddSTiny ,&SQL_OperULongAddUTiny ,&SQL_OperULongAddSBig ,&SQL_OperULongAddUBig ,&SQL_OperULongAddNum ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_FLOAT       */  ,{  &SQL_OperFloatAddChar ,&SQL_OperFloatAddSShort ,&SQL_OperFloatAddUShort ,&SQL_OperFloatAddSLong ,&SQL_OperFloatAddULong ,&SQL_OperFloatAddFloat ,&SQL_OperFloatAddDouble ,&SQL_OperFloatAddBit ,&SQL_OperFloatAddSTiny ,&SQL_OperFloatAddUTiny ,&SQL_OperFloatAddSBig ,&SQL_OperFloatAddUBig ,&SQL_OperFloatAddNum ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_DOUBLE      */  ,{  &SQL_OperDoubleAddChar,&SQL_OperDoubleAddSShort,&SQL_OperDoubleAddUShort,&SQL_OperDoubleAddSLong,&SQL_OperDoubleAddULong,&SQL_OperDoubleAddFloat,&SQL_OperDoubleAddDouble,&SQL_OperDoubleAddBit,&SQL_OperDoubleAddSTiny,&SQL_OperDoubleAddUTiny,&SQL_OperDoubleAddSBig,&SQL_OperDoubleAddUBig,&SQL_OperDoubleAddNum,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_BIT         */  ,{  &SQL_OperBitAddChar   ,&SQL_OperBitAddSShort   ,&SQL_OperBitAddUShort   ,&SQL_OperBitAddSLong   ,&SQL_OperBitAddULong   ,&SQL_OperBitAddFloat   ,&SQL_OperBitAddDouble   ,&SQL_OperBitAddBit   ,&SQL_OperBitAddSTiny   ,&SQL_OperBitAddUTiny   ,&SQL_OperBitAddSBig   ,&SQL_OperBitAddUBig   ,&SQL_OperBitAddNum   ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_STINYINT    */  ,{  &SQL_OperSTinyAddChar ,&SQL_OperSTinyAddSShort ,&SQL_OperSTinyAddUShort ,&SQL_OperSTinyAddSLong ,&SQL_OperSTinyAddULong ,&SQL_OperSTinyAddFloat ,&SQL_OperSTinyAddDouble ,&SQL_OperSTinyAddBit ,&SQL_OperSTinyAddSTiny ,&SQL_OperSTinyAddUTiny ,&SQL_OperSTinyAddSBig ,&SQL_OperSTinyAddUBig ,&SQL_OperSTinyAddNum ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_UTINYINT    */  ,{  &SQL_OperUTinyAddChar ,&SQL_OperUTinyAddSShort ,&SQL_OperUTinyAddUShort ,&SQL_OperUTinyAddSLong ,&SQL_OperUTinyAddULong ,&SQL_OperUTinyAddFloat ,&SQL_OperUTinyAddDouble ,&SQL_OperUTinyAddBit ,&SQL_OperUTinyAddSTiny ,&SQL_OperUTinyAddUTiny ,&SQL_OperUTinyAddSBig ,&SQL_OperUTinyAddUBig ,&SQL_OperUTinyAddNum ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_SBIGINT     */  ,{  &SQL_OperSBigAddChar  ,&SQL_OperSBigAddSShort  ,&SQL_OperSBigAddUShort  ,&SQL_OperSBigAddSLong  ,&SQL_OperSBigAddULong  ,&SQL_OperSBigAddFloat  ,&SQL_OperSBigAddDouble  ,&SQL_OperSBigAddBit  ,&SQL_OperSBigAddSTiny  ,&SQL_OperSBigAddUTiny  ,&SQL_OperSBigAddSBig  ,&SQL_OperSBigAddUBig  ,&SQL_OperSBigAddNum  ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_UBIGINT     */  ,{  &SQL_OperUBigAddChar  ,&SQL_OperUBigAddSShort  ,&SQL_OperUBigAddUShort  ,&SQL_OperUBigAddSLong  ,&SQL_OperUBigAddULong  ,&SQL_OperUBigAddFloat  ,&SQL_OperUBigAddDouble  ,&SQL_OperUBigAddBit  ,&SQL_OperUBigAddSTiny  ,&SQL_OperUBigAddUTiny  ,&SQL_OperUBigAddSBig  ,&SQL_OperUBigAddUBig  ,&SQL_OperUBigAddNum  ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_NUMERIC     */  ,{  &SQL_OperNumAddChar   ,&SQL_OperNumAddSShort   ,&SQL_OperNumAddUShort   ,&SQL_OperNumAddSLong   ,&SQL_OperNumAddULong   ,&SQL_OperNumAddFloat   ,&SQL_OperNumAddDouble   ,&SQL_OperNumAddBit   ,&SQL_OperNumAddSTiny   ,&SQL_OperNumAddUTiny   ,&SQL_OperNumAddSBig   ,&SQL_OperNumAddUBig   ,&SQL_OperNumAddNum   ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_GUID        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_BINARY      */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,nullptr                }
+  /* CT_DATE        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr              ,&SQL_OperDateAddTime ,nullptr               ,nullptr               ,&SQL_OperDateAddIntDS  }
+  /* CT_TIME        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,&SQL_OperTimeAddDate ,nullptr              ,nullptr               ,nullptr               ,&SQL_OperTimeAddIntDS  }
+  /* CT_TIMESTAMP   */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,nullptr               ,&SQL_OperStampAddIntDS }
+  /* CT_INTERVAL_YM */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr              ,nullptr              ,nullptr               ,&SQL_OperIntYMAddIntYM,nullptr                }
+  /* CT_INTERVAL_DS */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,&SQL_OperIntDSAddDate,&SQL_OperIntDSAddTime,&SQL_OperIntDSAddStamp,nullptr               ,&SQL_OperIntDSAddIntDS }
 };
+
 
 // Add operator for SQLVariant
 SQLVariant
@@ -81,7 +1623,7 @@ SQLVariant::operator+(SQLVariant& p_right)
   OperatorCalculate function = OperatorAdd[left][right].function;
   if(function)
   {
-    return (this->*(function))(p_right);
+    return (*function)(*this,p_right);
   }
   // No compare function found
   // Data types are not comparable
@@ -90,1544 +1632,4 @@ SQLVariant::operator+(SQLVariant& p_right)
   CString error;
   error.Format("Cannot do the add operator on (%s + %s)",leftType,rightType);
   throw error;
-}
-
-SQLVariant
-SQLVariant::OperCharAddChar(SQLVariant& p_right)
-{
-  CString left;
-  CString right;
-
-  GetAsString(left);
-  p_right.GetAsString(right);
-
-  CString result = left + right;
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddChar(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddChar(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddChar(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-SQLVariant 
-SQLVariant::OperULongAddChar(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddChar(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddChar(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddChar(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddChar(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddChar(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddChar(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddChar(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddChar(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd((const char*)p_right.GetAsChar());
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == SSHORT
-
-SQLVariant 
-SQLVariant::OperCharAddSShort(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddSShort(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddSShort(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant SQLVariant::OperSLongAddSShort(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddSShort(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddSShort(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddSShort(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddSShort(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddSShort(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddSShort(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddSShort(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddSShort(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddSShort(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd(p_right.m_data.m_dataSHORT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == USHORT
-
-SQLVariant 
-SQLVariant::OperCharAddUShort(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddUShort(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddUShort(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-
-SQLVariant 
-SQLVariant::OperSLongAddUShort(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUlongAddUShort(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddUShort(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddUShort(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddUShort(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddUShort(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddUShort(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddUShort(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddUShort(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddUShort(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd((long)p_right.m_data.m_dataUSHORT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == SLONG
-
-SQLVariant 
-SQLVariant::OperCharAddSLong(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddSLong(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddSLong(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddSLong(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddSLong(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddSLong(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddSLong(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddSLong(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddSLong(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddSLong(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddSLong(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddSLong(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddSLong(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd(p_right.m_data.m_dataLONG);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == ULONG
-
-SQLVariant 
-SQLVariant::OperCharAddULong(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddULong(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddULong(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddULong(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddULong(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddULong(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddULong(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddULong(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddULong(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddULong(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddULong(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddULong(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddULong(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd((int64)p_right.m_data.m_dataULONG);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == FLOAT
-
-SQLVariant 
-SQLVariant::OperCharAddFloat(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddFloat(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddFloat(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddFloat(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddFloat(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddFloat(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddFloat(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddFloat(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddFloat(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddFloat(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddFloat(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddFloat(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddFloat(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd((double)p_right.m_data.m_dataFLOAT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == DOUBLE
-
-SQLVariant 
-SQLVariant::OperCharAddDouble(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddDouble(SQLVariant& p_right)
-{
-  short result = GetAsUShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddDouble(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddDouble(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddDouble(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddDouble(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddDouble(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddDouble(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddDouble(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddDouble(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddDouble(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddDouble(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddDouble(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd(p_right.m_data.m_dataDOUBLE);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == BIT
-
-SQLVariant 
-SQLVariant::OperCharAddBit(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddBit(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  if(p_right.GetAsBit()) 
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddBit(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  if(p_right.GetAsBit())
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddBit(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  if(p_right.GetAsBit())
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddBit(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  if(p_right.GetAsBit())
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddBit(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  if(p_right.GetAsBit())
-  {
-    result += 1.0;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddBit(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  if(p_right.GetAsBit())
-  {
-    result += 1.0;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddBit(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddBit(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  if(p_right.GetAsBit())
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddBit(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  if(p_right.GetAsBit())
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddBit(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  if(p_right.GetAsBit())
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddBit(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  if(p_right.GetAsBit())
-  {
-    ++result;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddBit(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd(p_right.m_data.m_dataBIT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == STINYINT
-
-SQLVariant 
-SQLVariant::OperCharAddSTiny(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddSTiny(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddSTiny(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddSTiny(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddSTiny(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddSTiny(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddSTiny(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddSTiny(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddSTiny(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddSTiny(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddSTiny(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddSTiny(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddSTiny(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd(p_right.m_data.m_dataSTINYINT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE = UTINYINT
-
-SQLVariant 
-SQLVariant::OperCharAddUTiny(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddUTiny(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddUTiny(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddUTiny(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddUTiny(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddUTiny(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddUTiny(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddUTiny(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddUTiny(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddUTiny(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddUTiny(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddUTiny(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddUTiny(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd((short)p_right.m_data.m_dataUTINYINT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == SBIGINT
-
-SQLVariant 
-SQLVariant::OperCharAddSBig(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddSBig(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddSBig(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddSBig(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddSBig(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddSBig(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddSBig(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddSBig(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddSBig(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddSBig(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddSBig(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddSBig(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddSBig(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd(p_right.m_data.m_dataSBIGINT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == UBIGINT
-
-SQLVariant 
-SQLVariant::OperCharAddUBig(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddUBig(SQLVariant& p_right)
-{
-  short result = GetAsSShort();
-  result += p_right.GetAsSShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddUBig(SQLVariant& p_right)
-{
-  unsigned short result = GetAsUShort();
-  result += p_right.GetAsUShort();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddUBig(SQLVariant& p_right)
-{
-  long result = GetAsSLong();
-  result += p_right.GetAsSLong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperULongAddUBig(SQLVariant& p_right)
-{
-  unsigned long result = GetAsULong();
-  result += p_right.GetAsULong();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddUBig(SQLVariant& p_right)
-{
-  float result = GetAsFloat();
-  result += p_right.GetAsFloat();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddUBig(SQLVariant& p_right)
-{
-  double result = GetAsDouble();
-  result += p_right.GetAsDouble();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperBitAddUBig(SQLVariant& p_right)
-{
-  bool result = false;
-  if(GetAsBit() || p_right.GetAsBit())
-  {
-    result = true;
-  }
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddUBig(SQLVariant& p_right)
-{
-  char result = GetAsSTinyInt();
-  result += p_right.GetAsSTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddUBig(SQLVariant& p_right)
-{
-  unsigned char result = GetAsUTinyInt();
-  result += p_right.GetAsUTinyInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddUBig(SQLVariant& p_right)
-{
-  SQLBIGINT result = GetAsSBigInt();
-  result += p_right.GetAsSBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddUBig(SQLVariant& p_right)
-{
-  SQLUBIGINT result = GetAsUBigInt();
-  result += p_right.GetAsUBigInt();
-  return SQLVariant(result);
-}
-
-SQLVariant 
-SQLVariant::OperNumAddUBig(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + bcd(p_right.m_data.m_dataUBIGINT);
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == NUMERIC
-
-SQLVariant 
-SQLVariant::OperCharAddNum(SQLVariant& p_right)
-{
-  bcd num = bcd(GetAsChar()) + p_right.GetAsBCD();
-  SQLVariant var(num.AsString());
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperSShortAddNum(SQLVariant& p_right)
-{
-  short num = GetAsUShort() + (short)p_right.GetAsBCD().AsLong();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperUShortAddNum(SQLVariant& p_right)
-{
-  unsigned short num = GetAsUShort() + (unsigned short)p_right.GetAsBCD().AsLong();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperSLongAddNum(SQLVariant& p_right)
-{
-  long num = GetAsSLong() + p_right.GetAsBCD().AsLong();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperULongAddNum(SQLVariant& p_right)
-{
-  unsigned long num = GetAsULong() + (unsigned long) p_right.GetAsBCD().AsInt64();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperFloatAddNum(SQLVariant& p_right)
-{
-  float num = GetAsFloat() + (float)p_right.GetAsBCD().AsDouble();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperDoubleAddNum(SQLVariant& p_right)
-{
-  double num = GetAsDouble() + p_right.GetAsBCD().AsDouble();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperBitAddNum(SQLVariant& p_right)
-{
-  bool num = false;
-  if(GetAsBit() || p_right.GetAsBCD().IsNull() == false)
-  {
-    num = true;
-  }
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperSTinyAddNum(SQLVariant& p_right)
-{
-  char num = GetAsSTinyInt() + (char) p_right.GetAsBCD().AsLong();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperUTinyAddNum(SQLVariant& p_right)
-{
-  unsigned char num = GetAsUTinyInt() + (unsigned char) p_right.GetAsBCD().AsLong();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperSBigAddNum(SQLVariant& p_right)
-{
-  int64 num = GetAsSBigInt() + p_right.GetAsBCD().AsInt64();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperUBigAddNum(SQLVariant& p_right)
-{
-  uint64 num = GetAsUBigInt() + p_right.GetAsBCD().AsUInt64();
-  SQLVariant var(num);
-  return var;
-}
-
-SQLVariant 
-SQLVariant::OperNumAddNum(SQLVariant& p_right)
-{
-  bcd num = GetAsBCD() + p_right.GetAsBCD();
-  SQLVariant var(&num,m_data.m_dataNUMERIC.precision,m_data.m_dataNUMERIC.scale);
-  return var;
-}
-
-// TYPE == DATE
-
-SQLVariant 
-SQLVariant::OperTimeAddDate(SQLVariant& p_right)
-{
-  SQLTimestamp result(p_right.GetAsSQLDate(),GetAsSQLTime());
-  return SQLVariant(&result);
-}
-
-SQLVariant 
-SQLVariant::OperIntDSAddDate(SQLVariant& p_right)
-{
-  SQLDate result = p_right.GetAsSQLDate();
-  result = result + GetAsSQLInterval();
-  return SQLVariant(&result);
-}
-
-// TYPE == TIME
-
-SQLVariant 
-SQLVariant::OperDateAddTime(SQLVariant& p_right)
-{
-  SQLTimestamp result(GetAsSQLDate(),p_right.GetAsSQLTime());
-  return SQLVariant(&result);
-}
-SQLVariant 
-SQLVariant::OperIntDSAddTime(SQLVariant& p_right)
-{
-  SQLTime result = p_right.GetAsSQLTime();
-  result = result + GetAsSQLInterval();
-  return SQLVariant(&result);
-}
-
-// TYPE == TIMESTAMP
-
-SQLVariant 
-SQLVariant::OperIntDSAddStamp(SQLVariant& p_right)
-{
-  SQLTimestamp result = p_right.GetAsSQLTimestamp();
-  result = result + GetAsSQLInterval();
-  return SQLVariant(&result);
-}
-
-// TYPE == INTERVAL_YEAR_MONTH
-#pragma warning (disable: 4239)
-
-SQLVariant 
-SQLVariant::OperIntYMAddIntYM(SQLVariant& p_right)
-{
-  SQLInterval result = GetAsSQLInterval();
-  result = result + p_right.GetAsSQLInterval();
-  return SQLVariant(&result);
-}
-
-// TYPE == INTERVAL_DAY_SECOND
-
-SQLVariant 
-SQLVariant::OperDateAddIntDS(SQLVariant& p_right)
-{
-  SQLDate result = GetAsSQLDate();
-  result = result + p_right.GetAsSQLInterval();
-  return SQLVariant(&result);
-}
-
-SQLVariant 
-SQLVariant::OperTimeAddIntDS(SQLVariant& p_right)
-{
-  SQLTime result = GetAsSQLTime();
-  result = result + p_right.GetAsSQLInterval();
-  return SQLVariant(&result);
-}
-
-SQLVariant 
-SQLVariant::OperStampAddIntDS(SQLVariant& p_right)
-{
-  SQLTimestamp result = GetAsSQLTimestamp();
-  result = result + p_right.GetAsSQLInterval();
-  return SQLVariant(&result);
-}
-
-SQLVariant 
-SQLVariant::OperIntDSAddIntDS(SQLVariant& p_right)
-{
-  SQLInterval result = GetAsSQLInterval() + p_right.GetAsSQLInterval();
-  return SQLVariant(&result);
 }

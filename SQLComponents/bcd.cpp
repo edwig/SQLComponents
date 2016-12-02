@@ -1509,6 +1509,80 @@ bcd::AsDouble() const
   return result;
 }
 
+// bcd::AsShort
+// Description: Get as a short
+short   
+bcd::AsShort() const
+{
+  // Quick check for zero
+  if(m_exponent < 0)
+  {
+    return 0;
+  }
+  int exponent = bcdDigits - m_exponent - 1;
+
+  // Get from the mantissa
+  int result = m_mantissa[0];
+
+  // Adjust to exponent
+  while(exponent--)
+  {
+    result /= 10;
+  }
+
+  // Take care of sign and over/under flows
+  if(m_sign == Positive)
+  {
+    if(result > SHORT_MAX)
+    {
+      throw CString("BCD: Overflow in conversion to short number.");
+    }
+  }
+  else
+  {
+    if(result < SHORT_MIN)
+    {
+      throw CString("BCD: Underflow in conversion to short number.");
+    }
+  }
+  return (short) result;
+}
+
+// bcd::AsUShort
+// Description: Get as an unsigned short
+ushort  
+bcd::AsUShort() const
+{
+  // Check for unsigned
+  if(m_sign == Negative)
+  {
+    throw CString("BCD: Cannot convert a negative number to an unsigned short number.");
+  }
+  // Quick check for zero
+  if(m_exponent < 0)
+  {
+    return 0;
+  }
+
+  // Get from the mantissa
+  int result = m_mantissa[0];
+
+  // Adjust to exponent
+  int exponent = bcdDigits - m_exponent - 1;
+  while(exponent--)
+  {
+    result /= 10;
+  }
+
+  // Take care of overflow
+  if(result > USHORT_MAX)
+  {
+    throw CString("BCD: Overflow in conversion to unsigned short number.");
+  }
+
+  return (short)result;
+}
+
 // bcd::AsLong
 // Description: Get as a long
 long    
@@ -1519,13 +1593,12 @@ bcd::AsLong() const
   {
     return 0L;
   }
-  int64 result = 0L;
-  int exponent = 2 * bcdDigits - m_exponent - 1;
 
   // Get from the mantissa
-  result = ((int64)m_mantissa[0] * bcdBase) + ((int64)m_mantissa[1]);
+  int64 result = ((int64)m_mantissa[0] * bcdBase) + ((int64)m_mantissa[1]);
 
   // Adjust to exponent
+  int exponent = 2 * bcdDigits - m_exponent - 1;
   while(exponent--)
   {
     result /= 10;
@@ -1548,6 +1621,41 @@ bcd::AsLong() const
     result = -result;
   }
   return (long) result;
+}
+
+// bcd::AsULong
+// Get as an unsigned long
+ulong   
+bcd::AsULong() const
+{
+  // Check for unsigned
+  if(m_sign == Negative)
+  {
+    throw CString("BCD: Cannot convert a negative number to an unsigned long.");
+  }
+
+  // Quick optimization for really small numbers
+  if(m_exponent < 0)
+  {
+    return 0L;
+  }
+
+  // Get from the mantissa
+  int64 result = ((int64)m_mantissa[0] * bcdBase) + ((int64)m_mantissa[1]);
+
+  // Adjust to exponent
+  int exponent = 2 * bcdDigits - m_exponent - 1;
+  while(exponent--)
+  {
+    result /= 10;
+  }
+
+  // Take care of overflow
+  if(result > ULONG_MAX)
+  {
+    throw CString("BCD: Overflow in conversion to unsigned long integer.");
+  }
+  return (long)result;
 }
 
 // bcd::AsInt64

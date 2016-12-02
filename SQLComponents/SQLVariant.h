@@ -110,13 +110,13 @@ public:
    bool    IsIntervalType();
    bool    IsDateTimeType();
    // INFO about type names/values
-   int     FindDatatype   (char* p_type);
-   char*   FindDatatype   (int   p_type);
-   int     FindParamtype  (char* p_type);
-   char*   FindParamtype  (int   p_type);
-   int     FindSQLDatatype(char* p_type);
-   char*   FindSQLDatatype(int   p_type);
-   int     FindDataTypeFromSQLType();
+   static  int     FindDatatype   (char* p_type);
+   static  char*   FindDatatype   (int   p_type);
+   static  int     FindParamtype  (char* p_type);
+   static  char*   FindParamtype  (int   p_type);
+   static  int     FindSQLDatatype(char* p_type);
+   static  char*   FindSQLDatatype(int   p_type);
+           int     FindDataTypeFromSQLType();
 
    // GETTERS
    int     GetDataType();
@@ -124,10 +124,13 @@ public:
    int     GetSQLDataType();
    bool    GetAtExec();
    int     GetBinaryPieceSize();
+   int     GetBinaryLength();
    SQLLEN* GetIndicatorPointer();
    int     GetColumnNumber();
    int     GetParameterType();
    int     GetFraction();
+   int     GetNumericPrecision();  // Only for SQL_NUMERIC
+   int     GetNumericScale();      // Only for SQL_NUMERIC
    // SETTERS
    void    SetSQLDataType(int p_type);
    void    SetAtExec(bool p_atExec);
@@ -222,23 +225,8 @@ private:
    // Internal conversions
    bool    StringToBinary (const char* p_data);
    bool    BinaryToString (unsigned char* buffer,int buflen);
-
-   // Internal conversion and trimming
-   // Used for requesting a value as another type
-   // and for the operators where both sides have different types
-#include "SQLVariantTrim.h"
-
-   // Internals for the operators
-#include "SQLVariantOperatorEqual.h"
-#include "SQLVariantOperatorGreater.h"
-#include "SQLVariantOperatorGreatEqual.h"
-#include "SQLVariantOperatorSmaller.h"
-#include "SQLVariantOperatorSmallEqual.h"
-#include "SQLVariantOperatorAdd.h"
-#include "SQLVariantOperatorSub.h"
-#include "SQLVariantOperatorMul.h"
-#include "SQLVariantOperatorDiv.h"
-#include "SQLVariantOperatorMod.h"
+   // Throw error as a result of internal trimming
+   void    ThrowErrorDatatype(int p_getas);
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX
@@ -311,6 +299,12 @@ inline int
 SQLVariant::GetBinaryPieceSize()
 {
   return m_binaryPieceSize;
+}
+
+inline int
+SQLVariant::GetBinaryLength()
+{
+  return m_binaryLength;
 }
 
 inline void
