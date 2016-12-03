@@ -31,6 +31,7 @@
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
 #include "SQLInterval.h"
+#include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -50,6 +51,9 @@ namespace OperatorUnitTest
 
     void FillArrays()
     {
+      bcd num1(42);
+      bcd num2(24);
+
       // Init the test array
       variants[CT_CHAR]     = SQLVariant("42");
       variants[CT_SSHORT]   = SQLVariant((short)42);
@@ -63,6 +67,7 @@ namespace OperatorUnitTest
       variants[CT_UTINYINT] = SQLVariant((unsigned char)42);
       variants[CT_SBIGINT]  = SQLVariant((__int64)42);
       variants[CT_UBIGINT]  = SQLVariant((unsigned __int64)42);
+      variants[CT_NUMERIC]  = SQLVariant(&num1,8,2);
 
       other[CT_CHAR]     = SQLVariant("24");
       other[CT_SSHORT]   = SQLVariant((short)24);
@@ -76,6 +81,7 @@ namespace OperatorUnitTest
       other[CT_UTINYINT] = SQLVariant((unsigned char)24);
       other[CT_SBIGINT]  = SQLVariant((__int64)24);
       other[CT_UBIGINT]  = SQLVariant((unsigned __int64)24);
+      other[CT_NUMERIC]  = SQLVariant(&num2,8,2);
     }
 
     TEST_METHOD(CompareEqualityTest)
@@ -83,9 +89,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test equality operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &variants[y];
@@ -106,9 +112,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test inequality operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           // Cannot test this case true == 24 / true == 42 :-)
           if(x == CT_BIT)
@@ -135,9 +141,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test greater than operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           // Cannot test this case true == 24 / true == 42 :-)
           if(x == CT_BIT)
@@ -164,9 +170,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test greater than or equal operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           // Cannot test this case true == 24 / true == 42 :-)
           if(x == CT_BIT)
@@ -194,9 +200,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test smaller than operators");
       FillArrays();
 
-      for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+      for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
       {
-        for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+        for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
         {
           // Cannot test this case true == 24 / true == 42 :-)
           if(x == CT_BIT)
@@ -223,9 +229,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test smaller than or equal operators");
       FillArrays();
 
-      for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+      for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
       {
-        for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+        for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
         {
           // Cannot test this case in this way: true == 24 / true == 42 :-)
           if(x == CT_BIT)

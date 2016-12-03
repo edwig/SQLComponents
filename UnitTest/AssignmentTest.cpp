@@ -31,6 +31,7 @@
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
 #include "SQLInterval.h"
+#include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -553,6 +554,55 @@ namespace OperatorUnitTest
       Assert::AreEqual((BYTE)0x66,guid->Data4[5]);
       Assert::AreEqual((BYTE)0x77,guid->Data4[6]);
       Assert::AreEqual((BYTE)0x88,guid->Data4[7]);
+    }
+
+    TEST_METHOD(TestCastOperators)
+    {
+      Logger::WriteMessage("Testing the cast operators of SQLVariant");
+
+      SQLVariant varBit   ((bool)true);
+      SQLVariant varSTiny ((char)-67);
+      SQLVariant varUTiny ((unsigned char)189);
+      SQLVariant varSShort((short)-567);
+      SQLVariant varUShort((ushort)567);
+      SQLVariant varInt   ((long)2 * 42);
+      SQLVariant varUInt  ((ulong)0x84556677);
+      SQLVariant varFloat ((float)9.87654E12);
+      SQLVariant varDouble((double)1.12345678901234E88);
+      SQLVariant varBig   (0x12312341234i64);
+      SQLVariant varUBig  ((uint64)0xCC11DD22FF11EE11ui64);
+
+      bool     numberBit    = varBit;
+      char     numberSTiny  = varSTiny;
+      uchar    numberUTiny  = varUTiny;
+      short    numberSShort = varSShort;
+      ushort   numberUShort = varUShort;
+      int      numberInt    = varInt;
+      unsigned numberUInt   = varUInt;
+      float    numberFloat  = varFloat;
+      double   numberDouble = varDouble;
+      int64    numberBig    = varBig;
+      uint64   numberUBig   = varUBig;
+
+      Assert::AreEqual((bool)true,numberBit);
+      Assert::AreEqual((char)-67, numberSTiny);
+      Assert::AreEqual((unsigned char)189,numberUTiny);
+      Assert::AreEqual((short)-567,numberSShort);
+      Assert::AreEqual((int)567,(int)numberUShort);
+      Assert::AreEqual((int)84,numberInt);
+      Assert::AreEqual((unsigned)0x84556677,numberUInt);
+      Assert::AreEqual((float)9.87654E12,numberFloat);
+      Assert::AreEqual((double)1.12345678901234E88,numberDouble);
+
+      unsigned high = (unsigned)(numberBig >> 32);
+      unsigned low  = (unsigned)(numberBig & 0xFFFFFFFFi64);
+      Assert::AreEqual((unsigned)0x123,high);
+      Assert::AreEqual((unsigned)0x12341234,low);
+
+      high = (unsigned)(numberUBig >> 32);
+      low  = (unsigned)(numberUBig & 0xFFFFFFFFui64);
+      Assert::AreEqual((unsigned)0xCC11DD22,high);
+      Assert::AreEqual((unsigned)0xFF11EE11,low);
     }
   };
 }

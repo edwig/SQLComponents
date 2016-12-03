@@ -1941,7 +1941,7 @@ SQLVariant::GetNumericScale()
   {
     return m_data.m_dataNUMERIC.scale;
   }
-  throw CString("Cannot get the numeric sclae of this datatype");
+  throw CString("Cannot get the numeric scale of this datatype");
 }
 
 bcd

@@ -45,7 +45,7 @@ public:
   SQLInterval();
 
   // Interval constructed from another interval
-  SQLInterval(SQLInterval& p_interval);
+  SQLInterval(const SQLInterval& p_interval);
 
   // Interval constructed from an ODBC structure
   SQLInterval(SQL_INTERVAL_STRUCT* p_interval);

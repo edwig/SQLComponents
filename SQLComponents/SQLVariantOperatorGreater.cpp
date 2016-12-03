@@ -949,7 +949,7 @@ SQL_OperUBigGreaterNum(SQLVariant& p_left,SQLVariant& p_right)
 bool
 SQL_OperNumGreaterNum(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsBCD() == p_right.GetAsBCD();
+  return p_left.GetAsBCD() > p_right.GetAsBCD();
 }
 
 // TYPE == GUID

@@ -109,7 +109,7 @@ public:
   // Get bounded columns from query
   ColNumMap*  GetBoundedColumns();
 
-  // Paralllel cancelation of the statement
+  // Parallel cancellation of the statement
   void        DoCancelQuery();
 
   // GET RESULTS FROM AN EXECUTED QUERY
@@ -133,6 +133,9 @@ public:
   // Get Display size of the column
   int         GetColumnDisplaySize(int p_column);
 
+  // Getting the results of the query
+  SQLVariant& operator[](int p_index);
+
   // VARIOUS STATUS METHODS
   // Get true if no error found so far
   bool        IsOk() const;
@@ -142,7 +145,7 @@ public:
   bool        IsNull(int col);
   // See if column is EMPTY value
   bool        IsEmpty(int col);
-  // Get version for work-arounds
+  // Get version for work-around
   int         GetODBCVersion();
 
   // LEGACY SUPPORT ODBC 1.x AND 2.x
@@ -249,3 +252,8 @@ SQLQuery::SetSpeedThreshold(double p_seconds)
   m_speedThreshold = p_seconds;
 }
 
+inline SQLVariant&
+SQLQuery::operator[](int p_index)
+{
+  return *(GetColumn(p_index));
+}

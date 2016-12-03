@@ -27,6 +27,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "SQLDatabase.h"
+#include "SQLQuery.h"
 #include "SQLDataSet.h"
 #include "SQLInfoTree.h"
 
@@ -108,6 +109,62 @@ namespace DatabaseUnitTest
       endTime = clock();
       performance.Format("Close test performed in: %.6f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(performance);
+    }
+
+    TEST_METHOD(TestQuery)
+    {
+      Logger::WriteMessage("In unit test Database query function");
+
+      double grandTotal = 0.0;
+      CString sql("SELECT id\n"
+                  "      ,invoice\n"
+                  "      ,description\n" 
+                  "      ,total\n" 
+                  "  FROM master");
+
+
+      SQLDatabase dbs;
+      dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+      try
+      {
+        // Set options for the MS-Access database
+        dbs.SetLoginTimeout(0);
+        dbs.SetMARS(false);
+
+        if(dbs.Open(g_dsn,g_user,g_password))
+        {
+          Logger::WriteMessage("Database opened.");
+
+          SQLQuery query(&dbs);
+          query.DoSQLStatement(sql);
+          while(query.GetRecord())
+          {
+            long    id       = query[1];
+            long    invoice  = query[2];
+            CString descript = query[3];
+            double  total    = query[4];
+
+            grandTotal += total;
+
+            Logger::WriteMessage(descript);
+          }
+        }
+        else
+        {
+          Logger::WriteMessage("Database ***NOT*** opened.");
+        }
+        // Real test 750 + 600 = 1350
+        Assert::AreEqual((double)1350.0,grandTotal);
+      }
+      catch(CString& s)
+      {
+        Logger::WriteMessage("Database ***NOT*** opened. Reason:");
+        Logger::WriteMessage(s);
+      }
+      catch(...)
+      {
+        Logger::WriteMessage("Database ***NOT*** opened for unknown reasons");
+      }
     }
 
     // For DATASET tests

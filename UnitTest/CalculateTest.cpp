@@ -31,6 +31,7 @@
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
 #include "SQLInterval.h"
+#include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -50,6 +51,9 @@ namespace OperatorUnitTest
 
     void FillArrays()
     {
+      bcd num1((long)42);
+      bcd num2((long)5);
+
       // Init the test array
       variants[CT_CHAR]     = SQLVariant("42");
       variants[CT_SSHORT]   = SQLVariant((short)42);
@@ -63,6 +67,7 @@ namespace OperatorUnitTest
       variants[CT_UTINYINT] = SQLVariant((unsigned char)42);
       variants[CT_SBIGINT]  = SQLVariant((__int64)42);
       variants[CT_UBIGINT]  = SQLVariant((unsigned __int64)42);
+      variants[CT_NUMERIC]  = SQLVariant(&num1,8,2);
 
       other[CT_CHAR]     = SQLVariant("5");
       other[CT_SSHORT]   = SQLVariant((short)5);
@@ -76,6 +81,7 @@ namespace OperatorUnitTest
       other[CT_UTINYINT] = SQLVariant((unsigned char)5);
       other[CT_SBIGINT]  = SQLVariant((__int64)5);
       other[CT_UBIGINT]  = SQLVariant((unsigned __int64)5);
+      other[CT_NUMERIC]  = SQLVariant(&num2,8,2);
     }
 
     TEST_METHOD(CalculateAddTest)
@@ -83,9 +89,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test add operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           if(x == CT_BIT || y == CT_BIT)
           {
@@ -122,9 +128,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test subtraction operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           if(x == CT_BIT || y == CT_BIT)
           {
@@ -161,9 +167,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test multiplication operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           if(x == CT_BIT || y == CT_BIT)
           {
@@ -201,9 +207,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test division operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           if(x == CT_BIT || y == CT_BIT)
           {
@@ -228,6 +234,7 @@ namespace OperatorUnitTest
             SQLVariant result = *left / *right; // TEST
             CString res;
             result.GetAsString(res);
+            res.TrimRight('0');
 
             if(res.Compare("8") && res.Compare("8.4"))
             {
@@ -243,9 +250,9 @@ namespace OperatorUnitTest
       Logger::WriteMessage("In unit test modulo operators");
       FillArrays();
 
-      for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        for(int y = CT_CHAR; y <= CT_UBIGINT; ++y)
+        for(int y = CT_CHAR; y <= CT_NUMERIC; ++y)
         {
           if(x == CT_BIT || y == CT_BIT)
           {
@@ -270,6 +277,8 @@ namespace OperatorUnitTest
             SQLVariant result = *left % *right; // TEST
             CString res;
             result.GetAsString(res);
+            res.TrimRight('0');
+            res.TrimRight('.');
 
             Assert::AreEqual("2",res);
           }

@@ -219,6 +219,27 @@ public:
    SQLVariant  operator  /(SQLVariant& p_right);
    SQLVariant  operator  %(SQLVariant& p_right);
 
+   // Cast operators
+   operator bool();
+   operator char();
+   operator const char*();
+   operator unsigned char();
+   operator short();
+   operator unsigned short();
+   operator int();
+   operator unsigned int();
+   operator long();
+   operator unsigned long();
+   operator float();
+   operator double();
+   operator __int64();
+   operator unsigned __int64();
+   operator SQLDate();
+   operator SQLTime();
+   operator SQLTimestamp();
+   operator SQLInterval();
+   operator bcd();
+
 private:
    // Total internal reset (type and data store)
    void    ResetDataType(int p_type);

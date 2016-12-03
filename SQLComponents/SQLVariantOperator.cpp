@@ -438,3 +438,104 @@ SQLVariant::operator=(bcd& p_bcd)
 
   return *this;
 }
+
+//////////////////////////////////////////////////////////////////////////
+//
+// CAST OPERATORS
+//
+//////////////////////////////////////////////////////////////////////////
+
+SQLVariant::operator bool()
+{
+  return GetAsBit() > 0;
+}
+
+SQLVariant::operator char()
+{
+  return GetAsSTinyInt();
+}
+
+SQLVariant::operator unsigned char()
+{
+  return GetAsUTinyInt();
+}
+
+SQLVariant::operator const char*()
+{
+  return (const char*)GetAsChar();
+}
+
+SQLVariant::operator short()
+{
+  return GetAsSShort();
+}
+
+SQLVariant::operator unsigned short()
+{
+  return GetAsUShort();
+}
+
+SQLVariant::operator int()
+{
+  return GetAsSLong();
+}
+
+SQLVariant::operator unsigned int()
+{
+  return GetAsULong();
+}
+
+SQLVariant::operator long()
+{
+  return GetAsSLong();
+}
+
+SQLVariant::operator unsigned long()
+{
+  return GetAsULong();
+}
+
+SQLVariant::operator float()
+{
+  return GetAsFloat();
+}
+
+SQLVariant::operator double()
+{
+  return GetAsDouble();
+}
+
+SQLVariant::operator __int64()
+{
+  return GetAsSBigInt();
+}
+
+SQLVariant::operator unsigned __int64()
+{
+  return GetAsUBigInt();
+}
+
+SQLVariant::operator SQLDate()
+{
+  return GetAsSQLDate();
+}
+
+SQLVariant::operator SQLTime()
+{
+  return GetAsSQLTime();
+}
+
+SQLVariant::operator SQLTimestamp()
+{
+  return GetAsSQLTimestamp();
+}
+
+SQLVariant::operator SQLInterval()
+{
+  return GetAsSQLInterval();
+}
+
+SQLVariant::operator bcd()
+{
+  return GetAsBCD();
+}

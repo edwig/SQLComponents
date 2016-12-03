@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "SQLVariant.h"
 #include "SQLDate.h"
+#include "bcd.h"
 
 SQLVariant variants[CT_LAST];
 SQLVariant others  [CT_LAST];
@@ -135,6 +136,48 @@ TestAdd()
   }
 }
 
+void TestMul()
+{
+  CString numString("42");
+  bcd num(5);
+
+  SQLVariant var1(numString);
+  SQLVariant var2(&num,8,2);
+
+  SQLVariant var3 = var1 * var2;
+  printf("The result of the char*decimal = %s\n",var3.GetAsChar());
+}
+
+void TestCast()
+{
+  printf("Testing the cast operators of SQLVariant\n");
+  printf("========================================\n");
+
+  SQLVariant varBit   ((bool) true);
+  SQLVariant varSTiny ((char) -67);
+  SQLVariant varUTiny ((unsigned char) 189);
+  SQLVariant varSShort((short) -567);
+  SQLVariant varUShort((ushort) 567);
+  SQLVariant varInt   ((long) 2 * 42);
+  SQLVariant varUInt  ((ulong) 0x84556677);
+  
+  bool     numberBit     = varBit;
+  char     numberSTiny   = varSTiny;
+  uchar    numberUTiny   = varUTiny;
+  short    numberSShort  = varSShort;
+  ushort   numberUShort  = varUShort;
+  int      numberInt     = varInt;
+  unsigned numberUInt    = varUInt;
+
+  printf("Test for correct bit cast               : %s\n",numberBit ? "true" : "false");
+  printf("Test for correct signed tiny int cast   : %d\n",(int) numberSTiny);
+  printf("Test for correct unsigned tiny int cast : %d\n",(int) numberUTiny);
+  printf("Test for correct signed short int cast  : %d\n",(int) numberSShort);
+  printf("Test for correct unsigned short int cast: %d\n",(int) numberUShort);
+  printf("Test for correct int cast               : %d\n",numberInt);
+  printf("Test for correct unsigned int cast      : %X\n",numberUInt);
+}
+
 void TestOperators()
 {
   TestGreater();
@@ -142,4 +185,6 @@ void TestOperators()
   TestEqual();
   TestAddVar();
   TestAdd();
+  TestMul();
+  TestCast();
 }

@@ -44,7 +44,7 @@ SQLInterval::SQLInterval(SQLINTERVAL p_type,const CString p_string)
 }
 
 // XTOR from another interval
-SQLInterval::SQLInterval(SQLInterval& p_interval)
+SQLInterval::SQLInterval(const SQLInterval& p_interval)
 {
   memcpy(&m_interval,&p_interval.m_interval,sizeof(SQL_INTERVAL_STRUCT));
   m_value = p_interval.m_value;
