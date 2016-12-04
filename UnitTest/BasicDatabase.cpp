@@ -30,6 +30,7 @@
 #include "SQLQuery.h"
 #include "SQLDataSet.h"
 #include "SQLInfoTree.h"
+#include "SQLInfoDB.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -411,6 +412,272 @@ namespace DatabaseUnitTest
       {
         Assert::Fail(L"Unknown error in database test");
       }
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+    //
+    // TESTING DBInfo
+    //
+    //////////////////////////////////////////////////////////////////////////
+
+    void ReportString(CString p_prompt,CString p_info)
+    {
+      CString text;
+      text.Format("%s %s",p_prompt,p_info);
+      Logger::WriteMessage(text);
+    }
+
+    void ReportBoolean(CString p_prompt,bool p_info)
+    {
+      CString text;
+      text.Format("%s %s",p_prompt,p_info ? "true" : "false");
+      Logger::WriteMessage(text);
+    }
+
+    void ReportLong(CString p_prompt,long p_info)
+    {
+      CString text;
+      text.Format("%s %d",p_prompt,p_info);
+      Logger::WriteMessage(text);
+    }
+
+    void ReportSQL(CString p_prompt,CString p_sql)
+    {
+      Logger::WriteMessage(p_prompt);
+      if(p_sql.IsEmpty())
+      {
+        Logger::WriteMessage("<NO SQL GIVEN BY DBINFO>");
+      }
+      else
+      {
+        Logger::WriteMessage(p_sql);
+      }
+    }
+
+    void ReportDBInfo(SQLInfoDB* p_info)
+    {
+      CString schema ("dbo");
+      CString table  ("master");
+      CString column ("id");
+      CString select ("SELECT id FROM master\n");
+      CString columns("oid,description,amount");
+      CString procedure("procedure");
+      CString mode("auto");
+      CString destiny("variable");
+      CString source("\'Test'\"");
+      CString indexname("01_master_id");
+      CString condition("variable IS NOT NULL");
+      int     statements = 0;
+
+      DBForeign foreign;
+      foreign.m_constraintname    = "FK_detail_master";
+      foreign.m_schema            = schema;
+      foreign.m_tablename         = "detail";
+      foreign.m_column            = "master_id";
+      foreign.m_primaryTable      = table;
+      foreign.m_primaryColumn     = column;
+      foreign.m_enabled           = true;
+      foreign.m_deferrable        = true;
+      foreign.m_initiallyDeffered = false;
+      foreign.m_match             = 0; // 0=Full, 1=partial, 2=simple
+      foreign.m_updateRule        = 0; // 0=restrict, 1=cascade, 2=set null, 3=set default, 4=No action
+      foreign.m_deleteRule        = 1; // 0=restrict, 1=cascade, 2=set null, 3=set default, 4=No action
+
+      DBIndex index[2];
+
+      index[0].m_indexName  = indexname;
+      index[0].m_column     = "id";
+      index[0].m_position   = 0;
+      index[0].m_unique     = true;
+      index[0].m_descending = true;
+      index[1].m_indexName  = "";
+
+      ReportString ("Database vendor name               :",p_info->GetDatabaseVendorName());
+      ReportBoolean("Catalog is in upper case           :",p_info->IsCatalogUpper());
+      ReportBoolean("Database understands schemas       :",p_info->GetUnderstandsSchemas());
+      ReportBoolean("Driver understands comments        :",p_info->SupportsDatabaseComments());
+      ReportBoolean("Support deferred constraints       :",p_info->SupportsDeferredConstraints());
+      ReportBoolean("Support order-by expressions       :",p_info->SupportsOrderByExpression());
+      ReportSQL    ("SQL to get default col value       :",p_info->GetSQLStringDefaultValue(table,column));
+      ReportString ("Database DATETIME keyword          :",p_info->GetSystemDateTimeKeyword());
+      ReportString ("Database date keyword              :",p_info->GetSystemDateString());
+      ReportBoolean("Time stored as decimal             :",p_info->GetTimeIsDecimal());
+      ReportBoolean("Interval stored as decimal         :",p_info->GetIntervalIsDecimal());
+      ReportString ("Concatenation operator             :",p_info->GetConcatanationOperator());
+      ReportString ("Quote character                    :",p_info->GetQuoteCharacter());
+      ReportString ("DEFAULT NULL in tables             :",p_info->GetDefaultNULL());
+      ReportString ("INOUT Parameter                    :",p_info->GetParameterINOUT());
+      ReportString ("OUT Parameter                      :",p_info->GetParameterOUT());
+      ReportString ("Audit user datatype                :",p_info->GetAuditUserDatatype());
+      ReportString ("Audit user datatype variable       :",p_info->GetAuditUserDatatypeAsVariable());
+      ReportString ("IDENTITY Primary key               :",p_info->GetPrimaryKeyType());
+      ReportString ("DATETIME year-to-second type       :",p_info->GetDatetimeYearToSecondType());
+      ReportString ("ALTER CONSTRAINT separator         :",p_info->GetAlterConstraintSeparator());
+      ReportString ("INNER JOIN keyword                 :",p_info->GetInnerJoinKeyword());
+      ReportString ("OUTER JOIN keyword                 :",p_info->GetOuterJoinKeyword());
+      ReportString ("INNER JOIN keyword (in views)      :",p_info->GetViewInnerJoinKeyword());
+      ReportString ("OUTER JOIN keyword (in views)      :",p_info->GetViewOuterJoinKeyword());
+      ReportString ("OUTER JOIN closure                 :",p_info->GetOuterJoinClosure());
+      ReportString ("OUTER JOIN sign in WHERE           :",p_info->GetOuterJoinSign());
+      ReportString ("Stored procedure parameter prefix  :",p_info->GetSPParamPrefix());
+      ReportString ("Identity string                    :",p_info->GetIdentityString(table));
+      ReportSQL    ("Create temporary table             :",p_info->GetSQLCreateTemporaryTable(table,select));
+      ReportSQL    ("Remove temporary table             :",p_info->GetSQLRemoveTemporaryTable(table,statements));
+      ReportSQL    ("SELECT into temporary table        :",p_info->GetSQLSelectIntoTemp(table,select));
+      ReportString ("Replace OID by sequence            :",p_info->GetReplaceColumnOIDbySequence(columns,table));
+      ReportSQL    ("Remove procedure dependencies      :",p_info->GetSQLRemoveProcedureDependencies(procedure));
+      ReportSQL    ("Remove field dependencies          :",p_info->GetSQLRemoveFieldDependencies(table));
+      ReportSQL    ("Primary key definition (persistent):",p_info->GetPrimaryKeyDefinition(schema,table,false));
+      ReportSQL    ("Primary key definition (temporary) :",p_info->GetPrimaryKeyDefinition(schema,table,true));
+      ReportSQL    ("Primary key constraint             :",p_info->GetPrimaryKeyConstraint(schema,table,column));
+      ReportSQL    ("Foreign key constraint             :",p_info->GetSQLForeignKeyConstraint(foreign));
+      ReportSQL    ("Alter foreign key constraint       :",p_info->GetSQLAlterForeignKey(foreign,foreign));
+      ReportSQL    ("Performance settings               :",p_info->GetSQLPerformanceSettings());
+      ReportSQL    ("Cache mode settings                :",p_info->GetSQLCacheModeSetting(mode));
+      ReportSQL    ("NLS Numeric characters             :",p_info->GetSQLNlsNumericCharacters());
+      ReportSQL    ("Alter table column name            :",p_info->GetSQLModifyColumnName(table,column,"oid","INTEGER"));
+      ReportLong   ("Maximum SQL length                 :",p_info->GetMaxStatementLength());
+      ReportString ("Modify datatype prefix             :",p_info->GetModifyDatatypePrefix());
+      ReportString ("Name of a temporary table          :",p_info->GetCodeTemporaryTable());
+      ReportSQL    ("ROW LOCKING mode                   :",p_info->GetCodeLockModeRow());
+      ReportString ("Temporary table with no log        :",p_info->GetCodeTempTableWithNoLog());
+      ReportSQL    ("GRANT ALL on table to user         :",p_info->GetSQLGrantAllOnTable(schema,table,false));
+      ReportSQL    ("GRANT ALL on table (GRANT OPTION)  :",p_info->GetSQLGrantAllOnTable(schema,table,true));
+      ReportSQL    ("SELECT INTO TEMP prefix            :",p_info->GetSelectIntoTempClausePrefix(table));
+      ReportSQL    ("SELECT INTO TEMP suffix            :",p_info->GetSelectIntoTempClauseSuffix(table));
+      ReportBoolean("IF statement needs BEGIN/END       :",p_info->GetCodeIfStatementBeginEnd());
+      ReportString ("End of the IF statement            :",p_info->GetCodeEndIfStatement());
+      ReportString ("Assignment to variable             :",p_info->GetAssignmentStatement(destiny,source));
+      ReportString ("Keyword for ALTER COLUMN           :",p_info->GetCodeAlterColumn());
+      ReportString ("Start of a WHILE loop              :",p_info->GetStartWhileLoop(condition));
+      ReportString ("End   of a WHILE loop              :",p_info->GetEndWhileLoop());
+      ReportBoolean("Parenthesis for SELECT assignment  :",p_info->GetAssignmentSelectParenthesis());
+      ReportString ("UPPER function                     :",p_info->GetUpperFunction(destiny));
+      ReportString ("INTERVAL 1 minute ago              :",p_info->GetInterval1MinuteAgo());
+      ReportSQL    ("Generate new serial                :",p_info->GetSQLGenerateSerial(table));
+      ReportString ("Effective serial                   :",p_info->GetSQLEffectiveSerial("oid"));
+      ReportString ("NVL statement                      :",p_info->GetNVLStatement(destiny,source));
+      ReportSQL    ("Start new subtransaction           :",p_info->GetStartSubTransaction(table));
+      ReportSQL    ("Commit subtransaction              :",p_info->GetCommitSubTransaction(table));
+      ReportSQL    ("Rollback subtransaction            :",p_info->GetRollbackSubTransaction(table));
+      ReportSQL    ("Find out if stored procedure exists:",p_info->GetSQLStoredProcedureExists(procedure));
+      ReportString ("DUAL table name                    :",p_info->GetDualTableName());
+      ReportString ("FROM part for single row select    :",p_info->GetDualClause());
+      ReportSQL    ("DEFERRABLE for a constraint        :",p_info->GetConstraintDeferrable());
+      ReportSQL    ("SET ALL CONSTRAINTS DEFERRED       :",p_info->GetSQLDeferConstraints());
+      ReportSQL    ("SET ALL CONSTRAINTS IMMEDIATE      :",p_info->GetSQLConstraintsImmediate());
+      ReportSQL    ("Find out if table exists           :",p_info->GetSQLTableExists(schema,table));
+      ReportSQL    ("Get all column info of a table     :",p_info->GetSQLGetColumns(schema,table));
+      ReportSQL    ("Get all constraints of a table     :",p_info->GetSQLGetConstraintsForTable(table));
+      ReportSQL    ("Get all indices of a table         :",p_info->GetSQLTableIndices(schema,table));
+      ReportSQL    ("Create an index                    :",p_info->GetSQLCreateIndex(schema,table,index));
+      ReportSQL    ("Drop an index                      :",p_info->GetSQLDropIndex(schema,indexname));
+      ReportSQL    ("Get table references               :",p_info->GetSQLTableReferences(schema,table));
+      ReportSQL    ("Getting the state of a sequence    :",p_info->GetSQLSequence(schema,table));
+      ReportSQL    ("Create a new sequence for a table  :",p_info->GetSQLCreateSequence(schema,table));
+      ReportSQL    ("Drop the sequence for a table      :",p_info->GetSQLDropSequence(schema,table));
+      ReportSQL    ("Getting the rights for a sequence  :",p_info->GetSQLSequenceRights(schema,table));
+      ReportSQL    ("Getting session and terminal       :",p_info->GetSQLSessionAndTerminal());
+      ReportSQL    ("Get session exists                 :",p_info->GetSQLSessionExists("123"));
+      ReportSQL    ("Get primary key information        :",p_info->GetSQLPrimaryKeyConstraintInformation(schema,table));
+    }
+    
+    void ReportOracle()
+    {
+      Logger::WriteMessage("Reporting on DBInfo for Oracle database");
+      Logger::WriteMessage("---------------------------------------");
+
+      SQLDatabase dbs;
+      dbs.SetDatabaseType(RDBMS_ORACLE);
+      SQLInfoDB* info = dbs.GetSQLInfoDB();
+      ReportDBInfo(info);
+      dbs.Close();
+    }
+
+    void ReportInformix()
+    {
+      Logger::WriteMessage("Reporting on DBInfo for Informix database");
+      Logger::WriteMessage("-----------------------------------------");
+
+      SQLDatabase dbs;
+      dbs.SetDatabaseType(RDBMS_INFORMIX);
+      SQLInfoDB* info = dbs.GetSQLInfoDB();
+      ReportDBInfo(info);
+      dbs.Close();
+    }
+
+    void ReportSQLServer()
+    {
+      Logger::WriteMessage("Reporting on DBInfo for SQL Server database");
+      Logger::WriteMessage("-------------------------------------------");
+
+      SQLDatabase dbs;
+      dbs.SetDatabaseType(RDBMS_SQLSERVER);
+      SQLInfoDB* info = dbs.GetSQLInfoDB();
+      ReportDBInfo(info);
+      dbs.Close();
+    }
+
+    void ReportFirebird()
+    {
+      Logger::WriteMessage("Reporting on DBInfo for Firebird database");
+      Logger::WriteMessage("-----------------------------------------");
+
+      SQLDatabase dbs;
+      dbs.SetDatabaseType(RDBMS_FIREBIRD);
+      SQLInfoDB* info = dbs.GetSQLInfoDB();
+      ReportDBInfo(info);
+      dbs.Close();
+    }
+
+    void ReportPostgreSQL()
+    {
+      Logger::WriteMessage("Reporting on DBInfo for PostgreSQL database");
+      Logger::WriteMessage("-------------------------------------------");
+
+      SQLDatabase dbs;
+      dbs.SetDatabaseType(RDBMS_POSTGRESQL);
+      SQLInfoDB* info = dbs.GetSQLInfoDB();
+      ReportDBInfo(info);
+      dbs.Close();
+    }
+
+    void ReportMSAccess()
+    {
+      Logger::WriteMessage("Reporting on DBInfo for MS-Access database");
+      Logger::WriteMessage("------------------------------------------");
+
+      SQLDatabase dbs;
+      dbs.SetDatabaseType(RDBMS_ACCESS);
+      SQLInfoDB* info = dbs.GetSQLInfoDB();
+      ReportDBInfo(info);
+      dbs.Close();
+    }
+
+    void ReportGenericODBC()
+    {
+      Logger::WriteMessage("Reporting on DBInfo for Generic ODBC database");
+      Logger::WriteMessage("---------------------------------------------");
+
+      SQLDatabase dbs;
+      dbs.SetDatabaseType(RDBMS_ODBC_STANDARD);
+      SQLInfoDB* info = dbs.GetSQLInfoDB();
+      ReportDBInfo(info);
+      dbs.Close();
+    }
+
+    TEST_METHOD(TestDBInfo)
+    {
+      Logger::WriteMessage("Reporting on DBInfo");
+      Logger::WriteMessage("===================");
+
+      ReportOracle();
+      ReportInformix();
+      ReportSQLServer();
+      ReportFirebird();
+      ReportPostgreSQL();
+      ReportMSAccess();
+      ReportGenericODBC();
     }
   };
 }

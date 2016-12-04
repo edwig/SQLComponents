@@ -140,10 +140,10 @@ public:
   // Open the database on basis of a connect string only
   bool           Open(CString const& p_connectString,bool p_readOnly = false);
 
-  bool           IsOpen();       // Is de database open?
+  bool           IsOpen();       // Is the database open?
   void           Close();        // Close it for further use
   bool           CollectInfo();  // Collect database info
-  void           SetDirtyRead(); // Readmode for Informix
+  void           SetDirtyRead(); // Read mode for Informix
 
   // OPTIONS FOR THE OPEN/CLOSE CYCLE
 
@@ -151,7 +151,7 @@ public:
   void           SetLoginTimeout(int p_timeout);
   // Set the Multiple Active Record Set option (MARS) for MS-SQL-Server
   void           SetMARS(bool p_set);
-  // Setting the database connection to readonly (if supported at all)
+  // Setting the database connection to read-only (if supported at all)
   bool           SetReadOnly(bool p_readOnly);
   // Add a general ODBC option for use in the connection string
   void           AddConnectOption(CString p_keyword,CString p_value);
@@ -162,7 +162,7 @@ public:
 
   // MACRO's FOR SQL TEXT
 
-  // Do the Querytext macro replacement
+  // Do the Query text macro replacement
   void           ReplaceMacros(CString& p_statement);
   // Add a macro replacement for SQL text
   void           AddMacro(CString p_macro,CString p_replacement);
@@ -182,10 +182,10 @@ public:
   CString        GetDatabaseName();         // Real database name
   DatabaseType   GetDatabaseType();
   CString        GetNamingMethod();
-  CString        GetConnect();              // Resulting connet string
+  CString        GetConnect();              // Resulting connect string
   CString        GetOriginalConnect();      // Original  connect string
   int            GetODBCVersion();          // Main version 1/2/3
-  CString        GetODBCVersionComplete();  // Compolete ODBC version e.g."3.51"
+  CString        GetODBCVersionComplete();  // Complete ODBC version e.g."3.51"
   bool           GetNeedLongDataLen();
   CString        GetDataIdent();
   CString        GetDBIdent();
@@ -222,6 +222,8 @@ public:
   void           SetOracleResultCacheMode(const CString& mode);
   // Get the available datasources in a list
   void           GetDataSources(DSMap& p_list,int p_type = SQL_FETCH_FIRST);
+  // Setting the database type (once)
+  bool           SetDatabaseType(DatabaseType p_type);
 
   // Asking for database-dependent constructions
   CString        GetSQLTimeString        (int p_hour,int p_minute,int p_second);
@@ -250,7 +252,7 @@ public:
   void           ParseSchema(CString& p_query);
 
   // MULTI-THREADING LOCKING
-  void           Acquire(unsigned p_timeout);   // Acuire a multithreading lock
+  void           Acquire(unsigned p_timeout);   // Acquire a multi threading lock
   void           Release();                     // Releasing the lock
   bool           IsLocked();                    // See if database is locked
 
@@ -271,7 +273,7 @@ protected:
   void           SetAttributesBeforeConnect();
   // Setting connection attributes AFTER connect
   void           SetAttributesAfterConnect(bool p_readOnly);
-  // Find number of quotes upto the lastpos position
+  // Find number of quotes up to the lastpos position
   int            FindQuotes(CString& p_statement,int p_lastpos);
   // Replace **ONE** macro in the statement text
   void           ReplaceMacro(CString& p_statement,int p_pos,int p_length,CString p_replace);
@@ -319,7 +321,7 @@ protected:
 
   // Generic logging
   LOGPRINT          m_logPrinter   = { nullptr };  // Printing a line to the logger
-  LOGLEVEL          m_logLevel     = { nullptr };  // Getting the loglevel
+  LOGLEVEL          m_logLevel     = { nullptr };  // Getting the log level
   void*             m_logContext   = { nullptr };  // Logging context (e.g. and object)
   int               m_loggingLevel = { 0       };  // Current level
   
@@ -327,7 +329,7 @@ protected:
   ODBCOptions       m_options;
   // Locking  
   CRITICAL_SECTION  m_databaseLock;
-  // Transaction adminstration
+  // Transaction administration
   TransactieStack   m_transactions;
 };
 

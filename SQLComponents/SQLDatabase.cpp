@@ -49,14 +49,14 @@ static char THIS_FILE[] = __FILE__;
 SQLDatabase::SQLDatabase()
             :m_info(NULL)
 {
-  // Initialise locking
+  // Initialize locking
   InitializeCriticalSection(&m_databaseLock);
 }
 
 SQLDatabase::SQLDatabase(HDBC p_hdbc)
             :m_hdbc(p_hdbc)
 {
-  // Initialise locking
+  // Initialize locking
   InitializeCriticalSection(&m_databaseLock);
 
   // Discover our database
@@ -83,7 +83,7 @@ SQLDatabase::Close()
   // Set lock on the stack
   Locker<SQLDatabase> lock(this,INFINITE);
 
-  // Sluit database handle
+  // Close database handle
   if(m_hdbc != SQL_NULL_HANDLE)
   {
     // Try to disconnect 
@@ -242,7 +242,7 @@ SQLDatabase::Open(CString const& p_datasource
   return true;
 }
 
-// Open the database (connectstring)
+// Open the database (connect string)
 bool 
 SQLDatabase::Open(CString const& p_connectString,bool p_readOnly)
 {
@@ -345,10 +345,10 @@ SQLDatabase::SetAttributesAfterConnect(bool p_readOnly)
     if(m_rdbmsType == RDBMS_ACCESS)
     {
       // MS-Access can only shift the autocommit mode once at the start of a connection
-      // Afterwards, after statements have occured, it cannot be turned on or off.
+      // Afterwards, after statements have occurred, it cannot be turned on or off.
       // See Microsoft KB169469 article for confirmation. It's and ODBC 3.x issue for MS-Access
       // All insert/updates/deletes **must** be transactions
-      // So we work in autocommitmode = off
+      // So we work in autocommit mode = off
       // Programs **MUST** put SQLTransaction on the stack to modify the database
       SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_OFF,SQL_IS_UINTEGER);
     }
@@ -399,11 +399,11 @@ SQLDatabase::CollectInfo()
 
   if (LoadVersie)
   {
-    // driver naam
+    // driver name
     SqlGetInfo(m_hdbc, SQL_DRIVER_NAME,szInfo1, sizeof(szInfo1), &nResult);
     m_DriverName = szInfo1;
 
-    // driver versie
+    // driver version
     SqlGetInfo(m_hdbc, SQL_DRIVER_VER,szInfo1, sizeof(szInfo1), &nResult);
     m_DriverVersion = szInfo1;
     int pos = m_DriverVersion.Find('.');
@@ -502,7 +502,7 @@ void
 SQLDatabase::SetKnownRebinds()
 {
   // Solving formatting for various databases (Oracle / MS-Access)
-  // Numeric and Decimal formats can be mangled by disbehaving ODCBC drivers
+  // Numeric and Decimal formats can be mangled by misbehaving ODCBC drivers
   // So they must be set or gotten in a predefined format (e.g. Oracle needs DOUBLE for a NUMERIC column)
   // Also see method "SQLQuery::SQLType2CType" for the use of the rebind maps
   if(m_rdbmsType == RDBMS_ORACLE)
@@ -568,7 +568,7 @@ SQLDatabase::RealDatabaseName()
   bool  result = false;
 
   CString databaseName;
-  // ODBC 1.x methode. Databasname.
+  // ODBC 1.x method. Databasename.
   buffer = databaseName.GetBuffer(SQL_MAX_OPTION_STRING_LENGTH);
   SQLGetInfo(m_hdbc, SQL_DATABASE_NAME, buffer, SQL_MAX_OPTION_STRING_LENGTH, &len);
   databaseName.ReleaseBuffer();
@@ -589,18 +589,18 @@ SQLDatabase::RealDatabaseName()
     {
       // Get the SQLInfo<Database> implementation's name
       databaseName   = m_info->GetFysicalDatabaseName();
-      m_namingMethod = "Fysical database name";
+      m_namingMethod = "Physical database name";
     }
   }
   if(databaseName.IsEmpty())
   {
-    // Anders alsnog de server proberen
+    // Or else: try the server name
     buffer = databaseName.GetBuffer(SQL_MAX_OPTION_STRING_LENGTH);
     SQLGetInfo(m_hdbc,SQL_SERVER_NAME,buffer,SQL_MAX_OPTION_STRING_LENGTH,&len);
     databaseName.ReleaseBuffer();
     m_namingMethod = "ODBC server name";
   }
-  // Strip fysical name for text sources 
+  // Strip physical name for text sources 
   // Such as: DB3, FoxBase, Firebird, MS-Access, MS-Excel, PostgreSQL
   if(databaseName.Find(".") >= 0)
   {
@@ -624,7 +624,7 @@ SQLDatabase::RealDatabaseName()
   }
   if(file == true && !databaseName.IsEmpty())
   {
-    m_namingMethod += " : Name stripped or Fysical file name";
+    m_namingMethod += " : Name stripped or physical file name";
   }
   // Found?
   if(!databaseName.IsEmpty())
@@ -673,7 +673,7 @@ SQLDatabase::SetDirtyRead()
   }
   catch(CString ex)
   {
-    CString boodschap = CString("ERROR: Datbase dirty-read mode not set, reason: ") + ex;
+    CString boodschap = CString("ERROR: Database dirty-read mode not set, reason: ") + ex;
     LogPrint(0,boodschap);
   }
   catch(...)
@@ -682,7 +682,7 @@ SQLDatabase::SetDirtyRead()
   }
 }
 
-// Setting the database connection to readonly (if supported at all)
+// Setting the database connection to read-only (if supported at all)
 bool 
 SQLDatabase::SetReadOnly(bool p_readOnly)
 {
@@ -706,7 +706,7 @@ SQLDatabase::GetDatabaseTypeName()
 {
   switch(m_rdbmsType)
   {
-    case RDBMS_UNKNOWN:       return "Onbekend";
+    case RDBMS_UNKNOWN:       return "Unknown";
     case RDBMS_ORACLE:        return "Oracle";
     case RDBMS_INFORMIX:      return "Informix";
     case RDBMS_ACCESS:        return "MS-Access";
@@ -766,7 +766,7 @@ SQLDatabase::MakeStmtHandle()
 {
   HSTMT stmt = SQL_NULL_HANDLE;
 
-  // Controleer de hdbc
+  // Check the hdbc
   if(m_hdbc == SQL_NULL_HANDLE)
   {
     throw CString("No database handle. Are you logged in to a database?");
@@ -867,8 +867,8 @@ SQLDatabase::ODBCNativeSQL(CString& p_sql)
   SQLINTEGER lengte = 0;
   buffer[0] = 0;
 
-  // Maar eerst eventuele macros vervangen.
-  // Anders gaat de parser op hol!!
+  // But first replace eventual macro texts
+  // Otherwise the parser will go haywire!
   ReplaceMacros(p_sql);
 
   // Let the driver do the translation
@@ -878,7 +878,7 @@ SQLDatabase::ODBCNativeSQL(CString& p_sql)
                               ,(UCHAR*)buffer
                               ,2*len
                               ,&lengte);
-  // Check if succseeded                             
+  // Check if succeeded
   if(Check(ret))
   {
     p_sql = buffer;
@@ -931,7 +931,7 @@ SQLDatabase::GetErrorString(SQL_HANDLE statement)
       errors += error;
     }
   }
-  // No errro information found
+  // No error information found
   if(errors.GetLength() == 0)
   {
     errors = "No error information is available.";
@@ -979,7 +979,7 @@ SQLDatabase::GetErrorInfo(SQLSMALLINT p_type, SQLHANDLE p_handle, int& p_number,
   CString errors;
   while(true)
   {
-    // Haal foutinfo op
+    // Getting the diagnostic info record
     szErrorMsg[0] = 0;
     szSqlState[0] = 0;
     SQLRETURN res = SqlGetDiagRec(p_type,             // Type of the handle
@@ -1080,7 +1080,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
       }
       catch(CString& err)
       {
-        // Add location to the errormessage
+        // Add location to the error message
         throw CString("Error at starting transaction: ") + err;
       }
     }
@@ -1124,7 +1124,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
     if(GetTransaction() != p_transaction)
     {
       // Note: If this exception is indeed reached it means that
-      // a transaction lower on the stack is now being commited
+      // a transaction lower on the stack is now being committed
       // This is clearly not what we want, and points to an error
       // in our application's logic in the calling code.
       throw CString("Error at commit: transaction is not the current transaction");
@@ -1159,7 +1159,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
         // do the rollback of the transaction
         RollbackTransaction(p_transaction);
 
-        // Throw an exception with the errorinfo of the failed commit
+        // Throw an exception with the error info of the failed commit
         throw CString("Error at commit: ") + error;
       }
     }
@@ -1240,7 +1240,7 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
       }
       catch(...)
       {
-        // Throw an exception with errorinfo at a failed rollback
+        // Throw an exception with error info at a failed rollback
         throw CString("Error at rollback: ") + GetErrorString();
       }
     }
@@ -1262,7 +1262,7 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
       }
     }
   }
-  // Notify all rolledback transactions
+  // Notify all rolled back transactions
   while(transactions.size())
   {
     transactions.top()->AfterRollback();
@@ -1465,6 +1465,23 @@ SQLDatabase::SetOracleResultCacheMode(const CString& p_mode)
   }
 }
 
+// Setting the database type (once)
+// Can only be done in unopened state 
+// Opening a database will overwrite this
+bool
+SQLDatabase::SetDatabaseType(DatabaseType p_type)
+{
+  if(m_rdbmsType == RDBMS_UNKNOWN && !IsOpen())
+  {
+    MakeEnvHandle();
+    MakeDbcHandle();
+    m_rdbmsType = p_type;
+    return true;
+  }
+  return false;
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 //
 // Various service routines
@@ -1657,7 +1674,7 @@ SQLDatabase::SetSchemaAction(SchemaAction p_action)
 //
 //////////////////////////////////////////////////////////////////////////
 
-// Do the Querytext macro replacement
+// Do the Query text macro replacement
 void           
 SQLDatabase::ReplaceMacros(CString& p_statement)
 {
@@ -1668,17 +1685,17 @@ SQLDatabase::ReplaceMacros(CString& p_statement)
 
     while(true)
     {
-      // Zoek macro tekst
+      // Search the macro text
       int pos = p_statement.Find(text);
       if(pos < 0)
       {
         break;
       }
-      // Macro vervangen
+      // Replace the macro
       int quotes = FindQuotes(p_statement,pos);
       if((quotes % 2) == 0)
       {
-        // doe de replacement
+        // Do the replacement
         ReplaceMacro(p_statement,pos,text.GetLength(),repl);
       }
     }
@@ -1734,21 +1751,20 @@ SQLDatabase::DeleteMacro(CString p_macro)
   }
 }
 
-
 //////////////////////////////////////////////////////////////////////////
 //
 // LOCKING THE DATABASE
 //
 //////////////////////////////////////////////////////////////////////////
 
-// Acquire a multithread lock for SQLQuery
+// Acquire a multi threaded lock for SQLQuery
 void 
 SQLDatabase::Acquire(unsigned /*p_timeout*/)   
 {
   EnterCriticalSection(&m_databaseLock);
 }
 
-// Release the multithread lock for SQLQuery
+// Release the multi threaded lock for SQLQuery
 void 
 SQLDatabase::Release()   
 {

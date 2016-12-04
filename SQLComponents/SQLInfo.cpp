@@ -265,9 +265,8 @@ SQLInfo::SupportedODBCFunctions()
     m_retCode = SqlGetFunctions(m_hdbc,SQL_API_ALL_FUNCTIONS,m_ODBCFunctions_2);
     if(!SQL_SUCCEEDED(m_retCode))
     {
-      AfxMessageBox("Cannot determine which ODBC functions are supported. Proceed with caution!\n\r"
-                    "In effect: Get a better driver, because this is a basic ODBC function!"
-                   ,MB_OK|MB_ICONERROR);
+      TRACE("Cannot determine which ODBC functions are supported. Proceed with caution!");
+      TRACE("In effect: Get a better driver, because this is a basic ODBC function!\n");
     }
   }
 }
@@ -374,9 +373,8 @@ SQLInfo::GetInfo()
   
   if(!SupportedFunction(SQL_API_SQLGETINFO))
   {
-    AfxMessageBox("Cannot get ODBC info with SQLGetInfo. Cannot determine capabilities\n\r"
-                  "In effect: Get a better driver, because this is a basic ODBC function!"
-                 ,MB_OK);
+    TRACE("Cannot get ODBC info with SQLGetInfo. Cannot determine capabilities\n");
+    TRACE("In effect: Get a better driver, because this is a basic ODBC function!\n");
     return;
   }
   // STATIC KEYWORDS FROM ODBC 3.5 as of compilation

@@ -160,7 +160,7 @@ SQLInfoOracle::GetTimeIsDecimal() const
   return true;
 }
 
-// If the database does not suppoprt the datatype INTERVAL, it can be implemented as a DECIMAL
+// If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
 bool 
 SQLInfoOracle::GetIntervalIsDecimal() const
 {
@@ -168,7 +168,7 @@ SQLInfoOracle::GetIntervalIsDecimal() const
   return true;
 }
 
-// Get the concatanation operator
+// Get the concatenation operator
 CString 
 SQLInfoOracle::GetConcatanationOperator() const
 {
@@ -182,21 +182,21 @@ SQLInfoOracle::GetQuoteCharacter() const
   return "'";
 }
 
-// Get default NULL for parameterlist input
+// Get default NULL for parameter list input
 CString 
 SQLInfoOracle::GetDefaultNULL() const
 {
   return " DEFAULT NULL ";
 }
 
-// Parameter is for INPUT and OUTPUT in parameterlist
+// Parameter is for INPUT and OUTPUT in parameter list
 CString 
 SQLInfoOracle::GetParameterINOUT() const
 {
   return "IN OUT ";
 }
 
-// Parameter is for OUTPUT only in parameterlist
+// Parameter is for OUTPUT only in parameter list
 CString 
 SQLInfoOracle::GetParameterOUT() const
 {
@@ -253,7 +253,7 @@ CString
 SQLInfoOracle::GetOuterJoinKeyword() const
 {
   // Before Oracle 9 it's empty
-  // After Oracle 9 its juist regular "LEFT OUTER JOIN"
+  // After Oracle 9 its just regular "LEFT OUTER JOIN"
   return "LEFT OUTER JOIN";
 }
 
@@ -308,7 +308,7 @@ SQLInfoOracle::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_select)
          "ON COMMIT PRESERVE ROWS";
 }
 
-// Get the query to remove a temporary table indefinetly
+// Get the query to remove a temporary table indefinite
 // BEWARE: Must be executed with a multi-statement stack!
 CString 
 SQLInfoOracle::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) const
@@ -367,7 +367,7 @@ SQLInfoOracle::GetSQLRemoveProcedureDependencies(CString p_procname) const
 CString 
 SQLInfoOracle::GetSQLRemoveFieldDependencies(CString p_tablename) const
 {
-  // Not neccesary in Oracle
+  // Not necessary in Oracle
   return "";
 }
 
@@ -376,8 +376,8 @@ CString
 SQLInfoOracle::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // The primary key constraint is not directly generated after the column
-  // to ensure it wil use the named index in the correct tablespace
-  // Otherwise the index name and tablespace cannot be definied and will be auto-generated
+  // to ensure it will use the named index in the correct tablespace
+  // Otherwise the index name and tablespace cannot be defined and will be auto-generated
   return GetPrimaryKeyType() + " NOT NULL CONSTRAINT pk_" + p_tableName + " PRIMARY KEY\n";
 }
 
@@ -394,7 +394,7 @@ SQLInfoOracle::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CStr
 CString 
 SQLInfoOracle::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 {
-  // Construct the correct tablenames
+  // Construct the correct table names
   CString table  (p_foreign.m_tablename);
   CString primary(p_foreign.m_primaryTable);
   if(!p_foreign.m_schema.IsEmpty())
@@ -470,7 +470,7 @@ SQLInfoOracle::GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested)
 CString 
 SQLInfoOracle::GetSQLPerformanceSettings() const
 {
-  // To run optimised queries on views with outer-joins and filters on the view
+  // To run optimized queries on views with outer-joins and filters on the view
   // the following parameter is of live-saving essence!
   return "ALTER SESSION SET \"_push_join_predicate\" = true";
 }
@@ -617,7 +617,7 @@ SQLInfoOracle::GetEndWhileLoop() const
   return "END LOOP;\n";
 }
 
-// Gets the fact if a SELECT must be inbetween parenthesis for an assignment
+// Gets the fact if a SELECT must be in between parenthesis for an assignment
 bool    
 SQLInfoOracle::GetAssignmentSelectParenthesis() const
 {
@@ -686,7 +686,7 @@ SQLInfoOracle::GetRollbackSubTransaction(CString p_savepointName) const
 // SQL CATALOG QUERIES
 // ===================================================================
 
-// Get SQL to check if a storedprocedure already exists in the database
+// Get SQL to check if a stored procedure already exists in the database
 CString 
 SQLInfoOracle::GetSQLStoredProcedureExists(CString& p_name) const
 {
@@ -763,7 +763,7 @@ SQLInfoOracle::GetSQLGetColumns(CString& p_user,CString& p_tableName) const
   systemUser.MakeUpper();
   upperName .MakeUpper();
 
-  // name, number, type, lengte, nullable, precision, scale
+  // name, number, type, length, nullable, precision, scale
   CString select = "SELECT column_name\n"
                    "      ,column_id\n"
                    "      ,data_type\n"
@@ -784,7 +784,7 @@ SQLInfoOracle::GetSQLGetConstraintsForTable(CString& p_tableName) const
 {
   // [EH] Expanded with a filter on SYS_ to prevent NOT NULL constraints
   // to be dropped twice in a row
-  // [EH] Type 'R' filterd out, otherwise all refrence constraints
+  // [EH] Type 'R' filtered out, otherwise all reference constraints
   // will be dropped at dropping the check constraints
   CString upperName = p_tableName;
   upperName.MakeUpper();
@@ -865,7 +865,7 @@ SQLInfoOracle::GetSQLDropIndex(CString p_user,CString p_indexName) const
   return sql;
 }
 
-// Get SQL to read the referential constaints from the catalog
+// Get SQL to read the referential constraints from the catalog
 CString 
 SQLInfoOracle::GetSQLTableReferences(CString p_schema
                                     ,CString p_tablename
@@ -1006,7 +1006,7 @@ SQLInfoOracle::GetSQLSessionAndTerminal() const
   return query;
 }
 
-// Get SQL to check if sessionnumber exists
+// Get SQL to check if session number exists
 CString 
 SQLInfoOracle::GetSQLSessionExists(CString sessieId) const
 {
@@ -1019,7 +1019,7 @@ SQLInfoOracle::GetSQLSessionExists(CString sessieId) const
 CString 
 SQLInfoOracle::GetSQLUniqueSessionId(const CString& /*p_databaseName*/,const CString& /*p_sessionTable*/) const
 {
-  // In Oracle the database is the instance. Databasename is irrelevant
+  // In Oracle the database is the instance. Database name is irrelevant
   return "SELECT UNIQUE(audsid)\n"
          "  FROM V$SESSION\n"
          " WHERE audsid <> 0";
@@ -1029,7 +1029,7 @@ SQLInfoOracle::GetSQLUniqueSessionId(const CString& /*p_databaseName*/,const CSt
 CString 
 SQLInfoOracle::GetSQLSearchSession(const CString& /*p_databaseName*/,const CString& p_sessionTable) const
 {
-  // In Oracle the database is the instance. Databasename is irrelevant
+  // In Oracle the database is the instance. Database name is irrelevant
   return  "SELECT audsid\n"
           "       ,osuser\n"
           "       ,terminal\n"
@@ -1040,7 +1040,7 @@ SQLInfoOracle::GetSQLSearchSession(const CString& /*p_databaseName*/,const CStri
           "         FROM "+ p_sessionTable+ ")";
 }
 
-// See if a column exsists within a table
+// See if a column exists within a table
 bool   
 SQLInfoOracle::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const
 {
@@ -1115,7 +1115,7 @@ CString
 SQLInfoOracle::GetSQLOptimizeTable(CString& p_owner,CString& p_tableName,int& p_number)
 {
   CString optim;
-  // Optimaliseer de tabel
+  // Optimize the table
   optim = "call dbms_stats.gather_table_stats('" + p_owner + "','" + p_tableName + "');\n";
   // Count number of statements
   ++p_number;
@@ -1392,7 +1392,7 @@ SQLInfoOracle::GetSQLSPLCall(CString p_procName) const
   return "DECLARE x VARCHAR2(254); BEGIN x := " + p_procName + "; END;";
 }
 
-// Length of paramters in binding
+// Length of parameters in binding
 int
 SQLInfoOracle::GetParameterLength(int p_SQLType) const
 {
@@ -1490,7 +1490,7 @@ SQLInfoOracle::GetParameterType(CString& p_type) const
 // GENERAL SQL ACTIONS
 // =================================================================
 
-// Makes a SQL string from a givven string, with all the right quotes
+// Makes a SQL string from a given string, with all the right quotes
 CString 
 SQLInfoOracle::GetSQLString(const CString& p_string) const
 {
@@ -1556,7 +1556,7 @@ SQLInfoOracle::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int
   return string;
 }
   
-// Get the SPL sourcecode for a stored procedure as registered in the database
+// Get the SPL source code for a stored procedure as registered in the database
 CString 
 SQLInfoOracle::GetSPLSourcecodeFromDatabase(const CString& p_owner,const CString& p_procName) const
 {
@@ -1685,20 +1685,20 @@ SQLInfoOracle::TranslateErrortext(int p_error,CString p_errorText) const
     return p_errorText;
   }
 
-  // Lees evt. foutnummer uit ORA-xxxx melding
+  // Read vendor error number
   if(p_error == -1 && p_errorText.GetAt(3) == '-' && p_errorText.GetLength() > 10)
   {
     p_error = atoi(p_errorText.Mid(4, 5));
   }
 
-  // 6018: Database fout = %d : 
+  // Database error = %d : 
   CString errorText = "Database error = ";
 
-  // Bepaal nummer van extra melding
+  // Get error number -> error text
   switch(p_error)
   {
     case   -95: errorText += "Removing of an object trough a logical update stored procedure '%s' is not possible"; break;
-    case   -96: break; // Generated by stored proc
+    case   -96: break; // Generated by stored procedure
     case   -97: errorText += "Removal denied: there are still references to the object%s."; break;
     case   -99: errorText += "Wrong object ID in procedure '%s'.";  break;
     case   942: errorText += "Table not found: '%s'.";              break;

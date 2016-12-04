@@ -36,17 +36,17 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 BEGIN_TEST_MODULE_ATTRIBUTE()
-  TEST_MODULE_ATTRIBUTE(L"SQLVariant",L"Operators")
+  TEST_MODULE_ATTRIBUTE(L"SQLComponents",L"ODBC")
 END_TEST_MODULE_ATTRIBUTE()
 
 TEST_MODULE_INITIALIZE(ModuleInitialize)
 {
-  Logger::WriteMessage("BEGIN OF: SQLVariant operators");
+  Logger::WriteMessage("BEGIN OF: SQLComponents");
 }
 
 TEST_MODULE_CLEANUP(ModuleCleanup)
 {
-  Logger::WriteMessage("END OF: SQLVariant operators");
+  Logger::WriteMessage("END OF: SQLComponents");
 }
 
 namespace OperatorUnitTest
