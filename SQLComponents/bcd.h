@@ -9,6 +9,9 @@
 //
 //  Copyright (c) 2013-2016 ir W. E. Huisman
 //
+// Last Revision:   04-12-2016
+// Version number:  1.3.0
+//
 #pragma once
 #include <sqltypes.h>   // Needed for conversions of SQL_NUMERIC_STRUCT
 

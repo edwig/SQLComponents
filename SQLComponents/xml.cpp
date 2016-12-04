@@ -6,8 +6,8 @@
 // As found on: https://sourceforge.net/projects/tinyxml/
 // Only with some light adaptions not found in that project
 //
-// Last Revision:   11-11-2016
-// Version number:  1.2.0
+// Last Revision:   04-12-2016
+// Version number:  1.3.0
 //
 #include "stdafx.h"
 #include <sstream>

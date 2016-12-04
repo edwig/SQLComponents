@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   11-11-2016
-// Version number:  1.2.0
+// Last Revision:   04-12-2016
+// Version number:  1.3.0
 //
 #include "stdafx.h"
 #include "SQLInfoFirebird.h"

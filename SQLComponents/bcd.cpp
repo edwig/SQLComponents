@@ -15,6 +15,9 @@
 //  E+01 34125600 00000000 00000000 -> 3.41256
 //  E-05 78976543 12388770 00000000 -> 0.0000789765431238877
 //
+// Last Revision:   04-12-2016
+// Version number:  1.3.0
+//
 #include "Stdafx.h"
 #include "bcd.h"
 #include <math.h> // Still needed for conversions of double

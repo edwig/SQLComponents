@@ -20,9 +20,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 // CREDITS:
-// Loosly based on the article by: Yap Chun Wei
+// Loosely based on the article by: Yap Chun Wei
 // http://www.codeproject.com/Articles/1636/CSpreadSheet-A-Class-to-Read-and-Write-to-Excel-an
 // 
+// Last Revision:   04-12-2016
+// Version number:  1.3.0
+//
 #pragma once
 
 #include "SQLDataSet.h"
