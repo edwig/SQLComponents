@@ -16,7 +16,7 @@ The 'standard' proces to work with these components is very easy and looks somet
 		CString query = "SELECT id,amount FROM invoice";
 	
 		// Grab a SQLQuery object, and connect to the database
-		SQLQUery query(database);
+		SQLQuery query(database);
 	
 		// Go run the statement
 		query.DoSQLStatement(sql);
@@ -134,7 +134,7 @@ also be rolled back. This is how you generally do it:
 		try	
 		{
 			// Grab a SQLQuery object, and connect to the database
-			SQLQUery query(database);
+			SQLQuery query(database);
 			SQLTransaction trans(database,"update");
 	
 			// Go run the statement with an embedded parameter
@@ -154,3 +154,18 @@ also be rolled back. This is how you generally do it:
 		// Or don't and just go out of scope
 		database.Close();
 	}
+
+##Unit testing
+
+To make the unit testing framework run, create a 32 bits ODBC datasource name for the 
+MS-Access database "basis.accdb" provided in the root folder of this project.
+Name that datasource "testing", as it is referenced in the "TestSQL" and "UnitTest"
+projects of the solution.
+
+After this datasource has been created, you should be able to run both test sets right away.
+The unit test run only in 32 bits, as Microsoft has not decided yet to support 64 bit unit
+testing for the C++ language.
+
+The MS-Access database does only work in 32 bits because I had a 32 bits MS-Office installment
+on my computer. To make it work in 64 bits, you need to install a 64 bits MS-Office version.
+That is the only way to get to a 64 bits MS-Access JET engine driver.
