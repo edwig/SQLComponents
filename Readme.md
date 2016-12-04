@@ -1,5 +1,5 @@
-SQL Components
-==============
+SQL Components Library
+======================
 
 General ODBC components to work with SQL Databases and all gory details therein.
 The 'standard' proces to work with these components is very easy and looks something like this:
