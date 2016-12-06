@@ -513,7 +513,7 @@ SQLDate::CalculateDate(const CString& p_datum)
     }
     // Speciaal geval: Pronto doet dit
     // 00-00-00 -> wordt vandaag
-    if (dag == 0 && maand == 0 && jaar == 0)
+    if (dag == 0 && maand == 0)
     {
       *this = Today();
       success = true;
@@ -992,9 +992,9 @@ SQLDate::NamedDate(const CString& p_date,int& p_year,int& p_month,int& p_day)
     int lang = g_defaultLanguage;
     
     // Adjust language for array origin
-    if(lang != LN_DEFAULT)
+    if(lang == LN_DEFAULT)
     {
-      --lang;
+      lang = LN_ENGLISH;
     }
         
     for(month = 0;month < MONTHS_IN_YEAR; ++month)
@@ -1147,17 +1147,17 @@ SQLDate::operator+(const SQLInterval& p_interval) const
   }
   // Do the calculation
   SQLDate date(*this);
-  date.AddDays(p_interval.GetDays());
+  date = date.AddDays(p_interval.GetDays());
 
   // Corner case where we land on the previous day!!
   if(p_interval.GetIsNegative())
   {
-    if(p_interval.GetHours()   || 
-       p_interval.GetMinutes() || 
-       p_interval.GetSeconds() || 
+    if(p_interval.GetHours()   % 24 || 
+       p_interval.GetMinutes() % 60 || 
+       p_interval.GetSeconds()% 60  || 
        p_interval.GetFractionPart())
     {
-      date.AddDays(-1);
+      date = date.AddDays(-1);
     }
   }
 
@@ -1180,17 +1180,17 @@ SQLDate::operator-(const SQLInterval& p_interval) const
   }
   // Do the calculation
   SQLDate date(*this);
-  date.AddDays(-(p_interval.GetDays()));
+  date = date.AddDays(-(p_interval.GetDays()));
 
   // Corner case where we land on the previous day!!
   if(!p_interval.GetIsNegative())
   {
-    if(p_interval.GetHours()   || 
-       p_interval.GetMinutes() || 
-       p_interval.GetSeconds() || 
+    if(p_interval.GetHours()   % 24 || 
+       p_interval.GetMinutes() % 60 || 
+       p_interval.GetSeconds() % 60 || 
        p_interval.GetFractionPart())
     {
-      date.AddDays(-1);
+      date = date.AddDays(-1);
     }
   }
   return date;

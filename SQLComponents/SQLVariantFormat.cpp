@@ -501,11 +501,6 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
   int posDate = datum.Find('-');
   if(posDate < 0)
   {
-    return false;
-  }
-  int posDat2 = datum.Find('-',posDate + 1);
-  if(posDat2 < 0)
-  {
     try
     {
       SQLDate lang(datum);
@@ -514,9 +509,14 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
       p_date->year  = (SQLUSMALLINT)lang.Year();
       return true;
     }
-    catch(...)
+    catch (...)
     {
     }
+    return false;
+  }
+  int posDat2 = datum.Find('-',posDate + 1);
+  if(posDat2 < 0)
+  {
     return false;
   }
   if(posDate == 2 && posDat2 == 5)

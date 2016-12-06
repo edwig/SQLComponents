@@ -191,7 +191,7 @@ int g_daysInTheMonth[14] =
 Language SetDefaultSQLLanguage(Language p_lang)
 {
   Language oldLanguage = g_defaultLanguage;
-  if(LN_DEFAULT >= p_lang && p_lang < LN_NUMLANG)
+  if(LN_DEFAULT <= p_lang && p_lang < LN_NUMLANG)
   {
     g_defaultLanguage = p_lang;
   }

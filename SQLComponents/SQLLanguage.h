@@ -32,7 +32,7 @@
 
 typedef enum _language
 {
-   LN_DEFAULT  = 0
+   LN_DEFAULT  = -1
   ,LN_DUTCH    = 0
   ,LN_ENGLISH
   ,LN_GERMAN
