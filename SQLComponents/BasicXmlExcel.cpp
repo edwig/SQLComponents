@@ -515,11 +515,10 @@ BasicXmlExcel::SetError(CString p_error)
 bool
 BasicXmlExcel::Load()
 {
-  if(LoadStrings())
-  {
-    return LoadWorksheets();
-  }
-  return false;
+  // Ignore return value from LoadStrings
+  // After Office-2013 it shared-strings are not mandatory any more
+  LoadStrings();
+  return LoadWorksheets();
 }
 
 bool

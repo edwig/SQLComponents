@@ -6,28 +6,28 @@ The 'standard' proces to work with these components is very easy and looks somet
 
 	// Define a database
 	SQLDatabase database;
-	
+
 	// Go open the database from some ODBC datasource name (DSN)
 	database.Open("serverDSN","user","password");
-	
+
 	if(database.IsOpen())
 	{
 		// Get some meaningful SQL statement :-)
 		CString query = "SELECT id,amount FROM invoice";
-	
+
 		// Grab a SQLQuery object, and connect to the database
 		SQLQuery query(database);
-	
+
 		// Go run the statement
 		query.DoSQLStatement(sql);
-	
+
 		// As long as we have a cursor running
 		while(query.GetRecord())
 		{
 			// Grab a few columns (starting at 1!!)
 			int    id     = query[1];
 			double amount = query[2]
-			
+
 			// Do something with it
 			printf("The value of [%d] is: %f\n",id,amount); 
 		}
@@ -107,8 +107,8 @@ Datatypes included are:
 - SQLTime
 - SQLTimestamp
 - SQLInterval
-- bcd (Binary coded decimal) 
- 
+- bcd (Binary coded decimal)
+
 Operators for this class include + * - / % and work for any type to any type,
 so you can add say an unsigned short to a double or you can add to strings.
 
@@ -122,21 +122,21 @@ also be rolled back. This is how you generally do it:
 
 	// Define a database
 	SQLDatabase database;
-	
+
 	// Go open the database from some ODBC datasource name (DSN)
 	database.Open("serverDSN","user","password");
-	
+
 	if(database.IsOpen())
 	{
 		// Get some meaningful SQL statement :-)
 		CString query = "UPDATE invoice SET amount = amount * 2 WHERE id = ?";
 
-		try	
+		try
 		{
 			// Grab a SQLQuery object, and connect to the database
 			SQLQuery query(database);
 			SQLTransaction trans(database,"update");
-	
+
 			// Go run the statement with an embedded parameter
 			int id = 3416;
 			query.DoSQLStatement(sql,id);
