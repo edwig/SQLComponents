@@ -162,7 +162,7 @@ namespace DatabaseUnitTest
       bcd  c_ln2;
       CString msg;
 
-      msg.Format("Floating point constants in [%d] iterations are:\n",p_count);
+      msg.Format("Floating point constants in [%d] iterations are:",p_count);
       Logger::WriteMessage(msg);
       Logger::WriteMessage("Constant Type   Time     Value");
       Logger::WriteMessage("-------  ------ -------- ---------------------------------------------");
@@ -175,7 +175,7 @@ namespace DatabaseUnitTest
       }
       count3.Stop();
       Logger::WriteMessage("PI       Calc   0.000000 +3,1415926535897932384626433832795");
-      msg.Format          ("         bcd    %0.6f %s\n",count3.GetCounter(),c_pi.AsString(bcd::Bookkeeping,true));
+      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_pi.AsString(bcd::Bookkeeping,true));
       Logger::WriteMessage(msg);
 
       // BEREKEN LN(10)
@@ -186,7 +186,7 @@ namespace DatabaseUnitTest
       }
       count3.Stop();
       Logger::WriteMessage("LN10     calc   0.000000 +2,3025850929940456840179914546844");
-      msg.Format          ("         bcd    %0.6f %s\n",count3.GetCounter(),c_ln10.AsString(bcd::Bookkeeping,true));
+      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_ln10.AsString(bcd::Bookkeeping,true));
       Logger::WriteMessage(msg);
 
       // BEREKEN LN(2)
@@ -196,10 +196,10 @@ namespace DatabaseUnitTest
         c_ln2 = bcd::LN2();
       }
       count3.Stop();
-      Logger::WriteMessage("LN2      calc   0.000000 +0,69314718055994530941723212145818\n");
-      msg.Format          ("         bcd    %0.6f %s\n",count3.GetCounter(),c_ln2.AsString(bcd::Bookkeeping,true));
+      Logger::WriteMessage("LN2      calc   0.000000 +0,69314718055994530941723212145818");
+      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_ln2.AsString(bcd::Bookkeeping,true));
       Logger::WriteMessage(msg);
-      Logger::WriteMessage("\n");
+      Logger::WriteMessage("");
     }
 
     void TestOperatoren(int p_count)
@@ -230,7 +230,7 @@ namespace DatabaseUnitTest
       CString msg;
       char* name = operators[p_operator];
 
-      msg.Format("Testing [%s] for a total of [%d] iterations:\n",name,p_count);
+      msg.Format("Testing [%s] for a total of [%d] iterations:",name,p_count);
       Logger::WriteMessage(msg);
 
       Logger::WriteMessage("Type         Time Value");
@@ -256,7 +256,7 @@ namespace DatabaseUnitTest
         }
       }
       counter1.Stop();
-      msg.Format("double %10.6f +%.15f\n",counter1.GetCounter(),d_result);
+      msg.Format("double %10.6f +%.15f",counter1.GetCounter(),d_result);
       Logger::WriteMessage(msg);
 
       bcd c_number1(p_een);
@@ -276,7 +276,7 @@ namespace DatabaseUnitTest
         }
       }
       counter5.Stop();
-      msg.Format("bcd    %10.6f %s\n",counter5.GetCounter(),c_result.AsString(bcd::Bookkeeping,true));
+      msg.Format("bcd    %10.6f %s",counter5.GetCounter(),c_result.AsString(bcd::Bookkeeping,true));
       Logger::WriteMessage(msg);
     }
 
@@ -350,7 +350,7 @@ namespace DatabaseUnitTest
       bool extraInteger = p_function == Func_frexp ? true : false;
 
       char* name = functions[p_function];
-      msg.Format("Testing the function [%s] for a total of [%d] iterations:\n",name,p_count);
+      msg.Format("Testing the function [%s] for a total of [%d] iterations:",name,p_count);
       Logger::WriteMessage(msg);
 
       if(strcmp(p_number2,"0"))
@@ -477,7 +477,7 @@ namespace DatabaseUnitTest
     {
       CString msg;
       // Header
-      msg.Format("Testing SQL_NUMERIC_STRUCT for a total of [%d] iterations\n\n",p_count);
+      msg.Format("Testing SQL_NUMERIC_STRUCT for a total of [%d] iterations",p_count);
       Logger::WriteMessage(msg);
 
       // num = 10.001 (ten and 1 thousandth)
@@ -500,7 +500,7 @@ namespace DatabaseUnitTest
       }
       counter.Stop();
       bcd ten(&num);
-      msg.Format("SQL_NUMERIC_STRUCT -> bcd %10.6f : %s\n",counter.GetCounter(),ten.AsString());
+      msg.Format("SQL_NUMERIC_STRUCT -> bcd %10.6f : %s",counter.GetCounter(),ten.AsString());
       Logger::WriteMessage(msg);
 
 
@@ -521,11 +521,11 @@ namespace DatabaseUnitTest
         // 
         //     for(unsigned ind = 0;ind < SQL_MAX_NUMERIC_LEN; ++ind)
         //     {
-        //       printf("Numeric mantissa [%d:%02.2X]\n",ind,num.val[ind]);
+        //       printf("Numeric mantissa [%d:%02.2X]",ind,num.val[ind]);
         //     }
 
         bcd check(&num);
-        msg.Format("bcd -> SQL_NUMERIC_STRUCT %10.6f : %s\n",cnt2.GetCounter(),check.AsString());
+        msg.Format("bcd -> SQL_NUMERIC_STRUCT %10.6f : %s",cnt2.GetCounter(),check.AsString());
         Logger::WriteMessage(msg);
       }
       Logger::WriteMessage("");

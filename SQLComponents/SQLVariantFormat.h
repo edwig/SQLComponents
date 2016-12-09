@@ -35,7 +35,8 @@ class SQLVariantFormat
 {
 public:
   SQLVariantFormat(SQLVariant* p_variant);
- ~SQLVariantFormat();
+  SQLVariantFormat(SQLVariant& p_variant);
+  ~SQLVariantFormat();
   void        Reset();
   void        ResetValue();
   void        ReFormat();
@@ -47,14 +48,14 @@ public:
   void        SetCurrentDate();
   // Format the date
   int         FormatDate(CString p_pattern);
-  // Is a constant or a numeric
-  bool        IsConstanteOfNummer(char p_separator = '.');
-  // Testmatig '.' en ',' omzetten
+  // Is a constant or a numeric / IsConstanteOfNummer
+  bool        IsConstantOrNumber(char p_seperator = '.');
+  // Converting european values to system values
   int         StrValutaNLOmzetten(CString& p_string,bool p_enkelValuta);
-  // Testmatig ',' en '.' omzetten
+  // Converting american $ values to dutch values
   int         StrValutaAMOmzetten(CString& p_string,bool p_enkelValuta);
-  // Waarde van de string als double
-  double      StringDoubleWaarde();
+  // Value of a string as a double
+  double      StringDoubleValue();
   // Format according to userinterface
   int         FormatNumber(CString p_format,bool p_currency);
   // Do math on dates
@@ -75,7 +76,6 @@ private:
   bool        GetTimeFromStringVariant(SQLVariant* p_variant,CString p_format,TIME_STRUCT* p_date);
 
   // Is string a (formatted) windows number?
-  bool        IsWinNumber(const CString p_string,CString* p_newNumber = NULL);
   bool        IsWinNumber(const CString p_string,char* p_decSeperator,char* p_thouSeperator,char* p_valuta,CString* p_newNumber = NULL);
 
 

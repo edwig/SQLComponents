@@ -74,6 +74,14 @@ SQLVariantFormat::SQLVariantFormat(SQLVariant* p_variant)
   InitValutaString();
 }
 
+SQLVariantFormat::SQLVariantFormat(SQLVariant& p_variant)
+                 :m_variant(&p_variant)
+                 ,m_userStatus(0)
+                 ,m_owner(false)
+{
+  InitValutaString();
+}
+
 SQLVariantFormat::~SQLVariantFormat()
 {
   if(m_owner && m_variant)
@@ -115,7 +123,8 @@ SQLVariantFormat::ReFormat()
   }
 }
 
-// Alle woorden een eerste hoofdletter
+// All words get a initial capital
+// The rest of the words become lower case
 void
 SQLVariantFormat::StringInitCapital()
 {
@@ -145,7 +154,8 @@ SQLVariantFormat::StringInitCapital()
   }
 }
 
-// Eerste letter een hoofdletter van de hele string
+// First letter of thes tring becomes a capital
+// The rest becomes all lower case
 void
 SQLVariantFormat::StringStartCapital()
 {
@@ -171,8 +181,9 @@ SQLVariantFormat::StringStartCapital()
   }
 }
 
+// The format is a constant or a simple number
 bool
-SQLVariantFormat::IsConstanteOfNummer(char p_separator)
+SQLVariantFormat::IsConstantOrNumber(char p_seperator /*='.'*/)
 {
   bool bDecimal  = false;
   bool bSpace    = false;
@@ -202,7 +213,7 @@ SQLVariantFormat::IsConstanteOfNummer(char p_separator)
       }
       bTeken = true;
     }
-    else if (ch == p_separator)
+    else if (ch == p_seperator)
     {
       if(bSpace || bDecimal)
       {
@@ -218,7 +229,7 @@ SQLVariantFormat::IsConstanteOfNummer(char p_separator)
     {
       return false;
     }
-    // Volgend teken
+    // Next character
     ++pos;
   }
   return true;
@@ -254,13 +265,6 @@ SQLVariantFormat::StrValutaAMOmzetten(CString& p_string,bool p_enkelValuta)
     p_string.Replace(".",",");
   }
   return p_string.GetLength();
-}
-
-// Is string a (formatted) windows number?
-bool
-SQLVariantFormat::IsWinNumber(const CString p_string,CString* p_newNumber)
-{
-  return IsWinNumber(p_string,DecimalSep,ThousandSep,strCurrency,p_newNumber);
 }
 
 // Is string a (formatted) windows number?
@@ -381,19 +385,19 @@ SQLVariantFormat::IsWinNumber(const CString p_string
 }
 
 double
-SQLVariantFormat::StringDoubleWaarde()
+SQLVariantFormat::StringDoubleValue()
 {
   double result = 0.0;
   InitValutaString();
 
-  if(IsConstanteOfNummer())
+  if(IsConstantOrNumber())
   {
     result = atof(m_format);
   }
   else
   {
     CString waarde = m_format;
-    if(IsConstanteOfNummer(','))
+    if(IsConstantOrNumber(','))
     {
       StrValutaNLOmzetten(waarde,false);
       result = atof(waarde);
@@ -897,7 +901,7 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
     }
   }
   // Getal varianten omzetten. Zet ook "123,4500000" om naar "123.45"
-  double waarde = StringDoubleWaarde();
+  double waarde = StringDoubleValue();
   getal.Format("%f",waarde);
 
   if(p_format.IsEmpty())

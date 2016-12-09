@@ -26,6 +26,7 @@
 //
 #include "stdafx.h"
 #include "SQLVariant.h"
+#include "SQLVariantOperator.h"
 #include "SQLDate.h"
 #include "bcd.h"
 

@@ -27,6 +27,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "SQLVariant.h"
+#include "SQLVariantOperator.h"
 #include "SQLDate.h"
 #include "SQLTime.h"
 #include "SQLTimestamp.h"

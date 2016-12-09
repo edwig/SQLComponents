@@ -43,7 +43,15 @@ static char THIS_FILE[] = __FILE__;
 
 #pragma warning (disable : 4996)
 
-DataTypes allTypes[] = 
+// Translation list of SQL datatype constants and names
+typedef struct _types
+{
+  char*  name;
+  int    type;
+}
+DataTypes;
+
+static DataTypes allTypes[] = 
 {
    { "<NO TYPE>",                  0                               }
   ,{ "CHAR",                       SQL_C_CHAR                      } 
@@ -90,7 +98,7 @@ DataTypes allTypes[] =
 
 // All datatypes not having a counterpart in SQL_C_XXX set
 // SQL Datatypes should be used for binding in SQLBindParameter
-DataTypes allOther[] = 
+static DataTypes allOther[] = 
 {
   { "VARBINARY",       SQL_VARBINARY      }  // LONG RAW
  ,{ "LONGVARBINARY",   SQL_LONGVARBINARY  }  // BLOB
@@ -103,7 +111,7 @@ DataTypes allOther[] =
 };
 
 // Names must appear in this order to work properly!!
-DataTypes allParams[] = 
+static DataTypes allParams[] = 
 {
   { "<UNKNOWN>", SQL_PARAM_TYPE_UNKNOWN }    // 0
  ,{ "INPUT",     SQL_PARAM_INPUT        }    // 1
@@ -1540,7 +1548,7 @@ SQLVariant::GetAsSBigInt()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return (SQLBIGINT)atoi(m_data.m_dataCHAR);
+    case SQL_C_CHAR:     return _atoi64(m_data.m_dataCHAR);
     case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return (SQLBIGINT)m_data.m_dataSHORT;
     case SQL_C_USHORT:   return (SQLBIGINT)m_data.m_dataUSHORT;
@@ -1594,7 +1602,7 @@ SQLVariant::GetAsUBigInt()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return SQL_LongToUBIGINT(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return SQL_SBIGINTToUBIGINT(_atoi64(m_data.m_dataCHAR));
     case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return SQL_ShortToUBIGINT(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return (SQLUBIGINT)m_data.m_dataUSHORT;
@@ -1658,6 +1666,11 @@ SQLVariant::GetAsNumeric()
   static SQL_NUMERIC_STRUCT val;
   switch(m_datatype)
   {
+    case SQL_C_CHAR:      { bcd num(m_data.m_dataCHAR);
+                            num.AsNumeric(&val,SQLNUM_MAX_PREC,SQLNUM_MAX_PREC/2);
+                            return &val;
+                          }
+                          break;
     case SQL_C_SSHORT:    // Fall through
     case SQL_C_SHORT:     { bcd num(m_data.m_dataSHORT);
                             num.AsNumeric(&val,5,0);
@@ -1810,6 +1823,8 @@ SQLVariant::GetAsTimestamp()
   return NULL;
 }
 
+// European timestamp has the day-month-year order
+// instead of the standard 'year-month-day' order of a timestamp
 CString
 SQLVariant::GetAsEuropeanTimestamp()
 {
@@ -1949,7 +1964,7 @@ SQLVariant::GetAsBCD()
 {
   switch(m_datatype)
   {
-    case SQL_C_CHAR:     return bcd(atoi(m_data.m_dataCHAR));
+    case SQL_C_CHAR:     return bcd(m_data.m_dataCHAR);
     case SQL_C_SSHORT:   // fall through
     case SQL_C_SHORT:    return bcd(m_data.m_dataSHORT);
     case SQL_C_USHORT:   return bcd(m_data.m_dataUSHORT);
@@ -1958,7 +1973,7 @@ SQLVariant::GetAsBCD()
     case SQL_C_ULONG:    return bcd((int64) m_data.m_dataULONG);
     case SQL_C_FLOAT:    return bcd((double)m_data.m_dataFLOAT);
     case SQL_C_DOUBLE:   return bcd(m_data.m_dataDOUBLE);
-    case SQL_C_BIT:      return bcd((short) m_data.m_dataBIT);
+    case SQL_C_BIT:      return bcd(m_data.m_dataBIT);
     case SQL_C_TINYINT:  // fall through
     case SQL_C_STINYINT: return bcd(m_data.m_dataTINYINT);
     case SQL_C_UTINYINT: return bcd((short)m_data.m_dataUTINYINT);

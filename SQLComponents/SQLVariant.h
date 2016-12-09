@@ -26,30 +26,11 @@
 //
 #pragma  once
 #include <sqlext.h>
-#include "SQLVariantOperator.h"
 
-// Truncation types in SQL_NUMERIC_STRUCT conversions
-#define SQLNUM_TRUNC_FRAC   1
-#define SQLNUM_TRUNC_WHOLE  2
-// Max length of a NUMERIC in a char buffer
-#define SQLNUM_MAXLEN      65
 // Max precision of a NUMERIC as a bcd (Binary Coded Decimal)
 #define SQLNUM_MAX_PREC    36
 // The default scaling of a NUMERIC
 #define SQLNUM_DEF_SCALE    2
-
-// Translation list of SQL datatype constants and names
-typedef struct _types
-{
-  char*  name;
-  int    type;
-}
-DataTypes;
-
-// All registrations of type names
-extern DataTypes allTypes[];
-extern DataTypes allOther[];
-extern DataTypes allParams[];
 
 // Forwarded declarations
 class bcd;
@@ -101,7 +82,9 @@ public:
    SQLVariant(bcd* p_bcd,unsigned p_precision = SQLNUM_MAX_PREC,unsigned p_scale = SQLNUM_DEF_SCALE);  // Binary Coded Decimal
    // Destructor
   ~SQLVariant();
-   void Init(); // Init empty
+   
+  // Init empty variant
+  void     Init(); 
 
    // STATUS
    bool    IsNULL();
@@ -109,6 +92,7 @@ public:
    bool    IsNumericType();
    bool    IsIntervalType();
    bool    IsDateTimeType();
+
    // INFO about type names/values
    static  int     FindDatatype   (char* p_type);
    static  char*   FindDatatype   (int   p_type);
@@ -375,3 +359,11 @@ SQLVariant::GetSQLDataType()
 {
   return m_sqlDatatype;
 }
+
+//////////////////////////////////////////////////////////////////////////
+//
+// USING short form of SQLVariant in your code
+//
+//////////////////////////////////////////////////////////////////////////
+
+using var = SQLVariant;

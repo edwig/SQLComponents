@@ -176,6 +176,7 @@
     <ClCompile Include="AssignmentTest.cpp" />
     <ClCompile Include="Temporal.cpp" />
     <ClCompile Include="TestBCD.cpp" />
+    <ClCompile Include="VariantFormatting.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
