@@ -29,6 +29,7 @@
 #include "SQLVariantFormat.h"
 #include "SQLTimestamp.h"
 #include "SQLTime.h"
+#include "SQLDate.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -134,12 +135,85 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("TODAY1 : " + format1);
       Logger::WriteMessage("TODAY2 : " + format2);
 
-      Assert::AreEqual(format1,format2);
+      Assert::IsTrue(format1 == format2);
     }
 
     TEST_METHOD(FormatDate)
     {
+      Logger::WriteMessage("Formatting: Formatting the date/time");
 
+      CString dateString("15-10-1959");
+      SQLDate date(dateString);
+      var dateVar(&date);
+      SQLVariantFormat form(dateVar);
+
+      form.FormatDate("dddd d MMMM yyyy|H:mm:ss");
+      Assert::AreEqual("donderdag 15 oktober 1959",form.GetFormat());
+
+      form.FormatDate("ddd dd MMM yyyy|H:mm:ss");
+      Logger::WriteMessage(form.GetFormat());
+      Assert::AreEqual("do 15 okt 1959",form.GetFormat());
+
+      CString stampString("1959-10-15 15:50:20");
+      SQLTimestamp stamp(stampString);
+      var stampVar(&stamp);
+      SQLVariantFormat st(stampVar);
+
+      st.FormatDate("dddd d MMMM yyyy |H:mm:ss");
+      Assert::AreEqual("donderdag 15 oktober 1959 15:50:20",st.GetFormat());
+
+      st.FormatDate("@");
+      Assert::AreEqual("donderdag 15 oktober 1959",st.GetFormat());
+
+      st.FormatDate("");
+      Assert::AreEqual("15-10-1959",st.GetFormat());
+
+      form.Reset();
+      st.ReFormat();
+      st.ResetValue();
+    }
+
+    TEST_METHOD(NumberFormatting)
+    {
+      Logger::WriteMessage("Formatting: Formatting the date/time");
+      var num( 45123.12);
+      var neg(-66789.56);
+      SQLVariantFormat form(num);
+      SQLVariantFormat negf(neg);
+
+      form.FormatNumber("",false);
+      Assert::AreEqual("45.123,12",form.GetFormat());
+
+      form.FormatNumber("#",false);
+      Logger::WriteMessage(form.GetFormat());
+      Assert::AreEqual("45123",form.GetFormat());
+
+      form.FormatNumber("###,###.00",false);      
+      Assert::AreEqual(" 45.123,12",    form.GetFormat());
+
+      form.FormatNumber("&&&,&&&.00",false);
+      Assert::AreEqual("45.123,12",form.GetFormat());
+
+      form.FormatNumber("&&&,&&&.x",false);
+      Assert::AreEqual("45.123,1",form.GetFormat());
+
+      form.FormatNumber("&&&,&&&.X",false);
+      Assert::AreEqual("45.123",form.GetFormat());
+
+      form.FormatNumber("#:00",false);
+      Assert::AreEqual("12",form.GetFormat());
+
+      form.FormatNumber("+###,###.00",false);
+      Assert::AreEqual ("  45.123,12",form.GetFormat());
+      negf.FormatNumber("+###,###.00",false);
+      Assert::AreEqual ("- 66.789,56",negf.GetFormat());
+
+      form.FormatNumber("-###,###.00",false);
+      Assert::AreEqual ("+ 45.123,12",form.GetFormat());
+      negf.FormatNumber("-###,###.00",false);
+      Assert::AreEqual ("- 66.789,56",negf.GetFormat());
+      negf.FormatNumber("~###,###.00",false);
+      Assert::AreEqual ("- 66.789,56",negf.GetFormat());
     }
   };
 }

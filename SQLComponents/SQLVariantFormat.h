@@ -29,7 +29,8 @@
 #include "SQLDatabase.h"
 
 // User status
-#define USER_DISPLAY		1
+#define USER_DISPLAY		   1
+#define NUMBER_BUFFER_SIZE 100
 
 class SQLVariantFormat
 {

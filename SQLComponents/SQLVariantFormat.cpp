@@ -548,8 +548,8 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
 int
 SQLVariantFormat::FormatDate(CString p_pattern)
 {
-  char    buffer1[100] = "";
-  char    buffer2[100] = "";
+  char    buffer1[NUMBER_BUFFER_SIZE + 1] = "";
+  char    buffer2[NUMBER_BUFFER_SIZE + 1] = "";
   CString dateFormat;
   CString timeFormat;
   DWORD   opties = 0;
@@ -696,7 +696,7 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     str.wMonth = date->month;
     str.wDay   = date->day;
     int buflen;
-    if((buflen = GetDateFormat(0,opties,&str, ((opties != 0) ? NULL : (LPCTSTR)dateFormat) , buffer1, 100)) < 0)
+    if((buflen = GetDateFormat(0,opties,&str, ((opties != 0) ? NULL : (LPCTSTR)dateFormat) , buffer1, NUMBER_BUFFER_SIZE)) < 0)
     {
       buflen = 0;
     }
@@ -715,7 +715,7 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     str.wMinute = time->minute;
     str.wSecond = time->second;
     int buflen;
-    if((buflen = GetTimeFormat(0,0,&str,(timeFormat.GetLength() > 0 ? (LPCTSTR)timeFormat : NULL),buffer2,100)) < 0)
+    if((buflen = GetTimeFormat(0,0,&str,(timeFormat.GetLength() > 0 ? (LPCTSTR)timeFormat : NULL),buffer2,NUMBER_BUFFER_SIZE)) < 0)
     {
       buflen = 0;
     }
@@ -906,15 +906,15 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
 
   if(p_format.IsEmpty())
   {
-    char buffer[250];
+    char buffer[NUMBER_BUFFER_SIZE + 1];
     int	 bufLen = 0;
     if (p_currency)
     {
-      bufLen = GetCurrencyFormat(LOCALE_USER_DEFAULT,0,getal,NULL,buffer,250);
+      bufLen = GetCurrencyFormat(LOCALE_USER_DEFAULT,0,getal,NULL,buffer,NUMBER_BUFFER_SIZE);
     }
     else
     {
-      bufLen = GetNumberFormat(LOCALE_USER_DEFAULT,0,getal,NULL,buffer,250);
+      bufLen = GetNumberFormat(LOCALE_USER_DEFAULT,0,getal,NULL,buffer,NUMBER_BUFFER_SIZE);
     }
     if (bufLen <= 0)
     {
@@ -927,9 +927,9 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
   {
     if(p_format.Find(';') < 0)
     {
-      char buffer[101];
-      strncpy_s(buffer,getal,100);
-      FormatNumberTemplate(buffer,p_format,100);
+      char buffer[NUMBER_BUFFER_SIZE + 1];
+      strncpy_s(buffer,getal,NUMBER_BUFFER_SIZE);
+      FormatNumberTemplate(buffer,p_format,NUMBER_BUFFER_SIZE);
       getal = buffer;
     }
     else
@@ -995,8 +995,8 @@ SQLVariantFormat::FormatVariantForSQL(SQLDatabase* p_database)
 int
 SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int p_buflen)
 {
-  char	strFormat[200];
-  char	Buffer[250];
+  char	strFormat[2 * NUMBER_BUFFER_SIZE + 1];
+  char	Buffer   [2 * NUMBER_BUFFER_SIZE + 1];
   int	  BufLen = 0;
   char	*pFormat;
   char	*pGetal;
@@ -1016,9 +1016,9 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   char	LastOpmaak = '\0';
   int	  Tel;
   int	  Pos;
-  char	FmtString[100];
-  int	  FmtPos = 0;
-  char	RestString[100];
+  char	FmtString [NUMBER_BUFFER_SIZE + 1];
+  char	RestString[NUMBER_BUFFER_SIZE + 1];
+  int	  FmtPos  = 0;
   int	  RestPos = 0;
 
   BOOL	bGrouping     = FALSE;	// Wordt er grouping toegepast
@@ -1090,7 +1090,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   // uitpluizen van de format string
   // RestString[0] = '\0';
   // FmtString[0] = '\0';
-  strncpy_s(strFormat, strNumFormat, 100);
+  strncpy_s(strFormat, strNumFormat, NUMBER_BUFFER_SIZE);
 
   bInDecimal = FALSE;
   bNummer    = FALSE;
@@ -1116,7 +1116,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
         {
           if(GetNumberFormat(0,LOCALE_NOUSEROVERRIDE, Getal, NULL, Buffer, p_buflen) > 0)
           {
-            strcpy_s(&RestString[RestPos], 100,Buffer);
+            strcpy_s(&RestString[RestPos], NUMBER_BUFFER_SIZE,Buffer);
             RestPos += (int)strlen(Buffer);
           }
           else
@@ -1129,7 +1129,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
         {
           if(GetCurrencyFormat(0, LOCALE_NOUSEROVERRIDE, Getal, NULL, Buffer, p_buflen) > 0)
           {
-            strcpy_s(&RestString[RestPos], 100, Buffer);
+            strcpy_s(&RestString[RestPos], NUMBER_BUFFER_SIZE, Buffer);
             RestPos += (int)strlen(Buffer);
           }
           else
@@ -1163,7 +1163,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
           {
             return ER_FormatNumberTemplateFormat;
           }
-          strcpy_s(&RestString[RestPos],100, "@*@");
+          strcpy_s(&RestString[RestPos],NUMBER_BUFFER_SIZE, "@*@");
           RestPos += 3;
           bFormat = TRUE;
           bInFormat = TRUE;
@@ -1400,7 +1400,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
       }
     }
     NewFormat += FmtString;
-    strcpy_s(FmtString, 100, (LPCSTR)NewFormat);
+    strcpy_s(FmtString, NUMBER_BUFFER_SIZE, (LPCSTR)NewFormat);
   }
   else if (iGetalLeading < iLeadingDigits)
   {
@@ -1467,7 +1467,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
                   break;
       case ',' :  if (bNummer)
                   {
-                    strcpy_s(&Buffer[Pos], 250, ThousandSep);
+                    strcpy_s(&Buffer[Pos], NUMBER_BUFFER_SIZE, ThousandSep);
                     Pos += (int)strlen(ThousandSep);
                   }
                   else
@@ -1487,7 +1487,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
                   }
                   if (iTrailingDigits > 0)
                   {
-                    strcpy_s(&Buffer[Pos], 250, DecimalSep);
+                    strcpy_s(&Buffer[Pos], NUMBER_BUFFER_SIZE, DecimalSep);
                     Pos += (int)strlen(DecimalSep);
                   }
                   if (*pFormat == ':')
@@ -1519,7 +1519,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   else
   {
     string.Replace(tPlus," ");
-    string.Replace(tMin, "-");
+    string.Replace(tMin, "+");
     string.Replace(tTilde,"");
   }
   m_format = string;
