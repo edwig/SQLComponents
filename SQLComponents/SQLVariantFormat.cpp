@@ -40,11 +40,13 @@ static char THIS_FILE[] = __FILE__;
 
 #pragma warning (disable: 4482) // Non standard enum used
 
-// string format number en valuta format functies
+#define SEP_LEN 10
+
+// string format number and money format functions
 static bool ValutaInit = false;
-static char DecimalSep[11];
-static char ThousandSep[11];
-static char strCurrency[11];
+static char DecimalSep [SEP_LEN + 1];
+static char ThousandSep[SEP_LEN + 1];
+static char strCurrency[SEP_LEN + 1];
 static int  DecimalSepLen;
 static int  ThousandSepLen;
 static int  strCurrencyLen;
@@ -54,9 +56,9 @@ InitValutaString()
 {
   if(ValutaInit == false)
   {
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL,  DecimalSep,  10);
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, ThousandSep, 10);
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SCURRENCY, strCurrency, 10);
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL,  DecimalSep, SEP_LEN);
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, ThousandSep,SEP_LEN);
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SCURRENCY, strCurrency,SEP_LEN);
     DecimalSepLen  = (int)strlen(DecimalSep);
     ThousandSepLen = (int)strlen(ThousandSep);
     strCurrencyLen = (int)strlen(strCurrency);
@@ -154,7 +156,7 @@ SQLVariantFormat::StringInitCapital()
   }
 }
 
-// First letter of thes tring becomes a capital
+// First letter of the string becomes a capital
 // The rest becomes all lower case
 void
 SQLVariantFormat::StringStartCapital()
@@ -276,8 +278,8 @@ SQLVariantFormat::IsWinNumber(const CString p_string
                              ,CString*      p_newNumber)
 {
   CString newGetal("+");
-  bool bDecimal  = false;   // decimal seperator found
-  bool bThousend = false;   // thousand seperator found
+  bool bDecimal  = false;   // decimal separator found
+  bool bThousend = false;   // thousand separator found
   bool bSpace    = false;   // Spaces behind the number
   bool bTeken    = false;   // Found a sign
   bool bNaTeken  = false;   // Sign after the number
@@ -442,15 +444,26 @@ SQLVariantFormat::StringDoubleValue()
   return result;
 }
 
-// Zet huidige datum en tijd
+// Setting the current date and time
 void
 SQLVariantFormat::SetCurrentDate()
 {
-  CTime tm  = CTime::GetCurrentTime();
-  m_format  = tm.Format("%Y-%m-%d %H:%M:%S");
+  // Making place for our own variant
+  if(m_variant && m_owner)
+  {
+    delete m_variant;
+    m_variant = nullptr;
+  }
+
+  // Setting the current timestamp in the format string
+  // Does so in standard order "Y-M-D H:M:S" 
+  SQLTimestamp stamp = SQLTimestamp::CurrentTimestamp();
+  m_format = stamp.AsXMLString();
+  m_format.Replace("T"," ");
+
+  // Getting a new variant
+  m_variant = new SQLVariant(&stamp);
   m_owner   = true;
-  m_variant = new SQLVariant();
-  m_variant->SetData(SQL_C_TIMESTAMP,m_format);
 }
 
 #pragma warning (disable: 4996)
@@ -468,7 +481,7 @@ SQLVariantFormat::GetTimeFromStringVariant(SQLVariant* p_variant,CString p_forma
     return false;
   }
 
-  //Is er een tijd in de string aanwezig
+  // Is there a time present int he string?
   if(pos > 0 && isdigit(tijd.GetAt(pos - 1)))
   {
     --pos;
@@ -497,20 +510,25 @@ bool
 SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_format,DATE_STRUCT* p_date)
 {
   ZeroMemory(p_date,sizeof(DATE_STRUCT));
-  CString datum(p_variant ? p_variant->GetAsChar() : p_format);
 
-  // Om amerikaanse datum formaten voor te zijn.
+  CString datum = p_variant->GetAsChar();
+  if(datum.IsEmpty() && !p_format.IsEmpty())
+  {
+    datum = p_format;
+  }
+
+  // To fix the American date formats
   datum.Replace("/","-");
 
+  // Let SQLDate catch formats like "dd" "ddmm" and "ddmmyy[yy]"
+  // And all special cases where we do "NOW +1 DAY" etc
   int posDate = datum.Find('-');
   if(posDate < 0)
   {
     try
     {
       SQLDate lang(datum);
-      p_date->day   = (SQLUSMALLINT)lang.Day();
-      p_date->month = (SQLUSMALLINT)lang.Month();
-      p_date->year  = (SQLUSMALLINT)lang.Year();
+      lang.AsDateStruct(p_date);
       return true;
     }
     catch (...)
@@ -525,6 +543,7 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
   }
   if(posDate == 2 && posDat2 == 5)
   {
+    // Formatted as "dd-mm-yy[yy]" (from a date)
     p_date->day   = (SQLUSMALLINT) atoi(datum.Left(2));
     p_date->month = (SQLUSMALLINT) atoi(datum.Mid(3,2));
     p_date->year  = (SQLUSMALLINT) atoi(datum.Mid(6,4));
@@ -532,6 +551,7 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
   }
   if(posDate == 4 && posDat2 == 7)
   {
+    // Formatted as "yyyy-mm-dd" (from a timestamp)
     p_date->year  = (SQLUSMALLINT) atoi(datum.Left(4));
     p_date->month = (SQLUSMALLINT) atoi(datum.Mid(5,2));
     p_date->day   = (SQLUSMALLINT) atoi(datum.Mid(8,2));
@@ -540,11 +560,10 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
   return false;
 }
 
-
 // Format the date
-// Lege string -> Korte windows notatie
-// "@"         -> Lange windows notatie
-// "d MMMM yyyy om |H:mm:ss|"  -> meest uitgebreide variant
+// Empty string -> Short windows notation
+// "@"          -> long  windows notation
+// "d MMMM yyyy om |H:mm:ss|"  -> Most expanded form
 int
 SQLVariantFormat::FormatDate(CString p_pattern)
 {
@@ -555,14 +574,13 @@ SQLVariantFormat::FormatDate(CString p_pattern)
   DWORD   opties = 0;
   bool    doTime = false;
 
-  // STAP 1: Controle datatypen en inhoud variant of string
+  // STEP 1: Check datatypes and contents of the variant for strings
   if(m_variant && m_variant->GetDataType() != SQL_C_CHAR)
   {
     if(! m_variant->IsDateTimeType())
     {
-      // IS EIGENLIJK FOUT
-      // return ER_FormatDateTypeWaarde;
-      // We laten m_format ongemoeid om constructies als '0'/@jjjj te ondersteunen
+      // ACTUALLY AN ERROR
+      // But we let it pass unnoticed to support constructions like '0'/@yyyy
       return 0;
     }
   }
@@ -576,7 +594,7 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     ZeroMemory(&date,sizeof(DATE_STRUCT));
     ZeroMemory(&time,sizeof(TIME_STRUCT));
 
-    //Is er een datum in de string aanwezig ?
+    // Is there a date present in the string?
     if (hasDate)
     {
       if(m_variant == NULL || m_variant->IsEmpty())
@@ -588,10 +606,10 @@ SQLVariantFormat::FormatDate(CString p_pattern)
         return ER_FormatDateTypeValue;
       }
     }
-    //Is er een tijd in de string aanwezig
+    // Is there a time present in the string?
     if(hasTime)
     {
-      // Mag fout en dus '00:00:00' opleveren
+      // Can result in an error and '00:00:00'
       GetTimeFromStringVariant(m_variant,m_format,&time);
     }
   
@@ -642,12 +660,12 @@ SQLVariantFormat::FormatDate(CString p_pattern)
   }
   else
   {
-    // Geen variant EN geen string
-    // Kan zijn dat er geen record is of inhoud NULL is
-    // Formattering blijft "" (lege string
+    // Not a Variant AND not a string
+    // Can be that there is no record, or that the contents are NULL
+    // Formatting remains "" (Empty string)
     return OK;
   }
-  // STAP 3: Opties bepalen
+  // STEP 3: Getting our options
   doTime = p_pattern.Find('|') >= 0;
 
   if(p_pattern.IsEmpty())
@@ -661,10 +679,10 @@ SQLVariantFormat::FormatDate(CString p_pattern)
   }
   else
   {
-    // Prepareren voor API call
+    // Prepare for an API call
     p_pattern.Replace("jj","yy");
   }
-  // STAP 4: Splitsen van patronen
+  // STEP 4: Splitting of the patterns
   if(!p_pattern.IsEmpty())
   {
     int pos1 = p_pattern.Find('|');
@@ -680,11 +698,11 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     }
     else
     {
-      // Alleen een datum
+      // date only
       dateFormat = p_pattern;
     }
   }
-  // STAP 5: Verwerken datum deel
+  // STEP 5: Processing the DATE part
   int type = m_variant->GetDataType();
   if(type == SQL_C_DATE      || type == SQL_C_TIMESTAMP ||
      type == SQL_C_TYPE_DATE || type == SQL_C_TYPE_TIMESTAMP)
@@ -702,7 +720,7 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     }
     buffer1[buflen] = 0;
   }
-  // STAP 6: Verwerken tijd deel
+  // STEP 6: Processing the time part
   if((type == SQL_C_TIME      || type == SQL_C_TIMESTAMP ||
       type == SQL_C_TYPE_TIME || type == SQL_C_TYPE_TIMESTAMP) 
       && (opties != DATE_SHORTDATE)
@@ -721,7 +739,7 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     }
     buffer2[buflen] = 0;
   }
-  // STAP 7: Datum en tijd weer achter elkaar
+  // STEP 7: Putting date and time back together again
   m_format = CString(buffer1);
   if(doTime)
   {
@@ -730,17 +748,25 @@ SQLVariantFormat::FormatDate(CString p_pattern)
   return OK;
 }
 
-// Data optellen/aftrekken
+// Adding and subtracting dates
+// p_operator  : '+'  -> Add days, months, years
+//               '-'  -> Subtract days, months, years
+//               '~'  -> Subtract two dates
+// p_argument  :  n   -> Always days
+//                nD  -> n days
+//                nM  -> n months
+//                nY  -> n years (english)
+//                nJ  -> n years (dutch / german)
+//                nA  -> n years (french)
 int
-SQLVariantFormat::DateCalculate(char p_bewerking,CString p_argument)
+SQLVariantFormat::DateCalculate(char p_operator,CString p_argument)
 {
-  int Getal;
-  int Tel;
-  int Incr;
-  int Aantal;
-  char GetalType;
+  int  number = 0;
+  int  amount = 0;
+  char numberType = 'D';
 
-  // STAP 1: Controle datatypen en inhoud variant of string
+  // STEP 1: Checking datatypes and the contents of the variant for strings
+  //         Making sure the underlying SQLVariant is of type SQL_C_DATE
   if(m_variant && m_variant->GetDataType() != SQL_C_CHAR)
   {
     if(! m_variant->IsDateTimeType())
@@ -755,26 +781,17 @@ SQLVariantFormat::DateCalculate(char p_bewerking,CString p_argument)
     {
       return ER_FormatDateTypeValue;
     }
-    DATE_STRUCT datestr;
-    datestr.year = date.year;
-    datestr.month = date.month;
-    datestr.day = date.day;
     if(m_owner)
     {
       delete m_variant;
     }
-    m_variant = new SQLVariant(&datestr);
-    m_owner=true;
-    // STAP 2: String naar DATE/TIME/TIMESTAMP
-    //m_variant = new SQLVariant();
-    //m_owner   = true;
-
-   // m_variant->SetData(SQL_C_DATE,m_format);
+    m_variant = new SQLVariant(&date);
+    m_owner   = true;
   }
   else
   {
-    // Geen variant EN geen string
-    // RFC 406801: Default is NULL datum
+    // Not a variant and not a string
+    // Default is a NULL date
     if(m_variant == NULL)
     {
       DATE_STRUCT date = {0,0,0};
@@ -783,116 +800,78 @@ SQLVariantFormat::DateCalculate(char p_bewerking,CString p_argument)
     }
     else
     {
-      // Wel variant, maar ander type, omvormen
-      m_variant->SetData(SQL_C_DATE,"");
+      // It's a variant, but a string
+      // Try to convert to a date
+      CString date = m_variant->GetAsChar();
+      m_variant->SetData(SQL_C_DATE,date);
     }
   }
   
-  DATE_STRUCT* date = m_variant->GetAsDate();
-  COleDateTime     dDatum(date->year,date->month,date->day,0,0,0);
-  COleDateTimeSpan dTimeSpan;
-
-  Getal = 0;
-  GetalType = 'D';
-  if(p_bewerking != '+' && p_bewerking != '-' && p_bewerking != '~')
+  // Setting the default operator. Making sure we have an operator
+  if(p_operator != '+' && p_operator != '-' && p_operator != '~')
   {
-    p_bewerking = '+';
+    p_operator = '+';
   }
-  if((dDatum.GetStatus() == COleDateTime::DateTimeStatus::valid) &&
-     (p_bewerking == '+' || p_bewerking == '-'))
+
+  // Getting the date to work on
+  SQLDate date = m_variant->GetAsSQLDate();
+
+  if(date.Valid() && (p_operator == '+' || p_operator == '-'))
   {
-
-    Aantal = sscanf_s(p_argument, "%d %c", &Getal, &GetalType,(unsigned int)sizeof(char));
-
-    //SetDateTimeSpan( long lDays, int nHours, int nMins, int nSecs );
-    if (Getal != 0 )
+    amount = sscanf_s(p_argument,"%d %c",&number,&numberType,(unsigned int)sizeof(char));
+    if(number != 0)
     {
-      if (Getal < 0 )
+      if(number < 0)
       {
-        p_bewerking = ( p_bewerking == '+' ? '-' : '+' );
-        Getal = abs(Getal);
+        p_operator = (p_operator == '+' ? '-' : '+');
+        number     = abs(number);
       }
-      GetalType = (unsigned char)toupper(GetalType);
-
-      switch (GetalType)
+      if(p_operator == '-')
       {
-      case 'D': dTimeSpan.SetDateTimeSpan(Getal, 0, 0, 0);
-                if (p_bewerking == '+' )
-                {
-                  dDatum += dTimeSpan;
-                }
-                else
-                {
-                  dDatum -= dTimeSpan;
-                }
-                date->year  = (SQLSMALLINT)  dDatum.GetYear();
-                date->month = (SQLUSMALLINT) dDatum.GetMonth();
-                date->day   = (SQLUSMALLINT) dDatum.GetDay();
-                m_variant->GetAsString(m_format);
-                break;
-      case 'M': Incr = ( p_bewerking == '+' ? 1 : -1 );
-                for ( Tel = Getal ; Tel > 0 ; Tel--)
-                {
-                  date->month += (SQLUSMALLINT) Incr;
-                  if(date->month > 12)
-                  {
-                    date->month = 1;
-                    date->year += 1;
-                  }
-                  else if(date->month <= 0)
-                  {
-                    date->month = 12;
-                    date->year -= 1;
-                  }
-                }
-                m_variant->GetAsString(m_format);
-                break;
-      case 'Y':
-      case 'J': if (p_bewerking == '+' )
-                {
-                  date->year += (SQLSMALLINT)Getal;
-                }
-                else
-                {
-                  if(date->year < Getal)
-                  {
-                    date->year = 0;
-                  }
-                  else
-                  {
-                    date->year -= (SQLUSMALLINT)Getal;
-                  }
-                }
-                m_variant->GetAsString(m_format);
-                break;
+        number = -number;
+      }
+      switch (toupper(numberType))
+      {
+        case 'D': date = date.AddDays(number);
+                  date.AsDateStruct(m_variant->GetAsDate());
+                  m_format = date.AsString();
+                  break;
+        case 'M': date = date.AddMonths(number);
+                  date.AsDateStruct(m_variant->GetAsDate());
+                  m_format = date.AsString();
+                  break;
+        case 'Y': // Fall through
+        case 'J': date = date.AddYears(number);
+                  date.AsDateStruct(m_variant->GetAsDate());
+                  m_format = date.AsString();
+                  break;
       }
     }
   }
-  if(p_bewerking == '~')
+  if(date.Valid() && p_operator == '~')
   {
-    double dagen;
-    COleDateTime DT;
-    // RFC 406801: Default is 0 dagen
-    m_format = "0";
-    if((dDatum.GetStatus() == COleDateTime::DateTimeStatus::valid) && 
-       DT.ParseDateTime(p_argument))
+    try
     {
-      dagen = DT - dDatum;
-      m_format.Format("%i", (int)dagen);
+      SQLDate other(p_argument);
+      SQLInterval intval = other - date;
+      m_format.Format("%d",intval.GetDays());
+    }
+    catch(...)
+    {
+      // Does nothing. Underlying date is unchanged
     }
   }
   return OK;
-
 }
 
-// Formatteer volgens BRIEF
+// Formatting of a number
 int
 SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
 {
-  // standaard windows opmaak
-  CString getal;
+  // Standard MS-Windows format
+  CString number;
 
-  // Eventueel vers ophalen uit de SQLVariant
+  // Freshly gotten for the underlying SQLVariant
   if(m_variant)
   {
     if(m_variant->IsNumericType())
@@ -900,9 +879,9 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
       m_variant->GetAsString(m_format);
     }
   }
-  // Getal varianten omzetten. Zet ook "123,4500000" om naar "123.45"
+  // Converting number variants. Also "123,4500000" to "123.45"
   double waarde = StringDoubleValue();
-  getal.Format("%f",waarde);
+  number.Format("%f",waarde);
 
   if(p_format.IsEmpty())
   {
@@ -910,11 +889,11 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
     int	 bufLen = 0;
     if (p_currency)
     {
-      bufLen = GetCurrencyFormat(LOCALE_USER_DEFAULT,0,getal,NULL,buffer,NUMBER_BUFFER_SIZE);
+      bufLen = GetCurrencyFormat(LOCALE_USER_DEFAULT,0,number,NULL,buffer,NUMBER_BUFFER_SIZE);
     }
     else
     {
-      bufLen = GetNumberFormat(LOCALE_USER_DEFAULT,0,getal,NULL,buffer,NUMBER_BUFFER_SIZE);
+      bufLen = GetNumberFormat(LOCALE_USER_DEFAULT,0,number,NULL,buffer,NUMBER_BUFFER_SIZE);
     }
     if (bufLen <= 0)
     {
@@ -928,13 +907,13 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
     if(p_format.Find(';') < 0)
     {
       char buffer[NUMBER_BUFFER_SIZE + 1];
-      strncpy_s(buffer,getal,NUMBER_BUFFER_SIZE);
+      strncpy_s(buffer,number,NUMBER_BUFFER_SIZE);
       FormatNumberTemplate(buffer,p_format,NUMBER_BUFFER_SIZE);
-      getal = buffer;
+      number = buffer;
     }
     else
     {
-      // NIETS? Wat doen we hier?
+      // NOTHING? Wat to do here?
     }
   }
   return OK;
@@ -991,7 +970,7 @@ SQLVariantFormat::FormatVariantForSQL(SQLDatabase* p_database)
   return text;
 }
 
-// Intern formatteren van een getal volgens BRIEF
+// Internally formatting a number according to a template
 int
 SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int p_buflen)
 {
@@ -1021,11 +1000,11 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   int	  FmtPos  = 0;
   int	  RestPos = 0;
 
-  BOOL	bGrouping     = FALSE;	// Wordt er grouping toegepast
-  int	  nEersteGroup  = 0;		  // Grote van de eerste groep
-  int	  nTweedeGroup  = 0;		  // grote van de tweede groep
-  int	  nGroup        = 0;			// Huidige groep teller
-  int	  nGroupSize    = 0;			// Grote van de repeating group
+  BOOL	bGrouping     = FALSE;	// Do we have a grouping
+  int	  nEersteGroup  = 0;		  // Size of the first group
+  int	  nTweedeGroup  = 0;		  // Size of the second group
+  int	  nGroup        = 0;			// Current group counter
+  int	  nGroupSize    = 0;			// Size of the repeating group
 
   int	  iGetalTrailing  = 0;
   int	  iGetalLeading   = 0;
@@ -1035,8 +1014,8 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   int	  iTrailingZero   = 0;
   int	  iAfronden       = 0;
 
-  // opmaken en uitpluizen van het getal
-  // Rommel verwijderen en de eerste controle
+  // Finding the format of the number
+  // Remove junk and first checks
   bInDecimal = FALSE;
   bNummer    = FALSE;
   bSign      = FALSE;
@@ -1087,7 +1066,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   }
   *pFormatStart = '\0';
 
-  // uitpluizen van de format string
+  // Finding out the format string
   // RestString[0] = '\0';
   // FmtString[0] = '\0';
   strncpy_s(strFormat, strNumFormat, NUMBER_BUFFER_SIZE);
@@ -1110,8 +1089,8 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
       }
       else if (strchr("@", *pFormat) != NULL )
       {
-        // @# = Oorspronkelijke Nummer opmaak
-        // @$ = Oorspronkelijke Valuta opmaak
+        // @# = Original number format
+        // @$ = Original money  format
         if (*(pFormat + 1) == '#')
         {
           if(GetNumberFormat(0,LOCALE_NOUSEROVERRIDE, Getal, NULL, Buffer, p_buflen) > 0)
@@ -1233,7 +1212,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
                       return ER_FormatNumberTemplateDecimal2;
                     }
                     bInDecimal = TRUE;
-                    // groep vaststellen
+                    // Finding the grouping
                     if (bGrouping)
                     {
                       if (nEersteGroup == 0)
@@ -1253,7 +1232,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
                     {
                       return ER_FormatNumberTemplateDecimal3;
                     }
-                    // groep vaststellen
+                    // Finding the grouping
                     bGrouping = TRUE;
                     if (nEersteGroup == 0)
                     {
@@ -1280,7 +1259,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
       }
     }
     else
-    { // instring
+    {
       if (*pFormat == InString)
       {
         InString = '\0';
@@ -1291,7 +1270,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
       }
     }
   }
-  // eventueel de laatste groep
+  // Eventually the last group
   if (!bInDecimal && bGrouping)
   {
     if (nEersteGroup == 0)
@@ -1307,20 +1286,18 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   {
     nGroupSize = max(nEersteGroup, nTweedeGroup);
   }
-  // strings afsluiten
+  // Closing the strings
   RestString[RestPos] = '\0';
   FmtString[FmtPos] = '\0';
 
-  /* @plaats opschonen getal */
-  // Eventueel afronden indien noodzakelijk
+  // Do the rounding if necessary
   if (	bAfronden )
   {
-    //strFormatLog += "[AFRONDEN DIE HAP]\r\n";
     NUMBERFMT NumFormat;
-    NumFormat.NumDigits = iAfronden;
-    NumFormat.LeadingZero = 0;
-    NumFormat.Grouping = 0;
-    NumFormat.lpDecimalSep = ".";
+    NumFormat.NumDigits     = iAfronden;
+    NumFormat.LeadingZero   = 0;
+    NumFormat.Grouping      = 0;
+    NumFormat.lpDecimalSep  = ".";
     NumFormat.lpThousandSep = ",";
     NumFormat.NegativeOrder = 0;
     BufLen = GetNumberFormat(0, 0, Getal, &NumFormat, Buffer, p_buflen);
@@ -1331,7 +1308,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
     strcpy_s(Getal,p_buflen,Buffer);
   }
   //
-  // eigenschappen van het getal bepalen
+  // Getting the attributes of the number
   //
   bInDecimal = FALSE;
   for (pFormat = Getal ; *pFormat != '\0' ; *pFormat++)
@@ -1374,11 +1351,10 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
       }
     }
   }
-  // Getal en formaat string op elkaar aanpassen
-  // Getal grote als de format string
+  // Adjusting the number size and format string size
   if (iGetalLeading > iLeadingDigits)
   {
-    // Aantal '#' toevoegen aan format string
+    // Adding '#' to the format string
     CString NewFormat;
     Pos = 0;
     nGroup = nEersteGroup;
@@ -1413,7 +1389,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
     strcpy_s(Getal, p_buflen,(LPCSTR)NewGetal);
   }
 
-  // Het Getal Formateren
+  // Formatting the number
   Pos = 0;
   RestPos = 0;
   bNummer = FALSE;
@@ -1444,11 +1420,6 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
                         Buffer[Pos++] = ' ';
                       }
                       else if (*pFormat != '&' )
-//                       else if (*pFormat == '&' )
-//                       {
-//                         Pos = Pos;
-//                       }
-//                       else
                       {
                         Buffer[Pos++] = '0';
                         bNummer = TRUE;
@@ -1500,7 +1471,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   Buffer[Pos] = '\0';
   CString string = RestString;
   string.Replace("@*@",Buffer);
-  // Teken Plaatsen
+  // The placing of the '+' or '-' sign
   char tPlus[2]  = {1 , 0};
   char tMin[2]   = {2 , 0};
   char tTilde[2] = {3 , 0};
@@ -1512,8 +1483,8 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   }
   else if (bNegatief)
   {
-    string.Replace(tPlus,"-");
-    string.Replace(tMin, "-");
+    string.Replace(tPlus, "-");
+    string.Replace(tMin,  "-");
     string.Replace(tTilde,"-");
   }
   else

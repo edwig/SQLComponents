@@ -136,6 +136,12 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("TODAY2 : " + format2);
 
       Assert::IsTrue(format1 == format2);
+
+      // Try doing it twice
+      form.SetCurrentDate();
+
+      // Test resetting the value
+      form.ResetValue();
     }
 
     TEST_METHOD(FormatDate)
@@ -171,6 +177,33 @@ namespace DatabaseUnitTest
       form.Reset();
       st.ReFormat();
       st.ResetValue();
+
+      // timestamp formatting on a string
+      CString  theDate("15-10-1959 15:50:20");
+      var date2(theDate);
+      SQLVariantFormat fdate(date2);
+      // Forcing the string to a timestamp
+      fdate.SetFormat(theDate);
+      fdate.FormatDate("dddd dd MMMM jjjj |M:mm:ss");
+      Assert::AreEqual("donderdag 15 oktober 1959 15:50:20",fdate.GetFormat());
+
+      // Only for date
+      theDate = "15-10-1959";
+      var date3(theDate);
+      SQLVariantFormat fdate3(date3);
+      // Forcing the string to a date
+      fdate3.SetFormat(theDate);
+      fdate3.FormatDate("dddd dd MMMM jjjj");
+      Assert::AreEqual("donderdag 15 oktober 1959",fdate3.GetFormat());
+
+      // Only for time
+      theDate = "15:50:20";
+      var date4(theDate);
+      SQLVariantFormat fdate4(date4);
+      // Forcing to a time
+      fdate.SetFormat(theDate);
+      fdate.FormatDate("|M:mm:ss");
+      Assert::AreEqual("15:50:20",fdate.GetFormat());
     }
 
     TEST_METHOD(NumberFormatting)
@@ -215,5 +248,116 @@ namespace DatabaseUnitTest
       negf.FormatNumber("~###,###.00",false);
       Assert::AreEqual ("- 66.789,56",negf.GetFormat());
     }
+
+    TEST_METHOD(FormatDateCalculation)
+    {
+      Logger::WriteMessage("Formatting: date calculations and reformatting");
+
+      // ADDITION
+
+      // + n -> interpret as days
+      SQLDate date1("2012-12-25");
+      var vdat1(&date1);
+      SQLVariantFormat fdat1(vdat1);
+      fdat1.DateCalculate('+',"9");
+      Assert::AreEqual("03-01-2013",fdat1.GetFormat());
+
+      // + nD -> interpret as days
+      SQLDate date2("2012-12-25");
+      var vdat2(&date2);
+      SQLVariantFormat fdat2(vdat2);
+      fdat2.DateCalculate('+',"9d");
+      Assert::AreEqual("03-01-2013",fdat2.GetFormat());
+
+      // + nM -> interpret as months
+      SQLDate date3("2012-12-25");
+      var vdat3(&date3);
+      SQLVariantFormat fdat3(vdat3);
+      fdat3.DateCalculate('+',"4m");
+      Assert::AreEqual("25-04-2013",fdat3.GetFormat());
+
+      // + nY -> interpret as years
+      SQLDate date4("2012-12-25");
+      var vdat4(&date4);
+      SQLVariantFormat fdat4(vdat4);
+      fdat4.DateCalculate('+',"2Y");
+      Assert::AreEqual("25-12-2014",fdat4.GetFormat());
+
+      // SUBTRACTION 
+
+      // - n -> interpret as days
+      SQLDate date5("03-01-2013");
+      var vdat5(&date5);
+      SQLVariantFormat fdat5(vdat5);
+      fdat5.DateCalculate('-',"9");
+      Assert::AreEqual("25-12-2012",fdat5.GetFormat());
+
+      // - nd -> interpret as days
+      SQLDate date6("03-01-2013");
+      var vdat6(&date6);
+      SQLVariantFormat fdat6(vdat6);
+      fdat6.DateCalculate('-',"9");
+      Assert::AreEqual("25-12-2012",fdat6.GetFormat());
+
+      // - nM -> interpret as months
+      SQLDate date7("25-04-2013");
+      var vdat7(&date7);
+      SQLVariantFormat fdat7(vdat7);
+      fdat7.DateCalculate('-',"4m");
+      Assert::AreEqual("25-12-2012",fdat7.GetFormat());
+
+      // + nY -> interpret as years
+      SQLDate date8("2014-12-25");
+      var vdat8(&date8);
+      SQLVariantFormat fdat8(vdat8);
+      fdat8.DateCalculate('-',"2Y");
+      Assert::AreEqual("25-12-2012",fdat8.GetFormat());
+
+      // SUBTRACTION OF DATES
+
+      SQLDate date9("25-12-2012");
+      var vdat9(&date9);
+      SQLVariantFormat fdat9(vdat9);
+      fdat9.DateCalculate('~',"03-01-2013");
+      Assert::AreEqual("9",fdat9.GetFormat());
+
+      SQLDate date10("03-01-2013");
+      var vdat10(&date10);
+      SQLVariantFormat fdat10(vdat10);
+      fdat10.DateCalculate('~',"25-12-2012");
+      Assert::AreEqual("-9",fdat10.GetFormat());
+
+      // From other than a date
+
+      CString date11("25-12-2012");
+      var vdat11(date11);
+      SQLVariantFormat fdat11(vdat11);
+      fdat11.DateCalculate('+',"9d");
+      Assert::AreEqual("03-01-2013",fdat11.GetFormat());
+
+      CString date12("");
+      var vdat12(date12);
+      SQLVariantFormat fdat12(vdat12);
+      fdat12.SetFormat("25-12-2012");
+      fdat12.DateCalculate('+',"9d");
+      Assert::AreEqual("03-01-2013",fdat12.GetFormat());
+
+      // Default operator is a '+'
+      SQLDate date13("2012-12-25");
+      var vdat13(&date13);
+      SQLVariantFormat fdat13(vdat13);
+      fdat13.DateCalculate(' ',"9d");
+      Assert::AreEqual("03-01-2013",fdat13.GetFormat());
+
+      // Test for negative number of days
+
+      SQLDate date14("03-01-2013");
+      var vdat14(&date14);
+      SQLVariantFormat fdat14(vdat14);
+      fdat14.DateCalculate('+',"-9");
+      Assert::AreEqual("25-12-2012",fdat14.GetFormat());
+
+    }
   };
 }
+

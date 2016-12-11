@@ -57,10 +57,10 @@ public:
   int         StrValutaAMOmzetten(CString& p_string,bool p_enkelValuta);
   // Value of a string as a double
   double      StringDoubleValue();
-  // Format according to userinterface
+  // Format according to user interface
   int         FormatNumber(CString p_format,bool p_currency);
   // Do math on dates
-  int         DateCalculate(char p_bewerking,CString p_argument);
+  int         DateCalculate(char p_operator,CString p_argument);
 
   CString     FormatVariantForSQL(SQLDatabase* p_database);
   void        SetVariant(SQLVariant* p_variant);

@@ -872,6 +872,11 @@ SQLDataSet::Aggregate(int p_num,AggregateInfo& p_info)
 bool
 SQLDataSet::Synchronize(int p_mutationID /*=0*/)
 {
+  // Needs the primary table name of the dataset
+  if(m_primaryTableName.IsEmpty())
+  {
+    return false;
+  }
   // Check if we have mutations
   if((m_status & (SQL_Record_Insert | SQL_Record_Deleted | SQL_Record_Updated)) == 0)
   {
@@ -883,6 +888,7 @@ SQLDataSet::Synchronize(int p_mutationID /*=0*/)
      !GetPrimaryKeyInfo()         ||    // Needs primary key info for doing updates/deletes
      !CheckPrimaryKeyColumns()    )     // Needs all of the primary key columns
   {
+    // No primary key, cannot do updates/deletes
     return false;
   }
 

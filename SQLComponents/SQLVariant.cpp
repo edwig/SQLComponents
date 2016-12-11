@@ -1760,11 +1760,18 @@ SQLVariant::GetAsDate()
   if(m_datatype == SQL_C_CHAR)
   {
     // Try  conversion from char
-    char buffer[20];
-    strcpy_s(buffer,20,m_data.m_dataCHAR);
-    if(SetData(SQL_C_DATE,buffer))
+    // NOT MULTI-THREAD SAFE
+    TRACE("BEWARE: Not multi-thread safe: Conversion from char to date_struct");
+    try
     {
-      return &m_data.m_dataDATE;
+      static DATE_STRUCT date_struct;
+      SQLDate date(m_data.m_dataCHAR);
+      date.AsDateStruct(&date_struct);
+      return &date_struct;
+    }
+    catch(CString& /*er*/)
+    {
+      throw;
     }
   }
   ThrowErrorDatatype(SQL_C_DATE);
