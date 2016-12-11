@@ -30,6 +30,7 @@
 #include "SQLQuery.h"
 #include "SQLWrappers.h"
 #include "SQLDate.h"
+#include "bcd.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -313,7 +314,7 @@ SQLQuery::ReportQuerySpeed(LARGE_INTEGER p_start)
   QueryPerformanceCounter(&einde);
 
   double secondsDBL = ((double)(einde.QuadPart - p_start.QuadPart)) / (double)freq.QuadPart;
-  seconds = (long) secondsDBL; // afronden
+  seconds = (long) secondsDBL; // rounding
 
   CString message;
   if(seconds > m_speedThreshold)
@@ -409,6 +410,42 @@ SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,int p_type /*=SQL_PARAM_I
   InternalSetParameter(p_num,var,p_type);
 }
 
+void 
+SQLQuery::SetParameter(int p_num,bcd& p_param,int p_type /*=SQL_PARAM_INPUT*/)
+{
+  SQLVariant* var = new SQLVariant(&p_param);
+  InternalSetParameter(p_num,var,p_type);
+}
+
+// Set numeric precision / scale different from SQLNUM_MAX_PREC / SQLNUM_DEF_SCALE
+void 
+SQLQuery::SetNumericPrecision(int p_column,int p_precision,int p_type /*=SQL_RESULT_COL*/)
+{
+  NumPrecScale::iterator it = m_precisions.find((p_type << 8) | p_column);
+  if(it == m_precisions.end())
+  {
+    m_precisions.insert(std::make_pair((int)((p_type << 8) | p_column),p_precision));
+  }
+  else
+  {
+    it->second = p_precision;
+  }
+}
+
+void 
+SQLQuery::SetNumericScale(int p_column,int p_scale,int p_type /*=SQL_RESULT_COL*/)
+{
+  NumPrecScale::iterator it = m_scales.find((p_type << 8) | p_column);
+  if(it == m_scales.end())
+  {
+    m_scales.insert(std::make_pair((int)((p_type << 8) | p_column), p_scale));
+  }
+  else
+  {
+    it->second = p_scale;
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // STATEMENTS
@@ -424,6 +461,13 @@ SQLQuery::DoSQLStatement(const CString& p_statement,int p_param1)
 
 void 
 SQLQuery::DoSQLStatement(const CString& p_statement,const char* p_param1)
+{
+  SetParameter(1,p_param1);
+  DoSQLStatement(p_statement);
+}
+
+void
+SQLQuery::DoSQLStatement(const CString& p_statement,bcd p_param1)
 {
   SetParameter(1,p_param1);
   DoSQLStatement(p_statement);
@@ -454,7 +498,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
 
   if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
   {
-    m_database->LogPrint(LOGLEVEL_MAX,"[Datbase query]\n");
+    m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
     m_database->LogPrint(LOGLEVEL_MAX,p_statement.GetString());
     m_database->LogPrint(LOGLEVEL_MAX,"\n");
   }
@@ -472,7 +516,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   // Optimization: remove trailing spaces
   statement.Trim();
 
-  // Do the Querytext macro replacement
+  // Do the Query text macro replacement
   if(m_database)
   {
     m_database->ReplaceMacros(statement);
@@ -803,14 +847,14 @@ SQLQuery::BindColumns()
   {
     atexec = 0;
     m_retCode = SqlDescribeCol(m_hstmt            // statement handle
-                             ,icol               // Column number
-                             ,colName            // Column name
-                             ,SQL_MAX_IDENTIFIER // name buffer length
-                             ,&dummy             // actual name length gotten
-                             ,&dataType          // SQL data type (SQL_XX)
-                             ,&precision         // precision of numbers
-                             ,&scale             // decimal scale
-                             ,&nullable);        // NULL values OK?
+                              ,icol               // Column number
+                              ,colName            // Column name
+                              ,SQL_MAX_IDENTIFIER // name buffer length
+                              ,&dummy             // actual name length gotten
+                              ,&dataType          // SQL data type (SQL_XX)
+                              ,&precision         // precision of numbers
+                              ,&scale             // decimal scale
+                              ,&nullable);        // NULL values OK?
     if(!SQL_SUCCEEDED(m_retCode))
     {
       CString fout;
@@ -891,8 +935,42 @@ SQLQuery::BindColumns()
         GetLastError(prefix);
         throw m_lastError;
       }
+
+      // Now do the SQL_NUMERIC precision/scale binding
+      if(type == SQL_C_NUMERIC || type == SQL_DECIMAL)
+      {
+        BindColumnNumeric(bcol,SQL_RESULT_COL);
+      }
     }
     ++it;
+  }
+}
+
+void
+SQLQuery::BindColumnNumeric(int p_column,int p_type /*=SQL_RESULT_COL*/)
+{
+  SQLHDESC    rowdesc   = NULL;
+  SQLSMALLINT precision = SQLNUM_MAX_PREC;
+  SQLSMALLINT scale     = SQLNUM_DEF_SCALE;
+
+  // See if we have different precisions or scales in mind
+  NumPrecScale::iterator pre = m_precisions.find((p_type << 8) | p_column);
+  NumPrecScale::iterator sca = m_scales    .find((p_type << 8) | p_column);
+  if(pre != m_precisions.end())
+  {
+    precision = (SQLSMALLINT)pre->second;
+  }
+  if(sca != m_scales.end())
+  {
+    scale = (SQLSMALLINT)sca->second;
+  }
+
+  // Getting the ROW descriptor and set the precision/scale fields
+  m_retCode = SQLGetStmtAttr(m_hstmt,SQL_ATTR_APP_ROW_DESC,&rowdesc,SQL_IS_POINTER,NULL);
+  if(SQL_SUCCEEDED(m_retCode))
+  {
+    SQLSetDescField(rowdesc,(SQLSMALLINT)p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
+    SQLSetDescField(rowdesc,(SQLSMALLINT)p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
   }
 }
 
@@ -1003,6 +1081,7 @@ SQLQuery::GetRecord()
   }
   // Set all columns to NULL
   ResetColumns();
+
   // Do the fetch
   m_retCode = SqlFetch(m_hstmt);
   if(SQL_SUCCEEDED(m_retCode))

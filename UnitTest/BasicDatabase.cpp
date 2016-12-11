@@ -31,6 +31,7 @@
 #include "SQLDataSet.h"
 #include "SQLInfoTree.h"
 #include "SQLInfoDB.h"
+#include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -412,6 +413,63 @@ namespace DatabaseUnitTest
       {
         Assert::Fail(L"Unknown error in database test");
       }
+    }
+
+    TEST_METHOD(BasicReadNumeric)
+    {
+      Logger::WriteMessage("Testing Numeric reading/writing:");
+      Logger::WriteMessage("================================");
+
+      SQLDatabase dbs;
+      dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+      long beginTime = clock();
+
+      try
+      {
+        // Set options for the database
+        dbs.SetLoginTimeout(0);
+        dbs.SetMARS(false);
+
+        if(dbs.Open(g_dsn,g_user,g_password))
+        {
+          Logger::WriteMessage("Database opened.");
+
+          CString sql = "SELECT field2,field3 FROM test_number";
+          SQLQuery query(&dbs);
+
+          query.SetNumericScale(2,4);
+
+          query.DoSQLStatement(sql);
+          while(query.GetRecord())
+          {
+            double field1 = query[1];
+            bcd    field2 = query[2];
+
+            CString msg;
+            msg.Format("Field 1 [%.4f] Field 2 [%s]",field1,field2.AsString());
+            Logger::WriteMessage(msg);
+          }
+        }
+        else
+        {
+          Assert::Fail(L"Database ***NOT*** opened.");
+        }
+        dbs.Close();
+      }
+      catch(CString& s)
+      {
+        Logger::WriteMessage("Database error. Reason:");
+        Logger::WriteMessage(s);
+        Assert::Fail(L"Database error");
+      }
+      catch(...)
+      {
+        Assert::Fail(L"Unknown error in database test");
+      }
+      long endTime = clock();
+      CString msg;
+      msg.Format("DATASET test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      Logger::WriteMessage(msg);
     }
 
     //////////////////////////////////////////////////////////////////////////

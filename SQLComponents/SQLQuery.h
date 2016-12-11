@@ -41,12 +41,14 @@
 // After this amount of seconds it's been toooooo long
 #define QUERY_TOO_LONG 2.0
 
+class bcd;
 class SQLDate;
 class SQLDatabase;
 
 typedef std::map<int,    SQLVariant*> ColNumMap;
 typedef std::map<CString,SQLVariant*> ColNameMap;
 typedef std::map<int,    SQLVariant*> VarMap;
+typedef std::map<int,int> NumPrecScale;
 
 class SQLQuery
 {
@@ -74,6 +76,9 @@ public:
   void SetSpeedThreshold(double p_seconds);
   // Set maximum rows to get
   void SetMaxRows(int p_maxrows);
+  // Set numeric precision / scale different from SQLNUM_MAX_PREC / SQLNUM_DEF_SCALE
+  void SetNumericPrecision(int p_column,int p_precision,int p_type = SQL_RESULT_COL);
+  void SetNumericScale    (int p_column,int p_scale,    int p_type = SQL_RESULT_COL);
 
   // Set parameters for statement
   void SetParameter  (int p_num,SQLVariant*   p_param,int p_type = SQL_PARAM_INPUT);
@@ -84,6 +89,7 @@ public:
   void SetParameter  (int p_num,SQLDate&      p_param,int p_type = SQL_PARAM_INPUT);
   void SetParameter  (int p_num,SQLTime&      p_param,int p_type = SQL_PARAM_INPUT);
   void SetParameter  (int p_num,SQLTimestamp& p_param,int p_type = SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,bcd&          p_param,int p_type = SQL_PARAM_INPUT);
 
   // SINGLE STATEMENT
 
@@ -94,6 +100,7 @@ public:
   // Overrides with one parameter
   void        DoSQLStatement(const CString& p_statement,const int   p_param1);
   void        DoSQLStatement(const CString& p_statement,const char* p_param1);
+  void        DoSQLStatement(const CString& p_statement,const bcd   p_param1);
   // Variants of the DoSQLStatement
   SQLVariant* DoSQLStatementScalar  (const CString& p_statement,const int   p_param1);
   SQLVariant* DoSQLStatementScalar  (const CString& p_statement,const char* p_param1);
@@ -103,7 +110,7 @@ public:
   void        TryDoSQLStatement(const CString& p_statement);
 
   // BOUND STATEMENT
-  // Devide a SQL statement in Prepare/Execute/Fetch
+  // Divide a SQL statement in Prepare/Execute/Fetch
   void        DoSQLPrepare(const CString& p_statement);
   void        DoSQLExecute();
   // Get bounded columns from query
@@ -164,6 +171,8 @@ private:
   // Bind application parameters
   void  BindParameters();
   void  BindColumns();
+  void  BindColumnNumeric(int p_column,int p_type = SQL_RESULT_COL);
+
   // Reset all column to NULL
   void  ResetColumns();
   // Convert database dependent SQL_XXXX types to C-types SQL_C_XXXX
@@ -203,6 +212,8 @@ private:
   ColNumMap     m_numMap;            // column maps of the derived result set
   ColNameMap    m_nameMap;           // column by names
 
+  NumPrecScale  m_precisions;        // Different numeric precisions
+  NumPrecScale  m_scales;            // Different numeric scales
   // Lock database for multi-access from other threads
   // For as long as the current statement takes
   Locker<SQLDatabase> m_lock;

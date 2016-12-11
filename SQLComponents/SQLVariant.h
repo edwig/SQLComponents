@@ -28,7 +28,7 @@
 #include <sqlext.h>
 
 // Max precision of a NUMERIC as a bcd (Binary Coded Decimal)
-#define SQLNUM_MAX_PREC    36
+#define SQLNUM_MAX_PREC    38
 // The default scaling of a NUMERIC
 #define SQLNUM_DEF_SCALE    2
 
