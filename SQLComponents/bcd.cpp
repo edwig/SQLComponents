@@ -1853,9 +1853,9 @@ bcd::AsNumeric(SQL_NUMERIC_STRUCT* p_numeric,unsigned p_precision,unsigned p_sca
   // Check precision/scale values
   // Precision cannot be greater than 256^16 = 2.03 10^38
   // Scale cannot be greater than (precision - 1)
-  if(p_precision > 37)
+  if(p_precision > SQLNUM_MAX_PREC)
   {
-    p_precision = 37;
+    p_precision = SQLNUM_MAX_PREC;
   }
   if(p_scale >= p_precision)
   {

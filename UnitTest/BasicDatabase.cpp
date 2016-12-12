@@ -437,8 +437,6 @@ namespace DatabaseUnitTest
           CString sql = "SELECT field2,field3 FROM test_number";
           SQLQuery query(&dbs);
 
-          query.SetNumericScale(2,4);
-
           query.DoSQLStatement(sql);
           while(query.GetRecord())
           {
@@ -449,6 +447,32 @@ namespace DatabaseUnitTest
             msg.Format("Field 1 [%.4f] Field 2 [%s]",field1,field2.AsString());
             Logger::WriteMessage(msg);
           }
+
+          // Change value
+          SQLTransaction trans(&dbs,"UpdNum");
+          CString sql2 = "UPDATE test_number\n"
+                         "   SET field3 = ?\n"
+                         " WHERE id     = 1";
+          bcd num(303.88);
+          query.SetParameter(1,num,14,2);
+          query.DoSQLStatementNonQuery(sql2);
+          trans.Commit();
+
+          // Reselect
+          sql += " WHERE id = 1";
+          query.DoSQLStatement(sql);
+          if(query.GetRecord())
+          {
+            bcd test = query[2];
+            Assert::IsTrue(test != num,L"NUMERIC incorrectly updated");
+          }
+
+          // Return to original value
+          bcd one(1);
+          query.SetParameter(1,one,14,2);
+          trans.Start("UpdNum");
+          query.DoSQLStatementNonQuery(sql2);
+          trans.Commit();
         }
         else
         {
@@ -468,7 +492,7 @@ namespace DatabaseUnitTest
       }
       long endTime = clock();
       CString msg;
-      msg.Format("DATASET test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      msg.Format("NUMERIC test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(msg);
     }
 

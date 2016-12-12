@@ -72,6 +72,9 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
   {
     // Test connection
     TestConnection();
+
+    // Testing Numerics
+    TestNumeric();
     
     TestClosingCursor();
 

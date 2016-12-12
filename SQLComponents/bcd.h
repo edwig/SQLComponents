@@ -15,6 +15,10 @@
 #pragma once
 #include <sqltypes.h>   // Needed for conversions of SQL_NUMERIC_STRUCT
 
+#ifndef SQLNUM_MAX_PREC
+#define SQLNUM_MAX_PREC 38
+#endif
+
 // Constants that controls the actual precision:
 const int bcdBase      = 100000000L; // Base of the numbers in m_mantissa
 const int bcdDigits    = 8;          // Number of digits in one mantissa element

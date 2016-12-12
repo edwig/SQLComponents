@@ -33,10 +33,10 @@ class SQLTransaction
 {
 public:
   SQLTransaction(SQLDatabase* p_database, 
-                 CString      p_name,
+                 const char*  p_name,
                  bool         p_startImmediate   = true, 
                  bool         p_isSubTransaction = false);
-  SQLTransaction(HDBC p_hdbc);
+  SQLTransaction(HDBC p_hdbc, bool p_startImmediate);
 
   // Destructor will rollback at an open transaction
  ~SQLTransaction();

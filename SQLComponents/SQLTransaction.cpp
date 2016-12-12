@@ -37,7 +37,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 SQLTransaction::SQLTransaction(SQLDatabase* p_database
-                              ,CString      p_name
+                              ,const char*  p_name
                               ,bool         p_startImmediate
                               ,bool         p_isSubTransaction) 
                :m_database  (p_database)
@@ -50,12 +50,15 @@ SQLTransaction::SQLTransaction(SQLDatabase* p_database
   }
 }
 
-SQLTransaction::SQLTransaction(HDBC p_hdbc)
+SQLTransaction::SQLTransaction(HDBC p_hdbc,bool p_startImmediate)
                :m_hdbc(p_hdbc)
                ,m_database(NULL)
                ,m_active(false)
 {
-  Start("",false);
+  if(p_startImmediate)
+  {
+    Start("",false);
+  }
 }
 
 SQLTransaction::~SQLTransaction()

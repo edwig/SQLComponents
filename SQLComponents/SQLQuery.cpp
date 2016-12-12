@@ -411,20 +411,28 @@ SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,int p_type /*=SQL_PARAM_I
 }
 
 void 
-SQLQuery::SetParameter(int p_num,bcd& p_param,int p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int  p_num
+                      ,bcd& p_param
+                      ,int  p_precision 
+                      ,int  p_scale     
+                      ,int  p_type      /*=SQL_PARAM_INPUT*/)
 {
-  SQLVariant* var = new SQLVariant(&p_param);
-  InternalSetParameter(p_num,var,p_type);
+  // Synchronize the SQL_NUMERIC_STRUCT settings and the binding of the paramater
+  // Otherwise we will get values that are n factor of 10 different in the database
+  SQLVariant* var = new SQLVariant(&p_param,p_precision,p_scale);
+  InternalSetParameter(p_num,var,        p_type);
+  SetNumericPrecision (p_num,p_precision,p_type);
+  SetNumericScale     (p_num,p_scale,    p_type);
 }
 
 // Set numeric precision / scale different from SQLNUM_MAX_PREC / SQLNUM_DEF_SCALE
 void 
 SQLQuery::SetNumericPrecision(int p_column,int p_precision,int p_type /*=SQL_RESULT_COL*/)
 {
-  NumPrecScale::iterator it = m_precisions.find((p_type << 8) | p_column);
+  NumPrecScale::iterator it = m_precisions.find((p_type << 16) | p_column);
   if(it == m_precisions.end())
   {
-    m_precisions.insert(std::make_pair((int)((p_type << 8) | p_column),p_precision));
+    m_precisions.insert(std::make_pair((int)((p_type << 16) | p_column),p_precision));
   }
   else
   {
@@ -435,10 +443,10 @@ SQLQuery::SetNumericPrecision(int p_column,int p_precision,int p_type /*=SQL_RES
 void 
 SQLQuery::SetNumericScale(int p_column,int p_scale,int p_type /*=SQL_RESULT_COL*/)
 {
-  NumPrecScale::iterator it = m_scales.find((p_type << 8) | p_column);
+  NumPrecScale::iterator it = m_scales.find((p_type << 16) | p_column);
   if(it == m_scales.end())
   {
-    m_scales.insert(std::make_pair((int)((p_type << 8) | p_column), p_scale));
+    m_scales.insert(std::make_pair((int)((p_type << 16) | p_column), p_scale));
   }
   else
   {
@@ -461,13 +469,6 @@ SQLQuery::DoSQLStatement(const CString& p_statement,int p_param1)
 
 void 
 SQLQuery::DoSQLStatement(const CString& p_statement,const char* p_param1)
-{
-  SetParameter(1,p_param1);
-  DoSQLStatement(p_statement);
-}
-
-void
-SQLQuery::DoSQLStatement(const CString& p_statement,bcd p_param1)
 {
   SetParameter(1,p_param1);
   DoSQLStatement(p_statement);
@@ -825,6 +826,13 @@ SQLQuery::BindParameters()
       GetLastError(prefix);
       throw m_lastError;
     }
+
+    // Bind NUMERIC/DECIMAL precision and scale
+    if(sqlDatatype == SQL_NUMERIC || sqlDatatype == SQL_DECIMAL)
+    {
+      BindColumnNumeric((SQLSMALLINT)icol,dataPointer,SQL_PARAM_INPUT);
+    }
+
     // Next column
     ++it;
   }
@@ -921,10 +929,12 @@ SQLQuery::BindColumns()
           type = re->second;
         }
       }
+      SQLPOINTER pointer = var->GetDataPointer();
+
       m_retCode = SqlBindCol(m_hstmt                                   // statement handle
                             ,(SQLUSMALLINT) bcol                       // Column number
                             ,(SQLSMALLINT)  type                       // Data type
-                            ,(SQLPOINTER)   var->GetDataPointer()      // Data pointer
+                            ,(SQLPOINTER)   pointer                    // Data pointer
                             ,(SQLINTEGER)   var->GetDataSize()         // Data length
                             ,(SQLLEN*)      var->GetIndicatorPointer() // Indicator address
                             );
@@ -937,25 +947,28 @@ SQLQuery::BindColumns()
       }
 
       // Now do the SQL_NUMERIC precision/scale binding
-      if(type == SQL_C_NUMERIC || type == SQL_DECIMAL)
+      if(type == SQL_NUMERIC || type == SQL_DECIMAL)
       {
-        BindColumnNumeric(bcol,SQL_RESULT_COL);
+        BindColumnNumeric((SQLSMALLINT)bcol,pointer,SQL_RESULT_COL);
       }
     }
     ++it;
   }
 }
 
+// Specifying the precision/scale of a NUMERIC/DECIMAL number
+// Must be set in the ARD/APD of the record descriptor to work
+//
 void
-SQLQuery::BindColumnNumeric(int p_column,int p_type /*=SQL_RESULT_COL*/)
+SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type /*=SQL_RESULT_COL*/)
 {
   SQLHDESC    rowdesc   = NULL;
   SQLSMALLINT precision = SQLNUM_MAX_PREC;
   SQLSMALLINT scale     = SQLNUM_DEF_SCALE;
 
   // See if we have different precisions or scales in mind
-  NumPrecScale::iterator pre = m_precisions.find((p_type << 8) | p_column);
-  NumPrecScale::iterator sca = m_scales    .find((p_type << 8) | p_column);
+  NumPrecScale::iterator pre = m_precisions.find((p_type << 16) | p_column);
+  NumPrecScale::iterator sca = m_scales    .find((p_type << 16) | p_column);
   if(pre != m_precisions.end())
   {
     precision = (SQLSMALLINT)pre->second;
@@ -965,13 +978,32 @@ SQLQuery::BindColumnNumeric(int p_column,int p_type /*=SQL_RESULT_COL*/)
     scale = (SQLSMALLINT)sca->second;
   }
 
+  // Is it for a result set, or for a binded parameter?
+  SQLINTEGER attribute = (p_type == SQL_RESULT_COL) ? SQL_ATTR_APP_ROW_DESC : SQL_ATTR_APP_PARAM_DESC;
+
   // Getting the ROW descriptor and set the precision/scale fields
-  m_retCode = SQLGetStmtAttr(m_hstmt,SQL_ATTR_APP_ROW_DESC,&rowdesc,SQL_IS_POINTER,NULL);
+  m_retCode = SQLGetStmtAttr(m_hstmt,attribute,&rowdesc,SQL_IS_POINTER,NULL);
   if(SQL_SUCCEEDED(m_retCode))
   {
-    SQLSetDescField(rowdesc,(SQLSMALLINT)p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
-    SQLSetDescField(rowdesc,(SQLSMALLINT)p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
+    RETCODE retCode1 = SQLSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
+    RETCODE retCode2 = SQLSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
+
+    if(SQL_SUCCEEDED(retCode1) && SQL_SUCCEEDED(retCode2))
+    {
+      // Now trigger the reset and check of the descriptor record, by re-supplying the data pointer again.
+      // Very covertly described in the ODBC documentation. But if you do not do this one last step
+      // results will be very different - and faulty - depending on your RDBMS
+      m_retCode = SQLSetDescField(rowdesc,p_column,SQL_DESC_DATA_PTR,p_pointer,NULL);
+      if(SQL_SUCCEEDED(m_retCode))
+      {
+        // All went well, we are done
+        return;
+      }
+    }
   }
+  CString error;
+  error.Format("Cannot bind NUMERIC attributes PRECISION/SCALE for column: %d",p_column);
+  throw error;
 }
 
 int 

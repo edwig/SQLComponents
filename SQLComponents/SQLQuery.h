@@ -77,6 +77,7 @@ public:
   // Set maximum rows to get
   void SetMaxRows(int p_maxrows);
   // Set numeric precision / scale different from SQLNUM_MAX_PREC / SQLNUM_DEF_SCALE
+  // Use p_type = SQL_PARAM_INPUT to bind precision/scale for input parameters
   void SetNumericPrecision(int p_column,int p_precision,int p_type = SQL_RESULT_COL);
   void SetNumericScale    (int p_column,int p_scale,    int p_type = SQL_RESULT_COL);
 
@@ -89,7 +90,7 @@ public:
   void SetParameter  (int p_num,SQLDate&      p_param,int p_type = SQL_PARAM_INPUT);
   void SetParameter  (int p_num,SQLTime&      p_param,int p_type = SQL_PARAM_INPUT);
   void SetParameter  (int p_num,SQLTimestamp& p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,bcd&          p_param,int p_type = SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,bcd&          p_param,int p_precision,int p_scale,int p_type = SQL_PARAM_INPUT);
 
   // SINGLE STATEMENT
 
@@ -100,7 +101,6 @@ public:
   // Overrides with one parameter
   void        DoSQLStatement(const CString& p_statement,const int   p_param1);
   void        DoSQLStatement(const CString& p_statement,const char* p_param1);
-  void        DoSQLStatement(const CString& p_statement,const bcd   p_param1);
   // Variants of the DoSQLStatement
   SQLVariant* DoSQLStatementScalar  (const CString& p_statement,const int   p_param1);
   SQLVariant* DoSQLStatementScalar  (const CString& p_statement,const char* p_param1);
@@ -171,7 +171,7 @@ private:
   // Bind application parameters
   void  BindParameters();
   void  BindColumns();
-  void  BindColumnNumeric(int p_column,int p_type = SQL_RESULT_COL);
+  void  BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type = SQL_RESULT_COL);
 
   // Reset all column to NULL
   void  ResetColumns();
