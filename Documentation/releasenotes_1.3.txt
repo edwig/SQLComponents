@@ -1,0 +1,13 @@
+RELEASENOTES SQLCOMPONENTS VERSION 1.3
+======================================
+
+1) Added the "bcd" class to be able to use NUMERIC/DECIMAL datatypes from the
+   database directly, instead of a mapping to double or character string.
+   The classes SQLQuery and SQLVariant have been expanded to directly use the bcd.
+2) Added the ability to use a column directly from the SQLQuery by array index.
+   After this change the following lines are functionally the same:
+
+   int variable = query.GetColumn(2).GetAsSLong();
+   int variable = query[2];
+
+3) 

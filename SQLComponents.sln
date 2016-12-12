@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{949635B6-421F-42B2-B9AB-A56CE0B371E7}"
 	ProjectSection(SolutionItems) = preProject
 		Readme.md = Readme.md
+		Documentation\releasenotes_1.3.txt = Documentation\releasenotes_1.3.txt
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}"
