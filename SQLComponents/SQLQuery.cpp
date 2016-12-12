@@ -851,9 +851,15 @@ SQLQuery::BindColumns()
   int atexec = 0;
 
   GetMaxColumnLength();
+
+  // COLLECT INFO FOR ALL COLUMNS AND CREATE VARIANTS
+
   for(icol = 1; icol <= m_numColumns; ++icol)
   {
     atexec = 0;
+    scale  = SQLNUM_DEF_SCALE;
+ 
+    // Getting the info for this column
     m_retCode = SqlDescribeCol(m_hstmt            // statement handle
                               ,icol               // Column number
                               ,colName            // Column name
@@ -893,6 +899,7 @@ SQLQuery::BindColumns()
       // IF YOU DON'T DO THIS, YOU WILL CRASH!!
       precision *= 2;
     }
+    // Create new variant and reserve space for CHAR and BINARY types
     SQLVariant* var = new SQLVariant(type,(int)precision);
     var->SetColumnNumber(icol);
     var->SetSQLDataType(dataType);
@@ -902,6 +909,15 @@ SQLQuery::BindColumns()
       var->SetAtExec(true);
       var->SetBinaryPieceSize(atexec);
     }
+
+    // Record precision/scale for NUMERIC/DECIMAL types
+    if(type == SQL_DECIMAL || type == SQL_NUMERIC)
+    {
+      SQL_NUMERIC_STRUCT* numeric = var->GetAsNumeric();
+      numeric->precision = (SQLCHAR)  precision;
+      numeric->scale     = (SQLSCHAR) scale;
+    }
+
     CString columnName(colName);
     columnName.MakeLower();
     m_numMap .insert(std::make_pair(icol,var));
@@ -913,6 +929,10 @@ SQLQuery::BindColumns()
 //     TRACE("- Precision: %d\n",precision);
 //     TRACE("- ATEXEC   : %d\n",atexec);
   }
+
+  // NOW WE HAVE ALL INFORMATION
+  // BEGIN THE BINDING PROCES
+
   ColNumMap::iterator it = m_numMap.begin();
   while(it != m_numMap.end())
   {
@@ -949,7 +969,9 @@ SQLQuery::BindColumns()
       // Now do the SQL_NUMERIC precision/scale binding
       if(type == SQL_NUMERIC || type == SQL_DECIMAL)
       {
-        BindColumnNumeric((SQLSMALLINT)bcol,pointer,SQL_RESULT_COL);
+        BindColumnNumeric((SQLSMALLINT)bcol,pointer,SQL_RESULT_COL
+                          ,var->GetNumericPrecision()
+                          ,var->GetNumericScale());
       }
     }
     ++it;
@@ -960,11 +982,19 @@ SQLQuery::BindColumns()
 // Must be set in the ARD/APD of the record descriptor to work
 //
 void
-SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type /*=SQL_RESULT_COL*/)
+SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type,int p_precision,int p_scale)
 {
   SQLHDESC    rowdesc   = NULL;
   SQLSMALLINT precision = SQLNUM_MAX_PREC;
   SQLSMALLINT scale     = SQLNUM_DEF_SCALE;
+
+  // SQLDescribeColumn has given us the precision and scale for SELECT queries
+  if(p_precision > 0 || p_scale > 0)
+  {
+    // Comes from the column binding process
+    precision = (SQLSMALLINT) p_precision;
+    scale     = (SQLSMALLINT) p_scale;
+  }
 
   // See if we have different precisions or scales in mind
   NumPrecScale::iterator pre = m_precisions.find((p_type << 16) | p_column);
@@ -1034,7 +1064,7 @@ SQLQuery::ProvideAtExecData()
           piece = size;
         }
 
-        // Put all the datapieces into place
+        // Put all the data pieces into place
         while(total < size)
         {
           m_retCode = SqlPutData(m_hstmt,data,piece);

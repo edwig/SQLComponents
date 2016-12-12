@@ -171,7 +171,7 @@ private:
   // Bind application parameters
   void  BindParameters();
   void  BindColumns();
-  void  BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type = SQL_RESULT_COL);
+  void  BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type,int p_precision = 0,int p_scale = 0);
 
   // Reset all column to NULL
   void  ResetColumns();
