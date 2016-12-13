@@ -81,7 +81,7 @@ public:
    SQLVariant(SQLTime* p_time);               // SQLTime
    SQLVariant(SQLTimestamp* p_stamp);         // SQLTimestamp
    SQLVariant(SQLInterval* p_interval);       // SQLInterval
-   SQLVariant(bcd* p_bcd);                    // Binary Coded Decimal
+   SQLVariant(const bcd* p_bcd);              // Binary Coded Decimal
    // Destructor
   ~SQLVariant();
    

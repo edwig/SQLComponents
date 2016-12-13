@@ -411,39 +411,10 @@ SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,int p_type /*=SQL_PARAM_I
 }
 
 void
-SQLQuery::SetParameter(int p_num,bcd& p_param,int p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,const bcd& p_param,int p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type);
-}
-
-// Set numeric precision / scale different from SQLNUM_MAX_PREC / SQLNUM_DEF_SCALE
-void 
-SQLQuery::SetNumericPrecision(int p_column,int p_precision,int p_type /*=SQL_RESULT_COL*/)
-{
-  NumPrecScale::iterator it = m_precisions.find((p_type << 16) | p_column);
-  if(it == m_precisions.end())
-  {
-    m_precisions.insert(std::make_pair((int)((p_type << 16) | p_column),p_precision));
-  }
-  else
-  {
-    it->second = p_precision;
-  }
-}
-
-void 
-SQLQuery::SetNumericScale(int p_column,int p_scale,int p_type /*=SQL_RESULT_COL*/)
-{
-  NumPrecScale::iterator it = m_scales.find((p_type << 16) | p_column);
-  if(it == m_scales.end())
-  {
-    m_scales.insert(std::make_pair((int)((p_type << 16) | p_column), p_scale));
-  }
-  else
-  {
-    it->second = p_scale;
-  }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -461,6 +432,13 @@ SQLQuery::DoSQLStatement(const CString& p_statement,int p_param1)
 
 void 
 SQLQuery::DoSQLStatement(const CString& p_statement,const char* p_param1)
+{
+  SetParameter(1,p_param1);
+  DoSQLStatement(p_statement);
+}
+
+void
+SQLQuery::DoSQLStatement(const CString& p_statement,const bcd&  p_param1)
 {
   SetParameter(1,p_param1);
   DoSQLStatement(p_statement);
@@ -604,6 +582,13 @@ SQLQuery::DoSQLStatementScalar(const CString& p_statement,const char* p_param1)
   return DoSQLStatementScalar(p_statement);
 }
 
+SQLVariant* 
+SQLQuery::DoSQLStatementScalar(const CString& p_statement,const bcd&  p_param1)
+{
+  SetParameter(1,p_param1);
+  return DoSQLStatementScalar(p_statement);
+}
+
 int
 SQLQuery::DoSQLStatementNonQuery(const CString& p_statement,const int p_param1)
 {
@@ -613,6 +598,13 @@ SQLQuery::DoSQLStatementNonQuery(const CString& p_statement,const int p_param1)
 
 int
 SQLQuery::DoSQLStatementNonQuery(const CString& p_statement,const char* p_param1)
+{
+  SetParameter(1,p_param1);
+  return DoSQLStatementNonQuery(p_statement);
+}
+
+int
+SQLQuery::DoSQLStatementNonQuery(const CString& p_statement,const bcd&  p_param1)
 {
   SetParameter(1,p_param1);
   return DoSQLStatementNonQuery(p_statement);
@@ -822,9 +814,7 @@ SQLQuery::BindParameters()
     // Bind NUMERIC/DECIMAL precision and scale
     if(sqlDatatype == SQL_NUMERIC || sqlDatatype == SQL_DECIMAL)
     {
-      BindColumnNumeric((SQLSMALLINT)icol,dataPointer,SQL_PARAM_INPUT
-                        ,var->GetNumericPrecision()
-                        ,var->GetNumericScale());
+      BindColumnNumeric((SQLSMALLINT)icol,var,SQL_PARAM_INPUT);
     }
 
     // Next column
@@ -963,9 +953,7 @@ SQLQuery::BindColumns()
       // Now do the SQL_NUMERIC precision/scale binding
       if(type == SQL_NUMERIC || type == SQL_DECIMAL)
       {
-        BindColumnNumeric((SQLSMALLINT)bcol,pointer,SQL_RESULT_COL
-                          ,var->GetNumericPrecision()
-                          ,var->GetNumericScale());
+        BindColumnNumeric((SQLSMALLINT)bcol,var,SQL_RESULT_COL);
       }
     }
     ++it;
@@ -976,31 +964,10 @@ SQLQuery::BindColumns()
 // Must be set in the ARD/APD of the record descriptor to work
 //
 void
-SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type,int p_precision,int p_scale)
+SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLVariant* p_var,int p_type)
 {
-  SQLHDESC    rowdesc   = NULL;
-  SQLSMALLINT precision = SQLNUM_MAX_PREC;
-  SQLSMALLINT scale     = SQLNUM_DEF_SCALE;
-
-  // SQLDescribeColumn has given us the precision and scale for SELECT queries
-//   if(p_precision > 0 || p_scale > 0)
-//   {
-    // Comes from the column binding process
-    precision = (SQLSMALLINT) p_precision;
-    scale     = (SQLSMALLINT) p_scale;
-//  }
-
-//   // See if we have different precisions or scales in mind
-//   NumPrecScale::iterator pre = m_precisions.find((p_type << 16) | p_column);
-//   NumPrecScale::iterator sca = m_scales    .find((p_type << 16) | p_column);
-//   if(pre != m_precisions.end())
-//   {
-//     precision = (SQLSMALLINT)pre->second;
-//   }
-//   if(sca != m_scales.end())
-//   {
-//     scale = (SQLSMALLINT)sca->second;
-//   }
+  // Row descriptor for RESULT rows or PARAMeter rows
+  SQLHDESC rowdesc = NULL;
 
   // Is it for a result set, or for a binded parameter?
   SQLINTEGER attribute = (p_type == SQL_RESULT_COL) ? SQL_ATTR_APP_ROW_DESC : SQL_ATTR_APP_PARAM_DESC;
@@ -1009,15 +976,18 @@ SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type
   m_retCode = SQLGetStmtAttr(m_hstmt,attribute,&rowdesc,SQL_IS_POINTER,NULL);
   if(SQL_SUCCEEDED(m_retCode))
   {
-    RETCODE retCode1 = SQLSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
-    RETCODE retCode2 = SQLSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
+    int     precision = p_var->GetNumericPrecision();
+    int     scale     = p_var->GetNumericScale();
+    RETCODE retCode1  = SQLSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
+    RETCODE retCode2  = SQLSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
 
     if(SQL_SUCCEEDED(retCode1) && SQL_SUCCEEDED(retCode2))
     {
       // Now trigger the reset and check of the descriptor record, by re-supplying the data pointer again.
       // Very covertly described in the ODBC documentation. But if you do not do this one last step
       // results will be very different - and faulty - depending on your RDBMS
-      m_retCode = SQLSetDescField(rowdesc,p_column,SQL_DESC_DATA_PTR,p_pointer,NULL);
+      SQLPOINTER pointer = p_var->GetDataPointer();
+      m_retCode = SQLSetDescField(rowdesc,p_column,SQL_DESC_DATA_PTR,pointer,NULL);
       if(SQL_SUCCEEDED(m_retCode))
       {
         // All went well, we are done

@@ -415,7 +415,7 @@ SQLVariant::SQLVariant(SQLInterval* p_interval)
   }
 }
 
-SQLVariant::SQLVariant(bcd* p_bcd)
+SQLVariant::SQLVariant(const bcd* p_bcd)
 {
   Init();
   m_datatype    = SQL_C_NUMERIC;
