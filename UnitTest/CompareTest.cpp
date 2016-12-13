@@ -68,7 +68,7 @@ namespace OperatorUnitTest
       variants[CT_UTINYINT] = SQLVariant((unsigned char)42);
       variants[CT_SBIGINT]  = SQLVariant((__int64)42);
       variants[CT_UBIGINT]  = SQLVariant((unsigned __int64)42);
-      variants[CT_NUMERIC]  = SQLVariant(&num1,8,2);
+      variants[CT_NUMERIC]  = SQLVariant(&num1);
 
       other[CT_CHAR]     = SQLVariant("24");
       other[CT_SSHORT]   = SQLVariant((short)24);
@@ -82,7 +82,7 @@ namespace OperatorUnitTest
       other[CT_UTINYINT] = SQLVariant((unsigned char)24);
       other[CT_SBIGINT]  = SQLVariant((__int64)24);
       other[CT_UBIGINT]  = SQLVariant((unsigned __int64)24);
-      other[CT_NUMERIC]  = SQLVariant(&num2,8,2);
+      other[CT_NUMERIC]  = SQLVariant(&num2);
     }
 
     TEST_METHOD(CompareEqualityTest)

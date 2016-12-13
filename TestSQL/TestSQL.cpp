@@ -70,21 +70,20 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
   }
   else
   {
-    // Test connection
+    // Basic connection test
     TestConnection();
-
+    // Test BCD to NUMERIC conversions
+    TestBcd();
     // Testing Numerics
     TestNumeric();
-    
+    // Test closing cursors does not leave thrash in RDBMS    
     TestClosingCursor();
-
+    // Test the reading of NULL
     TestNULL();
-
     // Test formatting of Date/Time/Timestamp
     TestFormatting();
     // Test operators
     TestOperators();
-
     // Test dataset
     TestDataSet();
   }

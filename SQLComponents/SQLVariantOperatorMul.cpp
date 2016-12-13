@@ -126,7 +126,7 @@ SQLVariant
 SQL_OperNumMulChar(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsChar());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -234,7 +234,7 @@ SQLVariant
 SQL_OperNumMulSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsSShort());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -359,7 +359,7 @@ SQLVariant
 SQL_OperNumMulUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd((long)p_right.GetAsUShort());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -482,7 +482,7 @@ SQLVariant
 SQL_OperNumMulSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsSLong());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -605,7 +605,7 @@ SQLVariant
 SQL_OperNumMulULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd((int64)p_right.GetAsULong());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -728,7 +728,7 @@ SQLVariant
 SQL_OperNumMulFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd((double)p_right.GetAsFloat());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -851,7 +851,7 @@ SQLVariant
 SQL_OperNumMulDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsDouble());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1008,7 +1008,7 @@ SQLVariant
 SQL_OperNumMulBit(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsBit());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1141,7 +1141,7 @@ SQLVariant
 SQL_OperNumMulSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsSTinyInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1264,7 +1264,7 @@ SQLVariant
 SQL_OperNumMulUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd((short)p_right.GetAsUTinyInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1388,7 +1388,7 @@ SQLVariant
 SQL_OperNumMulSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsSBigInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1511,7 +1511,7 @@ SQLVariant
 SQL_OperNumMulUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * bcd(p_right.GetAsUBigInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1535,7 +1535,7 @@ SQLVariant
 SQL_OperCharMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsChar()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1543,7 +1543,7 @@ SQLVariant
 SQL_OperSShortMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsSShort()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1551,7 +1551,7 @@ SQLVariant
 SQL_OperUShortMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd((long)p_left.GetAsUShort()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1559,7 +1559,7 @@ SQLVariant
 SQL_OperSLongMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsSLong()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1567,7 +1567,7 @@ SQLVariant
 SQL_OperULongMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd((int64)p_left.GetAsULong()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1575,7 +1575,7 @@ SQLVariant
 SQL_OperFloatMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd((double)p_left.GetAsFloat()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1583,7 +1583,7 @@ SQLVariant
 SQL_OperDoubleMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsDouble()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1591,7 +1591,7 @@ SQLVariant
 SQL_OperBitMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsBit()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1599,7 +1599,7 @@ SQLVariant
 SQL_OperSTinyMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsSTinyInt()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1607,7 +1607,7 @@ SQLVariant
 SQL_OperUTinyMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd((short)p_left.GetAsUTinyInt()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1615,7 +1615,7 @@ SQLVariant
 SQL_OperSBigMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsSBigInt()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1623,7 +1623,7 @@ SQLVariant
 SQL_OperUBigMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = bcd(p_left.GetAsUBigInt()) * p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1631,7 +1631,7 @@ SQLVariant
 SQL_OperNumMulNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() * p_right.GetAsBCD();
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 

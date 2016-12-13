@@ -169,7 +169,7 @@ void TestMul()
   bcd num(5);
 
   SQLVariant var1(numString);
-  SQLVariant var2(&num,8,2);
+  SQLVariant var2(&num);
 
   SQLVariant var3 = var1 * var2;
   printf("The result of the char*decimal = %s\n",var3.GetAsChar());

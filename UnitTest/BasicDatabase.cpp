@@ -424,9 +424,9 @@ namespace DatabaseUnitTest
       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
       long beginTime = clock();
 
-      g_dsn = "ok2b01";
-      g_user = "k2b";
-      g_password = "k2b";
+//       g_dsn = "ok2b01";
+//       g_user = "k2b";
+//       g_password = "k2b";
 
       try
       {
@@ -457,8 +457,8 @@ namespace DatabaseUnitTest
           CString sql2 = "UPDATE test_number\n"
                          "   SET field3 = ?\n"
                          " WHERE id     = 1";
-          bcd num(303.8801);
-          query.SetParameter(1,num,38,4);
+          bcd num(3034.6);
+          query.SetParameter(1,num);
           query.DoSQLStatementNonQuery(sql2);
           trans.Commit();
 
@@ -468,12 +468,12 @@ namespace DatabaseUnitTest
           if(query.GetRecord())
           {
             bcd test = query[2];
-            Assert::IsTrue(test != num,L"NUMERIC incorrectly updated");
+            Assert::IsTrue(test == num,L"NUMERIC incorrectly updated");
           }
 
           // Return to original value
           bcd one(1);
-          query.SetParameter(1,one,14,2);
+          query.SetParameter(1,one);
           trans.Start("UpdNum");
           query.DoSQLStatementNonQuery(sql2);
           trans.Commit();

@@ -237,7 +237,7 @@ public:
   // Get as a display string (by desktop locale)
   CString AsDisplayString() const;
   // Get as an ODBC SQL NUMERIC(p,s)
-  bool    AsNumeric(SQL_NUMERIC_STRUCT* p_numeric,unsigned p_precision,unsigned p_scale);
+  void    AsNumeric(SQL_NUMERIC_STRUCT* p_numeric) const;
   
   // GETTER FUNCTIES
 

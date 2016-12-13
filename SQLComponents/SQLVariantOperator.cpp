@@ -434,7 +434,7 @@ SQLVariant::operator=(bcd& p_bcd)
   // precision scaling of a numeric = prec + scale
   prec += scale;
 
-  p_bcd.AsNumeric(&m_data.m_dataNUMERIC,prec,scale);
+  p_bcd.AsNumeric(&m_data.m_dataNUMERIC);
 
   return *this;
 }

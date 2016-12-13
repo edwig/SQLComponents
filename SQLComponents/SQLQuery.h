@@ -91,7 +91,6 @@ public:
   void SetParameter  (int p_num,SQLTime&      p_param,int p_type = SQL_PARAM_INPUT);
   void SetParameter  (int p_num,SQLTimestamp& p_param,int p_type = SQL_PARAM_INPUT);
   void SetParameter  (int p_num,bcd&          p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,bcd&          p_param,int p_precision,int p_scale,int p_type = SQL_PARAM_INPUT);
 
   // SINGLE STATEMENT
 

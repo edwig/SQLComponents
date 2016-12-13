@@ -413,26 +413,8 @@ SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,int p_type /*=SQL_PARAM_I
 void
 SQLQuery::SetParameter(int p_num,bcd& p_param,int p_type /*=SQL_PARAM_INPUT*/)
 {
-  int scale = p_param.GetPrecision();
-  SQLVariant* var = new SQLVariant(&p_param,SQLNUM_MAX_PREC,scale);
-  InternalSetParameter(p_num,var,            p_type);
-  SetNumericPrecision (p_num,SQLNUM_MAX_PREC,p_type);
-  SetNumericScale     (p_num,scale,          p_type);
-}
-
-void 
-SQLQuery::SetParameter(int  p_num
-                      ,bcd& p_param
-                      ,int  p_precision 
-                      ,int  p_scale     
-                      ,int  p_type      /*=SQL_PARAM_INPUT*/)
-{
-  // Synchronize the SQL_NUMERIC_STRUCT settings and the binding of the paramater
-  // Otherwise we will get values that are n factor of 10 different in the database
-  SQLVariant* var = new SQLVariant(&p_param,p_precision,p_scale);
-  InternalSetParameter(p_num,var,        p_type);
-  SetNumericPrecision (p_num,p_precision,p_type);
-  SetNumericScale     (p_num,p_scale,    p_type);
+  SQLVariant* var = new SQLVariant(&p_param);
+  InternalSetParameter(p_num,var,p_type);
 }
 
 // Set numeric precision / scale different from SQLNUM_MAX_PREC / SQLNUM_DEF_SCALE
@@ -800,7 +782,7 @@ SQLQuery::BindParameters()
         sqlDatatype = (SQLSMALLINT)rt->second;
       }
     }
-    // Check minimaal input type
+    // Check minimal input type
     if(var->GetParameterType() == SQL_PARAM_TYPE_UNKNOWN)
     {
       var->SetParameterType(SQL_PARAM_INPUT);
@@ -840,7 +822,9 @@ SQLQuery::BindParameters()
     // Bind NUMERIC/DECIMAL precision and scale
     if(sqlDatatype == SQL_NUMERIC || sqlDatatype == SQL_DECIMAL)
     {
-      BindColumnNumeric((SQLSMALLINT)icol,dataPointer,SQL_PARAM_INPUT);
+      BindColumnNumeric((SQLSMALLINT)icol,dataPointer,SQL_PARAM_INPUT
+                        ,var->GetNumericPrecision()
+                        ,var->GetNumericScale());
     }
 
     // Next column
@@ -999,24 +983,24 @@ SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLPOINTER p_pointer,int p_type
   SQLSMALLINT scale     = SQLNUM_DEF_SCALE;
 
   // SQLDescribeColumn has given us the precision and scale for SELECT queries
-  if(p_precision > 0 || p_scale > 0)
-  {
+//   if(p_precision > 0 || p_scale > 0)
+//   {
     // Comes from the column binding process
     precision = (SQLSMALLINT) p_precision;
     scale     = (SQLSMALLINT) p_scale;
-  }
+//  }
 
-  // See if we have different precisions or scales in mind
-  NumPrecScale::iterator pre = m_precisions.find((p_type << 16) | p_column);
-  NumPrecScale::iterator sca = m_scales    .find((p_type << 16) | p_column);
-  if(pre != m_precisions.end())
-  {
-    precision = (SQLSMALLINT)pre->second;
-  }
-  if(sca != m_scales.end())
-  {
-    scale = (SQLSMALLINT)sca->second;
-  }
+//   // See if we have different precisions or scales in mind
+//   NumPrecScale::iterator pre = m_precisions.find((p_type << 16) | p_column);
+//   NumPrecScale::iterator sca = m_scales    .find((p_type << 16) | p_column);
+//   if(pre != m_precisions.end())
+//   {
+//     precision = (SQLSMALLINT)pre->second;
+//   }
+//   if(sca != m_scales.end())
+//   {
+//     scale = (SQLSMALLINT)sca->second;
+//   }
 
   // Is it for a result set, or for a binded parameter?
   SQLINTEGER attribute = (p_type == SQL_RESULT_COL) ? SQL_ATTR_APP_ROW_DESC : SQL_ATTR_APP_PARAM_DESC;

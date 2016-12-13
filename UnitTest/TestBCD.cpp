@@ -508,26 +508,25 @@ namespace DatabaseUnitTest
       HPFCounter cnt2;
       for(int x = 0; x < p_count; ++x)
       {
-        ten.AsNumeric(&res,12,7);
+        ten.AsNumeric(&res);
       }
       cnt2.Stop();
 
 
-      if(ten.AsNumeric(&res,12,7))
-      {
-        //     printf("Precision: %d\n",num.precision);
-        //     printf("Scale    : %d\n",num.scale);
-        //     printf("Sign     : %d\n",num.sign);
-        // 
-        //     for(unsigned ind = 0;ind < SQL_MAX_NUMERIC_LEN; ++ind)
-        //     {
-        //       printf("Numeric mantissa [%d:%02.2X]",ind,num.val[ind]);
-        //     }
+      ten.AsNumeric(&res);
+      //     printf("Precision: %d\n",num.precision);
+      //     printf("Scale    : %d\n",num.scale);
+      //     printf("Sign     : %d\n",num.sign);
+      // 
+      //     for(unsigned ind = 0;ind < SQL_MAX_NUMERIC_LEN; ++ind)
+      //     {
+      //       printf("Numeric mantissa [%d:%02.2X]",ind,num.val[ind]);
+      //     }
 
-        bcd check(&num);
-        msg.Format("bcd -> SQL_NUMERIC_STRUCT %10.6f : %s",cnt2.GetCounter(),check.AsString());
-        Logger::WriteMessage(msg);
-      }
+      bcd check(&num);
+      msg.Format("bcd -> SQL_NUMERIC_STRUCT %10.6f : %s",cnt2.GetCounter(),check.AsString());
+      Logger::WriteMessage(msg);
+
       Logger::WriteMessage("");
       return 0;
     }

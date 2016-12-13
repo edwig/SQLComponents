@@ -99,3 +99,44 @@ void TestNumeric()
   long endTime = clock();
   printf("NUMERIC test performed in: %.4f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 }
+
+// Test BCD to NUMERIC conversions
+void TestBcd()
+{
+  // Header
+  printf("Testing bcd to SQL_NUMERIC_STRUCT\n");
+  printf("---------------------------------\n");
+
+  // num = 10.001 (ten and 1 thousandth)
+  SQL_NUMERIC_STRUCT num;
+  SQL_NUMERIC_STRUCT res;
+  memset(&num,0,sizeof(SQL_NUMERIC_STRUCT));
+  memset(&res,0,sizeof(SQL_NUMERIC_STRUCT));
+  num.sign = 1; // Positive
+  num.precision = 6;
+  num.scale = 4;
+
+  num.val[0] = 0xAA;
+  num.val[1] = 0x86;
+  num.val[2] = 0x01;
+
+  bcd ten(&num);
+
+  printf("SQL_NUMERIC_STRUCT -> bcd: %s\n",ten.AsString());
+
+
+  // Now back again to a SQL_NUMERIC_STRUCT
+  ten.AsNumeric(&res);
+
+  printf("Precision: %d\n",res.precision);
+  printf("Scale    : %d\n",res.scale);
+  printf("Sign     : %d\n",res.sign);
+
+  for(char ind = 0;ind <= res.scale; ++ind)
+  {
+    printf("Numeric mantissa [%d:%02.2X]\n",ind,res.val[ind]);
+  }
+
+  bcd check(&res);
+  printf("bcd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString());
+}

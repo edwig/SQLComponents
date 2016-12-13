@@ -126,7 +126,7 @@ SQLVariant
 SQL_OperNumDivChar(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd(p_right.GetAsChar());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -234,7 +234,7 @@ SQLVariant
 SQL_OperNumDivSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd(p_right.GetAsSShort());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -359,7 +359,7 @@ SQLVariant
 SQL_OperNumDivUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd((long)p_right.GetAsUShort());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -482,7 +482,7 @@ SQLVariant
 SQL_OperNumDivSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd(p_right.GetAsSLong());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -605,7 +605,7 @@ SQLVariant
 SQL_OperNumDivULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd((int64)p_right.GetAsULong());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -728,7 +728,7 @@ SQLVariant
 SQL_OperNumDivFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd((double)p_right.GetAsFloat());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -851,7 +851,7 @@ SQLVariant
 SQL_OperNumDivDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd(p_right.GetAsDouble());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1082,7 +1082,7 @@ SQLVariant
 SQL_OperNumDivSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd(p_right.GetAsSTinyInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1205,7 +1205,7 @@ SQLVariant
 SQL_OperNumDivUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd((short)p_right.GetAsUTinyInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1329,7 +1329,7 @@ SQLVariant
 SQL_OperNumDivSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd(p_right.GetAsSBigInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1452,7 +1452,7 @@ SQLVariant
 SQL_OperNumDivUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / bcd(p_right.GetAsUBigInt());
-  SQLVariant var(&num,p_left.GetNumericPrecision(),p_left.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 
@@ -1573,7 +1573,7 @@ SQLVariant
 SQL_OperNumDivNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   bcd num = p_left.GetAsBCD() / p_right.GetAsBCD();
-  SQLVariant var(&num,p_right.GetNumericPrecision(),p_right.GetNumericScale());
+  SQLVariant var(&num);
   return var;
 }
 

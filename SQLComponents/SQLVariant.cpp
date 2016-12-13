@@ -415,21 +415,13 @@ SQLVariant::SQLVariant(SQLInterval* p_interval)
   }
 }
 
-SQLVariant::SQLVariant(bcd* p_bcd,unsigned p_precision /*=36*/,unsigned p_scale /*=2*/)
+SQLVariant::SQLVariant(bcd* p_bcd)
 {
   Init();
   m_datatype    = SQL_C_NUMERIC;
   m_sqlDatatype = SQL_NUMERIC;
   m_indicator   = 0;
-  if(p_precision > SQLNUM_MAX_PREC)
-  {
-    p_precision = SQLNUM_MAX_PREC;
-  }
-  if(p_scale > p_precision)
-  {
-    p_scale = p_precision - 1;
-  }
-  p_bcd->AsNumeric(&m_data.m_dataNUMERIC,p_precision,p_scale);
+  p_bcd->AsNumeric(&m_data.m_dataNUMERIC);
 }
 
 // GENERAL DTOR
@@ -1667,65 +1659,65 @@ SQLVariant::GetAsNumeric()
   switch(m_datatype)
   {
     case SQL_C_CHAR:      { bcd num(m_data.m_dataCHAR);
-                            num.AsNumeric(&val,SQLNUM_MAX_PREC,SQLNUM_MAX_PREC/2);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_SSHORT:    // Fall through
     case SQL_C_SHORT:     { bcd num(m_data.m_dataSHORT);
-                            num.AsNumeric(&val,5,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_USHORT:    { bcd num((int)m_data.m_dataUSHORT);
-                            num.AsNumeric(&val,5,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_LONG:      // Fall through
     case SQL_C_SLONG:     { bcd num(m_data.m_dataLONG);
-                            num.AsNumeric(&val,11,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_ULONG:     { bcd num((int64)m_data.m_dataULONG);
-                            num.AsNumeric(&val,11,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_FLOAT:     { bcd num((double)m_data.m_dataFLOAT);
-                            num.AsNumeric(&val,16,8);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_DOUBLE:    { bcd num(m_data.m_dataDOUBLE);
-                            num.AsNumeric(&val,32,16);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_BIT:       { bcd num(m_data.m_dataBIT);
-                            num.AsNumeric(&val,1,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_TINYINT:   // Fall through
     case SQL_C_STINYINT:  { bcd num(m_data.m_dataSTINYINT);
-                            num.AsNumeric(&val,3,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_UTINYINT:  { bcd num(m_data.m_dataUTINYINT);
-                            num.AsNumeric(&val,3,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_SBIGINT:   { bcd num(m_data.m_dataSBIGINT);
-                            num.AsNumeric(&val,24,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
     case SQL_C_UBIGINT:   { bcd num(m_data.m_dataUBIGINT);
-                            num.AsNumeric(&val,24,0);
+                            num.AsNumeric(&val);
                             return &val;
                           }
                           break;
@@ -2146,7 +2138,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_NUMERIC:                   {  bcd num(p_data);
-                                             num.AsNumeric(&m_data.m_dataNUMERIC,SQLNUM_MAX_PREC,SQLNUM_DEF_SCALE);
+                                             num.AsNumeric(&m_data.m_dataNUMERIC);
                                           }
                                           break;
     case SQL_C_GUID:                      //aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee 

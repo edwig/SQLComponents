@@ -1844,73 +1844,77 @@ bcd::AsDisplayString() const
 }
 
 // Get as an ODBC SQL NUMERIC
-bool
-bcd::AsNumeric(SQL_NUMERIC_STRUCT* p_numeric,unsigned p_precision,unsigned p_scale)
+void
+bcd::AsNumeric(SQL_NUMERIC_STRUCT* p_numeric) const
 {
   // Init the value array
   memset(p_numeric->val,0,SQL_MAX_NUMERIC_LEN);
 
-  // Check precision/scale values
-  // Precision cannot be greater than 256^16 = 2.03 10^38
-  // Scale cannot be greater than (precision - 1)
-  if(p_precision > SQLNUM_MAX_PREC)
-  {
-    p_precision = SQLNUM_MAX_PREC;
-  }
-  if(p_scale >= p_precision)
-  {
-    p_scale = p_precision - 1;
-  }
-
   // Setting the sign, precision and scale
   p_numeric->sign      = (m_sign == Positive) ? 1 : 0;
-  p_numeric->precision = (SQLCHAR)  p_precision;
-  p_numeric->scale     = (SQLSCHAR) p_scale;
+  p_numeric->precision = (SQLCHAR)  SQLNUM_MAX_PREC;
 
-  // Special case for 0.0
-  if(IsNull())
+  // Special case for 0.0 or smaller than can be contained (1.0E-38)
+  if(IsNull() || m_exponent < -SQLNUM_MAX_PREC)
   {
-    return true;
+    return;
   }
 
-  // Check for size
-  bcd maximum = bcd(10).TenPower(p_precision - p_scale);
-  bool result = *this < maximum;
+  // Check for overflow. Cannot be greater than 9.999999999E+37
+  if(m_exponent >= SQLNUM_MAX_PREC)
+  {
+    throw CString("Overflow in converting bcd to SQL NUMERIC/DECIMAL");
+  }
 
-  // Adjusting m_exponent to positive scaled integer result
-  m_sign = Positive;
-  m_exponent += (short) p_scale;
+  // Calculate the scale of the number
+  int scale     = GetPrecision();
+  int precision = 1 + m_exponent + scale;
+
+  // If we become too large, we loose a bit of the scale digits
+  if(precision > SQLNUM_MAX_PREC)
+  {
+    scale    -= (precision - SQLNUM_MAX_PREC);
+    precision = SQLNUM_MAX_PREC;
+  }
+
+  // Register the resulting precision and scale
+  p_numeric->precision = (SQLCHAR)  precision;
+  p_numeric->scale     = (SQLSCHAR) scale;
 
   // Converting the value array
-  bcd radix(256);
   bcd one(1);
-  int ind = 0;
+  bcd radix(256);
+  bcd accu(*this);
+  int index = 0;
+
+  // Here is the big trick: use the exponent to scale up the number
+  // Adjusting m_exponent to positive scaled integer result
+  accu.m_exponent += (short)scale;
+  accu.m_sign      = Positive;
 
   while(true)
   {
-    // Getting the next val array value
-    bcd val = Mod(radix);
-    p_numeric->val[ind] = (SQLCHAR) val.AsLong();
-    *this -= val;
-    *this  = Div(radix);
-    ++ind;
+    // Getting the next val array value, relying on the bcd::modulo
+    bcd val = accu.Mod(radix);
+    p_numeric->val[index++] = (SQLCHAR) val.AsLong();
+
+    // Adjust the intermediate accu
+    accu -= val;
+    accu  = accu.Div(radix);
 
     // Breaking criterion: nothing left
-    if(*this < one)
+    if(accu < one)
     {
       break;
     }
 
     // Breaking criterion on overflow
     // Check as last, number could fit exactly!
-    if(ind >= SQL_MAX_NUMERIC_LEN)
+    if(index >= SQL_MAX_NUMERIC_LEN)
     {
-      result = false;
       break;
     }
   }
-  // Returns the fact that we have an overflow or not
-  return result;
 }
 
 //////////////////////////////////////////////////////////////////////////
