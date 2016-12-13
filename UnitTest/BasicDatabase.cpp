@@ -424,6 +424,10 @@ namespace DatabaseUnitTest
       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
       long beginTime = clock();
 
+      g_dsn = "ok2b01";
+      g_user = "k2b";
+      g_password = "k2b";
+
       try
       {
         // Set options for the database
@@ -453,8 +457,8 @@ namespace DatabaseUnitTest
           CString sql2 = "UPDATE test_number\n"
                          "   SET field3 = ?\n"
                          " WHERE id     = 1";
-          bcd num(303.88);
-          query.SetParameter(1,num,14,2);
+          bcd num(303.8801);
+          query.SetParameter(1,num,38,4);
           query.DoSQLStatementNonQuery(sql2);
           trans.Commit();
 

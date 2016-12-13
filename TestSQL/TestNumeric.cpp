@@ -74,10 +74,10 @@ void TestNumeric()
       sql = "UPDATE test_number\n"
             "   SET field3 = ?\n"
             " WHERE id     = 1";
-      bcd num("9876.99");
+      bcd num("33445.2");
 
       // Parameter must match prec/scale of the database field
-      query.SetParameter(1,num,14,2);
+      query.SetParameter(1,num);
 
       query.DoSQLStatementNonQuery(sql);
       trans.Commit();

@@ -410,6 +410,16 @@ SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,int p_type /*=SQL_PARAM_I
   InternalSetParameter(p_num,var,p_type);
 }
 
+void
+SQLQuery::SetParameter(int p_num,bcd& p_param,int p_type /*=SQL_PARAM_INPUT*/)
+{
+  int scale = p_param.GetPrecision();
+  SQLVariant* var = new SQLVariant(&p_param,SQLNUM_MAX_PREC,scale);
+  InternalSetParameter(p_num,var,            p_type);
+  SetNumericPrecision (p_num,SQLNUM_MAX_PREC,p_type);
+  SetNumericScale     (p_num,scale,          p_type);
+}
+
 void 
 SQLQuery::SetParameter(int  p_num
                       ,bcd& p_param
