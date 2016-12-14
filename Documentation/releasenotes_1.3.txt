@@ -1,5 +1,7 @@
 RELEASENOTES SQLCOMPONENTS VERSION 1.3
 ======================================
+====== Release date:  14-12-2016 =====
+======================================
 
 1)  Added the "bcd" class to be able to use NUMERIC/DECIMAL datatypes from the
     database directly, instead of a mapping to double or character string.
@@ -17,34 +19,31 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.3
 3)  SQLVariant (alias = var) now has a full set of mathematical operators (+, -, *, /, %)
     and comparison operators (==, !=, <, >, <=, >=) that take care of all datatypes
     differences through a jump table for every combination of datatypes that can do
-    those operations
+    those operations.
 4)  Rewrite of the SQLVariantFormat class. All Dutch members are translated to English.
     The class now makes use of the SQLDate/SQLTime/SQLTimestamp classes instead of the
     OLEDateTime classes of the OS. Thus removing the dependency on the desktop configuration.
 5)  SQLQuery now can take care of incoming "DECIMAL/NUMERIC" fields and automatically
     pass them on to SQLVariants in the correct precision/scale representation.
 6)  SQLQuery can receive bcd's as a parameter, provided that you also specify the correct
-    precision/scale in the database. Some RDBMS'es (MS-SQLServer !) will reject the 
-    parameters if the precision is too great for the database purpose.
-7)  You can specify the precision and scale on a paramter on selected result column
-    through the new methods of the SQLQuery class:
-
-    SQLQuery::SetNumericPrecision(int p_column,int p_precision,int p_type = SQL_RESULT_COL);
-    SQLQUery::SetNumericScale    (int p_column,int p_scale,    int p_type = SQL_RESULT_COL);
-
-    You can use SQL_RESULT_COL for a result column or SQL_PARAM_INPUT for an input parameter.
-    Be aware that you need to use SQL_PARAM_INPUT_OUTPUT or SQL_PARAM_OUTPUT for a procedure
-    parameter that can do also outputed data.
-8)  Cleaned out the interface of SQLVariant. Moved all 'clutter' for trimming data to the
+    precision/scale in the database. 
+7)  Cleaned out the interface of SQLVariant. Moved all 'clutter' for trimming data to the
     special static VariantTrim module. Adding bcd also meaned that the conversion of a 
     numeric through a string work-around was removed from the class.
-9)  SQLInfo<database> classes are rewritten to take care of the schema name. This is a 
+8)  SQLInfo<database> classes are rewritten to take care of the schema name. This is a 
     large rewrite and it will take more versions of this module to complete.
-10) The GetSQLInfo method of SQLDatabase has been rewritten to return the more generic 
+9)  The GetSQLInfo method of SQLDatabase has been rewritten to return the more generic 
     SQLInfoDB pointer, thus removing the need to do a cast every time the method is called.
-	To represent this fact (and to better refactor current code) the method is renamed
-	to "GetSQLInfoDB()".
-	Also all methods in SQLDatabase that were dependent on this method are re-written.
+	  To represent this fact (and to better refactor current code) the method is renamed
+	  to "GetSQLInfoDB()".
+	  Also all methods in SQLDatabase that were dependent on this method are re-written.
+10) Expanded the functionality of the SQLDataSet class. You can now:
+    - Have multiple concurrent transactions on the same objects
+    - Cancel one single mutation, without disturbing other transactions
+    - Complete synchronisation to the database by calling "Synchronize()"
+    - Have the ability to defere the constraints check to the end of the transactions
+    - Set primary/foreign keys of more than 1 column
+    - Automatic calculate aggregations (min, max, sum, count) of columns
 11) Started a UnitTest module to unit test just about everything in this module.
-    Code coverage is now above 50% and still climbing...
+    Code coverage is now above 55% (scattered over all classes) and still climbing...
     Unit testing found a few nasty bugs in SQLVariant, SQLVariantFormat and SQLDate....

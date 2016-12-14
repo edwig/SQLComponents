@@ -21,7 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   04-12-2016
+// Last Revision:   14-12-2016
 // Version number:  1.3.0
 //
 #include "stdafx.h"
@@ -545,6 +545,7 @@ namespace DatabaseUnitTest
       CString schema ("dbo");
       CString table  ("master");
       CString column ("id");
+      CString type   ("integer");
       CString select ("SELECT id FROM master\n");
       CString columns("oid,description,amount");
       CString procedure("procedure");
@@ -553,7 +554,14 @@ namespace DatabaseUnitTest
       CString source("\'Test'\"");
       CString indexname("01_master_id");
       CString condition("variable IS NOT NULL");
+      CString tabledef("(ID INTEGER,NAME VARCHAR(200),NUMBER DECIMAL(14,2));");
+      CString precursor;
+      CString cursorname("selcursor");
+      CString splParam1("CHAR");
+      CString splParam2("NUMERIC");
+      CString quoteString("This is 'a' string");
       int     statements = 0;
+      bool    notnull    = true;
 
       DBForeign foreign;
       foreign.m_constraintname    = "FK_detail_master";
@@ -666,6 +674,52 @@ namespace DatabaseUnitTest
       ReportSQL    ("Getting session and terminal       :",p_info->GetSQLSessionAndTerminal());
       ReportSQL    ("Get session exists                 :",p_info->GetSQLSessionExists("123"));
       ReportSQL    ("Get primary key information        :",p_info->GetSQLPrimaryKeyConstraintInformation(schema,table));
+      ReportSQL    ("SQL to lock a table (exclusive)    :",p_info->GetSQLLockTable(table,true));
+      ReportSQL    ("SQL to lock a table (share-read)   :",p_info->GetSQLLockTable(table,false));
+      ReportSQL    ("Optimize performance of a table    :",p_info->GetSQLOptimizeTable(schema,table,statements));
+//    ReportBoolean("Only one user session capability   :",p_info->GetOnlyOneUserSession());
+      ReportSQL    ("Create a new table column          :",p_info->GetCreateColumn(schema,table,column,type,notnull));
+      ReportSQL    ("Drop a column from a table         :",p_info->GetSQLDropColumn(schema,table,column));
+      ReportSQL    ("Create one (1) foreign key         :",p_info->GetCreateForeignKey(table,CString("constraintname"),column,"master","OID"));
+      ReportSQL    ("Modify table column type           :",p_info->GetModifyColumnType(schema,table,column,type));
+      ReportSQL    ("Modify table column not null state :",p_info->GetModifyColumnNull(schema,table,column,notnull));
+      ReportSQL    ("Drop view                          :",p_info->GetSQLDropView(schema,table,precursor));
+      ReportSQL    ("Create or replace view             :",p_info->GetSQLCreateOrReplaceView(schema,table,select));
+      ReportBoolean("Must create temp tables at runtime :",p_info->GetMustMakeTemptablesAtRuntime());
+//    ReportSQL    ("Create temp table from content     :",p_info->DoMakeTemporaryTable(table,tabledef,column));
+//    ReportSQL    ("Remove a temporary table           :",p_info->DoRemoveTemporaryTable(table));
+      ReportString ("SPL assignment                     :",p_info->GetSPLAssignment(destiny));
+      ReportString ("SPL Start a while loop             :",p_info->GetSPLStartWhileLoop(condition));
+      ReportString ("SPL End while loop                 :",p_info->GetSPLEndWhileLoop());
+      ReportString ("SPL Get procedure call             :",p_info->GetSQLSPLCall(procedure));
+      ReportLong   ("SPL Parameter Length CHAR          :",p_info->GetParameterLength(SQL_CHAR));
+      ReportLong   ("SPL Parameter Length VARCHAR       :",p_info->GetParameterLength(SQL_VARCHAR));
+      ReportLong   ("SPL Parameter Length LONGVARCHAR   :",p_info->GetParameterLength(SQL_LONGVARCHAR));
+      ReportLong   ("SPL Parameter Length DECIMAL       :",p_info->GetParameterLength(SQL_DECIMAL));
+      ReportLong   ("SPL Parameter Length INTEGER       :",p_info->GetParameterLength(SQL_INTEGER));
+      ReportLong   ("SPL Parameter Length TIMESTAMP     :",p_info->GetParameterLength(SQL_TIMESTAMP));
+      ReportLong   ("SPL Parameter Length INTERVAL      :",p_info->GetParameterLength(SQL_INTERVAL_DAY_TO_SECOND));
+      ReportString ("SPL Builded parameter list (5)     :",p_info->GetBuildedParameterList(5));
+      ReportString ("SPL Parameter type rename CHAR     :",p_info->GetParameterType(splParam1));
+      ReportString ("SPL Parameter type rename NUMERIC  :",p_info->GetParameterType(splParam2));
+      ReportString ("SQL string quotes                  :",p_info->GetSQLString(quoteString));
+      ReportString ("SQL date string                    :",p_info->GetSQLDateString(1959,15,10));
+      ReportString ("SQL time string                    :",p_info->GetSQLTimeString(15,50,20));
+      ReportString ("SQL datetime string (timestamp)    :",p_info->GetSQLDateTimeString(1959,10,15,15,50,20));
+      ReportString ("SQL datetime bound string          :",p_info->GetSQLDateTimeBoundString());
+      ReportString ("SQL datetime stripped string       :",p_info->GetSQLDateTimeStrippedString(1959,10,15,15,50,20));
+      ReportString ("SPL integer type                   :",p_info->GetSPLIntegerType());
+      ReportString ("SPL decimal type                   :",p_info->GetSPLDecimalType());
+      ReportString ("SPL cursor declaration             :",p_info->GetSPLCursorDeclaratie(destiny,select));
+      ReportString ("SPL cursor name resultset          :",p_info->GetSPLCursorFound(destiny));
+      ReportString ("SPL cursor row count variable      :",p_info->GetSPLCursorRowCount(destiny));
+      ReportString ("SPL cursor row declaration         :",p_info->GetSPLCursorRowDeclaration(cursorname,destiny));
+      ReportString ("SPL fetch cursor in row variable   :",p_info->GetSPLFetchCursorIntoRowVariable(cursorname,destiny));
+      ReportString ("SPL no data found exception        :",p_info->GetSPLNoDataFoundExceptionClause());
+      ReportString ("SPL raise exception                :",p_info->GetSPLRaiseException("NODATA"));
+      ReportBoolean("SPL server proc with return values :",p_info->GetSPLServerFunctionsWithReturnValues());
+      ReportString ("Translate error -97                :",p_info->TranslateErrortext(-1 ,"ORA--97 : Unreadable error about referenced master-detail objects"));
+      ReportString ("Translate error -97                :",p_info->TranslateErrortext(-97,"Cannot remove object. Stil referenced by detail objects"));
     }
     
     void ReportOracle()

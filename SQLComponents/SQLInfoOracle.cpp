@@ -21,7 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   04-12-2016
+// Last Revision:   14-12-2016
 // Version number:  1.3.0
 //
 #include "stdafx.h"
@@ -1243,7 +1243,7 @@ SQLInfoOracle::DoesViewExists(CString& p_viewName)
   return false;
 }
 
-// Must create temoporary tables runtime 
+// Must create temporary tables runtime 
 bool
 SQLInfoOracle::GetMustMakeTemptablesAtRuntime() const
 {
@@ -1252,7 +1252,7 @@ SQLInfoOracle::GetMustMakeTemptablesAtRuntime() const
   return false;
 }
 
-// Create a temporary table in an optimized manner with the givven index column
+// Create a temporary table in an optimized manner with the given index column
 void    
 SQLInfoOracle::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const
 {
@@ -1466,7 +1466,7 @@ SQLInfoOracle::GetBuildedParameterList(size_t p_numOfParameters) const
   return strParamList;
 }
 
-// Parametertype for stored procedure for a givven columntype for parameters and return types
+// Parameter type for stored procedure for a given column type for parameters and return types
 CString 
 SQLInfoOracle::GetParameterType(CString& p_type) const
 {

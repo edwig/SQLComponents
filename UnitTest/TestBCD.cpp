@@ -21,7 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   04-12-2016
+// Last Revision:   14-12-2016
 // Version number:  1.3.0
 //
 #include "stdafx.h"
@@ -514,16 +514,16 @@ namespace DatabaseUnitTest
 
 
       ten.AsNumeric(&res);
-      //     printf("Precision: %d\n",num.precision);
-      //     printf("Scale    : %d\n",num.scale);
-      //     printf("Sign     : %d\n",num.sign);
+      //     printf("Precision: %d\n",res.precision);
+      //     printf("Scale    : %d\n",res.scale);
+      //     printf("Sign     : %d\n",res.sign);
       // 
       //     for(unsigned ind = 0;ind < SQL_MAX_NUMERIC_LEN; ++ind)
       //     {
-      //       printf("Numeric mantissa [%d:%02.2X]",ind,num.val[ind]);
+      //       printf("Numeric mantissa [%d:%02.2X]",ind,res.val[ind]);
       //     }
 
-      bcd check(&num);
+      bcd check(&res);
       msg.Format("bcd -> SQL_NUMERIC_STRUCT %10.6f : %s",cnt2.GetCounter(),check.AsString());
       Logger::WriteMessage(msg);
 

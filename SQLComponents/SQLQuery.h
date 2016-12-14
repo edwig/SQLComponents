@@ -21,7 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   04-12-2016
+// Last Revision:   14-12-2016
 // Version number:  1.3.0
 //
 #pragma once
@@ -174,7 +174,7 @@ private:
   // Reset all column to NULL
   void  ResetColumns();
   // Convert database dependent SQL_XXXX types to C-types SQL_C_XXXX
-  short SQLType2CType(short nSQLType);
+  short SQLType2CType(short p_sqlType);
   // Provide piece-by-piece data at exec time of the SQLExecute
   int   ProvideAtExecData();
   // Retrieve the piece-by-piece data at exec time of the SQLFetch

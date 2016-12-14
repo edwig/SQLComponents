@@ -21,7 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   04-12-2016
+// Last Revision:   14-12-2016
 // Version number:  1.3.0
 //
 #include "stdafx.h"
@@ -100,10 +100,10 @@ SQLQuery::Init(HDBC p_connection)
 void
 SQLQuery::Close()
 {
-  // Statement resetten
+  // Statement reset
   if (m_hstmt)
   {
-    // If a cursor was openend (binding columns present)
+    // If a cursor was opened (binding columns present)
     // And not read until the end of the cursor stream
     // Try closing the cursor first
     if(m_numMap.size() && m_retCode != SQL_NO_DATA)
@@ -138,7 +138,7 @@ SQLQuery::Close()
       ::SQLEndTran(SQL_HANDLE_DBC,m_connection,SQL_COMMIT);
     }
 
-    // Free the statement and drop alle associated info
+    // Free the statement and drop all associated info
     // And all cursors on the database engine
     m_retCode = SQLDatabase::FreeSQLHandle(&m_hstmt,SQL_DROP);
     if(!SQL_SUCCEEDED(m_retCode))
@@ -147,7 +147,7 @@ SQLQuery::Close()
       throw m_lastError;
     }
   }
-  // Clear nummer map
+  // Clear number map
   ColNumMap::iterator it = m_numMap.begin();
   while(it != m_numMap.end())
   {
@@ -235,7 +235,7 @@ SQLQuery::Open()
   //   }
 
   // Change cursor type to the cheapest qua performance
-  m_retCode = SQLSetStmtAttr(m_hstmt,SQL_CURSOR_TYPE,(SQLPOINTER)SQL_CURSOR_FORWARD_ONLY,SQL_IS_UINTEGER);
+  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_CURSOR_TYPE,(SQLPOINTER)SQL_CURSOR_FORWARD_ONLY,SQL_IS_UINTEGER);
   if(!SQL_SUCCEEDED(m_retCode))
   {
     GetLastError("Cannot set CURSOR-FORWARD-ONLY attribute: ");
@@ -245,7 +245,7 @@ SQLQuery::Open()
   // Set max-rows if our database DOES support it (Oracle!)
   if(m_maxRows)
   {
-    m_retCode = SQLSetStmtAttr(m_hstmt,SQL_MAX_ROWS,(SQLPOINTER)m_maxRows,SQL_IS_UINTEGER);
+    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_MAX_ROWS,(SQLPOINTER)m_maxRows,SQL_IS_UINTEGER);
     if(!SQL_SUCCEEDED(m_retCode))
     {
       GetLastError("Cannot set SQL_MAX_ROWS attribute: ");
@@ -253,8 +253,7 @@ SQLQuery::Open()
     }
   }
   // Solving formatting for various databases (Oracle / MS-Access)
-  // Numeric and Decimal formats can be mangled by disbehaving ODBC drivers
-  // So they must be set or gotten in a predefined format (e.g. Oracle needs DOUBLE for a NUMERIC column)
+  // So they must be set or gotten in a predefined format (e.g. Oracle needs LONG for SLONG and ULONG)
   // Also see method "SQLType2CType" for the use of the rebind maps
   if(m_database)
   {
@@ -494,7 +493,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   }
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
-  // in the processing of the query-strings which crashes it in CharNexW
+  // in the processing of the query-strings which crashes it in CharNextW
   // by a missing NULL-Terminator. By changing the length of the statement
   // _including_ the terminating NUL, it won't crash at all
   SQLINTEGER lengthStatement = statement.GetLength() + 1;
@@ -644,7 +643,7 @@ SQLQuery::DoSQLPrepare(const CString& p_statement)
   // Optimization: remove trailing spaces
   statement.Trim();
 
-  // Do the Querytext macro replacement
+  // Do the Query text macro replacement
   if(m_database)
   {
     m_database->ReplaceMacros(statement);
@@ -973,13 +972,13 @@ SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLVariant* p_var,int p_type)
   SQLINTEGER attribute = (p_type == SQL_RESULT_COL) ? SQL_ATTR_APP_ROW_DESC : SQL_ATTR_APP_PARAM_DESC;
 
   // Getting the ROW descriptor and set the precision/scale fields
-  m_retCode = SQLGetStmtAttr(m_hstmt,attribute,&rowdesc,SQL_IS_POINTER,NULL);
+  m_retCode = SqlGetStmtAttr(m_hstmt,attribute,&rowdesc,SQL_IS_POINTER,NULL);
   if(SQL_SUCCEEDED(m_retCode))
   {
     int     precision = p_var->GetNumericPrecision();
     int     scale     = p_var->GetNumericScale();
-    RETCODE retCode1  = SQLSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
-    RETCODE retCode2  = SQLSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
+    RETCODE retCode1  = SqlSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
+    RETCODE retCode2  = SqlSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
 
     if(SQL_SUCCEEDED(retCode1) && SQL_SUCCEEDED(retCode2))
     {
@@ -987,7 +986,7 @@ SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLVariant* p_var,int p_type)
       // Very covertly described in the ODBC documentation. But if you do not do this one last step
       // results will be very different - and faulty - depending on your RDBMS
       SQLPOINTER pointer = p_var->GetDataPointer();
-      m_retCode = SQLSetDescField(rowdesc,p_column,SQL_DESC_DATA_PTR,pointer,NULL);
+      m_retCode = SqlSetDescField(rowdesc,p_column,SQL_DESC_DATA_PTR,pointer,NULL);
       if(SQL_SUCCEEDED(m_retCode))
       {
         // All went well, we are done
@@ -1010,7 +1009,7 @@ SQLQuery::ProvideAtExecData()
   int value;
   do 
   {
-    m_retCode = ::SQLParamData(m_hstmt,(SQLPOINTER*)&value);
+    m_retCode = SqlParamData(m_hstmt,(SQLPOINTER*)&value);
     if(m_retCode == SQL_NEED_DATA)
     {
       VarMap::iterator it = m_parameters.find(value);
@@ -1382,10 +1381,10 @@ SQLQuery::GetColumnName(int p_column,CString& p_name)
 
 // Convert database dependent SQL_XXXX types to C-types SQL_C_XXXX
 short
-SQLQuery::SQLType2CType(short nSQLType)
+SQLQuery::SQLType2CType(short p_sqlType)
 {
   short type = SQL_C_CHAR; // Default;
-  switch(nSQLType)
+  switch(p_sqlType)
   {
     case SQL_CHAR:                      // Fall through
     case SQL_WCHAR:                     // Fall through
@@ -1429,7 +1428,7 @@ SQLQuery::SQLType2CType(short nSQLType)
   {
     // A rebind simply transposes a SQL_C_XXX type for another
     // So we can as to return say a SQL_C_DATE as an SQL_C_CHAR from the ODBC driver
-    RebindMap::iterator it = m_rebindColumns->find(nSQLType);
+    RebindMap::iterator it = m_rebindColumns->find(p_sqlType);
     if(it != m_rebindColumns->end())
     {
       // Return rebind type to this one
@@ -1492,7 +1491,7 @@ SQLQuery::GetColumnDisplaySize(int p_column)
   return (int)integerValue;
 }
 
-// LEGACY SUPPORT ODBC 1.x AND 2.x
+// LEGACY SUPPORT ODBC 1.x AND 2.x Style applications
 
 void
 SQLQuery::DescribeColumn(int           p_col
