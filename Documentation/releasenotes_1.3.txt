@@ -47,3 +47,11 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.3
 11) Started a UnitTest module to unit test just about everything in this module.
     Code coverage is now above 55% (scattered over all classes) and still climbing...
     Unit testing found a few nasty bugs in SQLVariant, SQLVariantFormat and SQLDate....
+
+Version 1.3.1 of 20-12-2016
+---------------------------
+1)  Fixed a serious multi-threaded issue in the SQLVariant when requesting a column
+    in a different format than originally intended.
+2)  Fixed a problem in the transaction stack (SQLQuery did it's own commit)
+    and added unit tests for Commit() and Rollback()
+3)  Enhanced the transaction errors and logging with the transaction names

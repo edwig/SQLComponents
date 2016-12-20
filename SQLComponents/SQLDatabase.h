@@ -46,8 +46,9 @@
 // By convention in use for older INFORMIX systems
 #define DS_IDENT_LEN 10
 
-// Loglevel for various systems (BRIEF4all)
+// Loglevel for various systems
 // Log queries at this loglevel
+#define LOGLEVEL_ERROR  1
 #define LOGLEVEL_MAX    6
 // Log actions at this level
 #define LOGLEVEL_ACTION 2

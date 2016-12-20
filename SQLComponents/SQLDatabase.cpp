@@ -1068,7 +1068,6 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
     // If no transaction active yet, we must turn of autocommit
     if(m_transactions.size() == 0)
     {
-      // Try tot start the transaction
       try
       {
         if(m_rdbmsType != RDBMS_ACCESS)
@@ -1076,10 +1075,11 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
           SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_OFF,SQL_IS_UINTEGER);
         }
       }
-      catch(CString& err)
+      catch(CString& error)
       {
-        // Add location to the error message
-        throw CString("Error at starting transaction: ") + err;
+        CString message;
+        message.Format("Error at starting transaction [%s] : %s",p_transaction->GetName(),error);
+        throw message;
       }
     }
 
@@ -1091,17 +1091,20 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
       transName.Format("AutoSavePoint%d", m_transactions.size());
 
       // Set savepoint
-      CString startSubtrans = reinterpret_cast<SQLInfoDB*>(m_info)->GetStartSubTransaction(transName);
+      CString startSubtrans = m_info->GetStartSubTransaction(transName);
       if(!startSubtrans.IsEmpty())
       {
         try
         {
           SQLQuery rs(this);
           rs.DoSQLStatement(startSubtrans);
+          p_transaction->SetSavepoint(transName);
         }
         catch(CString& err)
         {
-          throw CString("Error starting sub-transaction: ") + err;
+          CString message;
+          message.Format("Error starting sub-transaction [%s:%s] : %s",p_transaction->GetName(),transName,err);
+          throw message;
         }
       }
     }
@@ -1125,7 +1128,9 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
       // a transaction lower on the stack is now being committed
       // This is clearly not what we want, and points to an error
       // in our application's logic in the calling code.
-      throw CString("Error at commit: transaction is not the current transaction");
+      CString message;
+      message.Format("Error at commit: transaction [%s] is not the current transaction",p_transaction->GetName());
+      throw message;
     }
 
     // Only the last transaction will really be committed
@@ -1158,7 +1163,9 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
         RollbackTransaction(p_transaction);
 
         // Throw an exception with the error info of the failed commit
-        throw CString("Error at commit: ") + error;
+        CString message;
+        message.Format("Error in commit of transaction [%s] : %s",p_transaction->GetName(),error);
+        throw message;
       }
     }
     else
@@ -1166,7 +1173,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
       // It's a sub transaction
       // If the database is capable: Do the commit of the sub transaction
       // Otherwise: do nothing and wait for the outer transaction to commit the whole in-one-go
-      CString startSubtrans = reinterpret_cast<SQLInfoDB*>(m_info)->GetCommitSubTransaction(p_transaction->GetSavePoint());
+      CString startSubtrans = m_info->GetCommitSubTransaction(p_transaction->GetSavePoint());
       if(!startSubtrans.IsEmpty())
       {
         try
@@ -1174,9 +1181,14 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
           SQLQuery rs(this);
           rs.DoSQLStatement(startSubtrans);
         }
-        catch(CString& err)
+        catch(CString& error)
         {
-          throw CString("Error committing a sub-transaction: ") + err;
+          CString message;
+          message.Format("Error in commit of sub-transaction [%s:%s] : %s"
+                        ,p_transaction->GetName()
+                        ,p_transaction->GetSavePoint()
+                        ,error);
+          throw message;
         }
       }
     }
@@ -1191,7 +1203,9 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
   // Check taht it is the top-of-the-stack transaction
   if(GetTransaction() != p_transaction)
   {
-    throw CString("Error in rollback: transaction is not the current transaction");
+    CString message;
+    message.Format("Error in rollback: transaction [%s] is not the current transaction",p_transaction->GetName());
+    throw message;
   }
 
   // Look for the first saveepoint on the stack
@@ -1238,14 +1252,17 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
       }
       catch(...)
       {
-        // Throw an exception with error info at a failed rollback
-        throw CString("Error at rollback: ") + GetErrorString();
+        // Throw an exception with error info at a failed rollback1
+        CString message;
+        CString error = GetErrorString();
+        message.Format("Error at rollback of transaction [%s] : %s",p_transaction->GetName(),error);
+        throw message;
       }
     }
     else
     {
       // It is a subtransaction
-      CString startSubtrans = reinterpret_cast<SQLInfoDB*>(m_info)->GetRollbackSubTransaction(p_transaction->GetSavePoint());
+      CString startSubtrans = m_info->GetRollbackSubTransaction(p_transaction->GetSavePoint());
       if(!startSubtrans.IsEmpty())
       {
         try
@@ -1253,9 +1270,14 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
           SQLQuery rs(this);
           rs.DoSQLStatement(startSubtrans);
         }
-        catch(CString& err)
+        catch(CString& error)
         {
-          throw CString("Error rolling back a sub-transaction: ") + err;
+          CString message;
+          message.Format("Error in rolling back sub-transaction [%s:%s] : %s"
+                        ,p_transaction->GetName()
+                        ,p_transaction->GetSavePoint()
+                        ,error);
+          throw message;
         }
       }
     }
@@ -1335,7 +1357,10 @@ SQLDatabase::GetSQL_GenerateSerial(CString p_table)
     rs.DoSQLStatement(query);
     if(rs.GetRecord())
     {
-      return rs.GetColumn(1)->GetAsChar();
+      int serial = rs[1];
+      CString result;
+      result.Format("%d",serial);
+      return result;
     }
     return "0";
   }
