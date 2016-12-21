@@ -66,29 +66,25 @@ SQLTransaction::SQLTransaction(HDBC p_hdbc,bool p_startImmediate)
 
 SQLTransaction::~SQLTransaction()
 {
-  // If still active, rollback the transaction
-  if(m_active)
+  try
   {
-    try
+    Rollback();
+  }
+  catch(CString& error)
+  {
+    CString message;
+    message.Format("Error in rollback of transaction [%s] : %s\n",m_name,error);
+    if(m_database)
     {
-      Rollback();
+      m_database->LogPrint(LOGLEVEL_ERROR,message);
     }
-    catch(CString& error)
+    else
     {
-      CString message;
-      message.Format("Error in rollback of transaction [%s] : %s\n",m_name,error);
-      if(m_database)
-      {
-        m_database->LogPrint(LOGLEVEL_ERROR,message);
-      }
-      else
-      {
-        // No database. Poor man's logging
-        TRACE(message);
-      }
-      // Cannot throw in a destructor. Stops here
-      // But we where already 'cornered', why would we otherwise need to rollback :-(
+      // No database. Poor man's logging
+      TRACE(message);
     }
+    // Cannot throw in a destructor. Stops here
+    // But we where already 'cornered', why would we otherwise need to rollback :-(
   }
 }
 
@@ -169,6 +165,12 @@ SQLTransaction::Commit()
 void 
 SQLTransaction::Rollback()
 {
+  // See if we are still an active transaction
+  if(!m_active)
+  {
+    return;
+  }
+
   // Do the rollback. Cleaning will be done by
   // the AfterRollback method, called by SQLDatabase
   if(m_database)

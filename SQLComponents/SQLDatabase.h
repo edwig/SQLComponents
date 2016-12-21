@@ -144,7 +144,6 @@ public:
   bool           IsOpen();       // Is the database open?
   void           Close();        // Close it for further use
   bool           CollectInfo();  // Collect database info
-  void           SetDirtyRead(); // Read mode for Informix
 
   // OPTIONS FOR THE OPEN/CLOSE CYCLE
 
@@ -262,6 +261,10 @@ protected:
   void           MakeEnvHandle();   // Environment
   void           MakeDbcHandle();   // Database
   HSTMT          MakeStmtHandle();  // Statement
+  void           FreeEnvHandle();   // Environment
+  void           FreeDbcHandle();   // Database
+  // Before closing the database, close transactions
+  void           CloseAllTransactions();
   // Setting of a connection attribute
   void           SetConnectAttr(int attr, int value,int type);
   // Setting known rebind mappings of databases

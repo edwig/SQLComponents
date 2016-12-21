@@ -52,6 +52,8 @@ namespace DatabaseUnitTest
 
       try
       {
+        m_database->SetMARS(false);
+        m_database->SetLoginTimeout(0);
         if(m_database->Open(g_dsn,g_user,g_password))
         {
           Logger::WriteMessage("Database opened.");
@@ -77,6 +79,7 @@ namespace DatabaseUnitTest
     {
       if(m_database)
       {
+        Logger::WriteMessage("Closing database....");
         m_database->Close();
         delete m_database;
         m_database = nullptr;
@@ -91,7 +94,8 @@ namespace DatabaseUnitTest
                   " WHERE id     = ?");
       query.SetParameter(1,p_value);
       query.SetParameter(2,p_recno);
-      query.DoSQLStatement(sql);
+      int num = query.DoSQLStatementNonQuery(sql);
+      Assert::AreEqual(1,num,L"Record update not counted");
     }
 
     void CheckRecord(int p_recno,bcd p_value)
@@ -114,6 +118,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionCommit)
     {
+      Logger::WriteMessage("Testing standard COMMIT transaction");
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database,"TransCommit");
@@ -131,6 +136,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionRollback)
     {
+      Logger::WriteMessage("Testing standard ROLLBACK transaction");
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database,"TransCommit");
@@ -154,6 +160,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionCommit_DBC)
     {
+      Logger::WriteMessage("Testing isolated COMMIT transaction");
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database->GetDBHandle(),true);
@@ -171,6 +178,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionRollback_DBC)
     {
+      Logger::WriteMessage("Testing isolated ROLLBACK transaction");
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database->GetDBHandle(),true);
@@ -192,15 +200,43 @@ namespace DatabaseUnitTest
       }
     }
 
-//     TEST_METHOD(TransactionSavepoint)
-//     {
-// 
-//     }
-// 
-//     TEST_METHOD(TransactionRollbackToSavepoint)
-//     {
-// 
-//     }
+    TEST_METHOD(TransactionRollback_FAIL)
+    {
+      Logger::WriteMessage("Testing the FAILING of the ROLLBACK");
+      if(OpenDatabase())
+      {
+        // Extra scope
+        {
+          SQLTransaction trans(m_database,"Check");
+          UpdateRecord(1,100.0);
+          CheckRecord(1,100.0);
+          trans.Commit();
+          CheckRecord(1,100.0);
+        }
+
+        try
+        {
+          // Extra scope
+          {
+            SQLTransaction trans(m_database,"OpenTransaction");
+            UpdateRecord(1,400.0);
+            CheckRecord(1,400.0);
+            CloseDatabase();
+          }
+        }
+        catch(CString& s)
+        {
+          Logger::WriteMessage("Error in transaction: " + s);
+        }
+      }
+
+      if(OpenDatabase())
+      {
+        // Extra transaction is out of scope and should have done a rollback
+        CheckRecord(1,100.0);
+        CloseDatabase();
+      }
+    }
 
     SQLDatabase* m_database = nullptr;
   };
