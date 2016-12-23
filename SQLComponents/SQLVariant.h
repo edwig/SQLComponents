@@ -126,6 +126,7 @@ public:
    void    SetSizeIndicator(bool p_realSize);
    void    SetNULL();
    void    ReserveSpace(int p_type,int p_space);
+   void    ShrinkSpace();
 
    // General access
    bool                 SetData(int p_type,const char* p_data);

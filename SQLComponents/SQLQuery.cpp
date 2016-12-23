@@ -717,25 +717,26 @@ SQLQuery::BindParameters()
     return;
   }
 
+  // See if we have an extra function-return parameter
+  int extra = (m_parameters.find(0) == m_parameters.end()) ? 0 : 1;
+
+  // Walk the parameter list
   for(auto& parameter : m_parameters)
   {
-    int icol = parameter.first;
-    SQLVariant* var = parameter.second;
-    if(var->GetDataType() == 0) 
-    {
-      continue;
-    }
-    // Special case for SCALE
-    int scale = 0;
-    if(var->GetDataType() == SQL_C_NUMERIC)
-    {
-      scale = var->GetAsNumeric()->scale;
-    }
-    SQLPOINTER  dataPointer = var->GetDataPointer();
+    // Getting the variant for the parameter for a column
+    SQLINTEGER  icol = parameter.first + extra;
+    SQLVariant* var  = parameter.second;
+
+    // Getting the info from the variable
+    SQLSMALLINT scale       = (SQLSMALLINT)var->GetNumericScale();
+    SQLPOINTER  dataPointer = (SQLPOINTER )var->GetDataPointer();
+    SQLSMALLINT dataType    = (SQLSMALLINT)var->GetDataType();
     SQLSMALLINT sqlDatatype = (SQLSMALLINT)var->GetSQLDataType();
+    SQLSMALLINT paramType   = (SQLSMALLINT)var->GetParameterType();
     SQLUINTEGER columnSize  = var->GetDataSize();
     SQLINTEGER  bufferSize  = var->GetDataSize();
 
+    // Check for an at-execution-streaming of values
     if(var->GetAtExec())
     {
       // AT EXEC data piece by piece
@@ -745,57 +746,68 @@ SQLQuery::BindParameters()
       var->SetSizeIndicator(m_database ? m_database->GetNeedLongDataLen() : true);
       bufferSize = 0;
     }
+
     // Check rebinds to do for scripting 
-    if(m_rebindParameters)
-    {
-      RebindMap::iterator rt = m_rebindParameters->find(sqlDatatype);
-      if(rt != m_rebindParameters->end())
-      {
-        sqlDatatype = (SQLSMALLINT)rt->second;
-      }
-    }
-    // Check minimal input type
-    if(var->GetParameterType() == SQL_PARAM_TYPE_UNKNOWN)
-    {
-      var->SetParameterType(SQL_PARAM_INPUT);
-    }
-    if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
-    {
-      if(icol == 1)
-      {
-        m_database->LogPrint(LOGLEVEL_MAX,"Parameters as passed on to the database:\n");
-      }
-      CString text;
-      CString value;
-      var->GetAsString(value);
-      text.Format("Parameter %d: %s\n",icol,value);
-      m_database->LogPrint(LOGLEVEL_MAX,text);
-    }
+    sqlDatatype = RebindParameter(sqlDatatype);
+
+    // Log what we bind here
+    LogParameter(icol,var);
 
     // Do the bindings
-    m_retCode = SqlBindParameter(m_hstmt
-                               ,(SQLUSMALLINT)icol                        // Number of parameter
-                               ,(SQLSMALLINT) var->GetParameterType()     // SQL_PARAM_INPUT etc
-                               ,(SQLSMALLINT) var->GetDataType()          // SQL_C_XXX Types
-                               ,(SQLSMALLINT) sqlDatatype                 // SQL_XXX Type
-                               ,(SQLUINTEGER) columnSize                  // Column size
-                               ,(SQLSMALLINT) scale                       // Numeric scale
-                               ,(SQLPOINTER)  dataPointer                 // Buffer pointer
-                               ,(SQLINTEGER)  bufferSize                  // Buffer size (truncate on output)
-                               ,(SQLLEN*)     var->GetIndicatorPointer());// NULL indicator
+    m_retCode = SqlBindParameter(m_hstmt                     // Statement handle
+                                ,(ushort)icol                // Number of parameter
+                                ,paramType                   // SQL_PARAM_INPUT etc
+                                ,dataType                    // SQL_C_XXX Types
+                                ,sqlDatatype                 // SQL_XXX Type
+                                ,columnSize                  // Column size
+                                ,scale                       // Numeric scale
+                                ,dataPointer                 // Buffer pointer
+                                ,bufferSize                  // Buffer size (truncate on output)
+                                ,var->GetIndicatorPointer());// NULL indicator
     if(!SQL_SUCCEEDED(m_retCode))
     {
-      CString prefix;
-      prefix.Format("Cannot bind parameter %d. Error: ",icol);
-      GetLastError(prefix);
+      GetLastError("Cannot bind parameter. Error: ");
+      m_lastError.AppendFormat(" Parameter: %d",icol);
       throw m_lastError;
     }
 
     // Bind NUMERIC/DECIMAL precision and scale
-    if(sqlDatatype == SQL_NUMERIC || sqlDatatype == SQL_DECIMAL)
+    if(dataType == SQL_C_NUMERIC)
     {
-      BindColumnNumeric((SQLSMALLINT)icol,var,SQL_PARAM_INPUT);
+      BindColumnNumeric((ushort)icol,var,SQL_PARAM_INPUT);
     }
+  }
+}
+
+// Do the rebind parameter datatype replacement
+short
+SQLQuery::RebindParameter(short p_datatype)
+{
+  if(m_rebindParameters)
+  {
+    RebindMap::iterator rt = m_rebindParameters->find(p_datatype);
+    if(rt != m_rebindParameters->end())
+    {
+      return (SQLSMALLINT)rt->second;
+    }
+  }
+  return p_datatype;
+}
+
+// Log parameter during the binding process
+void
+SQLQuery::LogParameter(int p_column,SQLVariant* p_parameter)
+{
+  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
+  {
+    if(p_column == 1)
+    {
+      m_database->LogPrint(LOGLEVEL_MAX,"Parameters as passed on to the database:\n");
+    }
+    CString text,value;
+    p_parameter->GetAsString(value);
+    text.Format("Parameter %d: %s\n",p_parameter,value);
+    m_database->LogPrint(LOGLEVEL_MAX,text);
   }
 }
 
@@ -872,7 +884,7 @@ SQLQuery::BindColumns()
     }
 
     // Record precision/scale for NUMERIC/DECIMAL types
-    if(type == SQL_DECIMAL || type == SQL_NUMERIC)
+    if(type == SQL_C_NUMERIC)
     {
       SQL_NUMERIC_STRUCT* numeric = var->GetAsNumeric();
       numeric->precision = (SQLCHAR)  precision;
@@ -892,47 +904,55 @@ SQLQuery::BindColumns()
   }
 
   // NOW WE HAVE ALL INFORMATION
-  // BEGIN THE BINDING PROCES
+  // TO BEGIN THE BINDING PROCES
 
   for(auto& column : m_numMap)
   {
     SQLVariant* var = column.second;
     if(var->GetAtExec() == false)
     {
-      int bcol = var->GetColumnNumber();
-      int type = var->GetDataType();
-      if(m_rebindColumns)
-      {
-        RebindMap::iterator re = m_rebindColumns->find(type);
-        if(re != m_rebindColumns->end())
-        {
-          type = re->second;
-        }
-      }
-      SQLPOINTER pointer = var->GetDataPointer();
+      ushort bcol = (ushort) var->GetColumnNumber();
+      short  type = (short)  var->GetDataType();
 
-      m_retCode = SqlBindCol(m_hstmt                                   // statement handle
-                            ,(SQLUSMALLINT) bcol                       // Column number
-                            ,(SQLSMALLINT)  type                       // Data type
-                            ,(SQLPOINTER)   pointer                    // Data pointer
-                            ,(SQLINTEGER)   var->GetDataSize()         // Data length
-                            ,(SQLLEN*)      var->GetIndicatorPointer() // Indicator address
+      // Rebind the column datatype
+      type = RebindColumn(type);
+
+      m_retCode = SqlBindCol(m_hstmt                    // statement handle
+                            ,bcol                       // Column number
+                            ,type                       // Data type
+                            ,var->GetDataPointer()      // Data pointer
+                            ,var->GetDataSize()         // Data length
+                            ,var->GetIndicatorPointer() // Indicator address
                             );
       if(!SQL_SUCCEEDED(m_retCode))
       {
-        CString prefix;
-        prefix.Format("Cannot bind to column %d: ",icol);
-        GetLastError(prefix);
+        GetLastError("Cannot bind to column. Error: ");
+        m_lastError.AppendFormat(" Column number: %d",icol);
         throw m_lastError;
       }
 
       // Now do the SQL_NUMERIC precision/scale binding
-      if(type == SQL_NUMERIC || type == SQL_DECIMAL)
+      if(type == SQL_C_NUMERIC)
       {
         BindColumnNumeric((SQLSMALLINT)bcol,var,SQL_RESULT_COL);
       }
     }
   }
+}
+
+// Do the rebind replacement for a column
+short
+SQLQuery::RebindColumn(short p_datatype)
+{
+  if(m_rebindColumns)
+  {
+    RebindMap::iterator re = m_rebindColumns->find(p_datatype);
+    if(re != m_rebindColumns->end())
+    {
+      return (short) re->second;
+    }
+  }
+  return p_datatype;
 }
 
 // Specifying the precision/scale of a NUMERIC/DECIMAL number
@@ -1535,4 +1555,130 @@ SQLQuery::DescribeColumn(int           p_col
   p_colNullable = fNullable;
   p_colLabel    = rgbDesc;
   p_colDispSize = (SQLINTEGER)fDesc;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION / PROCEDURE calls
+//
+// Parameter 0  -> The return parameter (if present) type = PARAM_OUTPUT
+// Parameter 1  -> First procedure parameter (input, output, inout)
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Oracle:    BEGIN :1 := procname(:2,:3); END;
+// SQLServer: EXEC ? = procname ?,?
+// MSAccess : { ? = CALL procname(?,?) }
+// Firebird : { ? = CALL procname(?,?) }
+
+SQLVariant*
+SQLQuery::DoSQLCall(CString p_procedure,const int p_param1)
+{
+  SQLVariant* var = new SQLVariant((long)p_param1);
+  InternalSetParameter(1,var,SQL_PARAM_INPUT);
+  return DoSQLCall(p_procedure);
+}
+
+SQLVariant*
+SQLQuery::DoSQLCall(CString p_procedure,const char* p_param1)
+{
+  SQLVariant* var = new SQLVariant(p_param1);
+  InternalSetParameter(1,var,SQL_PARAM_INPUT);
+  return DoSQLCall(p_procedure);
+}
+
+SQLVariant*
+SQLQuery::DoSQLCall(CString p_procedure,const bcd& p_param1)
+{
+  SQLVariant* var = new SQLVariant(&p_param1);
+  InternalSetParameter(1,var,SQL_PARAM_INPUT);
+  return DoSQLCall(p_procedure);
+}
+
+// Call procedure, do your own parameter plumbing  
+SQLVariant*
+SQLQuery::DoSQLCall(CString p_procedure,bool p_hasReturn /*=false*/)
+{
+  // Start with generating the SQL
+  CString sql = ConstructSQLForCall(p_procedure,p_hasReturn);
+
+  // Make sure we have a minimal output parameter (SQL_SLONG !!)
+  // OTHERWISE, YOU HAVE TO PROVIDE IT YOURSELF!
+  if(p_hasReturn && m_parameters.find(0) == m_parameters.end())
+  {
+    SQLVariant* var = new SQLVariant((long)0L);
+    InternalSetParameter(0,var,SQL_PARAM_OUTPUT);
+  }
+
+  // Do the call and return the return-parameter
+  DoSQLStatement(sql);
+
+  LimitOutputParameters();
+  return GetParameter(0);
+}
+
+CString
+SQLQuery::ConstructSQLForCall(CString p_procedure,bool p_hasReturn)
+{
+  // Start with odbc-escape character
+  CString sql("{");
+
+  // Add placeholder for return parameter
+  if(p_hasReturn)
+  {
+    sql += "?=";
+  }
+  // Add function / procedure name
+  sql += "CALL ";
+  sql += p_procedure;
+
+  if(!m_parameters.empty())
+  {
+    // Opening parenthesis
+    sql += "(";
+
+    // Construct parameter markers 
+    for(auto& param : m_parameters)
+    {
+      if(param.first == 0) continue;
+      if(param.first > 1) sql += ",";
+      sql += "?";
+    }
+
+    // Closing parenthesis
+    sql += ")";
+  }
+  // Add closing odbc-escape character
+  sql += "}";
+
+  return sql;
+}
+
+// Character output parameters are sometimes not limited
+void
+SQLQuery::LimitOutputParameters()
+{
+  for(auto& param : m_parameters)
+  {
+    int type = param.second->GetParameterType();
+    if(type == SQL_PARAM_OUTPUT || type == SQL_PARAM_INPUT_OUTPUT)
+    {
+      if(param.second->GetDataType() == SQL_C_CHAR)
+      {
+        param.second->ShrinkSpace();
+      }
+    }
+  }
+}
+
+// Getting the result parameter value
+SQLVariant* 
+SQLQuery::GetParameter(int p_num)
+{
+  VarMap::iterator it = m_parameters.find(p_num);
+  if(it != m_parameters.end())
+  {
+    return it->second;
+  }
+  return nullptr;
 }

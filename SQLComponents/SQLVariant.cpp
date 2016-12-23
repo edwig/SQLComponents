@@ -468,6 +468,39 @@ SQLVariant::ReserveSpace(int p_type,int p_space)
   }
 }
 
+// In case of CHAR parameter output, shrink the spaces
+void
+SQLVariant::ShrinkSpace()
+{
+  // Only to do for character strings
+  if(m_datatype != SQL_C_CHAR)
+  {
+    return;
+  }
+  if((m_paramType != SQL_PARAM_OUTPUT) && (m_paramType != SQL_PARAM_INPUT_OUTPUT))
+  {
+    return;
+  }
+
+  // Trim of the trailing spaces. Some RDBMS will return trailing spaces instead of SQL_NTS. 
+  // This makes it impossible to return strings with spaces in the end.
+  // DO NOT realloc the buffer, or we would lose the data binding
+  int length = m_binaryLength - 2;
+  while(length >= 0)
+  {
+    char c = m_data.m_dataCHAR[length];
+    if(c == ' ' || c == 0)
+    {
+      m_data.m_dataCHAR[length--] = 0;
+    }
+    else
+    {
+      break;
+    }
+  }
+}
+
+
 // Check if the data is 'empty'
 // CHAR -> Empty string, scalar types are 0 or 0.0
 bool
@@ -1960,7 +1993,8 @@ SQLVariant::GetNumericScale()
   {
     return m_data.m_dataNUMERIC.scale;
   }
-  throw CString("Cannot get the numeric scale of this datatype");
+  // Cannot get the numeric scale of this datatype
+  return 0;
 }
 
 bcd

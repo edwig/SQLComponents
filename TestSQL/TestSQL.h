@@ -43,3 +43,4 @@ extern void TestNULL();
 extern void TestOperators();
 extern void TestNumeric();
 extern void TestBcd();
+extern void TestCalling();

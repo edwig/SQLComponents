@@ -107,6 +107,14 @@ public:
   // Variant with a catch to it
   void        TryDoSQLStatement(const CString& p_statement);
 
+  // Call FUNCTION / PROCEDURE
+  SQLVariant* DoSQLCall(CString p_procedure,bool p_hasReturn = false);
+  SQLVariant* DoSQLCall(CString p_procedure,const int   p_param1);
+  SQLVariant* DoSQLCall(CString p_procedure,const char* p_param1);
+  SQLVariant* DoSQLCall(CString p_procedure,const bcd&  p_param1);
+  // Getting the result parameter value
+  SQLVariant* GetParameter(int p_num);
+
   // BOUND STATEMENT
   // Divide a SQL statement in Prepare/Execute/Fetch
   void        DoSQLPrepare(const CString& p_statement);
@@ -185,6 +193,16 @@ private:
   void  GetLastError(CString p_prefix = "");
   // Report timing to logfile
   void  ReportQuerySpeed(LARGE_INTEGER p_start);
+  // Construct the SQL for a function/procedure call
+  CString ConstructSQLForCall(CString p_procedure,bool p_hasReturn);
+  // Log parameter during the binding process
+  void  LogParameter(int p_column,SQLVariant* p_parameter);
+  // Do the rebind replacement for a parameter
+  short RebindParameter(short p_datatype);
+  // Do the rebind replacement for a column
+  short RebindColumn(short p_datatype);
+  // Character output parameters are sometimes not limited
+  void  LimitOutputParameters();
 
   SQLDatabase*  m_database;          // Database
   HDBC          m_connection;        // In CTOR connection handle.

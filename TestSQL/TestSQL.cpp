@@ -72,6 +72,8 @@ int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
   {
     // Basic connection test
     TestConnection();
+    // Test calling procedure/function
+    TestCalling();
     // Test BCD to NUMERIC conversions
     TestBcd();
     // Testing Numerics
