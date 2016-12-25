@@ -57,3 +57,14 @@ Version 1.3.1 of 21-12-2016
 3)  Enhanced the transaction errors and logging with the transaction names
 4)  Closing the database, will rollback hanging transactions.
     If no transactions exist, a commit will be done for multi-generation databases.
+
+Version 1.3.2 of 25-12-2016
+---------------------------
+1)  Added the ability to call a function or a procedure with the ODBC [?=]CALL convention
+    Stored functions and stored procedures can be called with an arbitrary number of
+    input, output or input-and-output parameters.
+2)  Added the ability for a database to implement a different convention to call functions
+    or parameters. Namely the Firebird SQL engine does this sort of thing. See the 
+    implementation in SQLInfoFirebird class to do this.
+3)  Changed the default testing database from MS-Access to Firebird 3.0 database.
+    Register the "testing.fdb" database in the root project folder as a ODBC DSN "testing"

@@ -27,6 +27,7 @@
 #include "stdafx.h"
 #include <sqlext.h>
 #include "SQLDatabase.h"
+#include "SQLInfoDB.h"
 #include "SQLQuery.h"
 #include "SQLWrappers.h"
 #include "SQLDate.h"
@@ -56,6 +57,14 @@ SQLQuery::SQLQuery(SQLDatabase* p_database)
   Init(p_database);
 }
 
+// CTOR: Also for a reference to a database
+SQLQuery::SQLQuery(SQLDatabase& p_database)
+         :m_lock(&p_database,INFINITE)
+{
+  Init(&p_database);
+}
+
+// CTOR on a stand-alone handle
 SQLQuery::SQLQuery(HDBC p_hdbc)
          :m_lock(NULL,INFINITE)
 {
@@ -1563,20 +1572,17 @@ SQLQuery::DescribeColumn(int           p_col
 //
 // Parameter 0  -> The return parameter (if present) type = PARAM_OUTPUT
 // Parameter 1  -> First procedure parameter (input, output, inout)
+// Parameter n  -> nth   procedure parameter (input, output, inout)
 //
 //////////////////////////////////////////////////////////////////////////
 
-// Oracle:    BEGIN :1 := procname(:2,:3); END;
-// SQLServer: EXEC ? = procname ?,?
-// MSAccess : { ? = CALL procname(?,?) }
-// Firebird : { ? = CALL procname(?,?) }
-
+// Short forms for 1 (one) input parameter and 1 output parameter
 SQLVariant*
 SQLQuery::DoSQLCall(CString p_procedure,const int p_param1)
 {
   SQLVariant* var = new SQLVariant((long)p_param1);
   InternalSetParameter(1,var,SQL_PARAM_INPUT);
-  return DoSQLCall(p_procedure);
+  return DoSQLCall(p_procedure,true);
 }
 
 SQLVariant*
@@ -1584,7 +1590,7 @@ SQLQuery::DoSQLCall(CString p_procedure,const char* p_param1)
 {
   SQLVariant* var = new SQLVariant(p_param1);
   InternalSetParameter(1,var,SQL_PARAM_INPUT);
-  return DoSQLCall(p_procedure);
+  return DoSQLCall(p_procedure,true);
 }
 
 SQLVariant*
@@ -1592,15 +1598,18 @@ SQLQuery::DoSQLCall(CString p_procedure,const bcd& p_param1)
 {
   SQLVariant* var = new SQLVariant(&p_param1);
   InternalSetParameter(1,var,SQL_PARAM_INPUT);
-  return DoSQLCall(p_procedure);
+  return DoSQLCall(p_procedure,true);
 }
 
 // Call procedure, do your own parameter plumbing  
 SQLVariant*
 SQLQuery::DoSQLCall(CString p_procedure,bool p_hasReturn /*=false*/)
 {
-  // Start with generating the SQL
-  CString sql = ConstructSQLForCall(p_procedure,p_hasReturn);
+  // Check we have a database object and not a isolated HDBC
+  if(m_database == nullptr)
+  {
+    throw CString("Cannot do a function/procedure call without a database object");
+  }
 
   // Make sure we have a minimal output parameter (SQL_SLONG !!)
   // OTHERWISE, YOU HAVE TO PROVIDE IT YOURSELF!
@@ -1610,17 +1619,43 @@ SQLQuery::DoSQLCall(CString p_procedure,bool p_hasReturn /*=false*/)
     InternalSetParameter(0,var,SQL_PARAM_OUTPUT);
   }
 
-  // Do the call and return the return-parameter
+  // Is we support standard ODBC, do that call
+  if(m_database->GetSQLInfoDB()->SupportsODBCCallEscapes())
+  {
+    return DoSQLCallODBCEscape(p_procedure,p_hasReturn);
+  }
+
+  // Let the database implementation take care of it
+  return m_database->GetSQLInfoDB()->DoSQLCall(this,p_procedure);
+}
+
+// Direct call through ODBC escape language
+SQLVariant*
+SQLQuery::DoSQLCallODBCEscape(CString& p_procedure,bool p_hasReturn)
+{
+  // Start with generating the SQL
+  CString sql = ConstructSQLForCall(p_procedure,p_hasReturn);
+
+  // Do the call and fetch return values
   DoSQLStatement(sql);
 
+  // Correct RDBMS that give too much spaces (Oracle!)
   LimitOutputParameters();
+
+  // Return the return-parameter (if any)
   return GetParameter(0);
 }
 
+// Construct the SQL for a function/procedure call with binding markers
+// form 1: Without parameters     { CALL function }
+// form 2: Without parameters     { CALL function() }
+// form 3: With input parameters  { CALL function(?,?) }
+// form 4: With return parameter  { ? = CALL function(?,?) }
+// form 5: Only return parameter  { ? = CALL function }
 CString
 SQLQuery::ConstructSQLForCall(CString p_procedure,bool p_hasReturn)
 {
-  // Start with odbc-escape character
+  // Start with ODBC-escape character
   CString sql("{");
 
   // Add placeholder for return parameter
@@ -1628,10 +1663,12 @@ SQLQuery::ConstructSQLForCall(CString p_procedure,bool p_hasReturn)
   {
     sql += "?=";
   }
+
   // Add function / procedure name
   sql += "CALL ";
   sql += p_procedure;
 
+  // Only add parenthesis if we need them
   if(!m_parameters.empty())
   {
     // Opening parenthesis
@@ -1648,7 +1685,7 @@ SQLQuery::ConstructSQLForCall(CString p_procedure,bool p_hasReturn)
     // Closing parenthesis
     sql += ")";
   }
-  // Add closing odbc-escape character
+  // Add closing ODBC-escape character
   sql += "}";
 
   return sql;

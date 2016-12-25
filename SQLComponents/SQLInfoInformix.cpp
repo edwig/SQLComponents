@@ -120,6 +120,13 @@ SQLInfoInformix::SupportsOrderByExpression() const
   return false;
 }
 
+// Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+bool
+SQLInfoInformix::SupportsODBCCallEscapes() const
+{
+  return true;
+}
+
 // Catalogus query for the default value of a table's column
 CString 
 SQLInfoInformix::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
@@ -1535,6 +1542,13 @@ bool
 SQLInfoInformix::GetSPLServerFunctionsWithReturnValues() const
 {
   return true;
+}
+
+// Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+SQLVariant*
+SQLInfoInformix::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+{
+  return nullptr;
 }
 
 // SPECIALS

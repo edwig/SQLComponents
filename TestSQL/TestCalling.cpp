@@ -41,14 +41,8 @@ void TestCalling()
   printf("Test calling function/procedure:\n");
   printf("================================\n");
 
-  // Test environment
-  g_dsn      = "twoc09";
-  g_user     = "k2b";
-  g_password = "k2b";
-
   SQLDatabase dbs;
-  // Do not log: we want clean output of open/close
-  // dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
 
   long beginTime = clock();
 
@@ -66,10 +60,10 @@ void TestCalling()
       beginTime = clock();
 
       // Call with 1 input and 1 output parameter
-      SQLQuery query(&dbs);
-      query.SetParameter(1,12);
-      var result = query.DoSQLCall("testmul",true);
-      printf("Result of the function call: %d\n",result.GetAsSLong());
+      SQLQuery query(dbs);
+      SQLTransaction trans(&dbs,"testing");
+      var* result = query.DoSQLCall("testmul2",12);
+      printf("Result of the function call: %d\n",result->GetAsSLong());
 
       long endTime = clock();
       printf("Calling test 1 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
@@ -77,7 +71,7 @@ void TestCalling()
       // Call with 1 input parameter and NO return value
       beginTime = clock();
       SQLQuery q2(&dbs);
-      q2.DoSQLCall("testins","Testen vanuit de programmatuur");
+      q2.DoSQLCall("testins","Testing from within a program.");
 
       endTime = clock();
       printf("Calling test 2 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
@@ -91,7 +85,7 @@ void TestCalling()
       q2.ResetParameters();
       q2.SetParameter(0,bcd(0.01),SQL_PARAM_OUTPUT);
       q2.SetParameter(1,"Multi duplicate testing.");
-      q2.SetParameter(2,line,SQL_PARAM_INPUT_OUTPUT);
+      q2.SetParameter(2,line,SQL_PARAM_OUTPUT);
       var* res = q2.DoSQLCall("multinout",true);
 
       endTime = clock();
@@ -100,6 +94,8 @@ void TestCalling()
       bcd number = res->GetAsBCD();
       CString text = q2.GetParameter(2)->GetAsChar();
       printf("Result of MULTINOUT: [%s] [%s]\n",number.AsString(),text.GetString());
+
+      trans.Commit();
     }
     else
     {

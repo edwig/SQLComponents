@@ -37,13 +37,13 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace DatabaseUnitTest
 {
-  // MS-Access
-  // DSN "testing" points to the "basis.accdb" database
-  // in the project rootfolder
+  // Firebird Open Source RDBMS 3.0
+  // DSN "testing" points to the "testing.fdb" database
+  // in the project root folder
   //
   CString g_dsn("testing");
-  CString g_user("sa");
-  CString g_password("word");
+  CString g_user("sysdba");
+  CString g_password("altijd");
 
   void CALLBACK LogPrint(void* p_context,const char* p_text)
   {

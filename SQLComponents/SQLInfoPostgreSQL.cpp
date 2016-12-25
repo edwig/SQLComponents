@@ -112,6 +112,13 @@ SQLInfoPostgreSQL::SupportsOrderByExpression() const
   return true;
 }
 
+// Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+bool
+SQLInfoPostgreSQL::SupportsODBCCallEscapes() const
+{
+  return true;
+}
+
 // Catalogus tabel met alle default waarden van een kolom in de database
 CString 
 SQLInfoPostgreSQL::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
@@ -1680,6 +1687,13 @@ bool
 SQLInfoPostgreSQL::GetSPLServerFunctionsWithReturnValues() const
 {
   return true;
+}
+
+// Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+SQLVariant*
+SQLInfoPostgreSQL::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+{
+  return nullptr;
 }
 
 // SPECIALS

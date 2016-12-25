@@ -106,6 +106,13 @@ SQLInfoAccess::SupportsOrderByExpression() const
   return true;
 }
 
+// Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+bool
+SQLInfoAccess::SupportsODBCCallEscapes() const
+{
+  return true;
+}
+
 // Catalogus query for the default value of a table's column
 CString 
 SQLInfoAccess::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
@@ -1375,6 +1382,13 @@ bool
 SQLInfoAccess::GetSPLServerFunctionsWithReturnValues() const
 {
   return true;
+}
+
+// Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+SQLVariant*
+SQLInfoAccess::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+{
+  return nullptr;
 }
 
 // SPECIALS

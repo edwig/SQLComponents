@@ -176,6 +176,7 @@
     <ClCompile Include="AssignmentTest.cpp" />
     <ClCompile Include="Temporal.cpp" />
     <ClCompile Include="TestBCD.cpp" />
+    <ClCompile Include="TestCalling.cpp" />
     <ClCompile Include="TransactionTest.cpp" />
     <ClCompile Include="VariantFormatting.cpp" />
   </ItemGroup>

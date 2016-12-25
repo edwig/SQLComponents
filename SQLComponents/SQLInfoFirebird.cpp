@@ -108,6 +108,13 @@ SQLInfoFirebird::SupportsOrderByExpression() const
   return true;
 }
 
+// Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+bool    
+SQLInfoFirebird::SupportsODBCCallEscapes() const
+{
+  return false;
+}
+
 // Catalogus tabel met alle default waarden van een kolom in de database
 CString 
 SQLInfoFirebird::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
@@ -1453,6 +1460,27 @@ SQLInfoFirebird::GetSPLServerFunctionsWithReturnValues() const
   return true;
 }
 
+// Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+SQLVariant* 
+SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,CString& p_procedure)
+{
+  bool result = false;
+  int returns = GetCountReturnParameters(p_query);
+
+  // See if we have a single return parameter in function style
+  if(p_query->GetParameter(0) && returns == 0)
+  {
+    result = DoSQLCallFunction(p_query,p_procedure);
+  }
+  else
+  {
+    result = DoSQLCallProcedure(p_query,p_procedure);
+  }
+  // If result, return 0th parameter as the result
+  return result ? p_query->GetParameter(0) : nullptr;
+}
+
+
 // SPECIALS
 // ==========================================================================
 
@@ -1471,3 +1499,175 @@ SQLInfoFirebird::TranslateErrortext(int p_error,CString p_errorText) const
   return errorText;
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+//
+// PRIVATE PART
+//
+//////////////////////////////////////////////////////////////////////////
+
+
+// Firebird does not support the "{[?=]CALL function(?,?)}" sequence
+// instead you have to do a "SELECT function(?,?) FROM rdb$database" 
+// and use the result of the select as the return parameter
+bool
+SQLInfoFirebird::DoSQLCallFunction(SQLQuery* p_query,CString& p_function)
+{
+  SQLQuery query(m_database);
+  CString sql = ConstructSQLForFunctionCall(p_query,&query,p_function);
+
+  var* retval = query.DoSQLStatementScalar(sql);
+  if(retval)
+  {
+    p_query->SetParameter(0,retval);
+  }
+  return retval != nullptr;
+}
+
+// Firebird does not support the "{[?=]CALL procedure(?,?)}" sequence
+// instead you have to do a "SELECT * FROM procedure(?,?)" 
+// The result set is the set of output parameters
+// DOES ONLY SUPPORT A SINGLE ROW RESULT SET!!
+bool
+SQLInfoFirebird::DoSQLCallProcedure(SQLQuery* p_query,CString& p_procedure)
+{
+  SQLQuery query(m_database);
+  CString sql = ConstructSQLForProcedureCall(p_query,&query,p_procedure);
+
+  query.DoSQLStatement(sql);
+  if(query.GetRecord())
+  {
+    // Processing the result
+    int type     = 0;
+    int setIndex = -1;
+    for(int resIndex = 1;resIndex <= query.GetNumberOfColumns();++resIndex)
+    {
+      // Getting the next result from the result set
+      SQLVariant* result = query.GetColumn(resIndex);
+
+      // Finding the next OUTPUT parameter in the original query call
+      do
+      {
+        SQLVariant* target = p_query->GetParameter(++setIndex);
+        if(target == nullptr)
+        {
+          throw CString("Wrong number of output parameters for procedure call");
+        }
+        type = target->GetParameterType();
+      }
+      while(type != SQL_PARAM_OUTPUT && type != SQL_PARAM_INPUT_OUTPUT);
+
+      // Storing the result;
+      p_query->SetParameter(setIndex,result);
+    }
+    // Returning the first return column as the result of the procedure
+    return true;
+  }
+  return false;
+}
+
+// Get the number of OUTPUT or INPUT_OUTPUT parameters
+// In the parameter list (disregarding the 0th parameter)
+int
+SQLInfoFirebird::GetCountReturnParameters(SQLQuery* p_query)
+{
+  int count = 0;
+  int index = 1;
+
+  while(true)
+  {
+    var* parameter = p_query->GetParameter(index++);
+    if(parameter == nullptr) break;
+    int type = parameter->GetParameterType();
+    if((type == SQL_PARAM_OUTPUT || type == SQL_PARAM_INPUT_OUTPUT))
+    {
+      ++count;
+    }
+  }
+  return count;
+}
+
+// Construct the "SELECT function(?,?) FROM rdb$database"
+CString
+SQLInfoFirebird::ConstructSQLForFunctionCall(SQLQuery* p_query
+                                            ,SQLQuery* p_thecall
+                                            ,CString&  p_function)
+{
+  // Start with select from function
+  CString sql = "SELECT ";
+  sql += p_function;
+
+  // Opening parenthesis
+  sql += "(";
+
+  // Build list of markers
+  int ind = 1;
+  while(true)
+  {
+    // Try get the next parameter
+    var* parameter = p_query->GetParameter(ind);
+    if(parameter == nullptr) break;
+
+    // Add marker
+    if(ind > 1) sql += ",";
+    sql += "?";
+
+    // Add the parameter
+    p_thecall->SetParameter(ind,parameter);
+
+    // Next parameter
+    ++ind;
+  }
+
+  // Closing parenthesis
+  sql += ")";
+
+  // From singular object
+  sql += " FROM rdb$database";
+  return sql;
+}
+
+// Construct the "SELECT * FROM procedure(?,?)" (input parameters ONLY!)
+CString
+SQLInfoFirebird::ConstructSQLForProcedureCall(SQLQuery* p_query
+                                             ,SQLQuery* p_thecall
+                                             ,CString&  p_procedure)
+{
+  // Start with select form
+  CString sql = "SELECT * FROM ";
+  sql += p_procedure;
+
+  // Opening parenthesis
+  sql += "(";
+
+  // Build list of markers
+  int ind = 1;
+  int res = 1;
+  while(true)
+  {
+    // Try get the next parameter
+    var* parameter = p_query->GetParameter(ind);
+    if(parameter == nullptr) break;
+
+    // Input parameters ONLY!!
+    int type = parameter->GetParameterType();
+    if(type == SQL_PARAM_INPUT)
+    {
+      // Add marker
+      if(ind > 1) sql += ",";
+      sql += "?";
+
+      // Add the parameter with the result counter!
+      p_thecall->SetParameter(res++,parameter);
+    }
+    // Next parameter
+    ++ind;
+  }
+
+  // CLosing parenthesis
+  sql += ")";
+
+  // The procedure IS the singular object
+  // Procedure **MUST** end with "SUSPEND;" 
+  return sql;
+}

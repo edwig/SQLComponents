@@ -61,6 +61,9 @@ public:
   // Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
   bool    SupportsOrderByExpression() const;
 
+  // Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+  bool    SupportsODBCCallEscapes() const;
+
   // Catalogus query for the default value of a table's column
   CString GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const;
 
@@ -459,6 +462,9 @@ public:
 
   // Get the fact that the SPL has server functions that return more than 1 value
   bool       GetSPLServerFunctionsWithReturnValues() const;
+
+  // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+  SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_procedure);
 
   // SPECIALS
   // ==========================================================================

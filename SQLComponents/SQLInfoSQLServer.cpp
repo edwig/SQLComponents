@@ -62,7 +62,7 @@ SQLInfoSQLServer::GetDatabaseVendorName() const
   return "Microsoft";
 }
 
-// Get the fysical database name
+// Get the physical database name
 CString 
 SQLInfoSQLServer::GetFysicalDatabaseName() const
 {
@@ -103,7 +103,7 @@ SQLInfoSQLServer::SupportsDatabaseComments() const
 bool 
 SQLInfoSQLServer::SupportsDeferredConstraints() const
 {
-  // SET CONSTRAINTS DEFERRED aanwezig
+  // SET CONSTRAINTS DEFERRED is understood
   return true;
 }
 
@@ -115,7 +115,14 @@ SQLInfoSQLServer::SupportsOrderByExpression() const
   return true;
 }
 
-// Catalogus query for the default value of a table's column
+// Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+bool
+SQLInfoSQLServer::SupportsODBCCallEscapes() const
+{
+  return true;
+}
+
+// Catalogs query for the default value of a table's column
 CString 
 SQLInfoSQLServer::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
 {
@@ -132,7 +139,7 @@ SQLInfoSQLServer::GetSQLStringDefaultValue(CString p_tableName,CString p_columnN
 CString 
 SQLInfoSQLServer::GetSystemDateTimeKeyword () const
 {
-  return "GETDATE()"; // current_timestamp alsoo reported
+  return "GETDATE()"; // current_timestamp also reported
 } 
 
 // String for the current date
@@ -152,7 +159,7 @@ SQLInfoSQLServer::GetTimeIsDecimal() const
   return false;
 }
 
-// If the database does not suppoprt the datatype INTERVAL, it can be implemented as a DECIMAL
+// If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
 bool 
 SQLInfoSQLServer::GetIntervalIsDecimal() const
 {
@@ -160,7 +167,7 @@ SQLInfoSQLServer::GetIntervalIsDecimal() const
   return true;
 }
 
-// Get the concatanation operator
+// Get the concatenation operator
 CString 
 SQLInfoSQLServer::GetConcatanationOperator() const
 {
@@ -174,35 +181,35 @@ SQLInfoSQLServer::GetQuoteCharacter() const
   return "'";    
 }
 
-// Get default NULL for parameterlist input
+// Get default NULL for parameter list input
 CString 
 SQLInfoSQLServer::GetDefaultNULL() const
 {
   return " = NULL ";    
 }
 
-// Parameter is for INPUT and OUTPUT in parameterlist
+// Parameter is for INPUT and OUTPUT in parameter list
 CString 
 SQLInfoSQLServer::GetParameterINOUT() const
 {
   return "OUTPUT ";    
 }
   
-// Parameter is for OUTPUT only in parameterlist
+// Parameter is for OUTPUT only in parameter list
 CString 
 SQLInfoSQLServer::GetParameterOUT() const
 {
   return "OUTPUT ";    
 }
 
-// Get the datatype of the auditted user (h_user) in a stored procedure
+// Get the datatype of the audited user (h_user) in a stored procedure
 CString 
 SQLInfoSQLServer::GetAuditUserDatatype() const
 {
   return "VARCHAR(50)";
 } 
 
-// Get the datatype of the auditted user (h_user) as variable in a stored-procedure
+// Get the datatype of the audited user (h_user) as variable in a stored-procedure
 CString 
 SQLInfoSQLServer::GetAuditUserDatatypeAsVariable() const
 {
@@ -300,10 +307,9 @@ SQLInfoSQLServer::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_sele
 CString
 SQLInfoSQLServer::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) const
 {
-  // Dit werkt in MS_SQLServer alleen zo, omdat er anders een foutmelding komt dat
-  // de tijdelijke tabel nog in gebruik is en de tabeldefinitie dan in de
-  // catalog van de RDBMS blijft staan. De definitie is dan strijdig met een
-  // mogelijke volgende definitie onder deze naam
+  // Needed on MS_SQLServer because otherwise we get an error message
+  // that the temporary table is still in use, and so will leave a temporary
+  // table in the catalog, conflicting with a new temp table
   p_number += 3;
   return "DELETE FROM #"    + p_tablename + ";\n"
          "TRUNCATE TABLE #" + p_tablename + ";\n"
@@ -1542,6 +1548,13 @@ bool
 SQLInfoSQLServer::GetSPLServerFunctionsWithReturnValues() const
 {
   return true;
+}
+
+// Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+SQLVariant*
+SQLInfoSQLServer::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+{
+  return nullptr;
 }
 
 // SPECIALS

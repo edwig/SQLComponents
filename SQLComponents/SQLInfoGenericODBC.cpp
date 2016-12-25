@@ -112,6 +112,13 @@ SQLInfoGenericODBC::SupportsOrderByExpression() const
   return false;
 }
 
+// Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+bool
+SQLInfoGenericODBC::SupportsODBCCallEscapes() const
+{
+  return true;
+}
+
 // Catalogus query for the default value of a table's column
 CString 
 SQLInfoGenericODBC::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
@@ -1447,8 +1454,15 @@ bool
 SQLInfoGenericODBC::GetSPLServerFunctionsWithReturnValues() const
 {
   // No way of knowing this, 
-  // so it's safe to asume we cannot return more than 1 value
+  // so it's safe to assume we cannot return more than 1 value
   return false;
+}
+
+// Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+SQLVariant*
+SQLInfoGenericODBC::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+{
+  return nullptr;
 }
 
 // SPECIALS

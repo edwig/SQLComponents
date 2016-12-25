@@ -123,7 +123,14 @@ SQLInfoOracle::SupportsOrderByExpression() const
   return true;
 }
 
-// Catalogus query for the default value of a table's column
+// Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+bool
+SQLInfoOracle::SupportsODBCCallEscapes() const
+{
+  return true;
+}
+
+// Catalogs query for the default value of a table's column
 CString 
 SQLInfoOracle::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
 {
@@ -1670,6 +1677,13 @@ bool
 SQLInfoOracle::GetSPLServerFunctionsWithReturnValues() const
 {
   return true;
+}
+
+// Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+SQLVariant*
+SQLInfoOracle::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+{
+  return nullptr;
 }
 
 // SPECIALS

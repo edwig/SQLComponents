@@ -56,6 +56,7 @@ public:
   SQLQuery();
   // Construct SQL query connected to a database
   SQLQuery(SQLDatabase* p_database);
+  SQLQuery(SQLDatabase& p_database);
   SQLQuery(HDBC p_hdbc);
  ~SQLQuery();
 
@@ -109,10 +110,11 @@ public:
 
   // Call FUNCTION / PROCEDURE
   SQLVariant* DoSQLCall(CString p_procedure,bool p_hasReturn = false);
+  // Overrides with one input parameter and an int return parameter
   SQLVariant* DoSQLCall(CString p_procedure,const int   p_param1);
   SQLVariant* DoSQLCall(CString p_procedure,const char* p_param1);
   SQLVariant* DoSQLCall(CString p_procedure,const bcd&  p_param1);
-  // Getting the result parameter value
+  // Getting the result parameters values
   SQLVariant* GetParameter(int p_num);
 
   // BOUND STATEMENT
@@ -173,7 +175,7 @@ public:
 
 private:
   // Set parameter for statement
-  void  InternalSetParameter(int p_num,SQLVariant*   p_param,int p_type = SQL_PARAM_INPUT);
+  void  InternalSetParameter(int p_num,SQLVariant* p_param,int p_type = SQL_PARAM_INPUT);
   // Bind application parameters
   void  BindParameters();
   void  BindColumns();
@@ -194,7 +196,9 @@ private:
   // Report timing to logfile
   void  ReportQuerySpeed(LARGE_INTEGER p_start);
   // Construct the SQL for a function/procedure call
-  CString ConstructSQLForCall(CString p_procedure,bool p_hasReturn);
+  CString     ConstructSQLForCall(CString  p_procedure,bool p_hasReturn);
+  // Direct call through ODBC escape language
+  SQLVariant* DoSQLCallODBCEscape(CString& p_procedure,bool p_hasReturn);
   // Log parameter during the binding process
   void  LogParameter(int p_column,SQLVariant* p_parameter);
   // Do the rebind replacement for a parameter

@@ -44,9 +44,9 @@ void TestNumeric()
 
   try
   {
-    g_dsn = "ok2b01";  // twoc09 = oracle / ok2b01 = MS-SQLServer / testing = MS-Access
-    g_user = "k2b";
-    g_password = "k2b";
+//     g_dsn = "ok2b01";  // twoc09 = oracle / ok2b01 = MS-SQLServer / testing = MS-Access
+//     g_user = "k2b";
+//     g_password = "k2b";
 
     // Set options for the database
     dbs.SetLoginTimeout(0);

@@ -29,6 +29,9 @@
 #include "SQLDatabase.h"
 #include <vector>
 
+class SQLVariant;
+class SQLQuery;
+
 // Maximum supported columns in an index or a foreign key
 // Does not constrict every SQL RDBMS's, but some have multiple!!
 #define SQLINFO_MAX_COLUMNS  8
@@ -104,6 +107,9 @@ public:
   // Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
   // Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
   virtual bool SupportsOrderByExpression() const = 0;
+
+  // Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
+  virtual bool SupportsODBCCallEscapes() const = 0;
 
   // Catalogus query for the default value of a table's column
   virtual CString GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const = 0;
@@ -500,13 +506,15 @@ public:
 
   // Get the fact that the SPL has server functions that return more than 1 value
   virtual bool    GetSPLServerFunctionsWithReturnValues() const = 0;
+
+  // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
+  virtual SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_procedure) = 0;
   
   // SPECIALS
   // ==========================================================================
 
   // Translate database-errors to a human readable form
   virtual CString TranslateErrortext(int p_error,CString p_errorText) const = 0;
-
 
 private:
   CString m_grantedUsers;
