@@ -464,7 +464,7 @@ public:
   bool       GetSPLServerFunctionsWithReturnValues() const;
 
   // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
-  SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_procedure);
+  SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_schema,CString& p_procedure);
 
   // SPECIALS
   // ==========================================================================

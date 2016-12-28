@@ -62,16 +62,23 @@ void TestCalling()
       // Call with 1 input and 1 output parameter
       SQLQuery query(dbs);
       SQLTransaction trans(&dbs,"testing");
-      var* result = query.DoSQLCall("testmul2",12);
+      var* result = query.DoSQLCall(g_schema,"testmul2",12);
       printf("Result of the function call: %d\n",result->GetAsSLong());
 
       long endTime = clock();
       printf("Calling test 1 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       
+      // Call to get a decimal
+      query.ResetParameters();
+      query.SetParameter(0,bcd(0.01),SQL_PARAM_OUTPUT);
+      query.SetParameter(1,"234.99");
+      result = query.DoSQLCall(g_schema,"getdecimal");
+      printf("Conversion of number 234.99 is: %s\n",result->GetAsBCD().AsString());
+
       // Call with 1 input parameter and NO return value
       beginTime = clock();
       SQLQuery q2(&dbs);
-      q2.DoSQLCall("testins","Testing from within a program.");
+      q2.DoSQLCall(g_schema,"testins","TESTING");
 
       endTime = clock();
       printf("Calling test 2 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
@@ -86,7 +93,7 @@ void TestCalling()
       q2.SetParameter(0,bcd(0.01),SQL_PARAM_OUTPUT);
       q2.SetParameter(1,"Multi duplicate testing.");
       q2.SetParameter(2,line,SQL_PARAM_OUTPUT);
-      var* res = q2.DoSQLCall("multinout",true);
+      var* res = q2.DoSQLCall(g_schema,"multinout",true);
 
       endTime = clock();
       printf("Calling test 3 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);

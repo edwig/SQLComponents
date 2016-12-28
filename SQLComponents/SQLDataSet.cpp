@@ -280,7 +280,7 @@ SQLDataSet::ParseQuery()
       } 
       while (isalnum(c) || c == '_');
       parNaam = parNaam.Left(parNaam.GetLength() - 1);
-      // naam gevonden
+      // Found parameter name
       SQLVariant* par = GetParameter(parNaam);
       if(par)
       {
@@ -304,6 +304,11 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
   CString sql("SELECT ");
   sql += m_selection.IsEmpty() ? "*" : m_selection;
   sql += "\n  FROM ";
+
+  if(!m_primarySchema.IsEmpty())
+  {
+    sql += m_primarySchema + ".";
+  }
   sql += m_primaryTableName;
 
   int number = 0;

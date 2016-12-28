@@ -758,6 +758,7 @@ SQLQuery::BindParameters()
 
     // Check rebinds to do for scripting 
     sqlDatatype = RebindParameter(sqlDatatype);
+    dataType    = RebindParameter(dataType);
 
     // Log what we bind here
     LogParameter(icol,var);
@@ -815,7 +816,7 @@ SQLQuery::LogParameter(int p_column,SQLVariant* p_parameter)
     }
     CString text,value;
     p_parameter->GetAsString(value);
-    text.Format("Parameter %d: %s\n",p_parameter,value);
+    text.Format("Parameter %d: %s\n",p_column,value);
     m_database->LogPrint(LOGLEVEL_MAX,text);
   }
 }
@@ -1578,32 +1579,32 @@ SQLQuery::DescribeColumn(int           p_col
 
 // Short forms for 1 (one) input parameter and 1 output parameter
 SQLVariant*
-SQLQuery::DoSQLCall(CString p_procedure,const int p_param1)
+SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,const int p_param1)
 {
   SQLVariant* var = new SQLVariant((long)p_param1);
   InternalSetParameter(1,var,SQL_PARAM_INPUT);
-  return DoSQLCall(p_procedure,true);
+  return DoSQLCall(p_schema,p_procedure,true);
 }
 
 SQLVariant*
-SQLQuery::DoSQLCall(CString p_procedure,const char* p_param1)
+SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,const char* p_param1)
 {
   SQLVariant* var = new SQLVariant(p_param1);
   InternalSetParameter(1,var,SQL_PARAM_INPUT);
-  return DoSQLCall(p_procedure,true);
+  return DoSQLCall(p_schema,p_procedure,true);
 }
 
 SQLVariant*
-SQLQuery::DoSQLCall(CString p_procedure,const bcd& p_param1)
+SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,const bcd& p_param1)
 {
   SQLVariant* var = new SQLVariant(&p_param1);
   InternalSetParameter(1,var,SQL_PARAM_INPUT);
-  return DoSQLCall(p_procedure,true);
+  return DoSQLCall(p_schema,p_procedure,true);
 }
 
 // Call procedure, do your own parameter plumbing  
 SQLVariant*
-SQLQuery::DoSQLCall(CString p_procedure,bool p_hasReturn /*=false*/)
+SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,bool p_hasReturn /*=false*/)
 {
   // Check we have a database object and not a isolated HDBC
   if(m_database == nullptr)
@@ -1622,19 +1623,19 @@ SQLQuery::DoSQLCall(CString p_procedure,bool p_hasReturn /*=false*/)
   // Is we support standard ODBC, do that call
   if(m_database->GetSQLInfoDB()->SupportsODBCCallEscapes())
   {
-    return DoSQLCallODBCEscape(p_procedure,p_hasReturn);
+    return DoSQLCallODBCEscape(p_schema,p_procedure,p_hasReturn);
   }
 
   // Let the database implementation take care of it
-  return m_database->GetSQLInfoDB()->DoSQLCall(this,p_procedure);
+  return m_database->GetSQLInfoDB()->DoSQLCall(this,p_schema,p_procedure);
 }
 
 // Direct call through ODBC escape language
 SQLVariant*
-SQLQuery::DoSQLCallODBCEscape(CString& p_procedure,bool p_hasReturn)
+SQLQuery::DoSQLCallODBCEscape(CString& p_schema,CString& p_procedure,bool p_hasReturn)
 {
   // Start with generating the SQL
-  CString sql = ConstructSQLForCall(p_procedure,p_hasReturn);
+  CString sql = ConstructSQLForCall(p_schema,p_procedure,p_hasReturn);
 
   // Do the call and fetch return values
   DoSQLStatement(sql);
@@ -1653,7 +1654,7 @@ SQLQuery::DoSQLCallODBCEscape(CString& p_procedure,bool p_hasReturn)
 // form 4: With return parameter  { ? = CALL function(?,?) }
 // form 5: Only return parameter  { ? = CALL function }
 CString
-SQLQuery::ConstructSQLForCall(CString p_procedure,bool p_hasReturn)
+SQLQuery::ConstructSQLForCall(CString& p_schema,CString& p_procedure,bool p_hasReturn)
 {
   // Start with ODBC-escape character
   CString sql("{");
@@ -1666,6 +1667,11 @@ SQLQuery::ConstructSQLForCall(CString p_procedure,bool p_hasReturn)
 
   // Add function / procedure name
   sql += "CALL ";
+  if(!p_schema.IsEmpty())
+  {
+    sql += p_schema;
+    sql += ".";
+  }
   sql += p_procedure;
 
   // Only add parenthesis if we need them

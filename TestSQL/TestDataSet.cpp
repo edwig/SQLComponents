@@ -42,7 +42,7 @@ TestAppend(SQLDatabase* p_dbs,long p_master)
   printf("====================================\n");
 
   SQLDataSet details("detail",p_dbs);
-  details.SetPrimaryTable("detail");
+  details.SetPrimaryTable(g_schema,"detail");
   details.SetPrimaryKeyColumn("id");
   details.SetSearchableColumn("id");
   details.SetParameter("mast_id",SQLVariant(p_master));
@@ -89,7 +89,7 @@ double
 ReadDetailSet(SQLDatabase* p_dbs,long p_master)
 {
   SQLDataSet details("detail",p_dbs);
-  details.SetPrimaryTable("detail");
+  details.SetPrimaryTable(g_schema,"detail");
   details.SetPrimaryKeyColumn("id");
   details.SetParameter("mast_id",SQLVariant(p_master));
   details.SetSelection("*"); // Select all columns
@@ -100,13 +100,13 @@ ReadDetailSet(SQLDatabase* p_dbs,long p_master)
 //               "      ,line\n"
 //               "      ,description\n"
 //               "      ,amount\n"
-//               "  FROM detail\n"
+//               "  FROM $SCHEMA$.detail\n"
 //               " WHERE mast_id = $mast_id");
 //   details.SetQuery(sql);
 
   if(details.Open())
   {
-    printf("Dataset details (mast_id = %d) openend. Rows: %d\n",p_master,details.GetNumberOfRecords());
+    printf("Dataset details (mast_id = %d) opened. Rows: %d\n",p_master,details.GetNumberOfRecords());
   }
   else
   {
@@ -131,14 +131,14 @@ double
 ReadMasterSet(SQLDatabase* p_dbs,long p_master,double p_amount)
 {
   SQLDataSet master("master",p_dbs);
-  master.SetPrimaryTable("master");
+  master.SetPrimaryTable(g_schema,"master");
   master.SetPrimaryKeyColumn("id");
   master.SetParameter("key",SQLVariant(p_master));
   CString sql ("SELECT id\n"
                "      ,invoice\n"
                "      ,description\n"
                "      ,total\n"
-               "  FROM master\n"
+               "  FROM %SCHEMA%.master\n"
                " WHERE id = $key");
   master.SetQuery(sql);
   // Read in the dataset
@@ -175,7 +175,10 @@ TestDataSet()
   printf("Testing the DataSet function:\n");
   printf("=============================\n");
 
+  g_schema = "model";
+
   SQLDatabase dbs;
+  dbs.AddMacro("%SCHEMA%",g_schema);
   dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
   long beginTime = clock();
 

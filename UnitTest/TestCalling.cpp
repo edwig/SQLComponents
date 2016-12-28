@@ -40,7 +40,7 @@ namespace DatabaseUnitTest
   extern CString g_dsn;
   extern CString g_user;
   extern CString g_password;
-
+  extern CString g_schema;
 
   TEST_CLASS(TestCallingFunctions)
   {
@@ -139,7 +139,7 @@ namespace DatabaseUnitTest
       SQLQuery query(m_database);
       SQLTransaction trans(m_database,"testing");
 
-      var* result = query.DoSQLCall("testmul2",12);
+      var* result = query.DoSQLCall(g_schema,"testmul2",12);
 
       text.Format("Result of the function call (1  input parameter): %d",result->GetAsSLong());
       Logger::WriteMessage(text);
@@ -148,7 +148,7 @@ namespace DatabaseUnitTest
 
       // Call with 1 input parameter with SQL input
       SQLQuery q2(m_database);
-      result = q2.DoSQLCall("testins",m_program.GetString());
+      result = q2.DoSQLCall(g_schema,"testins",m_program.GetString());
       text.Format("Result of the function call (0 output parameter): %d",result->GetAsSLong());
       Logger::WriteMessage(text);
 
@@ -159,7 +159,7 @@ namespace DatabaseUnitTest
       q2.SetParameter(1,m_duplicate);
       q2.SetParameter(2,&txt,SQL_PARAM_OUTPUT);
 
-      var* res = q2.DoSQLCall("multinout",true);
+      var* res = q2.DoSQLCall(g_schema,"multinout",true);
 
       bcd number = res->GetAsBCD();
       CString restext = q2.GetParameter(2)->GetAsChar();

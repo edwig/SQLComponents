@@ -147,7 +147,7 @@ public:
   // Set a new full query (Superseeds 'SetSelection'!!)
   void         SetQuery(CString& p_query);
   // Set primary table (for updates)
-  void         SetPrimaryTable(CString p_tableName);
+  void         SetPrimaryTable(CString p_schema,CString p_tableName);
   // Set primary key column name (for updates)
   void         SetPrimaryKeyColumn(CString p_name);
   void         SetPrimaryKeyColumn(WordList& p_list);
@@ -206,7 +206,7 @@ private:
   void         CheckTypes(SQLQuery& p_query);
   // Getting the primary key for a table
   bool         GetPrimaryKeyInfo();
-  // Check that all primary key colums are in the dataset
+  // Check that all primary key columns are in the dataset
   bool         CheckPrimaryKeyColumns();
   // Find primary key in the column names
   int          FindSearchColumn();
@@ -222,7 +222,6 @@ private:
   CString      GetSQLUpdate  (SQLQuery* p_query,SQLRecord* p_record);
   CString      GetSQLInsert  (SQLQuery* p_query,SQLRecord* p_record);
   CString      GetWhereClause(SQLQuery* p_query,SQLRecord* p_record,int& p_parameter);
-  void         SetTransactionDeferred();
 
   // Private data of the dataset
 
@@ -231,6 +230,7 @@ private:
   bool         m_open;
   CString      m_query;
   CString      m_selection;
+  CString      m_primarySchema;
   CString      m_primaryTableName;
   ParameterSet m_parameters;
   NamenMap     m_primaryKey;
@@ -272,8 +272,9 @@ SQLDataSet::SetSelection(CString p_selection)
 }
 
 inline void
-SQLDataSet::SetPrimaryTable(CString p_tableName)
+SQLDataSet::SetPrimaryTable(CString p_schema,CString p_tableName)
 {
+  m_primarySchema    = p_schema;
   m_primaryTableName = p_tableName;
 }
 

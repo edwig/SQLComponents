@@ -109,11 +109,11 @@ public:
   void        TryDoSQLStatement(const CString& p_statement);
 
   // Call FUNCTION / PROCEDURE
-  SQLVariant* DoSQLCall(CString p_procedure,bool p_hasReturn = false);
+  SQLVariant* DoSQLCall(CString p_schema,CString p_procedure,bool p_hasReturn = false);
   // Overrides with one input parameter and an int return parameter
-  SQLVariant* DoSQLCall(CString p_procedure,const int   p_param1);
-  SQLVariant* DoSQLCall(CString p_procedure,const char* p_param1);
-  SQLVariant* DoSQLCall(CString p_procedure,const bcd&  p_param1);
+  SQLVariant* DoSQLCall(CString p_schema,CString p_procedure,const int   p_param1);
+  SQLVariant* DoSQLCall(CString p_schema,CString p_procedure,const char* p_param1);
+  SQLVariant* DoSQLCall(CString p_schema,CString p_procedure,const bcd&  p_param1);
   // Getting the result parameters values
   SQLVariant* GetParameter(int p_num);
 
@@ -196,9 +196,9 @@ private:
   // Report timing to logfile
   void  ReportQuerySpeed(LARGE_INTEGER p_start);
   // Construct the SQL for a function/procedure call
-  CString     ConstructSQLForCall(CString  p_procedure,bool p_hasReturn);
+  CString     ConstructSQLForCall(CString& p_schema,CString& p_procedure,bool p_hasReturn);
   // Direct call through ODBC escape language
-  SQLVariant* DoSQLCallODBCEscape(CString& p_procedure,bool p_hasReturn);
+  SQLVariant* DoSQLCallODBCEscape(CString& p_schema,CString& p_procedure,bool p_hasReturn);
   // Log parameter during the binding process
   void  LogParameter(int p_column,SQLVariant* p_parameter);
   // Do the rebind replacement for a parameter

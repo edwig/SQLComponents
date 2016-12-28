@@ -44,6 +44,7 @@ namespace DatabaseUnitTest
   CString g_dsn("testing");
   CString g_user("sysdba");
   CString g_password("altijd");
+  CString g_schema("");
 
   void CALLBACK LogPrint(void* p_context,const char* p_text)
   {
@@ -177,7 +178,7 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("====================================");
 
       SQLDataSet details("detail",p_dbs);
-      details.SetPrimaryTable("detail");
+      details.SetPrimaryTable(g_schema,"detail");
       details.SetPrimaryKeyColumn("id");
       details.SetSearchableColumn("id");
       details.SetParameter("mast_id",SQLVariant(p_master));
@@ -230,7 +231,7 @@ namespace DatabaseUnitTest
     {
       CString msg;
       SQLDataSet details("detail",p_dbs);
-      details.SetPrimaryTable("detail");
+      details.SetPrimaryTable(g_schema,"detail");
       details.SetPrimaryKeyColumn("id");
       details.SetParameter("mast_id",SQLVariant(p_master));
       details.SetSelection("*"); // Select all columns
@@ -276,7 +277,7 @@ namespace DatabaseUnitTest
     {
       CString msg;
       SQLDataSet master("master",p_dbs);
-      master.SetPrimaryTable("master");
+      master.SetPrimaryTable(g_schema,"master");
       master.SetPrimaryKeyColumn("id");
       master.SetParameter("key",SQLVariant(p_master));
       CString sql("SELECT id\n"

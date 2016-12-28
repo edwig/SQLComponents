@@ -1462,7 +1462,7 @@ SQLInfoFirebird::GetSPLServerFunctionsWithReturnValues() const
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant* 
-SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,CString& p_procedure)
+SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,CString& /*p_schema*/,CString& p_procedure)
 {
   bool result = false;
   int returns = GetCountReturnParameters(p_query);

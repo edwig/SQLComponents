@@ -61,7 +61,7 @@ SQLInfoPostgreSQL::GetDatabaseVendorName() const
   return "PostgreSQL";
 }
 
-// Geef de fysieke database naam
+// Get physical database name
 CString 
 SQLInfoPostgreSQL::GetFysicalDatabaseName() const
 {
@@ -100,12 +100,12 @@ SQLInfoPostgreSQL::SupportsDatabaseComments() const
 bool 
 SQLInfoPostgreSQL::SupportsDeferredConstraints() const
 {
-  // SET CONSTRAINTS DEFERRED aanwezig
+  // SET CONSTRAINTS DEFERRED is supported
   return true;
 }
 
-// Database kan ORDER BY met een expressie aan, dus bijv. UPPER(kolom). Alternatief
-// is het selecteren van een kolom expressie AS naampje en dan ORDER BY naampje.
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
+// Work-around is "SELECT UPPER(columnname) AS something.....ORDER BY something
 bool
 SQLInfoPostgreSQL::SupportsOrderByExpression() const
 {
@@ -116,10 +116,12 @@ SQLInfoPostgreSQL::SupportsOrderByExpression() const
 bool
 SQLInfoPostgreSQL::SupportsODBCCallEscapes() const
 {
-  return true;
+  // Does NOT support the [?=] return parameter
+  // So our own plumbing is needed
+  return false;
 }
 
-// Catalogus tabel met alle default waarden van een kolom in de database
+// Catalog table with all default values of a column in the database
 CString 
 SQLInfoPostgreSQL::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
 {
@@ -133,7 +135,7 @@ SQLInfoPostgreSQL::GetSQLStringDefaultValue(CString p_tableName,CString p_column
   return query;
 }
 
-// Keyword voor huidige datum en tijd
+// Keyword for current date and time
 CString 
 SQLInfoPostgreSQL::GetSystemDateTimeKeyword() const
 {
@@ -1691,8 +1693,67 @@ SQLInfoPostgreSQL::GetSPLServerFunctionsWithReturnValues() const
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant*
-SQLInfoPostgreSQL::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+SQLInfoPostgreSQL::DoSQLCall(SQLQuery* p_query,CString& p_schema,CString& p_procedure)
 {
+  // PostgreSQL does not support the return parameter of the "{[?=]CALL procedure(?,?)}" sequence
+  // instead you have to do a "SELECT procedure(?,?)" 
+  // The result set is the set of output parameters
+  // DOES ONLY SUPPORT A SINGLE ROW RESULT SET!!
+  SQLQuery query(m_database);
+  CString sql   = ConstructSQLForProcedureCall(p_query,&query,p_schema,p_procedure);
+  int numReturn = GetCountReturnParameters(p_query);
+
+  query.DoSQLStatement(sql);
+  if(query.GetRecord())
+  {
+    // Processing the result
+    int setIndex = -1;
+    int recIndex = 0;
+    for(int resIndex = 1; resIndex <= query.GetNumberOfColumns(); ++resIndex)
+    {
+      SQLVariant var;
+      int dataType = 0;
+      int type = 0;
+      bool ready = false;
+
+      // Finding the next OUTPUT parameter in the original query call
+      do
+      {
+        SQLVariant* target = p_query->GetParameter(++setIndex);
+        if(target == nullptr)
+        {
+          throw CString("Wrong number of output parameters for procedure call");
+        }
+        type = target->GetParameterType();
+        dataType = target->GetDataType();
+      }
+      while(type != SQL_PARAM_OUTPUT && type != SQL_PARAM_INPUT_OUTPUT);
+
+      // Getting the next result from the result set
+      SQLVariant* result = query.GetColumn(resIndex);
+      if(result->GetDataType() == SQL_C_CHAR)
+      {
+        char* resPointer = result->GetAsChar();
+        if(resPointer && *resPointer == '(' && numReturn)
+        {
+          var = GetVarFromRecord(dataType,resPointer,recIndex++,ready);
+          resIndex = 0;
+          result = &var;
+        }
+      }
+
+      // Storing the result;
+      p_query->SetParameter(setIndex,result);
+
+      // At the end of a multi-parameter record?
+      if(ready)
+      {
+        break;
+      }
+    }
+    // Returning the first return column as the result of the procedure
+    return p_query->GetParameter(0);
+  }
   return nullptr;
 }
 
@@ -1714,3 +1775,134 @@ SQLInfoPostgreSQL::TranslateErrortext(int p_error,CString p_errorText) const
   return errorText;
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// PRIVATE METHODS
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Get the number of OUTPUT or INPUT_OUTPUT parameters
+// In the parameter list (disregarding the 0th parameter)
+int
+SQLInfoPostgreSQL::GetCountReturnParameters(SQLQuery* p_query)
+{
+  int count = 0;
+  int index = 1;
+
+  while(true)
+  {
+    var* parameter = p_query->GetParameter(index++);
+    if(parameter == nullptr) break;
+    int type = parameter->GetParameterType();
+    if((type == SQL_PARAM_OUTPUT || type == SQL_PARAM_INPUT_OUTPUT))
+    {
+      ++count;
+    }
+  }
+  return count;
+}
+
+// Construct the "SELECT * FROM procedure(?,?)" (input parameters ONLY!)
+CString
+SQLInfoPostgreSQL::ConstructSQLForProcedureCall(SQLQuery* p_query
+                                               ,SQLQuery* p_thecall
+                                               ,CString&  p_schema
+                                               ,CString&  p_procedure)
+{
+  // Start with select form
+  CString sql = "SELECT ";
+  if(!p_schema.IsEmpty())
+  {
+    sql += p_schema;
+    sql += ".";
+  }
+  sql += p_procedure;
+
+  // Opening parenthesis
+  sql += "(";
+
+  // Build list of markers
+  int ind = 1;
+  int res = 1;
+  while(true)
+  {
+    // Try get the next parameter
+    var* parameter = p_query->GetParameter(ind);
+    if(parameter == nullptr) break;
+
+    // Input parameters ONLY!!
+    int type = parameter->GetParameterType();
+    if(type == SQL_PARAM_INPUT)
+    {
+      // Add marker
+      if(ind > 1) sql += ",";
+      sql += "?";
+
+      // Add the parameter with the result counter!
+      p_thecall->SetParameter(res++,parameter);
+    }
+    // Next parameter
+    ++ind;
+  }
+
+  // CLosing parenthesis
+  sql += ")";
+
+  // The procedure IS the singular object
+  // Procedure **MUST** end with "SUSPEND;" 
+  return sql;
+}
+
+// Get column from PostgreSQL result set
+// (123,"string",21.12)
+SQLVariant
+SQLInfoPostgreSQL::GetVarFromRecord(int p_type,char* p_pointer,int p_column,bool& p_ready)
+{
+  int beginPos  = 0;
+  int endPos    = 0;
+  int curColumn = 0;
+  SQLVariant variant;
+
+  // Skip first '('
+  if(*p_pointer == '(') ++beginPos;
+
+  while(p_pointer[beginPos])
+  {
+    // Find begin next column
+    bool isString = p_pointer[beginPos] == '\"';
+    if(isString) ++beginPos;
+    endPos = beginPos;
+
+    // Find end of the field
+    while(p_pointer[endPos] && p_pointer[endPos] != ','
+                            && p_pointer[endPos] != ')' 
+                            && p_pointer[endPos] != '\"')
+    {
+      ++endPos;
+    }
+
+    // If column found
+    if(p_column == curColumn)
+    {
+      char temp = p_pointer[endPos];
+      p_pointer[endPos] = 0;
+      variant.SetData(p_type,&p_pointer[beginPos]);
+      p_pointer[endPos] = temp;
+      break;
+    }
+
+    // Next column
+    beginPos = endPos;
+    if(isString && p_pointer[beginPos] == '\"') ++beginPos;
+    if(p_pointer[beginPos] == ',' || p_pointer[beginPos] == ')') ++beginPos;
+    ++curColumn;
+  }
+
+  // Are we ready with the record
+  if(p_pointer[endPos] == '\"') ++ endPos;
+  if(p_pointer[endPos] == ')')
+  {
+    p_ready = true;
+  }
+  return variant;
+}

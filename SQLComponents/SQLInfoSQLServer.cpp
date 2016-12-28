@@ -1552,7 +1552,7 @@ SQLInfoSQLServer::GetSPLServerFunctionsWithReturnValues() const
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant*
-SQLInfoSQLServer::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_procedure*/)
+SQLInfoSQLServer::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
 {
   return nullptr;
 }

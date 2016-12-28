@@ -508,6 +508,12 @@ SQLDatabase::SetKnownRebinds()
     m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
     m_rebindParameters[SQL_C_ULONG] = SQL_C_LONG;
   }
+  else if(m_rdbmsType == RDBMS_POSTGRESQL)
+  {
+    m_rebindParameters.clear();
+    m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
+    m_rebindParameters[SQL_C_ULONG] = SQL_C_LONG;
+  }
 }
 
 // Get the SQL Info object by database

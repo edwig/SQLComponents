@@ -41,6 +41,7 @@ void TestClosingCursor()
   printf("========================\n");
 
   SQLDatabase dbs;
+  dbs.AddMacro("$SCHEMA$",g_schema);
   // Do not log: we want clean output of open/close
   // dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
 
@@ -59,7 +60,7 @@ void TestClosingCursor()
       for(unsigned ind = 1;ind <= 1500; ++ind)
       {
         SQLQuery query(&dbs);
-        CString sql("SELECT COUNT(*) FROM DUAL");
+        CString sql("SELECT COUNT(*) FROM $SCHEMA$.DUAL");
         query.DoSQLStatement(sql);
         printf(".");
         if(ind % 50 == 0)

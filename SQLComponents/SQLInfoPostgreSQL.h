@@ -464,13 +464,23 @@ public:
   bool    GetSPLServerFunctionsWithReturnValues() const;
 
   // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
-  SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_procedure);
+  SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_schema,CString& p_procedure);
 
   // SPECIALS
   // ==========================================================================
 
   // Translate database-errors to a human readable form
   CString TranslateErrortext(int p_error,CString p_errorText) const;
+
+private:
+  // IMPLEMENTATION OF the DoSQLCall interface
+
+  // Get the number of OUTPUT or INPUT_OUTPUT parameters
+  int        GetCountReturnParameters(SQLQuery* p_query);
+  // Construct the "SELECT procedure(?,?)" (input parameters ONLY!)
+  CString    ConstructSQLForProcedureCall(SQLQuery* p_query,SQLQuery* p_thecall,CString& p_schema,CString& p_procedure);
+  // Get column from PostgreSQL result set
+  SQLVariant GetVarFromRecord(int p_type,char* p_pointer,int p_column,bool& p_ready);
 };
 
 

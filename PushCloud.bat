@@ -24,7 +24,7 @@ echo Ready cleaning up
 echo .
 echo Creating a RAR archive file
 echo .
-"C:\Program Files\Winrar\rar.exe" a SQLComponents.rar Documentation SQLComponents TestSQL basis.accdb *.bat *.sln
+"C:\Program Files\Winrar\rar.exe" a SQLComponents.rar Documentation SQLComponents TestSQL testing.fdb *.bat *.sln
 echo .
 echo Ready making a RAR archive
 echo .
