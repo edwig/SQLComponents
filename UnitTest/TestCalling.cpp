@@ -152,14 +152,24 @@ namespace DatabaseUnitTest
       text.Format("Result of the function call (0 output parameter): %d",result->GetAsSLong());
       Logger::WriteMessage(text);
 
+      // Call with 1 input parameter and a BCD return parameter
+      q2.ResetParameters();
+      q2.SetParameter(0,bcd(),SQL_PARAM_OUTPUT);
+      q2.GetParameter(0)->SetNumericPrecisionScale(18,2);
+      var* res = q2.DoSQLCall(g_schema,"getdecimal","345.99");
+      text.Format("Result of GETDECIMAL '345.99' = [%s]",res->GetAsBCD().AsString());
+      Logger::WriteMessage(text);
+      Assert::AreEqual("345.99",res->GetAsBCD().AsString());
+
       // Call with 1 input parameter and return value AND return parameter
       var txt(SQL_C_CHAR,200);
       q2.ResetParameters();
-      q2.SetParameter(0,bcd(0.01),SQL_PARAM_OUTPUT);
+      q2.SetParameter(0,bcd(),SQL_PARAM_OUTPUT);
+      q2.GetParameter(0)->SetNumericPrecisionScale(18,2);
       q2.SetParameter(1,m_duplicate);
       q2.SetParameter(2,&txt,SQL_PARAM_OUTPUT);
 
-      var* res = q2.DoSQLCall(g_schema,"multinout",true);
+      res = q2.DoSQLCall(g_schema,"multinout",true);
 
       bcd number = res->GetAsBCD();
       CString restext = q2.GetParameter(2)->GetAsChar();

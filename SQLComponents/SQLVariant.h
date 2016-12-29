@@ -124,6 +124,7 @@ public:
    void    SetColumnNumber(int p_column);
    void    SetParameterType(int p_type);
    void    SetSizeIndicator(bool p_realSize);
+   void    SetNumericPrecisionScale(int p_precision,int p_scale);
    void    SetNULL();
    void    ReserveSpace(int p_type,int p_space);
    void    ShrinkSpace();

@@ -642,6 +642,19 @@ SQLVariant::SetSQLDataType(int p_type)
   }
 }
 
+// Setting the NUMERIC precision and scale
+// Can e.g. be used for output parameter settings
+void    
+SQLVariant::SetNumericPrecisionScale(int p_precision,int p_scale)
+{
+  if(m_datatype != SQL_C_NUMERIC)
+  {
+    return;
+  }
+  m_data.m_dataNUMERIC.precision = (SQLCHAR)  p_precision;
+  m_data.m_dataNUMERIC.scale     = (SQLSCHAR) p_scale;
+}
+
 // Reduction of SQL_XXX to SQL_C_XXX type
 int
 SQLVariant::FindDataTypeFromSQLType()

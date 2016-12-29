@@ -57,7 +57,7 @@ As
   DECLARE @v_plus VARCHAR(200);
   DECLARE @v_dyn  varchar(500);
   SET  @v_plus = @p_text + @p_text;
-  SET @p_total = substring(@v_plus,1,200);
+  SET @p_total = substring(@v_plus,1,100);
   INSERT INTO dbo.testrecord (name) VALUES (@p_total);
   set @v_num = 77.88;
   return 2;

@@ -531,6 +531,48 @@ namespace DatabaseUnitTest
       return 0;
     }
 
+    void PrecisionTest(CString p_input,int p_precision,int p_scale)
+    {
+      SQL_NUMERIC_STRUCT numeric;
+      bcd num(p_input);
+      num.AsNumeric(&numeric);
+
+      CString text;
+      text.Format("BCD Precision/Scale [%d:%d] for: %s",(int)numeric.precision,(int)numeric.scale,p_input);
+      Logger::WriteMessage(text);
+
+      Assert::AreEqual((SQLCHAR) p_precision,numeric.precision);
+      Assert::AreEqual((SQLSCHAR)p_scale,    numeric.scale);
+    }
+
+    TEST_METHOD(BCDPrecisionTesting)
+    {
+      Logger::WriteMessage("Testing BCD->Numeric precision and scale");
+
+      PrecisionTest("1.111111111111111111111111111111111111",37,36);
+      PrecisionTest("11.11111111111111111111111111111111111",37,35);
+      PrecisionTest("111.1111111111111111111111111111111111",37,34);
+      PrecisionTest("1111.111111111111111111111111111111111",37,33);
+      PrecisionTest("11111.11111111111111111111111111111111",37,32);
+      PrecisionTest("111111.1111111111111111111111111111111",37,31);
+      PrecisionTest("1111111.111111111111111111111111111111",37,30);
+
+      PrecisionTest("11111.11111",10,5);
+      PrecisionTest("111111.1111",10,4);
+      PrecisionTest("1111111.111",10,3);
+      PrecisionTest("11111111.11",10,2);
+      PrecisionTest("111111111.1",10,1);
+      PrecisionTest( "1111111111",10,0);
+
+      PrecisionTest("1",1,0);
+      PrecisionTest("0.1",2,1);
+      PrecisionTest("0.01",3,2);
+      PrecisionTest("0.001",4,3);
+      PrecisionTest("0.0001",5,4);
+      PrecisionTest("0.00001",6,5);
+      PrecisionTest("0.000001",7,6);
+      PrecisionTest("0.0000001",8,7);
+    }
 
   };
 }

@@ -90,18 +90,17 @@ void TestCalling()
       for(unsigned ind = 0; ind < 202; ++ind) line += "-";
 
       q2.ResetParameters();
-      q2.SetParameter(0,0L,SQL_PARAM_OUTPUT);
+      q2.SetParameter(0,bcd("11.11"),SQL_PARAM_OUTPUT);
       q2.SetParameter(1,"Multi duplicate testing.");
-      q2.SetParameter(2,bcd("11.11"),SQL_PARAM_OUTPUT);
-      q2.SetParameter(3,line,SQL_PARAM_OUTPUT);
+      q2.SetParameter(2,line,SQL_PARAM_OUTPUT);
       var* res = q2.DoSQLCall(g_schema,"multinout",true);
 
       endTime = clock();
       printf("Calling test 3 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 
       int status = res->GetAsSLong();
-      bcd number = q2.GetParameter(2)->GetAsBCD();
-      CString text = q2.GetParameter(3)->GetAsChar();
+      bcd number = q2.GetParameter(0)->GetAsBCD();
+      CString text = q2.GetParameter(2)->GetAsChar();
       printf("Result of MULTINOUT = status:%d [%s] [%s]\n",status,number.AsString(),text.GetString());
 
       trans.Commit();

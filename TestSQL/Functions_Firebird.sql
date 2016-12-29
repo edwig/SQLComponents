@@ -1,5 +1,15 @@
 set term ^;
 
+create or alter function getdecimal(x varchar(200))
+returns decimal(18,2)
+as
+  declare variable num decimal(18,2);
+  begin
+     num = :x;
+     return num;
+  end
+^
+
 create or alter function testmul2(x int)
 returns int
 as
