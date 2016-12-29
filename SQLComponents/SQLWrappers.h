@@ -552,6 +552,18 @@ inline SQLRETURN SqlParamData(SQLHSTMT p_hstmt,SQLPOINTER* p_value)
   }
 }
 
+inline SQLRETURN SqlMoreResults(SQLHSTMT p_hstmt)
+{
+  try
+  {
+    return ::SQLMoreResults(p_hstmt);
+  }
+  catch(...)
+  {
+    return SQL_ERROR;
+  }
+}
+
 // OLD STYLE ODBC 1.x / 2.x call. Do only use if absolutely necessary!!
 inline SQLRETURN SqlColAttributes(SQLHSTMT     p_hstmt
                                  ,SQLUSMALLINT p_icol

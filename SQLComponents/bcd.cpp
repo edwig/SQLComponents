@@ -1868,7 +1868,7 @@ bcd::AsNumeric(SQL_NUMERIC_STRUCT* p_numeric) const
 
   // Calculate the scale of the number
   int scale     = GetPrecision();
-  int precision = 1 + m_exponent + scale;
+  int precision = 1 + scale + ((m_exponent >= 0) ? m_exponent : 0);
 
   // If we become too large, we loose a bit of the scale digits
   if(precision > SQLNUM_MAX_PREC)

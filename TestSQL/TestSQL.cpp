@@ -37,10 +37,10 @@
 // DSN "testing" points to the "testing.fdb" database
 // in the project root folder
 //
-CString g_dsn("magdev03");
+CString g_dsn("magdev02");
 CString g_user("sysdba");
 CString g_password("altijd");
-CString g_schema("public");
+CString g_schema("dbo");
 
 void CALLBACK LogPrint(void* p_context,const char* p_text)
 {

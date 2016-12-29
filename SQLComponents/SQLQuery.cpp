@@ -758,7 +758,6 @@ SQLQuery::BindParameters()
 
     // Check rebinds to do for scripting 
     sqlDatatype = RebindParameter(sqlDatatype);
-    dataType    = RebindParameter(dataType);
 
     // Log what we bind here
     LogParameter(icol,var);
@@ -1640,7 +1639,15 @@ SQLQuery::DoSQLCallODBCEscape(CString& p_schema,CString& p_procedure,bool p_hasR
   // Do the call and fetch return values
   DoSQLStatement(sql);
 
-  // Correct RDBMS that give too much spaces (Oracle!)
+  // Clear any result sets generated
+  // On some RDBMS'es this fetches the OUTPUT parameters of the procedure/function
+  do
+  {
+    m_retCode = SqlMoreResults(m_hstmt);
+  }
+  while(m_retCode != SQL_NO_DATA && m_retCode != SQL_ERROR);
+
+  // Correct RDBMS that give too much spaces in strings
   LimitOutputParameters();
 
   // Return the return-parameter (if any)
