@@ -1649,32 +1649,204 @@ SQL_OperIntDSMulNum(SQLVariant& p_left,SQLVariant& p_right)
   return SQLVariant(&result);
 }
 
+// TYPE = INTERVAL YM
+
+SQLVariant 
+SQL_OperSShortMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSShort();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperUShortMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsUShort();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperSLongMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperULongMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperFloatMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsFloat();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperDoubleMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsDouble();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperBitMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsBit();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperSTinyMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSTinyInt();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperUTinyMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * (int)p_left.GetAsUTinyInt();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperSBigMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperUBigMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant 
+SQL_OperNumMulIntYM(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+// TYPE = INTERVAL DS
+
+SQLVariant
+SQL_OperSShortMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSShort();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperUShortMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsUShort();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperSLongMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperULongMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperFloatMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsFloat();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperDoubleMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsDouble();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperBitMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsBit();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperSTinyMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * (int)p_left.GetAsSTinyInt();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperUTinyMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * (int)p_left.GetAsUTinyInt();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperSBigMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperUBigMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
+SQLVariant
+SQL_OperNumMulIntDS(SQLVariant& p_left,SQLVariant& p_right)
+{
+  SQLInterval result = p_right.GetAsSQLInterval() * p_left.GetAsSLong();
+  return SQLVariant(&result);
+}
+
 // OPERATOR ARRAY
 
 static CalculateFunctionArray OperatorMul[CT_LAST][CT_LAST] =
 {
-                         // CT_CHAR                CT_SSHORT                CT_USHORT                CT_SLONG                CT_ULONG                CT_FLOAT                CT_DOUBLE                CT_BIT                CT_STINYINT             CT_UTINYINT             CT_SBIGINT             CT_UBIGINT             CT_NUMERIC            CT_GUID  CT_BINARY CT_DATE  CT_TIME  CT_TIMESTAMP CT_INTERVAL_YM CT_INTERVAL_DS
-                         // ---------------------- ------------------------ ------------------------ ----------------------- ----------------------- ----------------------- ------------------------ --------------------- ----------------------- ----------------------- ---------------------- ---------------------- --------------------- -------- --------- -------- -------- ------------ -------------- --------------
-  /* CT_CHAR        */   {  nullptr               ,&SQL_OperCharMulSShort  ,&SQL_OperCharMulUShort  ,&SQL_OperCharMulSLong  ,&SQL_OperCharMulULong  ,&SQL_OperCharMulFloat  ,&SQL_OperCharMulDouble  ,&SQL_OperCharMulBit  ,&SQL_OperCharMulSTiny  ,&SQL_OperCharMulUTiny  ,&SQL_OperCharMulSBig  ,&SQL_OperCharMulUBig  ,&SQL_OperCharMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_SSHORT      */  ,{  &SQL_OperSShortMulChar,&SQL_OperSShortMulSShort,&SQL_OperSShortMulUShort,&SQL_OperSShortMulSLong,&SQL_OperSShortMulULong,&SQL_OperSShortMulFloat,&SQL_OperSShortMulDouble,&SQL_OperSShortMulBit,&SQL_OperSShortMulSTiny,&SQL_OperSShortMulUTiny,&SQL_OperSShortMulSBig,&SQL_OperSShortMulUBig,&SQL_OperSShortMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_USHORT      */  ,{  &SQL_OperUShortMulChar,&SQL_OperUShortMulSShort,&SQL_OperUShortMulUShort,&SQL_OperUShortMulSLong,&SQL_OperUShortMulULong,&SQL_OperUShortMulFloat,&SQL_OperUShortMulDouble,&SQL_OperUShortMulBit,&SQL_OperUShortMulSTiny,&SQL_OperUShortMulUTiny,&SQL_OperUShortMulSBig,&SQL_OperUShortMulUBig,&SQL_OperUShortMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_SLONG       */  ,{  &SQL_OperSLongMulChar ,&SQL_OperSLongMulSShort ,&SQL_OperSLongMulUShort ,&SQL_OperSLongMulSLong ,&SQL_OperSLongMulULong ,&SQL_OperSLongMulFloat ,&SQL_OperSLongMulDouble ,&SQL_OperSLongMulBit ,&SQL_OperSLongMulSTiny ,&SQL_OperSLongMulUTiny ,&SQL_OperSLongMulSBig ,&SQL_OperSLongMulUBig ,&SQL_OperSLongMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_ULONG       */  ,{  &SQL_OperULongMulChar ,&SQL_OperULongMulSShort ,&SQL_OperUlongMulUShort ,&SQL_OperULongMulSLong ,&SQL_OperULongMulULong ,&SQL_OperULongMulFloat ,&SQL_OperULongMulDouble ,&SQL_OperULongMulBit ,&SQL_OperULongMulSTiny ,&SQL_OperULongMulUTiny ,&SQL_OperULongMulSBig ,&SQL_OperULongMulUBig ,&SQL_OperULongMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_FLOAT       */  ,{  &SQL_OperFloatMulChar ,&SQL_OperFloatMulSShort ,&SQL_OperFloatMulUShort ,&SQL_OperFloatMulSLong ,&SQL_OperFloatMulULong ,&SQL_OperFloatMulFloat ,&SQL_OperFloatMulDouble ,&SQL_OperFloatMulBit ,&SQL_OperFloatMulSTiny ,&SQL_OperFloatMulUTiny ,&SQL_OperFloatMulSBig ,&SQL_OperFloatMulUBig ,&SQL_OperFloatMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_DOUBLE      */  ,{  &SQL_OperDoubleMulChar,&SQL_OperDoubleMulSShort,&SQL_OperDoubleMulUShort,&SQL_OperDoubleMulSLong,&SQL_OperDoubleMulULong,&SQL_OperDoubleMulFloat,&SQL_OperDoubleMulDouble,&SQL_OperDoubleMulBit,&SQL_OperDoubleMulSTiny,&SQL_OperDoubleMulUTiny,&SQL_OperDoubleMulSBig,&SQL_OperDoubleMulUBig,&SQL_OperDoubleMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_BIT         */  ,{  &SQL_OperBitMulChar   ,&SQL_OperBitMulSShort   ,&SQL_OperBitMulUShort   ,&SQL_OperBitMulSLong   ,&SQL_OperBitMulULong   ,&SQL_OperBitMulFloat   ,&SQL_OperBitMulDouble   ,&SQL_OperBitMulBit   ,&SQL_OperBitMulSTiny   ,&SQL_OperBitMulUTiny   ,&SQL_OperBitMulSBig   ,&SQL_OperBitMulUBig   ,&SQL_OperBitMulNum   ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_STINYINT    */  ,{  &SQL_OperSTinyMulChar ,&SQL_OperSTinyMulSShort ,&SQL_OperSTinyMulUShort ,&SQL_OperSTinyMulSLong ,&SQL_OperSTinyMulULong ,&SQL_OperSTinyMulFloat ,&SQL_OperSTinyMulDouble ,&SQL_OperSTinyMulBit ,&SQL_OperSTinyMulSTiny ,&SQL_OperSTinyMulUTiny ,&SQL_OperSTinyMulSBig ,&SQL_OperSTinyMulUBig ,&SQL_OperSTinyMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_UTINYINT    */  ,{  &SQL_OperUTinyMulChar ,&SQL_OperUTinyMulSShort ,&SQL_OperUTinyMulUShort ,&SQL_OperUTinyMulSLong ,&SQL_OperUTinyMulULong ,&SQL_OperUTinyMulFloat ,&SQL_OperUTinyMulDouble ,&SQL_OperUTinyMulBit ,&SQL_OperUTinyMulSTiny ,&SQL_OperUTinyMulUTiny ,&SQL_OperUTinyMulSBig ,&SQL_OperUTinyMulUBig ,&SQL_OperUTinyMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_SBIGINT     */  ,{  &SQL_OperSBigMulChar  ,&SQL_OperSBigMulSShort  ,&SQL_OperSBigMulUShort  ,&SQL_OperSBigMulSLong  ,&SQL_OperSBigMulULong  ,&SQL_OperSBigMulFloat  ,&SQL_OperSBigMulDouble  ,&SQL_OperSBigMulBit  ,&SQL_OperSBigMulSTiny  ,&SQL_OperSBigMulUTiny  ,&SQL_OperSBigMulSBig  ,&SQL_OperSBigMulUBig  ,&SQL_OperSBigMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_UBIGINT     */  ,{  &SQL_OperUBigMulChar  ,&SQL_OperUBigMulSShort  ,&SQL_OperUBigMulUShort  ,&SQL_OperUBigMulSLong  ,&SQL_OperUBigMulULong  ,&SQL_OperUBigMulFloat  ,&SQL_OperUBigMulDouble  ,&SQL_OperUBigMulBit  ,&SQL_OperUBigMulSTiny  ,&SQL_OperUBigMulUTiny  ,&SQL_OperUBigMulSBig  ,&SQL_OperUBigMulUBig  ,&SQL_OperUBigMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_NUMERIC     */  ,{  &SQL_OperNumMulChar   ,&SQL_OperNumMulSShort   ,&SQL_OperNumMulUShort   ,&SQL_OperNumMulSLong   ,&SQL_OperNumMulULong   ,&SQL_OperNumMulFloat   ,&SQL_OperNumMulDouble   ,&SQL_OperNumMulBit   ,&SQL_OperNumMulSTiny   ,&SQL_OperNumMulUTiny   ,&SQL_OperNumMulSBig   ,&SQL_OperNumMulUBig   ,&SQL_OperNumMulNum   ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_GUID        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_BINARY      */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_DATE        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_TIME        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_TIMESTAMP   */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_INTERVAL_YM */  ,{  nullptr               ,&SQL_OperIntYMMulSShort ,&SQL_OperIntYMMulUShort ,&SQL_OperIntYMMulSLong ,&SQL_OperIntYMMulULong ,&SQL_OperIntYMMulFloat ,&SQL_OperIntYMMulDouble ,&SQL_OperIntYMMulBit ,&SQL_OperIntYMMulSTiny ,&SQL_OperIntYMMulUTiny ,&SQL_OperIntYMMulSBig ,&SQL_OperIntYMMulUBig ,&SQL_OperIntYMMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
-  /* CT_INTERVAL_DS */  ,{  nullptr               ,&SQL_OperIntDSMulSShort ,&SQL_OperIntDSMulUShort ,&SQL_OperIntDSMulSLong ,&SQL_OperIntDSMulULong ,&SQL_OperIntDSMulFloat ,&SQL_OperIntDSMulDouble ,&SQL_OperIntDSMulBit ,&SQL_OperIntDSMulSTiny ,&SQL_OperIntDSMulUTiny ,&SQL_OperIntDSMulSBig ,&SQL_OperIntDSMulUBig ,&SQL_OperIntDSMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr       ,nullptr      }
+                         // CT_CHAR                CT_SSHORT                CT_USHORT                CT_SLONG                CT_ULONG                CT_FLOAT                CT_DOUBLE                CT_BIT                CT_STINYINT             CT_UTINYINT             CT_SBIGINT             CT_UBIGINT             CT_NUMERIC            CT_GUID  CT_BINARY CT_DATE  CT_TIME  CT_TIMESTAMP CT_INTERVAL_YM          CT_INTERVAL_DS
+                         // ---------------------- ------------------------ ------------------------ ----------------------- ----------------------- ----------------------- ------------------------ --------------------- ----------------------- ----------------------- ---------------------- ---------------------- --------------------- -------- --------- -------- -------- ------------ ----------------------- -------------------------
+  /* CT_CHAR        */   {  nullptr               ,&SQL_OperCharMulSShort  ,&SQL_OperCharMulUShort  ,&SQL_OperCharMulSLong  ,&SQL_OperCharMulULong  ,&SQL_OperCharMulFloat  ,&SQL_OperCharMulDouble  ,&SQL_OperCharMulBit  ,&SQL_OperCharMulSTiny  ,&SQL_OperCharMulUTiny  ,&SQL_OperCharMulSBig  ,&SQL_OperCharMulUBig  ,&SQL_OperCharMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
+  /* CT_SSHORT      */  ,{  &SQL_OperSShortMulChar,&SQL_OperSShortMulSShort,&SQL_OperSShortMulUShort,&SQL_OperSShortMulSLong,&SQL_OperSShortMulULong,&SQL_OperSShortMulFloat,&SQL_OperSShortMulDouble,&SQL_OperSShortMulBit,&SQL_OperSShortMulSTiny,&SQL_OperSShortMulUTiny,&SQL_OperSShortMulSBig,&SQL_OperSShortMulUBig,&SQL_OperSShortMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperSShortMulIntYM,&SQL_OperSShortMulIntDS }
+  /* CT_USHORT      */  ,{  &SQL_OperUShortMulChar,&SQL_OperUShortMulSShort,&SQL_OperUShortMulUShort,&SQL_OperUShortMulSLong,&SQL_OperUShortMulULong,&SQL_OperUShortMulFloat,&SQL_OperUShortMulDouble,&SQL_OperUShortMulBit,&SQL_OperUShortMulSTiny,&SQL_OperUShortMulUTiny,&SQL_OperUShortMulSBig,&SQL_OperUShortMulUBig,&SQL_OperUShortMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperUShortMulIntYM,&SQL_OperUShortMulIntDS }
+  /* CT_SLONG       */  ,{  &SQL_OperSLongMulChar ,&SQL_OperSLongMulSShort ,&SQL_OperSLongMulUShort ,&SQL_OperSLongMulSLong ,&SQL_OperSLongMulULong ,&SQL_OperSLongMulFloat ,&SQL_OperSLongMulDouble ,&SQL_OperSLongMulBit ,&SQL_OperSLongMulSTiny ,&SQL_OperSLongMulUTiny ,&SQL_OperSLongMulSBig ,&SQL_OperSLongMulUBig ,&SQL_OperSLongMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperSLongMulIntYM ,&SQL_OperSLongMulIntDS  }
+  /* CT_ULONG       */  ,{  &SQL_OperULongMulChar ,&SQL_OperULongMulSShort ,&SQL_OperUlongMulUShort ,&SQL_OperULongMulSLong ,&SQL_OperULongMulULong ,&SQL_OperULongMulFloat ,&SQL_OperULongMulDouble ,&SQL_OperULongMulBit ,&SQL_OperULongMulSTiny ,&SQL_OperULongMulUTiny ,&SQL_OperULongMulSBig ,&SQL_OperULongMulUBig ,&SQL_OperULongMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperULongMulIntYM ,&SQL_OperULongMulIntDS  }
+  /* CT_FLOAT       */  ,{  &SQL_OperFloatMulChar ,&SQL_OperFloatMulSShort ,&SQL_OperFloatMulUShort ,&SQL_OperFloatMulSLong ,&SQL_OperFloatMulULong ,&SQL_OperFloatMulFloat ,&SQL_OperFloatMulDouble ,&SQL_OperFloatMulBit ,&SQL_OperFloatMulSTiny ,&SQL_OperFloatMulUTiny ,&SQL_OperFloatMulSBig ,&SQL_OperFloatMulUBig ,&SQL_OperFloatMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperFloatMulIntYM ,&SQL_OperFloatMulIntDS  }
+  /* CT_DOUBLE      */  ,{  &SQL_OperDoubleMulChar,&SQL_OperDoubleMulSShort,&SQL_OperDoubleMulUShort,&SQL_OperDoubleMulSLong,&SQL_OperDoubleMulULong,&SQL_OperDoubleMulFloat,&SQL_OperDoubleMulDouble,&SQL_OperDoubleMulBit,&SQL_OperDoubleMulSTiny,&SQL_OperDoubleMulUTiny,&SQL_OperDoubleMulSBig,&SQL_OperDoubleMulUBig,&SQL_OperDoubleMulNum,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperDoubleMulIntYM,&SQL_OperDoubleMulIntDS }
+  /* CT_BIT         */  ,{  &SQL_OperBitMulChar   ,&SQL_OperBitMulSShort   ,&SQL_OperBitMulUShort   ,&SQL_OperBitMulSLong   ,&SQL_OperBitMulULong   ,&SQL_OperBitMulFloat   ,&SQL_OperBitMulDouble   ,&SQL_OperBitMulBit   ,&SQL_OperBitMulSTiny   ,&SQL_OperBitMulUTiny   ,&SQL_OperBitMulSBig   ,&SQL_OperBitMulUBig   ,&SQL_OperBitMulNum   ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperBitMulIntYM   ,&SQL_OperBitMulIntDS    }
+  /* CT_STINYINT    */  ,{  &SQL_OperSTinyMulChar ,&SQL_OperSTinyMulSShort ,&SQL_OperSTinyMulUShort ,&SQL_OperSTinyMulSLong ,&SQL_OperSTinyMulULong ,&SQL_OperSTinyMulFloat ,&SQL_OperSTinyMulDouble ,&SQL_OperSTinyMulBit ,&SQL_OperSTinyMulSTiny ,&SQL_OperSTinyMulUTiny ,&SQL_OperSTinyMulSBig ,&SQL_OperSTinyMulUBig ,&SQL_OperSTinyMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperSTinyMulIntYM ,&SQL_OperSTinyMulIntDS  }
+  /* CT_UTINYINT    */  ,{  &SQL_OperUTinyMulChar ,&SQL_OperUTinyMulSShort ,&SQL_OperUTinyMulUShort ,&SQL_OperUTinyMulSLong ,&SQL_OperUTinyMulULong ,&SQL_OperUTinyMulFloat ,&SQL_OperUTinyMulDouble ,&SQL_OperUTinyMulBit ,&SQL_OperUTinyMulSTiny ,&SQL_OperUTinyMulUTiny ,&SQL_OperUTinyMulSBig ,&SQL_OperUTinyMulUBig ,&SQL_OperUTinyMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperUTinyMulIntYM ,&SQL_OperUTinyMulIntDS  }
+  /* CT_SBIGINT     */  ,{  &SQL_OperSBigMulChar  ,&SQL_OperSBigMulSShort  ,&SQL_OperSBigMulUShort  ,&SQL_OperSBigMulSLong  ,&SQL_OperSBigMulULong  ,&SQL_OperSBigMulFloat  ,&SQL_OperSBigMulDouble  ,&SQL_OperSBigMulBit  ,&SQL_OperSBigMulSTiny  ,&SQL_OperSBigMulUTiny  ,&SQL_OperSBigMulSBig  ,&SQL_OperSBigMulUBig  ,&SQL_OperSBigMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperSBigMulIntYM  ,&SQL_OperSBigMulIntDS   }
+  /* CT_UBIGINT     */  ,{  &SQL_OperUBigMulChar  ,&SQL_OperUBigMulSShort  ,&SQL_OperUBigMulUShort  ,&SQL_OperUBigMulSLong  ,&SQL_OperUBigMulULong  ,&SQL_OperUBigMulFloat  ,&SQL_OperUBigMulDouble  ,&SQL_OperUBigMulBit  ,&SQL_OperUBigMulSTiny  ,&SQL_OperUBigMulUTiny  ,&SQL_OperUBigMulSBig  ,&SQL_OperUBigMulUBig  ,&SQL_OperUBigMulNum  ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperUBigMulIntYM  ,&SQL_OperUBigMulIntDS   }
+  /* CT_NUMERIC     */  ,{  &SQL_OperNumMulChar   ,&SQL_OperNumMulSShort   ,&SQL_OperNumMulUShort   ,&SQL_OperNumMulSLong   ,&SQL_OperNumMulULong   ,&SQL_OperNumMulFloat   ,&SQL_OperNumMulDouble   ,&SQL_OperNumMulBit   ,&SQL_OperNumMulSTiny   ,&SQL_OperNumMulUTiny   ,&SQL_OperNumMulSBig   ,&SQL_OperNumMulUBig   ,&SQL_OperNumMulNum   ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,&SQL_OperNumMulIntYM   ,&SQL_OperNumMulIntDS    }
+  /* CT_GUID        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
+  /* CT_BINARY      */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
+  /* CT_DATE        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
+  /* CT_TIME        */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
+  /* CT_TIMESTAMP   */  ,{  nullptr               ,nullptr                 ,nullptr                 ,nullptr                ,nullptr                ,nullptr                ,nullptr                 ,nullptr              ,nullptr                ,nullptr                ,nullptr               ,nullptr               ,nullptr              ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
+  /* CT_INTERVAL_YM */  ,{  nullptr               ,&SQL_OperIntYMMulSShort ,&SQL_OperIntYMMulUShort ,&SQL_OperIntYMMulSLong ,&SQL_OperIntYMMulULong ,&SQL_OperIntYMMulFloat ,&SQL_OperIntYMMulDouble ,&SQL_OperIntYMMulBit ,&SQL_OperIntYMMulSTiny ,&SQL_OperIntYMMulUTiny ,&SQL_OperIntYMMulSBig ,&SQL_OperIntYMMulUBig ,&SQL_OperIntYMMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
+  /* CT_INTERVAL_DS */  ,{  nullptr               ,&SQL_OperIntDSMulSShort ,&SQL_OperIntDSMulUShort ,&SQL_OperIntDSMulSLong ,&SQL_OperIntDSMulULong ,&SQL_OperIntDSMulFloat ,&SQL_OperIntDSMulDouble ,&SQL_OperIntDSMulBit ,&SQL_OperIntDSMulSTiny ,&SQL_OperIntDSMulUTiny ,&SQL_OperIntDSMulSBig ,&SQL_OperIntDSMulUBig ,&SQL_OperIntDSMulNum ,nullptr ,nullptr  ,nullptr ,nullptr ,nullptr     ,nullptr                ,nullptr                 }
 };
 
 // Multiplication operator for SQLVariant
