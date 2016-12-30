@@ -1108,7 +1108,7 @@ SQLVariant::GetAsSShort()
     case SQL_C_STINYINT: return (short)m_data.m_dataTINYINT;
     case SQL_C_UTINYINT: return (short)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SQL_BIGINTToShort(m_data.m_dataSBIGINT);
-    case SQL_C_UBIGINT:  return SQL_USQL_BIGINTToShort(m_data.m_dataUBIGINT);
+    case SQL_C_UBIGINT:  return SQL_UBIGINTToShort(m_data.m_dataUBIGINT);
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return SQL_SLongToShort(num.AsLong());
                          }

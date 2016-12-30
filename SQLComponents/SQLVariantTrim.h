@@ -45,7 +45,7 @@ short          SQL_ULongToShort(unsigned long p_value);
 short          SQL_FloatToShort(float p_value);
 short          SQL_DoubleToShort(double p_value);
 short          SQL_BIGINTToShort(SQLBIGINT p_value);
-short          SQL_USQL_BIGINTToShort(SQLUBIGINT p_value);
+short          SQL_UBIGINTToShort(SQLUBIGINT p_value);
 float          SQL_DoubleToFloat(double p_value);
 float          SQL_BIGINTToFloat(SQLBIGINT p_value);
 float          SQL_UBIGINTToFloat(SQLUBIGINT p_value);

@@ -160,7 +160,7 @@ SQL_BIGINTToShort(SQLBIGINT p_value)
 }
 
 short
-SQL_USQL_BIGINTToShort(SQLUBIGINT p_value)
+SQL_UBIGINTToShort(SQLUBIGINT p_value)
 {
   if(p_value > SHRT_MAX)
   {

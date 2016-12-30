@@ -284,33 +284,6 @@
     <ClInclude Include="SQLVariantTrim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SQLVariantOperatorGreater.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorSmaller.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorGreatEqual.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorSmallEqual.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorAdd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorSub.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorMul.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorDiv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLVariantOperatorMod.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="bcd.h">
       <Filter>Header Files</Filter>
     </ClInclude>

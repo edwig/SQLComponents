@@ -38,7 +38,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 bool
-SQL_OperVarSmallEQChar(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperVarSmallEQChar(SQLVariant& p_left,SQLVariant& p_right)
 {
   CString leftString,rightString;
   p_left .GetAsString(leftString);
@@ -48,7 +48,7 @@ SQL_OperVarSmallEQChar(SQLVariant& p_left,SQLVariant& p_right)
 }
 
 bool
-SQL_OperGuidSmallEQChar(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperGuidSmallEQChar(SQLVariant& p_left,SQLVariant& p_right)
 {
   CString leftString,rightString;
   p_left .GetAsString(leftString);
@@ -65,73 +65,73 @@ SQL_OperGuidSmallEQChar(SQLVariant& p_left,SQLVariant& p_right)
 // SIGNED SHORT
 
 bool
-SQL_OperSShortSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSShort() <= p_right.GetAsSShort();
 }
 
 bool
-SQL_OperUShortSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_ShortToUShort(p_right.GetAsSShort());
 }
 
 bool
-SQL_OperSLongSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToShort(p_left.GetAsSLong()) <= p_right.GetAsSShort();
 }
 
 bool
-SQL_OperULongSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ULongToUShort(p_left.GetAsULong()) <= SQL_ShortToUShort(p_right.GetAsSShort());
 }
 
 bool
-SQL_OperFloatSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_FloatToShort(p_left.GetAsFloat()) <= p_right.GetAsSShort();
 }
 
 bool
-SQL_OperDoubleSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_DoubleToShort(p_left.GetAsDouble()) <= p_right.GetAsSShort();
 }
 
 bool
-SQL_OperBitSmallEQSShort(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQSShort(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsSShort() != 0;
 }
 
 bool   
-SQL_OperSTinySmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= SQL_ShortToTinyInt(p_right.GetAsSShort());
 }
 
 bool
-SQL_OperUTinySmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_ShortToUTinyInt(p_right.GetAsSShort());
 }
 
 bool
-SQL_OperSBigSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_BIGINTToShort(p_left.GetAsSBigInt()) <= p_right.GetAsSShort();
 }
 
 bool
-SQL_OperUBigSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return SQL_USQL_BIGINTToShort(p_left.GetAsUBigInt()) <= p_right.GetAsSShort();
+  return SQL_UBIGINTToShort(p_left.GetAsUBigInt()) <= p_right.GetAsSShort();
 }
 
 bool
-SQL_OperNumSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToShort(p_left.GetAsBCD().AsLong()) <= p_right.GetAsSShort();
 }
@@ -139,73 +139,73 @@ SQL_OperNumSmallEQSShort(SQLVariant& p_left,SQLVariant& p_right)
 // UNSIGNED SHORT
 
 bool   
-SQL_OperSShortSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ShortToUShort(p_left.GetAsSShort()) <= p_right.GetAsUShort();
 }
 
 bool   
-SQL_OperUShortSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= p_right.GetAsUShort();
 }
 
 bool
-SQL_OperSLongSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToUShort(p_left.GetAsSLong()) <= p_right.GetAsUShort();
 }
 
 bool
-SQL_OperUlongSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUlongSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ULongToUShort(p_left.GetAsULong()) <= p_right.GetAsUShort();
 }
 
 bool
-SQL_OperFloatSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_FloatToUShort(p_left.GetAsFloat()) <= p_right.GetAsUShort();
 }
 
 bool
-SQL_OperDoubleSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_DoubleToUShort(p_left.GetAsDouble()) <= p_right.GetAsUShort();
 }
 
 bool
-SQL_OperBitSmallEQUShort(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQUShort(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsUShort() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= SQL_UShortToTinyInt(p_right.GetAsUShort());
 }
 
 bool
-SQL_OperUTinySmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_UShortToUTinyInt(p_right.GetAsUShort());
 }
 
 bool
-SQL_OperSBigSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_BIGINTToUShort(p_left.GetAsSBigInt()) <= p_right.GetAsUShort();
 }
 
 bool
-SQL_OperUBigSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_UBIGINTToUShort(p_left.GetAsUBigInt()) <= p_right.GetAsUShort();
 }
 
 bool   
-SQL_OperNumSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToUShort(p_left.GetAsBCD().AsLong()) <= p_right.GetAsUShort();
 }
@@ -213,73 +213,73 @@ SQL_OperNumSmallEQUShort(SQLVariant& p_left,SQLVariant& p_right)
 // SIGNED LONG
 
 bool   
-SQL_OperSShortSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSShort() <= SQL_SLongToShort(p_right.GetAsSLong());
 }
 
 bool
-SQL_OperUShortSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_SLongToUShort(p_right.GetAsSLong());
 }
 
 bool
-SQL_OperSLongSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSLong() <= p_right.GetAsSLong();
 }
 
 bool
-SQL_OperULongSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsULong() <= SQL_LongToULong(p_right.GetAsSLong());
 }
 
 bool
-SQL_OperFloatSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_FloatToLong(p_left.GetAsFloat()) <= p_right.GetAsSLong();
 }
 
 bool
-SQL_OperDoubleESmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleESmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_DoubleToLong(p_left.GetAsDouble()) <= p_right.GetAsSLong();
 }
 
 bool
-SQL_OperBitSmallEQSLong(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQSLong(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsSLong() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= SQL_SLongToTinyInt(p_right.GetAsSLong());
 }
 
 bool
-SQL_OperUTinySmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_SLongToUTinyInt(p_right.GetAsSLong());
 }
 
 bool
-SQL_OperSBigSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_BIGINTToLong(p_left.GetAsSBigInt()) <= p_right.GetAsSLong();
 }
 
 bool
-SQL_OperUBigSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_UBIGINTToLong(p_left.GetAsUBigInt()) <= p_right.GetAsSLong();
 }
 
 bool
-SQL_OperNumSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsBCD().AsLong() <= p_right.GetAsSLong();
 }
@@ -287,73 +287,73 @@ SQL_OperNumSmallEQSLong(SQLVariant& p_left,SQLVariant& p_right)
 // UNSIGNED LONG
 
 bool   
-SQL_OperSShortSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ShortToUShort(p_left.GetAsSShort()) <= SQL_ULongToUShort(p_right.GetAsULong());
 }
 
 bool
-SQL_OperUShortSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_ULongToUShort(p_right.GetAsULong());
 }
 
 bool
-SQL_OperSLongSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_LongToULong(p_left.GetAsSLong()) <= p_right.GetAsULong();
 }
 
 bool
-SQL_OperULongSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsULong() <= p_right.GetAsULong();
 }
 
 bool
-SQL_OperFloatSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_FloatToULong(p_left.GetAsFloat()) <= p_right.GetAsULong();
 }
 
 bool
-SQL_OperDoubleSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_DoubleToULong(p_left.GetAsDouble()) <= p_right.GetAsULong();
 }
 
 bool
-SQL_OperBitSmallEQULong(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQULong(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsULong() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_TinyIntToUTinyInt(p_left.GetAsSTinyInt()) <= SQL_ULongToUTinyInt(p_right.GetAsULong());
 }
 
 bool
-SQL_OperUTinySmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_ULongToUTinyInt(p_right.GetAsULong());
 }
 
 bool
-SQL_OperSBigSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_BIGINTToULong(p_left.GetAsSBigInt()) <= p_right.GetAsULong();
 }
 
 bool
-SQL_OperUBigSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_UBIGINTToULong(p_left.GetAsUBigInt()) <= p_right.GetAsULong();
 }
 
 bool
-SQL_OperNumSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_BIGINTToULong(p_left.GetAsBCD().AsInt64()) <= p_right.GetAsULong();
 }
@@ -361,73 +361,73 @@ SQL_OperNumSmallEQULong(SQLVariant& p_left,SQLVariant& p_right)
 // FLOAT
 
 bool   
-SQL_OperSShortSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSShort() <= SQL_FloatToShort(p_right.GetAsFloat());
 }
 
 bool   
-SQL_OperUShortSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_FloatToUShort(p_right.GetAsFloat());
 }
 
 bool
-SQL_OperSLongSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSLong() <= SQL_FloatToLong(p_right.GetAsFloat());
 }
 
 bool
-SQL_OperULongSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsULong() <= SQL_FloatToULong(p_right.GetAsFloat());
 }
 
 bool
-SQL_OperFloatSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsFloat() <= p_right.GetAsFloat();
 }
 
 bool
-SQL_OperDoubleSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_DoubleToFloat(p_left.GetAsDouble()) <= p_right.GetAsFloat();
 }
 
 bool
-SQL_OperBitSmallEQFloat(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQFloat(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsFloat() != 0.0;
 }
 
 bool
-SQL_OperSTinySmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= SQL_FloatToTinyInt(p_right.GetAsFloat());
 }
 
 bool
-SQL_OperUTinySmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_FloatToUTinyInt(p_right.GetAsFloat());
 }
 
 bool
-SQL_OperSBigSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSBigInt() <= SQL_FloatToBIGINT(p_right.GetAsFloat());
 }
 
 bool
-SQL_OperUBigSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUBigInt() <= SQL_FloatToUBIGINT(p_right.GetAsFloat());
 }
 
 bool
-SQL_OperNumSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsBCD().AsDouble() <= (double) p_right.GetAsFloat();
 }
@@ -435,73 +435,73 @@ SQL_OperNumSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 // DOUBLE
 
 bool
-SQL_OperSShortSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSShort() <= SQL_DoubleToShort(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperUShortSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_DoubleToUShort(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperSLongSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSLong() <= SQL_DoubleToLong(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperULongSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsULong() <= SQL_DoubleToULong(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperFloatSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsFloat() <= SQL_DoubleToFloat(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperDoubleSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsDouble() <= p_right.GetAsDouble();
 }
 
 bool
-SQL_OperBitSmallEQDouble(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQDouble(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsDouble() != 0.0;
 }
 
 bool
-SQL_OperSTinySmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= SQL_DoubleToTinyInt(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperUTinySmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_DoubleToUTinyInt(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperSBigSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSBigInt() <= SQL_DoubleToBIGINT(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperUBigSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUBigInt() <= SQL_DoubleToUBIGINT(p_right.GetAsDouble());
 }
 
 bool
-SQL_OperNumSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsBCD().AsDouble() <= p_right.GetAsDouble();
 }
@@ -509,73 +509,73 @@ SQL_OperNumSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 // BIT
 
 bool   
-SQL_OperSShortSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperSShortSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperUShortSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperUShortSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool   
-SQL_OperSLongSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperSLongSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperULongSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperULongSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperFloatSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperFloatSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperDoubleSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperBitSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperSTinySmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperUTinySmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperUTinySmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperSBigSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperSBigSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperUBigSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperUBigSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
 
 bool
-SQL_OperNumSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperNumSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsBit() != 0;
 }
@@ -583,73 +583,73 @@ SQL_OperNumSmallEQBit(SQLVariant& /*p_left*/,SQLVariant& p_right)
 // SIGNED TINYINT
 
 bool
-SQL_OperSShortSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ShortToTinyInt(p_left.GetAsSShort()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperUShortSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_UShortToTinyInt(p_left.GetAsUShort()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperSLongSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToTinyInt(p_left.GetAsSLong()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperULongSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ULongToTinyInt(p_left.GetAsULong()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperFloatSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_FloatToTinyInt(p_left.GetAsFloat()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperDoubleSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_DoubleToTinyInt(p_left.GetAsDouble()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperBitSmallEQSTiny(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQSTiny(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsSTinyInt() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperUTinySmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_TinyIntToUTinyInt(p_right.GetAsSTinyInt());
 }
 
 bool
-SQL_OperSBigSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SBIGINTToTinyInt(p_left.GetAsSBigInt()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperUBigSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_UBIGINTToTinyInt(p_left.GetAsUBigInt()) <= p_right.GetAsSTinyInt();
 }
 
 bool
-SQL_OperNumSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToTinyInt(p_left.GetAsBCD().AsLong()) <= p_right.GetAsSTinyInt();
 }
@@ -657,73 +657,73 @@ SQL_OperNumSmallEQSTiny(SQLVariant& p_left,SQLVariant& p_right)
 // UNSIGNED TINYINT
 
 bool
-SQL_OperSShortSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ShortToUTinyInt(p_left.GetAsSShort()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperUShortSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_UShortToUTinyInt(p_left.GetAsUShort()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperSLongSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToUTinyInt(p_left.GetAsSLong()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperULongSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_ULongToUTinyInt(p_left.GetAsULong()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperFloatSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_FloatToUTinyInt(p_left.GetAsFloat()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperDoubleSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_DoubleToUTinyInt(p_left.GetAsDouble()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperBitSmallEQUTiny(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQUTiny(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsUTinyInt() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_TinyIntToUTinyInt(p_left.GetAsSTinyInt()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperUTinySmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperSBigSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SBIGINTToUTinyInt(p_left.GetAsSBigInt()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperUBigSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_UBIGINTToUTinyInt(p_left.GetAsUBigInt()) <= p_right.GetAsUTinyInt();
 }
 
 bool
-SQL_OperNumSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SLongToUTinyInt(p_left.GetAsBCD().AsLong()) <= p_right.GetAsUTinyInt();
 }
@@ -731,73 +731,73 @@ SQL_OperNumSmallEQUTiny(SQLVariant& p_left,SQLVariant& p_right)
 // SIGNED BIGINT
 
 bool
-SQL_OperSShortSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSShort() <= SQL_BIGINTToShort(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperUShortSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_BIGINTToUShort(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperSLongSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSLong() <= SQL_BIGINTToLong(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperULongSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsULong() <= SQL_BIGINTToULong(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperFloatSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsFloat() <= SQL_BIGINTToFloat(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperDoubleSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsDouble() <= SQL_BIGINTToDouble(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperBitSmallEQSBig(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQSBig(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsSBigInt() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= SQL_SBIGINTToTinyInt(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperUTinySmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_SBIGINTToUTinyInt(p_right.GetAsSBigInt());
 }
 
 bool
-SQL_OperSBigSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSBigInt() <= p_right.GetAsSBigInt();
 }
 
 bool
-SQL_OperUBigSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUBigInt() <= SQL_SBIGINTToUBIGINT(p_right.GetAsSBigInt());
 }
 
 bool   
-SQL_OperNumSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsBCD().AsInt64() <= p_right.GetAsSBigInt();
 }
@@ -805,73 +805,73 @@ SQL_OperNumSmallEQSBig(SQLVariant& p_left,SQLVariant& p_right)
 // UNSIGNED BIGINT
 
 bool
-SQL_OperSShortSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsSShort() <= SQL_USQL_BIGINTToShort(p_right.GetAsUBigInt());
+  return p_left.GetAsSShort() <= SQL_UBIGINTToShort(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperUShortSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_UBIGINTToUShort(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperSLongSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSLong() <= SQL_UBIGINTToLong(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperULongSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsULong() <= SQL_UBIGINTToULong(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperFloatSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsFloat() <= SQL_UBIGINTToFloat(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperDoubleSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsDouble() <= SQL_UBIGINTToDouble(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperBitSmallEQUBig(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQUBig(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return p_right.GetAsUBigInt() != 0;
 }
 
 bool
-SQL_OperSTinySmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_UBIGINTToUTinyInt(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperUTinySmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_UBIGINTToUTinyInt(p_right.GetAsUBigInt());
 }
 
 bool
-SQL_OperSBigSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return SQL_SBIGINTToUBIGINT(p_left.GetAsSBigInt()) <= p_right.GetAsUBigInt();
 }
 
 bool
-SQL_OperUBigSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUBigInt() <= p_right.GetAsUBigInt();
 }
 
 bool
-SQL_OperNumSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsBCD().AsUInt64() <= p_right.GetAsUBigInt();
 }
@@ -879,73 +879,73 @@ SQL_OperNumSmallEQUBig(SQLVariant& p_left,SQLVariant& p_right)
 // NUMERIC
 
 bool
-SQL_OperSShortSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSShortSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSShort() <= SQL_SLongToShort(p_right.GetAsBCD().AsLong());
 }
 
 bool
-SQL_OperUShortSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUShortSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUShort() <= SQL_SLongToUShort(p_right.GetAsBCD().AsLong());
 }
 
 bool
-SQL_OperSLongSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSLongSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSLong() <= p_right.GetAsBCD().AsLong();
 }
 
 bool
-SQL_OperULongSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperULongSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsULong() <= SQL_BIGINTToULong(p_right.GetAsBCD().AsInt64());
 }
 
 bool
-SQL_OperFloatSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperFloatSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsFloat() <= (float) p_right.GetAsBCD().AsDouble();
 }
 
 bool
-SQL_OperDoubleSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDoubleSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsDouble() <= p_right.GetAsBCD().AsDouble();
 }
 
 bool
-SQL_OperBitSmallEQNum(SQLVariant& /*p_left*/,SQLVariant& p_right)
+static SQL_OperBitSmallEQNum(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
   return !p_right.GetAsBCD().IsNull();
 }
 
 bool
-SQL_OperSTinySmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSTinySmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSTinyInt() <= SQL_SLongToTinyInt(p_right.GetAsBCD().AsLong());
 }
 
 bool
-SQL_OperUTinySmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUTinySmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUTinyInt() <= SQL_SLongToUTinyInt(p_right.GetAsBCD().AsLong());
 }
 
 bool
-SQL_OperSBigSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperSBigSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsSBigInt() <= p_right.GetAsBCD().AsInt64();
 }
 
 bool
-SQL_OperUBigSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperUBigSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsUBigInt() <= p_right.GetAsBCD().AsUInt64();
 }
 
 bool
-SQL_OperNumSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperNumSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   return p_left.GetAsBCD() <= p_right.GetAsBCD();
 }
@@ -953,7 +953,7 @@ SQL_OperNumSmallEQNum(SQLVariant& p_left,SQLVariant& p_right)
 // TYPE == GUID
 
 bool
-SQL_OperGuidSmallEQGuid(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperGuidSmallEQGuid(SQLVariant& p_left,SQLVariant& p_right)
 {
   SQLGUID* left  = p_left.GetAsGUID();
   SQLGUID* right = p_right.GetAsGUID();
@@ -964,7 +964,7 @@ SQL_OperGuidSmallEQGuid(SQLVariant& p_left,SQLVariant& p_right)
 // TYPE == BINARY
 
 bool
-SQL_OperBinarySmallEQBinary(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperBinarySmallEQBinary(SQLVariant& p_left,SQLVariant& p_right)
 {
   void* left   = p_left.GetAsBinary();
   void* right  = p_right.GetAsBinary();
@@ -977,14 +977,14 @@ SQL_OperBinarySmallEQBinary(SQLVariant& p_left,SQLVariant& p_right)
 // TYPE == DATE
 
 bool
-SQL_OperDateSmallEQDate(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperDateSmallEQDate(SQLVariant& p_left,SQLVariant& p_right)
 {
   // Relies on the < operator of SQLDate
   return p_left.GetAsSQLDate() <= p_right.GetAsSQLDate();
 }
 
 bool
-SQL_OperStampSmallEQDate(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperStampSmallEQDate(SQLVariant& p_left,SQLVariant& p_right)
 {
   SQLDate date = p_left.GetAsSQLTimestamp().AsSQLDate();
   return date <= p_right.GetAsSQLDate();
@@ -993,14 +993,14 @@ SQL_OperStampSmallEQDate(SQLVariant& p_left,SQLVariant& p_right)
 // TYPE == TIME
 
 bool
-SQL_OperTimeSmallEQTime(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperTimeSmallEQTime(SQLVariant& p_left,SQLVariant& p_right)
 {
   // Relies on the < operator of SQLTime
   return p_left.GetAsSQLTime() <= p_right.GetAsSQLTime();
 }
 
 bool
-SQL_OperStampSmallEQTime(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperStampSmallEQTime(SQLVariant& p_left,SQLVariant& p_right)
 {
   SQLTime time = p_left.GetAsSQLTimestamp().AsSQLTime();
   return time <= p_right.GetAsSQLTime();
@@ -1009,7 +1009,7 @@ SQL_OperStampSmallEQTime(SQLVariant& p_left,SQLVariant& p_right)
 // TYPE == TIMESTAMP
 
 bool
-SQL_OperStampSmallEQStamp(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperStampSmallEQStamp(SQLVariant& p_left,SQLVariant& p_right)
 {
   // Relies on the < operator of SQLTimestamp
   return p_left.GetAsSQLTimestamp() <= p_right.GetAsSQLTimestamp();
@@ -1018,7 +1018,7 @@ SQL_OperStampSmallEQStamp(SQLVariant& p_left,SQLVariant& p_right)
 // TYPE == INTERVAL_YEAR_MONTH
 
 bool
-SQL_OperIntYMSmallEQIntYM(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperIntYMSmallEQIntYM(SQLVariant& p_left,SQLVariant& p_right)
 {
   // Relies on the calculation of months in SQLInterval
   return p_left.GetAsSQLInterval().AsDatabaseDouble() <= p_right.GetAsSQLInterval().AsDatabaseDouble();
@@ -1027,7 +1027,7 @@ SQL_OperIntYMSmallEQIntYM(SQLVariant& p_left,SQLVariant& p_right)
 // TYPE == INTERVAL_DAY_SECOND
 
 bool
-SQL_OperIntDSSmallEQIntDS(SQLVariant& p_left,SQLVariant& p_right)
+static SQL_OperIntDSSmallEQIntDS(SQLVariant& p_left,SQLVariant& p_right)
 {
   // Relies on the calculation of seconds in SQLInterval
   return p_left.GetAsSQLInterval().AsDatabaseDouble() <= p_right.GetAsSQLInterval().AsDatabaseDouble();

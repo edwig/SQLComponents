@@ -244,15 +244,6 @@
     <ClInclude Include="SQLVariant.h" />
     <ClInclude Include="SQLVariantFormat.h" />
     <ClInclude Include="SQLVariantOperator.h" />
-    <ClInclude Include="SQLVariantOperatorAdd.h" />
-    <ClInclude Include="SQLVariantOperatorDiv.h" />
-    <ClInclude Include="SQLVariantOperatorGreatEqual.h" />
-    <ClInclude Include="SQLVariantOperatorGreater.h" />
-    <ClInclude Include="SQLVariantOperatorMod.h" />
-    <ClInclude Include="SQLVariantOperatorMul.h" />
-    <ClInclude Include="SQLVariantOperatorSmallEqual.h" />
-    <ClInclude Include="SQLVariantOperatorSmaller.h" />
-    <ClInclude Include="SQLVariantOperatorSub.h" />
     <ClInclude Include="SQLVariantTrim.h" />
     <ClInclude Include="SQLWrappers.h" />
     <ClInclude Include="stdafx.h" />
