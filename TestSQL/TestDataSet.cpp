@@ -175,8 +175,6 @@ TestDataSet()
   printf("Testing the DataSet function:\n");
   printf("=============================\n");
 
-  g_schema = "model";
-
   SQLDatabase dbs;
   dbs.AddMacro("%SCHEMA%",g_schema);
   dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");

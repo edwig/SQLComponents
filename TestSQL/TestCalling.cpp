@@ -98,7 +98,7 @@ void TestCalling()
       endTime = clock();
       printf("Calling test 3 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 
-      int status = res->GetAsSLong();
+      int status = 0;
       bcd number = q2.GetParameter(0)->GetAsBCD();
       CString text = q2.GetParameter(2)->GetAsChar();
       printf("Result of MULTINOUT = status:%d [%s] [%s]\n",status,number.AsString(),text.GetString());
