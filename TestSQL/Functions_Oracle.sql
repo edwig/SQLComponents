@@ -7,7 +7,7 @@ CREATE TABLE testrecord
 /
 
 CREATE OR REPLACE PROCEDURE testmul(p_num INTEGER)
-  RETURN INTEGER AS
+RETURN INTEGER AS
 BEGIN
   RETURN p_num * 2;
 END testmul;
@@ -21,7 +21,7 @@ END testins;
 /
 
 CREATE OR REPLACE FUNCTION multinout(p_text IN VARCHAR2,p_total IN OUT VARCHAR)
-  RETURN NUMBER IS
+RETURN NUMBER IS
   v_plus VARCHAR2(4000);
 BEGIN
   v_plus := p_text || p_text;
