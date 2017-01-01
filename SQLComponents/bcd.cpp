@@ -15,8 +15,8 @@
 //  E+01 34125600 00000000 00000000 -> 3.41256
 //  E-05 78976543 12388770 00000000 -> 0.0000789765431238877
 //
-// Last Revision:   14-12-2016
-// Version number:  1.3.0
+// Last Revision:   01-02-2017
+// Version number:  1.3.3
 //
 #include "Stdafx.h"
 #include "bcd.h"

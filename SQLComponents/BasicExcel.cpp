@@ -24,8 +24,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   14-12-2016
-// Version number:  1.3.0
+// Last Revision:   01-02-2017
+// Version number:  1.3.3
 //
 #include "ExcelFormat.h"
 
@@ -5966,7 +5966,7 @@ void BasicExcel::UpdateWorksheets()
 
     // Modify Dimensions
     rawSheet.dimensions_.firstUsedRowIndex_ = 100000; // Use 100000 to indicate that firstUsedRowIndex is not set yet since maximum allowed rows in Excel is 65535.
-    rawSheet.dimensions_.firstUsedColIndex_ = 1000;	// Use 1000 to indicate that firstUsedColIndex is not set yet since maximum allowed columns in Excel is 255.
+    rawSheet.dimensions_.firstUsedColIndex_ = 1000;	  // Use 1000   to indicate that firstUsedColIndex is not set yet since maximum allowed columns in Excel is 255.
     rawSheet.dimensions_.lastUsedRowIndexPlusOne_ = maxRows;
     rawSheet.dimensions_.lastUsedColIndexPlusOne_ = maxCols;
 
@@ -5975,7 +5975,7 @@ void BasicExcel::UpdateWorksheets()
 
     // References and pointers to shorten code
     vector<Worksheet::CellTable::RowBlock>& rRowBlocks = rawSheet.cellTable_.rowBlocks_;
-    vector<SmartPtr<Worksheet::CellTable::RowBlock::CellBlock> >* pCellBlocks;
+    vector<SmartPtr<Worksheet::CellTable::RowBlock::CellBlock> >* pCellBlocks = nullptr;
     Worksheet::CellTable::RowBlock::CellBlock* pCell;
     rRowBlocks.resize(maxRows/32 + ((maxRows % 32) ? 1 : 0));
     for(int r=0, curRowBlock=0; r<maxRows; ++r) 

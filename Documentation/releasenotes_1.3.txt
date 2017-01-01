@@ -1,8 +1,38 @@
 RELEASENOTES SQLCOMPONENTS VERSION 1.3
 ======================================
-====== Release date:  14-12-2016 =====
+====== Released since:14-12-2016 =====
 ======================================
 
+Version 1.3.3 of 01-01-2017
+---------------------------
+1)  Tested the DoSQLCall interface on all database platforms. Oracle, MS-SQLServer, 
+    PostgreSQL, Firebird and IBM-Informix. The interface is working on all platforms.
+2)  Added documentation in the documentation directory about the DoSQLCall interface
+    and the intricacies of how to write stored functions and stored procedures for it.
+
+Version 1.3.2 of 25-12-2016
+---------------------------
+1)  Added the ability to call a function or a procedure with the ODBC [?=]CALL convention
+    Stored functions and stored procedures can be called with an arbitrary number of
+    input, output or input-and-output parameters.
+2)  Added the ability for a database to implement a different convention to call functions
+    or parameters. Namely the Firebird SQL engine does this sort of thing. See the 
+    implementation in SQLInfoFirebird class to do this.
+3)  Changed the default testing database from MS-Access to Firebird 3.0 database.
+    Register the "testing.fdb" database in the root project folder as a ODBC DSN "testing"
+
+Version 1.3.1 of 21-12-2016
+---------------------------
+1)  Fixed a serious multi-threaded issue in the SQLVariant when requesting a column
+    in a different format than originally intended.
+2)  Fixed a problem in the transaction stack (SQLQuery did it's own commit)
+    and added unit tests for Commit() and Rollback()
+3)  Enhanced the transaction errors and logging with the transaction names
+4)  Closing the database, will rollback hanging transactions.
+    If no transactions exist, a commit will be done for multi-generation databases.
+
+Version 1.3.0 of 14-12-2016
+---------------------------
 1)  Added the "bcd" class to be able to use NUMERIC/DECIMAL datatypes from the
     database directly, instead of a mapping to double or character string.
     The classes SQLQuery and SQLVariant have been expanded to directly use the bcd.
@@ -47,24 +77,3 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.3
 11) Started a UnitTest module to unit test just about everything in this module.
     Code coverage is now above 55% (scattered over all classes) and still climbing...
     Unit testing found a few nasty bugs in SQLVariant, SQLVariantFormat and SQLDate....
-
-Version 1.3.1 of 21-12-2016
----------------------------
-1)  Fixed a serious multi-threaded issue in the SQLVariant when requesting a column
-    in a different format than originally intended.
-2)  Fixed a problem in the transaction stack (SQLQuery did it's own commit)
-    and added unit tests for Commit() and Rollback()
-3)  Enhanced the transaction errors and logging with the transaction names
-4)  Closing the database, will rollback hanging transactions.
-    If no transactions exist, a commit will be done for multi-generation databases.
-
-Version 1.3.2 of 25-12-2016
----------------------------
-1)  Added the ability to call a function or a procedure with the ODBC [?=]CALL convention
-    Stored functions and stored procedures can be called with an arbitrary number of
-    input, output or input-and-output parameters.
-2)  Added the ability for a database to implement a different convention to call functions
-    or parameters. Namely the Firebird SQL engine does this sort of thing. See the 
-    implementation in SQLInfoFirebird class to do this.
-3)  Changed the default testing database from MS-Access to Firebird 3.0 database.
-    Register the "testing.fdb" database in the root project folder as a ODBC DSN "testing"

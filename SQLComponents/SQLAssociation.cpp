@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   14-12-2016
-// Version number:  1.3.0
+// Last Revision:   01-02-2017
+// Version number:  1.3.3
 //
 #include "Stdafx.h"
 #include "SQLAssociation.h"
