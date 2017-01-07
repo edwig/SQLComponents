@@ -36,6 +36,7 @@ public:
    SQLInfoTree(SQLDatabase* p_database);
   ~SQLInfoTree();
 
+#ifdef SQL_COMPONENTS_MFC
   // All ODBC Functions to the tree
   void MakeTreeInfo (CTreeCtrl* tree);
   // All table info to a tree control
@@ -68,6 +69,7 @@ private:
                          ,HTREEITEM  p_branch
                          ,int        p_level
                          ,FILE*      p_file);
+#endif
 };
 
 // End of namespace

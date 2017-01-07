@@ -48,6 +48,8 @@ namespace DatabaseUnitTest
   {
     TEST_METHOD(TestCallFunctions)
     {
+      InitSQLComponents();
+
       OpenDatabase();
       ResetResultSet();
       TestCalling();

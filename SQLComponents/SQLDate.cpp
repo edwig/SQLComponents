@@ -420,8 +420,11 @@ SQLDate::CalculateDate(const CString& p_datum)
     return true;
   }
 
-  // Speed optimalisation: only if alpha-chars found
-  // with numbers: go straigth to the date-parser
+  // Test if we are properly initialized
+  SQLComponentsInitialized();
+
+  // Speed optimalization: only if alpha-chars found
+  // with numbers: go straight to the date-parser
   if(isalpha(datum.GetAt(0)))
   {
     CString     sign;
@@ -433,7 +436,7 @@ SQLDate::CalculateDate(const CString& p_datum)
     // Static split-string-date
     SplitStrDate(datum, currentDate, sign, extraTime, interval);
 
-    // Speciale dagen zoeken
+    // Search for special days
     if (currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_TODAY])   == 0 ||
         currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CURRENT]) == 0 ||
         currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_NOW])     == 0 )

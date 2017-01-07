@@ -99,7 +99,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>..\Debug;$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SQLComponents.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SQLComponents.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>false</OptimizeReferences>
       <Profile>true</Profile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -128,7 +128,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NO_WARN_MBCS_MFC_DEPRECATION;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
     </ClCompile>
     <Link>

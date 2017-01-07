@@ -300,7 +300,10 @@ SQLTime::ParseTime(const CString& p_string)
     return;
   }
 
-  // Speed optimisation. Parse only if alphachar
+  // Test if we are properly initialized
+  SQLComponentsInitialized();
+
+  // Speed optimization. Parse only if alpha char
   if(isalpha(string.GetAt(0)))
   {
     if (string.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CURRENT]) == 0 ||

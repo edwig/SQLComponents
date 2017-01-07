@@ -31,6 +31,7 @@
 #include "SQLInfoDB.h"
 #include "SQLQuery.h"
 #include "SQLWrappers.h"
+#include <atltrace.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -85,7 +86,7 @@ SQLTransaction::~SQLTransaction()
     else
     {
       // No database. Poor man's logging
-      TRACE(message);
+      ATLTRACE(message);
     }
     // Cannot throw in a destructor. Stops here
     // But we where already 'cornered', why would we otherwise need to rollback :-(
@@ -158,7 +159,7 @@ SQLTransaction::Commit()
       // Not an error in all RDBMS'es. In MS-Access this is default behaviour
       // So we log the error instead of throwing it. 
       // But as we do not have the database object to log it, we TRACE it :-(
-      TRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name);
+      ATLTRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name);
     }
   }
   // Cleanup after use
@@ -196,7 +197,7 @@ SQLTransaction::Rollback()
       // Not an error in all RDBMS'es. In MS-Access this is default behaviour
       // So we log the error instead of throwing it. 
       // But as we do not have the database object to log it, we TRACE it :-(
-      TRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name);
+      ATLTRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name);
     }
   }
 }

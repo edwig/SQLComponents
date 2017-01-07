@@ -121,6 +121,9 @@ namespace DatabaseUnitTest
     TEST_METHOD(TransactionCommit)
     {
       Logger::WriteMessage("Testing standard COMMIT transaction");
+
+      InitSQLComponents();
+
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database,"TransCommit");
@@ -139,6 +142,9 @@ namespace DatabaseUnitTest
     TEST_METHOD(TransactionRollback)
     {
       Logger::WriteMessage("Testing standard ROLLBACK transaction");
+
+      InitSQLComponents();
+
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database,"TransCommit");
@@ -163,6 +169,9 @@ namespace DatabaseUnitTest
     TEST_METHOD(TransactionCommit_DBC)
     {
       Logger::WriteMessage("Testing isolated COMMIT transaction");
+
+      InitSQLComponents();
+
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database->GetDBHandle(),true);
@@ -181,6 +190,9 @@ namespace DatabaseUnitTest
     TEST_METHOD(TransactionRollback_DBC)
     {
       Logger::WriteMessage("Testing isolated ROLLBACK transaction");
+
+      InitSQLComponents();
+
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database->GetDBHandle(),true);
@@ -205,6 +217,9 @@ namespace DatabaseUnitTest
     TEST_METHOD(TransactionRollback_FAIL)
     {
       Logger::WriteMessage("Testing the FAILING of the ROLLBACK");
+
+      InitSQLComponents();
+
       if(OpenDatabase())
       {
         // Extra scope

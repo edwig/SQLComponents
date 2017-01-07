@@ -159,6 +159,9 @@
     <ClCompile Include="SMX_String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SQLComponents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Locker.h">
@@ -288,6 +291,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SMX_String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLMemoryDebug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

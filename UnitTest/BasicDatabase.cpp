@@ -33,6 +33,7 @@
 #include "SQLInfoTree.h"
 #include "SQLInfoDB.h"
 #include "bcd.h"
+#include <time.h>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace SQLComponents;
@@ -327,6 +328,8 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("Testing the DataSet function:");
       Logger::WriteMessage("=============================");
 
+      InitSQLComponents();
+
       SQLDatabase dbs;
       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
       long beginTime = clock();
@@ -375,6 +378,8 @@ namespace DatabaseUnitTest
       Logger::WriteMessage(msg);
     }
 
+#ifdef SQL_COMPONENTS_MFC
+
     TEST_METHOD(BasicTreeControl)
     {
       Logger::WriteMessage("Testing the InfoTree function:");
@@ -418,10 +423,14 @@ namespace DatabaseUnitTest
       }
     }
 
+#endif
+
     TEST_METHOD(BasicReadNumeric)
     {
       Logger::WriteMessage("Testing Numeric reading/writing:");
       Logger::WriteMessage("================================");
+
+      InitSQLComponents();
 
       SQLDatabase dbs;
       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");

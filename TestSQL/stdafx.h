@@ -5,7 +5,6 @@
 
 #pragma once
 
-#define SQL_COMPONENTS_MFC
 #define NO_WARN_MBCS_MFC_DEPRECATION
 
 #include "targetver.h"
@@ -17,14 +16,18 @@
 #define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
 #endif
 
+// IF We want SQLInfoTree to work, we need the whole shebang from MFC
+// IF we want SQLDatasetXLS to work, we need CArhive for oldstyle *.XLS
+//    so we also need to include the full set
+// So we include the full MFC set, otherwise: we just need CString
+//
+#ifdef SQL_COMPONENTS_MFC
 #include <afx.h>
-#include <afxwin.h>         // MFC core and standard components
-#include <afxext.h>         // MFC extensions
-#ifndef _AFX_NO_OLE_SUPPORT
-#include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
+#include <afxwin.h>             // MFC core and standard components
+#include <afxext.h>             // MFC extensions
+#include <afxcmn.h>             // MFC support for Windows Common Controls
+#else
+#include <atlstr.h>             // Just ATLString and CString
 #endif
-#ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>                     // MFC support for Windows Common Controls
-#endif // _AFX_NO_AFXCMN_SUPPORT
 
-#include <iostream>
+

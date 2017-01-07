@@ -25,13 +25,10 @@
 // Version number:  1.3.3
 //
 #pragma once
-#include <afx.h>
-#include <afxdb.h>
-#include <afxcoll.h>
-#include <sql.h>
-#include <sqlext.h>
 #include "SQLComponents.h"
 #include "SQLTransaction.h"
+#include <sql.h>
+#include <sqlext.h>
 #include <stack>
 #include <vector>
 #include <map>

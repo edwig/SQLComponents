@@ -40,7 +40,8 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Unit testing names of the days of the week");
 
-      SetDefaultSQLLanguage(LN_ENGLISH);
+      InitSQLComponents(LN_ENGLISH);
+
       SQLDate birth("15-10-1959");
 
       CString in_english = birth.WeekDayName();
@@ -86,7 +87,8 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Unit testing full date string");
 
-      SetDefaultSQLLanguage(LN_ENGLISH);
+      InitSQLComponents(LN_ENGLISH);
+
       SQLDate birth("15-10-1959");
 
       CString in_english = birth.FullDate();
@@ -110,7 +112,8 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("Unit testing attributes of an SQLDate");
       Logger::WriteMessage("Today is: " + SQLDate::Today().AsString());
 
-      SetDefaultSQLLanguage(LN_ENGLISH);
+      InitSQLComponents();
+
       SQLDate birth("15-10-1959");
 
       Assert::AreEqual(true, birth.Valid());
@@ -124,6 +127,8 @@ namespace DatabaseUnitTest
     TEST_METHOD(DateCalculation)
     {
       Logger::WriteMessage("Unit testing attributes of an SQLDate");
+
+      InitSQLComponents();
 
       SQLDate birth("15-10-1959");
       birth = birth.AddYears(2);
@@ -162,8 +167,8 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Unit testing special strings in dates");
 
-      SetDefaultSQLLanguage(LN_ENGLISH);
-      
+      InitSQLComponents();
+
       SQLDate today = SQLDate::Today();
       SQLDate todayString("TODAY");
       SQLDate todayFOM("FOM");  // First of month

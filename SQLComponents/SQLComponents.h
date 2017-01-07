@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #pragma once
+#include "SQLLanguage.h"
 
 // Everything in this library is part of this namespace
 namespace SQLComponents
@@ -34,7 +35,7 @@ namespace SQLComponents
 // of the SQLComponents library
 
 #define SQL_COMPONENTS_VERSION   "1.3.3"
-#define SQL_COMPONENTS_DATE      "05-01-2017"
+#define SQL_COMPONENTS_DATE      "07-01-2017"
 #define SQL_COMPONENTS_COPYRIGHT "Copyright (c) 2017 ir. W.E. Huisman"
 
 // SQL/CLI Standard states that 128 is the maximum length
@@ -76,6 +77,15 @@ typedef struct _datasource
   bool    m_dataConnection;
 }
 DataSourceInternal;
+
+// Initialization of the SQLComponents library
+void InitSQLComponents(Language p_language = LN_ENGLISH);
+
+// Marker boolean to see if we where properly initialized
+extern bool g_SQLComponentsInitialized;
+
+// Test if we are properly initialized
+void SQLComponentsInitialized();
 
 // End of namespace
 }

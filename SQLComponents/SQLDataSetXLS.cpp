@@ -102,6 +102,8 @@ SQLDataSetXLS::~SQLDataSetXLS()
   }
 }
 
+#ifdef SQL_COMPONENTS_MFC
+
 // Read in a XLS and optionally make a backup
 bool
 SQLDataSetXLS::ReadXLS(CString p_sheet)
@@ -249,7 +251,7 @@ SQLDataSetXLS::RollBack()
 
 // Add header row to spreadsheet
 bool 
-SQLDataSetXLS::AddHeaders(CStringArray &p_fieldNames, bool p_replace)
+SQLDataSetXLS::AddHeaders(WordList& p_fieldNames, bool p_replace)
 {
   if(m_append == 0) 
   {
@@ -261,9 +263,9 @@ SQLDataSetXLS::AddHeaders(CStringArray &p_fieldNames, bool p_replace)
     m_names.clear();
   }
   // New header row values
-  for (int i = 0; i < p_fieldNames.GetSize(); i++)
+  for(auto& field : p_fieldNames)
   {
-    m_names.push_back(p_fieldNames.GetAt(i));
+    m_names.push_back(field);
   }
   return true;
 }
@@ -271,16 +273,16 @@ SQLDataSetXLS::AddHeaders(CStringArray &p_fieldNames, bool p_replace)
 // Insert or replace a row into spreadsheet. 
 // Default is add new row.
 bool
-SQLDataSetXLS::AddRow(CStringArray &p_rowValues, long /*p_row*/, bool /*p_replace*/)
+SQLDataSetXLS::AddRow(WordList& p_rowValues, long /*p_row*/, bool /*p_replace*/)
 {
   int ind  = 0;
   int cols = GetNumberOfFields();
-  int vals = (int)p_rowValues.GetSize();
+  int vals = (int)p_rowValues.size();
   SQLRecord* record = InsertRecord();
 
   while(cols-- && vals--)
   {
-    SQLVariant* var = new SQLVariant(p_rowValues.GetAt(ind++));
+    SQLVariant* var = new SQLVariant(p_rowValues[ind++]);
     record->AddField(var);
   }
   if(!m_transaction)
@@ -504,7 +506,7 @@ SQLDataSetXLS::Open()
   {
     try
     {
-      // Buffer voor de cellen
+      // Buffer for all the cells
       char buffer[100];
 
       if(m_workbook->Load(m_file,true) ==false)
@@ -528,7 +530,7 @@ SQLDataSetXLS::Open()
         return false;
       }
 
-      // Lees de header row met cell namen
+      // Read the header row with the cell names
       for(int col = 0; col < cols; ++col)
       {
         CString value(sheet->CellValue(0,col,buffer,100));
@@ -536,7 +538,7 @@ SQLDataSetXLS::Open()
         m_types.push_back(SQL_C_CHAR);
       }
 
-      // Lees de data rows
+      // Read the data rows
       for(int row = 1; row < rows; ++row)
       {
         SQLRecord* record = InsertRecord();
@@ -582,7 +584,7 @@ SQLDataSetXLS::Open()
     int cols = sheet->GetMaxCols();
     int rows = sheet->GetMaxRows();
 
-    // Lees de header row met cell namen
+    // Read the header row with the cell names
     for(int col = 1; col <= cols; ++col)
     {
       CString value(sheet->GetCellValue(1,col));
@@ -590,7 +592,7 @@ SQLDataSetXLS::Open()
       m_types.push_back(SQL_C_CHAR);
     }
 
-    // Lees de data rows
+    // Read the data rows
     for(int row = 2; row <= rows; ++row)
     {
       SQLRecord* record = InsertRecord();
@@ -626,7 +628,7 @@ SQLDataSetXLS::Open()
           while(Archive->ReadString(tempString))
           {
             TRACE("INPUT: %s\n",tempString);
-            CStringArray values;
+            WordList values;
             if(SplitRow(tempString,values) == false)
             {
               result = false;
@@ -639,7 +641,7 @@ SQLDataSetXLS::Open()
               continue;
             }
             AddRow(values);
-            values.RemoveAll();
+            values.clear();
           }
           delete Archive;
           delete File;
@@ -861,5 +863,6 @@ SQLDataSetXLS::GetLastError()
   return m_lastError;   
 } 
 
+#endif
 // End of namespace
 }

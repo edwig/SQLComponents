@@ -233,6 +233,7 @@ protected:
                         ,SQLCHAR* search_table
                         ,SQLCHAR* search_type);
   void    ReadingDataTypes();
+  void    InfoMessageBox(CString p_message,UINT p_type = MB_OK);
 
 protected:
   bool           m_initDone;           // Already read in?

@@ -1555,15 +1555,15 @@ SQLQuery::DescribeColumn(int           p_col
                         ,SQLSMALLINT&  p_colNullable
                         ,SQLINTEGER&   p_colDispSize)
 {
-  SQLSMALLINT	cbDescMax     = MAX_FNAME_LEN;
+  SQLSMALLINT	cbDescMax     = SQL_MAX_IDENTIFIER;
   SQLSMALLINT cbDescResult  = 0;
   SQLSMALLINT	sqlType       = 0;
   SQLUINTEGER cbColDef      = 0;
   SQLSMALLINT ibScale       = 0;
   SQLSMALLINT fNullable     = 0;
   SQLLEN      fDesc         = 0;
-  SQLCHAR     szColName[MAX_FNAME_LEN + 1] = "";
-  SQLCHAR     rgbDesc  [MAX_FNAME_LEN + 1] = "";
+  SQLCHAR     szColName[SQL_MAX_BUFFER] = "";
+  SQLCHAR     rgbDesc  [SQL_MAX_BUFFER] = "";
 
   m_retCode = SqlDescribeCol(m_hstmt
                             ,(SQLUSMALLINT) p_col

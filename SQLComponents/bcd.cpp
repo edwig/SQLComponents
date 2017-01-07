@@ -22,6 +22,7 @@
 #include "SQLComponents.h"
 #include "bcd.h"
 #include <math.h> // Still needed for conversions of double
+#include <intsafe.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

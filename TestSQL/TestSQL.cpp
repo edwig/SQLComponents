@@ -62,40 +62,31 @@ int CALLBACK LogLevel(void* p_context)
 
 // The one and only application object
 
-CWinApp theApp;
-
 using namespace std;
 
-int _tmain(int argc, TCHAR* argv[], TCHAR* envp[])
+int main(int argc,char* argv[],char* envp[])
 {
   int nRetCode = 0;
 
-  if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
-  {
-    _tprintf(_T("Fatal Error: MFC initialization failed\n"));
-    nRetCode = 1;
-  }
-  else
-  {
-    // Basic connection test
-    TestConnection();
-    // Test calling procedure/function
-    TestCalling();
-    // Test BCD to NUMERIC conversions
-    TestBcd();
-    // Testing Numerics
-    TestNumeric();
-    // Test closing cursors does not leave thrash in RDBMS    
-    TestClosingCursor();
-    // Test the reading of NULL
-    TestNULL();
-    // Test formatting of Date/Time/Timestamp
-    TestFormatting();
-    // Test operators
-    TestOperators();
-    // Test dataset
-    TestDataSet();
-  }
+  // Basic connection test
+  TestConnection();
+  // Test calling procedure/function
+  TestCalling();
+  // Test BCD to NUMERIC conversions
+  TestBcd();
+  // Testing Numerics
+  TestNumeric();
+  // Test closing cursors does not leave thrash in RDBMS    
+  TestClosingCursor();
+  // Test the reading of NULL
+  TestNULL();
+  // Test formatting of Date/Time/Timestamp
+  TestFormatting();
+  // Test operators
+  TestOperators();
+  // Test dataset
+  TestDataSet();
+
 
   //////////////////////////////////////////////////////////////////////////
   // 

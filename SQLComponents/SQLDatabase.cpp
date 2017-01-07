@@ -39,6 +39,7 @@
 #include "SQLInfoPostgreSQL.h"
 #include "SQLInfoGenericODBC.h"
 #include "SQLTimestamp.h"
+#include <time.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -102,7 +103,7 @@ SQLDatabase::Close()
     // Disconnect environment
     FreeEnvHandle();
   }
-  // Empty parameter and column rebindings
+  // Empty parameter and column rebinding
   m_rebindParameters.clear();
   m_rebindColumns.clear();
 
@@ -240,6 +241,9 @@ SQLDatabase::Open(CString const& p_connectString,bool p_readOnly)
 {
   // Set lock on the stack
   Locker<SQLDatabase> lock(this,INFINITE);
+
+  // Test if we are properly initialized
+  SQLComponentsInitialized();
 
   // Close the open connection
   Close();

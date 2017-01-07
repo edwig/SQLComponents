@@ -46,7 +46,8 @@ public:
   // Perform cleanup
  ~SQLDataSetXLS(); 
 
-  // Read in a XLS and optionally make a backup
+#ifdef SQL_COMPONENTS_MFC
+ // Read in a XLS and optionally make a backup
   bool ReadXLS(CString p_sheet);
   // Begin transaction
   void BeginTransaction(); 
@@ -58,9 +59,9 @@ public:
   bool  CloseWorksheet();
 
   // Add header row to spreadsheet
-  bool AddHeaders(CStringArray &FieldNames, bool replace = false); 
+  bool AddHeaders(WordList &FieldNames, bool replace = false); 
   // Insert or replace a row into spreadsheet. Default is add new row. 
-  bool AddRow(CStringArray &RowValues, long row = 0, bool replace = false); 
+  bool AddRow(WordList &RowValues, long row = 0, bool replace = false); 
   // Read a cell from Excel spreadsheet using header row or column alphabet. 
   bool ReadCell (CString &CellValue, CString column, long row, bool p_name = true); 
   // Read a cell from spreadsheet using column number. Default is read the next cell in next row.
@@ -102,9 +103,11 @@ private:
   // Convert Excel column in alphabet into column number
   int   CalculateColumnNumber(CString column, bool p_name = true); 
   // Read a row from spreadsheet. Default is read the next row
-  bool  SplitRow(CString& p_input,CStringArray &RowValues); 
+  bool  SplitRow(CString& p_input,WordList &RowValues); 
   // Trim whitespace in between delimiters
   void  TrimRow(CString& p_row);
+
+#endif  // END OF SQL_COMPONENTS_MFC
 
   BasicExcel*     m_workbook;    // Excel workbook instance
   BasicXmlExcel*  m_xmlWorkbook; // New OOXML Workbook
@@ -120,7 +123,10 @@ private:
   CString m_delimLeft;       // Delimiter for text on the left  side, default = "
   CString m_delimRight;      // Delimiter for text on the right side, default = "
   CString m_lastError;       // Last error message
+
 };
+
+#ifdef SQL_COMPONENTS_MFC
 
 inline void
 SQLDataSetXLS::SetDelimiterLeft(CString p_delim)
@@ -158,5 +164,6 @@ SQLDataSetXLS::CloseWorksheet()
   return Close();
 }
 
+#endif
 // End of namespace
 }

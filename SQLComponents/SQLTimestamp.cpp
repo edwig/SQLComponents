@@ -656,18 +656,21 @@ SQLTimestamp::ParseMoment(const CString& p_string)
 
   // Trim spaces from string
   string.Trim();
-  // Test for emptyness
+  // Test for emptiness
   if(p_string.IsEmpty())
   {
     SetNull();
     return;
   }
 
+  // Test if we are properly initialized
+  SQLComponentsInitialized();
+
   SQLDate::SplitStrDate(p_string, CurrentDate, Sign, ExtraTime, interval);
 
   if(isalpha(CurrentDate.GetAt(0)))
   {
-    // Speed optimisation. only if alpha chars found parsed 
+    // Speed optimization. only if alpha chars found parsed 
     if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CURRENT]) == 0 ||
         CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_NOW])     == 0 ) 
     {
@@ -943,6 +946,9 @@ SQLTimestamp::GetVirtualMoment(CString Sign
                               ,int    interval
                               ,StampStorage& temp)
 { 	
+  // Test if we are properly initialized
+  SQLComponentsInitialized();
+
   SQLTimestamp mom(CurrentTimestamp());
   if (!Sign.IsEmpty())
   {

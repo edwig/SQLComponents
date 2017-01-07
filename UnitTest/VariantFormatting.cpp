@@ -150,6 +150,8 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Formatting: Formatting the date/time");
 
+      InitSQLComponents();
+
       CString dateString("15-10-1959");
       SQLDate date(dateString);
       var dateVar(&date);
@@ -254,6 +256,8 @@ namespace DatabaseUnitTest
     TEST_METHOD(FormatDateCalculation)
     {
       Logger::WriteMessage("Formatting: date calculations and reformatting");
+
+      InitSQLComponents();
 
       // ADDITION
 

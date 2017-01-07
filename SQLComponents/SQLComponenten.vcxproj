@@ -22,32 +22,33 @@
     <ProjectName>SQLComponents</ProjectName>
     <ProjectGuid>{0E56E030-9CDD-47A7-B580-DCD4E103F968}</ProjectGuid>
     <RootNamespace>SQLComponenten</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
-    <UseOfMfc>Static</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -152,6 +153,7 @@
     </ClCompile>
     <ClCompile Include="SQLAssociation.cpp" />
     <ClCompile Include="SQLColumnInfo.cpp" />
+    <ClCompile Include="SQLComponents.cpp" />
     <ClCompile Include="SQLDatabase.cpp" />
     <ClCompile Include="SQLDataSet.cpp" />
     <ClCompile Include="SQLDataSetXLS.cpp">
@@ -238,6 +240,7 @@
     <ClInclude Include="SQLInfoTree.h" />
     <ClInclude Include="SQLInterval.h" />
     <ClInclude Include="SQLLanguage.h" />
+    <ClInclude Include="SQLMemoryDebug.h" />
     <ClInclude Include="SQLMutation.h" />
     <ClInclude Include="SQLQuery.h" />
     <ClInclude Include="SQLRecord.h" />

@@ -37,8 +37,8 @@ static char THIS_FILE[] = __FILE__;
 namespace SQLComponents
 {
 
-// Default language for Key2Brief = DUTCH !
-Language g_defaultLanguage = LN_DUTCH;
+// Default language now English and not Dutch
+Language g_defaultLanguage = LN_ENGLISH;
 
 // All the days of the week 
 char* g_weekdays[LN_NUMLANG][DAYS_IN_WEEK] = 

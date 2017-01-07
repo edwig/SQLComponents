@@ -31,6 +31,8 @@
 #include "SQLInfo.h"
 #include "SQLWrappers.h"
 #include <sqlext.h>
+#include <atltrace.h>
+#include <map>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,7 +42,6 @@ static char THIS_FILE[] = __FILE__;
 
 namespace SQLComponents
 {
-
 #pragma warning (disable: 4996)
 #pragma warning (disable: 4312)
 
@@ -239,6 +240,12 @@ SQLInfo::Init()
   m_dataTypes.clear();
 }
 
+void
+SQLInfo::InfoMessageBox(CString p_message,UINT p_type /*= MB_OK*/)
+{
+  ::MessageBox(NULL,p_message,"ODBC Driver info",p_type);
+}
+
 // Add an ODBC SQL Keyword
 bool
 SQLInfo::AddSQLWord(CString sql)
@@ -269,8 +276,8 @@ SQLInfo::SupportedODBCFunctions()
     m_retCode = SqlGetFunctions(m_hdbc,SQL_API_ALL_FUNCTIONS,m_ODBCFunctions_2);
     if(!SQL_SUCCEEDED(m_retCode))
     {
-      TRACE("Cannot determine which ODBC functions are supported. Proceed with caution!");
-      TRACE("In effect: Get a better driver, because this is a basic ODBC function!\n");
+      ATLTRACE("Cannot determine which ODBC functions are supported. Proceed with caution!");
+      ATLTRACE("In effect: Get a better driver, because this is a basic ODBC function!\n");
     }
   }
 }
@@ -307,7 +314,7 @@ SQLInfo::GetInfoString(SQLUSMALLINT info)
   }
   if(overflow)
   {
-    AfxMessageBox("Buffer overflow on ::SQLGetInfo()\n\r"
+    InfoMessageBox("Buffer overflow on ::SQLGetInfo()\n\r"
                   "This is a serious error in the ODBCDriver\n\r"
                   "Please close this program and get a better ODBC driver!!"
                   ,MB_OK | MB_ICONERROR);
@@ -377,8 +384,8 @@ SQLInfo::GetInfo()
   
   if(!SupportedFunction(SQL_API_SQLGETINFO))
   {
-    TRACE("Cannot get ODBC info with SQLGetInfo. Cannot determine capabilities\n");
-    TRACE("In effect: Get a better driver, because this is a basic ODBC function!\n");
+    ATLTRACE("Cannot get ODBC info with SQLGetInfo. Cannot determine capabilities\n");
+    ATLTRACE("In effect: Get a better driver, because this is a basic ODBC function!\n");
     return;
   }
   // STATIC KEYWORDS FROM ODBC 3.5 as of compilation
@@ -803,17 +810,17 @@ SQLInfo::GetAttributeInteger(CString description,SQLINTEGER attrib)
        state.CompareNoCase("HYC00") == 0 )  // Optional feature not implemented
     {
       // Driver not capable to get/set this attribute
-      TRACE("%s\n",error);
+      ATLTRACE("%s\n",error);
       return -1;
     }
-    AfxMessageBox(error);
+    InfoMessageBox(error);
     return 0;
   }
   if(cbMax != 4)
   {
-    TRACE("Attribute \"%s\" not supported on your database\n",description);
+    ATLTRACE("Attribute \"%s\" not supported on your database\n",description);
   }
-  TRACE("Database connection attribute \"%s\" was: %d\n",description,value);
+  ATLTRACE("Database connection attribute \"%s\" was: %d\n",description,value);
   return value;
 }
 
@@ -834,11 +841,11 @@ SQLInfo::GetAttributeString(CString description,SQLINTEGER attrib)
     CString error;
     error.Format("Cannot get connection attribute \"%s\": ",description);
     error += m_database->GetErrorString(NULL);
-    AfxMessageBox(error);
+    InfoMessageBox(error);
     return "";
   }
   value[cbMax] = 0;
-  TRACE("Database connection attribute \"%s\" was: %s\n",description,value);
+  ATLTRACE("Database connection attribute \"%s\" was: %s\n",description,value);
   return CString(value);
 }
 
@@ -858,10 +865,10 @@ SQLInfo::SetAttributeInteger(CString     description
     CString error;
     error.Format("Cannot set connection attribute \"%s\": ",description);
     error += m_database->GetErrorString(NULL);
-    AfxMessageBox(error);
+    InfoMessageBox(error);
     return false;
   }
-  TRACE("Database connection attribute \"%s\" set to: %d\n",description,value);
+  ATLTRACE("Database connection attribute \"%s\" set to: %d\n",description,value);
   return true;
 }
 
@@ -881,10 +888,10 @@ SQLInfo::SetAttributeString(CString    description
     CString error;
     error.Format("Cannot set connection attribute \"%s\": ",description);
     error += m_database->GetErrorString(NULL);
-    AfxMessageBox(error);
+    InfoMessageBox(error);
     return false;
   }
-  TRACE("Database connection attribute \"%s\" set to: %s\n",description,value);
+  ATLTRACE("Database connection attribute \"%s\" set to: %s\n",description,value);
   return true;
 }
 
@@ -1173,7 +1180,7 @@ SQLInfo::GetStatement(bool p_metadataID /*= true*/)
     errorText += m_database->GetErrorString(m_hstmt);
     throw errorText;
   }
-  TRACE("DBInfo::GetStatement\n");
+  ATLTRACE("DBInfo::GetStatement\n");
 
   SQLUINTEGER meta = p_metadataID ? SQL_TRUE : SQL_FALSE;
   // On Various ODBC databases metadata is or is not case-sensitive. To work around
@@ -1203,7 +1210,7 @@ SQLInfo::CloseStatement()
     m_hstmt   = NULL;
     m_retCode = SQL_SUCCESS;
 
-    TRACE("DBInfo::CloseStatement\n");
+    ATLTRACE("DBInfo::CloseStatement\n");
   }
 }
 
@@ -1284,7 +1291,7 @@ SQLInfo::GetObjectName(CString& pattern
       }
       else
       {
-        AfxMessageBox(CString("Unknown catalog type: ") + type.GetAt(1),MB_OK|MB_ICONEXCLAMATION);
+        InfoMessageBox(CString("Unknown catalog type: ") + type.GetAt(1),MB_OK|MB_ICONEXCLAMATION);
         type = type.Mid(1);
       }
     }
@@ -1315,15 +1322,15 @@ SQLInfo::GetObjectName(CString& pattern
   }
   if(m_maxCatalogName && strlen((char*)search_catalog) > (size_t)m_maxCatalogName)
   {
-    AfxMessageBox("Requested catalog name is longer than this ODBC database supports!",MB_OK);
+    InfoMessageBox("Requested catalog name is longer than this ODBC database supports!",MB_OK);
   }
   if(m_maxSchemaName  && strlen((char*)search_schema)  > (size_t)m_maxSchemaName)
   {
-    AfxMessageBox("Requested schema name is longer than this ODBC database supports!",MB_OK);
+    InfoMessageBox("Requested schema name is longer than this ODBC database supports!",MB_OK);
   }
   if(m_maxTableNaam   && strlen((char*)search_table)   > (size_t)m_maxTableNaam)
   {
-    AfxMessageBox("Requested table name is longer than this ODBC database supports!",MB_OK);
+    InfoMessageBox("Requested table name is longer than this ODBC database supports!",MB_OK);
   }
 }
 
@@ -1468,7 +1475,7 @@ SQLInfo::MakeInfoTableTablepart(WordList* p_list,WordList* p_tables,CString& p_f
                              // e.g. MS-SQLServer / MS-Access / PostgreSQL / mySQL
       default:               if(m_METADATA_ID_unsupported && (m_METADATA_ID_errorseen == false))
                              {
-                               AfxMessageBox("Cannot garantee to find object '" + p_findTable + "' for one of the following reasons:\r\n"
+                               InfoMessageBox("Cannot garantee to find object '" + p_findTable + "' for one of the following reasons:\r\n"
                                              "- The usage of SQL_ATTR_METADATA_ID is not supported on the statement level\r\n"
                                              "- The usage of SQL_ATTR_METADATA_ID is not supported on the connection level\r\n"
                                              "- SQLInfo of catalog identifiers is not simply SQL_IC_UPPER or SQL_IC_LOWER\r\n"
@@ -1524,7 +1531,7 @@ SQLInfo::MakeInfoTableTablepart(WordList* p_list,WordList* p_tables,CString& p_f
        if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
        {
          CString err = m_database->GetErrorString(m_hstmt);
-         AfxMessageBox(err,MB_OK);
+         InfoMessageBox(err,MB_OK);
          if(m_retCode == SQL_ERROR)
          {
            return false;
@@ -1685,7 +1692,7 @@ SQLInfo::MakeInfoTableColumns(WordList* p_list)
        if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
        {
          CString err = m_database->GetErrorString(m_hstmt);
-         AfxMessageBox(err,MB_OK);
+         InfoMessageBox(err,MB_OK);
          if(m_retCode == SQL_ERROR)
          {
            return false;
@@ -1830,7 +1837,7 @@ SQLInfo::MakeInfoTablePrimary(WordList*   p_list
        if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
        {
          CString err = m_database->GetErrorString(m_hstmt);
-         AfxMessageBox(err,MB_OK);
+         InfoMessageBox(err,MB_OK);
          if(m_retCode == SQL_ERROR)
          {
            return false;
@@ -2008,7 +2015,7 @@ SQLInfo::MakeInfoTableForeign(WordList* p_list,bool ref)
        if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
        {
          CString err = m_database->GetErrorString(m_hstmt);
-         AfxMessageBox(err,MB_OK);
+         InfoMessageBox(err,MB_OK);
          if(m_retCode == SQL_ERROR)
          {
            return false;
@@ -2240,7 +2247,7 @@ SQLInfo::MakeInfoTableStatistics(WordList*   p_list
       if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
       {
         CString err = m_database->GetErrorString(m_hstmt);
-        AfxMessageBox(err,MB_OK);
+        InfoMessageBox(err,MB_OK);
         if(m_retCode == SQL_ERROR)
         {
           return false;
@@ -2449,7 +2456,7 @@ SQLInfo::MakeInfoTableSpecials(WordList* p_list)
        if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
        {
          CString err = m_database->GetErrorString(m_hstmt);
-         AfxMessageBox(err,MB_OK);
+         InfoMessageBox(err,MB_OK);
          if(m_retCode == SQL_ERROR)
          {
            return false;
@@ -2569,7 +2576,7 @@ SQLInfo::MakeInfoTablePrivileges(WordList* p_list)
        if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
        {
          CString err = m_database->GetErrorString(m_hstmt);
-         AfxMessageBox(err,MB_OK);
+         InfoMessageBox(err,MB_OK);
          if(m_retCode == SQL_ERROR)
          {
            return false;
@@ -2701,7 +2708,7 @@ SQLInfo::MakeInfoProcedureProcedurepart(WordList* p_list
       if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
       {
         CString err = m_database->GetErrorString(m_hstmt);
-        AfxMessageBox(err,MB_OK);
+        InfoMessageBox(err,MB_OK);
         if(m_retCode == SQL_ERROR)
         {
           return false;
@@ -2866,7 +2873,7 @@ SQLInfo::MakeInfoProcedureParameters(WordList* p_list)
       if(m_retCode == SQL_ERROR || m_retCode == SQL_SUCCESS_WITH_INFO)
       {
         CString err = m_database->GetErrorString(m_hstmt);
-        AfxMessageBox(err,MB_OK);
+        InfoMessageBox(err,MB_OK);
         if(m_retCode == SQL_ERROR)
         {
           return false;
@@ -2999,7 +3006,7 @@ SQLInfo::NativeSQL(HDBC hdbc,CString& sqlCommand)
   // Check whether we can do this
   if(!SupportedFunction(SQL_API_SQLNATIVESQL))
   {
-    AfxMessageBox("SQLNativeSQL unsupported. Get a better ODBC driver!",MB_OK|MB_ICONEXCLAMATION);
+    InfoMessageBox("SQLNativeSQL unsupported. Get a better ODBC driver!",MB_OK|MB_ICONEXCLAMATION);
     return "";
   }
   SQLINTEGER retLen = 0;
@@ -3021,7 +3028,7 @@ SQLInfo::NativeSQL(HDBC hdbc,CString& sqlCommand)
     {
       // Overflow error
       CString error = "Buffer overflow (30.000 chars) on SQLNativeSQL";
-      AfxMessageBox(error,MB_OK|MB_ICONERROR);
+      InfoMessageBox(error,MB_OK|MB_ICONERROR);
       return error;
     }
   }
@@ -3030,7 +3037,7 @@ SQLInfo::NativeSQL(HDBC hdbc,CString& sqlCommand)
     // SQLNativeSQL returned an error
     CString errorText = "Error while retrieving SQLNativeSQL:\n";
     errorText += m_database->GetErrorString(NULL);
-    AfxMessageBox(errorText,MB_OK|MB_ICONERROR);
+    InfoMessageBox(errorText,MB_OK|MB_ICONERROR);
     return errorText;
   }
 }
@@ -3068,7 +3075,8 @@ SQLInfo::MakeInfoMetaTypes(WordList* p_list,int type)
   unsigned char search_table  [10] = "";
   unsigned char search_type   [10] = "";
   // For duplicates
-  CMapStringToString found;
+  std::map<CString,CString> found;
+  std::map<CString,CString>::iterator it;
   int numFound = 0;
   char* nameFound = NULL;
 
@@ -3140,13 +3148,14 @@ SQLInfo::MakeInfoMetaTypes(WordList* p_list,int type)
         if(nameFound)
         {
           CString val;
-          if(found.Lookup(nameFound,val))
+          it = found.find(nameFound);
+          if(it != found.end())
           {
             ++numFound;
           }
           else
           {
-            found.SetAt(nameFound,nameFound);
+            found.insert(std::make_pair(nameFound,nameFound));
             if(cbRemarks > 0)
             {
               strcat_s(nameFound,SQL_MAX_BUFFER," (");

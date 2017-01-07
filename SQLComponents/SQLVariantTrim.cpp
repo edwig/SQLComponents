@@ -28,6 +28,7 @@
 #include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantTrim.h"
+#include <float.h>
 
 namespace SQLComponents
 {

@@ -47,6 +47,8 @@ SQLInfoTree::~SQLInfoTree()
 {
 }
 
+#ifdef SQL_COMPONENTS_MFC
+
 //////////////////////////////////////////////////////////////////////////
 //
 // PUBLIC MAIN ROUTINES
@@ -1606,5 +1608,6 @@ SQLInfoTree::ReportCapabilities(CTreeCtrl* p_tree
   while(branch);
 }
 
+#endif
 // End of namespace
 }

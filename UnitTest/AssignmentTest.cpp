@@ -313,6 +313,8 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = SQLDate");
 
+      InitSQLComponents();
+
       SQLDate date("15-10-1959");
       SQLVariant one(&date);        // XTOR SQLDate -> to SQLVariant
       CString oneString;
@@ -356,6 +358,8 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = SQLTime");
 
+      InitSQLComponents();
+
       SQLTime time("15:55:42");
       SQLVariant one(&time);        // XTOR DATE_STRUCT -> SQLVariant
       CString oneString;
@@ -398,6 +402,8 @@ namespace OperatorUnitTest
     TEST_METHOD(TestAssignTimestamp)
     {
       Logger::WriteMessage("SQLVariant = SQLTimestamp");
+
+      InitSQLComponents();
 
       SQLTimestamp stamp("1959-10-15 15:55:42");
       SQLVariant one(&stamp);       // XTOR SQLTimestamp -> SQLVariant
