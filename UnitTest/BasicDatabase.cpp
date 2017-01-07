@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "CppUnitTest.h"
 #include "SQLDatabase.h"
 #include "SQLQuery.h"
@@ -34,6 +35,7 @@
 #include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace SQLComponents;
 
 namespace DatabaseUnitTest
 {
@@ -459,6 +461,7 @@ namespace DatabaseUnitTest
                          "   SET field3 = ?\n"
                          " WHERE id     = 1";
           bcd num(3034.6);
+          query.SetConcurrency(SQL_CONCUR_LOCK);
           query.SetParameter(1,num);
           query.DoSQLStatementNonQuery(sql2);
           trans.Commit();
@@ -500,6 +503,79 @@ namespace DatabaseUnitTest
       msg.Format("NUMERIC test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(msg);
     }
+
+//     TEST_METHOD(BasicUpdateCursor)
+//     {
+//       Logger::WriteMessage("Testing UPDATE WHERE CURRENT OF:");
+//       Logger::WriteMessage("================================");
+// 
+//       SQLDatabase dbs;
+//       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+//       long beginTime = clock();
+// 
+//       try
+//       {
+//         // Set options for the database
+//         dbs.SetLoginTimeout(0);
+//         dbs.SetMARS(false);
+// 
+//         if(dbs.Open(g_dsn,g_user,g_password))
+//         {
+//           Logger::WriteMessage("Database opened.");
+// 
+//           bcd theValue;
+//           CString sql1 = "SELECT field3\n"
+//                          "  FROM test_number\n"
+//                          " WHERE id = 1";
+// 
+//           CString sql2 = "UPDATE test_number\n"
+//                         "   SET field3 = ?\n"
+//                         " WHERE CURRENT OF ";
+//           SQLQuery query(&dbs);
+//           SQLTransaction trans(&dbs,"UpdCursor");
+//           query.SetConcurrency(SQL_CONCUR_LOCK);
+// 
+//           query.DoSQLStatement(sql1);
+//           if(query.GetRecord())
+//           {
+//             bcd value = query[1];
+//             theValue  = value * 2;
+// 
+//             query.SetParameter(1,theValue);
+//             sql2 += query.GetCursorName();
+//             query.DoSQLStatementNonQuery(sql2);
+//           }
+//           trans.Commit();
+// 
+//           // Checking the value
+//           
+//           query.ResetParameters();
+//           SQLVariant* result = query.DoSQLStatementScalar(sql1);
+//           bcd check = result->GetAsBCD();
+// 
+//           Assert::AreEqual(theValue.AsString().GetString(),check.AsString().GetString());
+//         }
+//         else
+//         {
+//           Assert::Fail(L"Database ***NOT*** opened.");
+//         }
+//         dbs.Close();
+//       }
+//       catch(CString& s)
+//       {
+//         Logger::WriteMessage("Database error. Reason:");
+//         Logger::WriteMessage(s);
+//         Assert::Fail(L"Database error");
+//       }
+//       catch(...)
+//       {
+//         Assert::Fail(L"Unknown error in database test");
+//       }
+//       long endTime = clock();
+//       CString msg;
+//       msg.Format("NUMERIC test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+//       Logger::WriteMessage(msg);
+//     }
 
     //////////////////////////////////////////////////////////////////////////
     //
@@ -655,13 +731,11 @@ namespace DatabaseUnitTest
       ReportSQL    ("Start new subtransaction           :",p_info->GetStartSubTransaction(table));
       ReportSQL    ("Commit subtransaction              :",p_info->GetCommitSubTransaction(table));
       ReportSQL    ("Rollback subtransaction            :",p_info->GetRollbackSubTransaction(table));
-      ReportSQL    ("Find out if stored procedure exists:",p_info->GetSQLStoredProcedureExists(procedure));
       ReportString ("DUAL table name                    :",p_info->GetDualTableName());
       ReportString ("FROM part for single row select    :",p_info->GetDualClause());
       ReportSQL    ("DEFERRABLE for a constraint        :",p_info->GetConstraintDeferrable());
       ReportSQL    ("SET ALL CONSTRAINTS DEFERRED       :",p_info->GetSQLDeferConstraints());
       ReportSQL    ("SET ALL CONSTRAINTS IMMEDIATE      :",p_info->GetSQLConstraintsImmediate());
-      ReportSQL    ("Find out if table exists           :",p_info->GetSQLTableExists(schema,table));
       ReportSQL    ("Get all column info of a table     :",p_info->GetSQLGetColumns(schema,table));
       ReportSQL    ("Get all constraints of a table     :",p_info->GetSQLGetConstraintsForTable(table));
       ReportSQL    ("Get all indices of a table         :",p_info->GetSQLTableIndices(schema,table));
@@ -693,13 +767,6 @@ namespace DatabaseUnitTest
       ReportString ("SPL Start a while loop             :",p_info->GetSPLStartWhileLoop(condition));
       ReportString ("SPL End while loop                 :",p_info->GetSPLEndWhileLoop());
       ReportString ("SPL Get procedure call             :",p_info->GetSQLSPLCall(procedure));
-      ReportLong   ("SPL Parameter Length CHAR          :",p_info->GetParameterLength(SQL_CHAR));
-      ReportLong   ("SPL Parameter Length VARCHAR       :",p_info->GetParameterLength(SQL_VARCHAR));
-      ReportLong   ("SPL Parameter Length LONGVARCHAR   :",p_info->GetParameterLength(SQL_LONGVARCHAR));
-      ReportLong   ("SPL Parameter Length DECIMAL       :",p_info->GetParameterLength(SQL_DECIMAL));
-      ReportLong   ("SPL Parameter Length INTEGER       :",p_info->GetParameterLength(SQL_INTEGER));
-      ReportLong   ("SPL Parameter Length TIMESTAMP     :",p_info->GetParameterLength(SQL_TIMESTAMP));
-      ReportLong   ("SPL Parameter Length INTERVAL      :",p_info->GetParameterLength(SQL_INTERVAL_DAY_TO_SECOND));
       ReportString ("SPL Builded parameter list (5)     :",p_info->GetBuildedParameterList(5));
       ReportString ("SPL Parameter type rename CHAR     :",p_info->GetParameterType(splParam1));
       ReportString ("SPL Parameter type rename NUMERIC  :",p_info->GetParameterType(splParam2));
