@@ -27,6 +27,9 @@
 #pragma once
 #include "SQLInfoDB.h"
 
+namespace SQLComponents
+{
+
 class SQLInfoGenericODBC : public SQLInfoDB
 {
 public:
@@ -42,8 +45,8 @@ public:
   // The name of the database vendor
   CString GetDatabaseVendorName() const;
 
-  // Get the fysical database name
-  CString GetFysicalDatabaseName() const;
+  // Get the physical database name
+  CString GetPhysicalDatabaseName() const;
 
   // System catalog is stored in uppercase in the database?
   bool IsCatalogUpper () const;
@@ -51,20 +54,20 @@ public:
   // System catalog supports full ISO schemas (same tables per schema)
   bool GetUnderstandsSchemas() const;
 
-  // Supports database/ODBCdriver comments in sql
+  // Supports database/ODBCdriver comments in SQL
   bool SupportsDatabaseComments() const;
 
   // Database can defer constraints until the end of a transaction
   bool SupportsDeferredConstraints() const;
 
-  // Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
-  // Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
+  // Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
+  // Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
   bool SupportsOrderByExpression() const;
 
   // Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
   bool    SupportsODBCCallEscapes() const;
 
-  // Catalogus query for the default value of a table's column
+  // Catalog query for the default value of a table's column
   CString GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const;
 
   // Keyword for the current date and time
@@ -76,28 +79,28 @@ public:
   // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
   bool GetTimeIsDecimal() const;
 
-  // If the database does not suppoprt the datatype INTERVAL, it can be implemented as a DECIMAL
+  // If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
   bool GetIntervalIsDecimal() const;
 
-  // Get the concatanation operator
+  // Get the concatenation operator
   CString GetConcatanationOperator() const;
 
   // Get quote character for strings
   CString GetQuoteCharacter() const;
 
-  // Get default NULL for parameterlist input
+  // Get default NULL for parameter list input
   CString GetDefaultNULL() const;
 
-  // Parameter is for INPUT and OUTPUT in parameterlist
+  // Parameter is for INPUT and OUTPUT in parameter list
   CString GetParameterINOUT() const;
 
-  // Parameter is for OUTPUT only in parameterlist
+  // Parameter is for OUTPUT only in parameter list
   CString GetParameterOUT() const;
 
-  // Get the datatype of the auditted user (h_user) in a stored procedure
+  // Get the datatype of the audited user (h_user) in a stored procedure
   CString GetAuditUserDatatype() const;
 
-  // Get the datatype of the auditted user (h_user) as variable in a stored-procedure
+  // Get the datatype of the audited user (h_user) as variable in a stored-procedure
   CString GetAuditUserDatatypeAsVariable() const;
 
   // Get datatype of the IDENTITY primary key
@@ -158,10 +161,10 @@ public:
   // Get the constraint form of a primary key to be added to a table after creation of that table
   CString GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const;
 
-  // Get the sql to add a foreign key to a table
+  // Get the SQL to add a foreign key to a table
   CString GetSQLForeignKeyConstraint(DBForeign& p_foreign) const;
 
-  // Get the sql (if possible) to change the foreign key constraint
+  // Get the SQL (if possible) to change the foreign key constraint
   CString GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested) const;
 
   // Performance parameters to be added to the database
@@ -218,7 +221,7 @@ public:
   // Get the code to end a WHILE-loop
   CString GetEndWhileLoop() const;
 
-  // Gets the fact if a SELECT must be inbetween parenthesis for an assignment
+  // Gets the fact if a SELECT must be in between parenthesis for an assignment
   bool    GetAssignmentSelectParenthesis() const;
 
   // Gets the UPPER function
@@ -236,7 +239,7 @@ public:
   // Gets the Not-NULL-Value statement of the database
   CString GetNVLStatement(CString& p_test,CString& p_isnull) const;
 
-  // Gets the subtransaction commands
+  // Gets the sub transaction commands
   CString GetStartSubTransaction   (CString p_savepointName) const;
   CString GetCommitSubTransaction  (CString p_savepointName) const;
   CString GetRollbackSubTransaction(CString p_savepointName) const;
@@ -244,7 +247,7 @@ public:
   // SQL CATALOG QUERIES
   // ===================
 
-  // Get SQL to check if a storedprocedure already exists in the database
+  // Get SQL to check if a stored procedure already exists in the database
   CString GetSQLStoredProcedureExists(CString& p_name) const;
 
   // Part of a query to select only 1 (one) record
@@ -280,7 +283,7 @@ public:
   // Get SQL to drop an index
   CString GetSQLDropIndex(CString p_user,CString p_indexName) const;
 
-  // Get SQL to read the referential constaints from the catalog
+  // Get SQL to read the referential constraints from the catalog
   CString GetSQLTableReferences(CString p_schema,CString p_tablename,CString p_constraint = "",int p_maxColumns = SQLINFO_MAX_COLUMNS) const;
 
   // Get the SQL to determine the sequence state in the database
@@ -298,10 +301,10 @@ public:
   // Remove a stored procedure from the database
   void    DoRemoveProcedure(CString& p_procedureName) const;
 
-  // Get SQL for your session and controling terminal
+  // Get SQL for your session and controlling terminal
   CString GetSQLSessionAndTerminal() const;
 
-  // Get SQL to check if sessionnumber exists
+  // Get SQL to check if session number exists
   CString GetSQLSessionExists(CString sessieId) const;
 
   // Get SQL for unique session ID
@@ -310,7 +313,7 @@ public:
   // Get SQL for searching a session
   CString GetSQLSearchSession(const CString& p_databaseName,const CString& p_sessionTable) const;
 
-  // See if a column exsists within a table
+  // See if a column exists within a table
   bool    DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const;
 
   // Get SQL to get all the information about a Primary Key constraint
@@ -365,16 +368,16 @@ public:
   // Does the named view exists in the database
   bool    DoesViewExists(CString& p_viewName);
 
-  // Must create temoporary tables runtime 
+  // Must create temporary tables runtime 
   bool    GetMustMakeTemptablesAtRuntime() const;
 
-  // Create a temporary table in an optimized manner with the givven index column
+  // Create a temporary table in an optimized manner with the given index column
   void    DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const;
 
   // Remove a temporary table
   void    DoRemoveTemporaryTable(CString& p_tableName) const;
 
-  // Maak een procedure aan in de database
+  // Create a procedure in the database
   void    DoMakeProcedure(CString& p_procName,CString p_table,bool p_noParameters,CString& p_codeBlock);
 
   // Rename a database table 
@@ -398,16 +401,13 @@ public:
   // Get stored procedure call
   CString GetSQLSPLCall(CString p_procName) const;
 
-  // Length of paramters in binding
-  int     GetParameterLength(int p_SQLType) const;
-
   // Build a parameter list for calling a stored procedure
   CString GetBuildedParameterList(size_t p_numOfParameters) const;
 
-  // Parametertype for stored procedure for a givven columntype for parameters and return types
+  // Parameter type for stored procedure for a given column type for parameters and return types
   CString GetParameterType(CString &p_type) const;
 
-  // Makes a SQL string from a givven string, with all the right quotes
+  // Makes a SQL string from a given string, with all the right quotes
   CString GetSQLString(const CString& p_string) const;
 
   // Get date string in engine format
@@ -447,9 +447,9 @@ public:
   CString GetSPLCursorRowDeclaration(CString& p_cursorName,CString& p_variableName) const;
 
   CString GetSPLFetchCursorIntoVariables(CString                p_cursorName
-    ,CString                p_variableName
-    ,std::vector<CString>&  p_columnNames
-    ,std::vector<CString>&  p_variableNames) const;
+                                        ,CString                p_variableName
+                                        ,std::vector<CString>&  p_columnNames
+                                        ,std::vector<CString>&  p_variableNames) const;
 
   // Fetch the current SPL cursor row into the row variable
   CString GetSPLFetchCursorIntoRowVariable(CString& p_cursorName,CString p_variableName) const;
@@ -472,3 +472,6 @@ public:
   // Translate database-errors to a human readable form
   CString TranslateErrortext(int p_error,CString p_errorText) const;
 };
+
+// End of namespace
+}

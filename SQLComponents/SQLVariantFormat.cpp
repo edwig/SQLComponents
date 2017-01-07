@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLVariantFormat.h"
 #include "SQLFormatErrors.h"
 #include "SQLTime.h"
@@ -37,6 +38,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 #pragma warning (disable: 4482) // Non standard enum used
 
@@ -1495,4 +1499,7 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   }
   m_format = string;
   return OK;
+}
+
+// End of namespace
 }

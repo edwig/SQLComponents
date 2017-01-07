@@ -25,13 +25,15 @@
 // Version number:  1.3.3
 //
 #pragma once
+#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLDatabase.h"
 #include "Locker.h"
 #include <sql.h>
 #include <map>
 
-#define SQL_MAX_IDENTIFIER   128
+namespace SQLComponents
+{
 
 // Arbitrary max limit for a normal string to be retrieved
 // Above this limit the stream interface is used
@@ -76,6 +78,8 @@ public:
   void SetSpeedThreshold(double p_seconds);
   // Set maximum rows to get
   void SetMaxRows(int p_maxrows);
+  // Setting the locking concurrency level
+  void SetConcurrency(int p_concurrency);
 
   // Set parameters for statement
   void SetParameter  (int p_num,SQLVariant*   p_param,int p_type = SQL_PARAM_INPUT);
@@ -133,6 +137,8 @@ public:
   bool        GetRecord();
   // Get a pointer to a variable of the column
   SQLVariant* GetColumn(int icol);
+  // Get the name of the SQL cursor for the statement
+  CString     GetCursorName();
   // Get the variant data type of the columns
   int         GetColumnType(int icol);
   // Get number of columns in the result set
@@ -183,6 +189,8 @@ private:
 
   // Reset all column to NULL
   void  ResetColumns();
+  // Fetch the resulting cursor name
+  void  FetchCursorName();
   // Convert database dependent SQL_XXXX types to C-types SQL_C_XXXX
   short SQLType2CType(short p_sqlType);
   // Provide piece-by-piece data at exec time of the SQLExecute
@@ -218,7 +226,9 @@ private:
   int           m_bufferSize;        // Alternate Buffer size
   int           m_maxRows;           // Maximum rows to fetch
   double        m_speedThreshold;    // After this amount of seconds, it's taken too long
+  int           m_concurrency;       // Concurrency level of the cursor
 
+  CString       m_cursorName;        // Name of the SQL Cursor
   short         m_numColumns;        // Number of result columns in result set
   SQLLEN        m_rows;              // Number of rows processed in INSERT/UPDATE/DELETE
   long          m_fetchIndex;        // Number of rows fetched
@@ -243,6 +253,12 @@ inline void
 SQLQuery::SetRebindMap(RebindMap* p_map)
 {
   m_rebindColumns = p_map;
+}
+
+inline CString
+SQLQuery::GetCursorName()
+{
+  return m_cursorName;
 }
 
 inline void
@@ -285,4 +301,7 @@ inline SQLVariant&
 SQLQuery::operator[](int p_index)
 {
   return *(GetColumn(p_index));
+}
+
+// End of namespace
 }

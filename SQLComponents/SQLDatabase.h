@@ -25,16 +25,19 @@
 // Version number:  1.3.3
 //
 #pragma once
-
 #include <afx.h>
 #include <afxdb.h>
 #include <afxcoll.h>
 #include <sql.h>
 #include <sqlext.h>
+#include "SQLComponents.h"
 #include "SQLTransaction.h"
 #include <stack>
 #include <vector>
 #include <map>
+
+namespace SQLComponents
+{
 
 // Redefine all handle types to pointer-to-void
 #define SQL_HANDLE void*
@@ -45,13 +48,6 @@
 // Derived name of max 10 chars length
 // By convention in use for older INFORMIX systems
 #define DS_IDENT_LEN 10
-
-// Loglevel for various systems
-// Log queries at this loglevel
-#define LOGLEVEL_ERROR  1
-#define LOGLEVEL_MAX    6
-// Log actions at this level
-#define LOGLEVEL_ACTION 2
 
 // After this much minutes, the database can no longer be
 // used from a database pool and will 'go-away'
@@ -67,21 +63,13 @@
 // Length of the SQLSTATE: See ISO standard
 #define SQLSTATE_LEN 6
 
-// Huidige herkende database typen
-typedef enum _databaseType
-{
-  RDBMS_UNKNOWN       = 0
- ,RDBMS_ODBC_STANDARD = 1
- ,RDBMS_ORACLE        = 2
- ,RDBMS_INFORMIX      = 3
- ,RDBMS_ACCESS        = 4
- ,RDBMS_SQLSERVER     = 5
- ,RDBMS_POSTGRESQL    = 6
- ,RDBMS_FIREBIRD      = 7
- ,RDBMS_PERVASIVE     = 8
- ,RDBMS_EXCEL         = 9
-}
-DatabaseType;
+// SQLSetConnectAttr driver specific defines.
+// Microsoft has 1200 through 1249 reserved for Microsoft SQL Server Native Client driver usage.
+// Multiple Active Result Set (MARS) per connection
+// COPT_SS_MARS_ENABLED comes effectively from <sqlncli.h> from the MS-SQL Native client driver
+#define SQL_COPT_SS_MARS_ENABLED    1224  
+#define SQL_MARS_ENABLED_NO         0L
+#define SQL_MARS_ENABLED_YES        1L
 
 typedef enum _schemaAction
 {
@@ -91,20 +79,8 @@ typedef enum _schemaAction
 }
 SchemaAction;
 
-typedef struct _datasource
-{
-  CString m_datasource;
-  CString m_username;
-  CString m_password;
-  bool    m_system;
-  bool    m_outputOMF;
-  bool    m_default;
-  bool    m_dataConnection;
-}
-DataSourceInternal;
-
 typedef std::vector<DataSourceInternal> DSMap;
-typedef std::stack<SQLTransaction*>     TransactieStack;
+typedef std::stack<SQLTransaction*>     TransactionStack;
 typedef std::map<int,int>               RebindMap;
 typedef std::map<CString,CString>       ODBCOptions;
 typedef std::map<CString,CString>       Macros;
@@ -112,7 +88,7 @@ typedef std::map<CString,CString>       Macros;
 typedef void (CALLBACK* LOGPRINT)(void*,const char*);
 typedef int  (CALLBACK* LOGLEVEL)(void*);
 
-// Foreward declaration
+// Forward declaration
 class SQLInfoDB;
 class SQLInfoTree;
 class SQLTimestamp;
@@ -169,7 +145,7 @@ public:
   // Remove macro
   void           DeleteMacro(CString p_macro);
 
-  // DATABASE POOL METHODEN
+  // DATABASE POOL METHODS
   void           SetDatasource(CString p_dsn);
   void           SetLastActionTime();
   bool           PastWaitingTime();
@@ -226,6 +202,7 @@ public:
   bool           SetDatabaseType(DatabaseType p_type);
 
   // Asking for database-dependent constructions
+  // Shortcuts to a SQLInfoDB function
   CString        GetSQLTimeString        (int p_hour,int p_minute,int p_second);
   CString        GetStrippedSQLTimeString(int p_hour,int p_minute,int p_second);
   CString        GetSQLDateString        (int p_day, int p_month, int p_year);
@@ -241,7 +218,6 @@ public:
 
   // Support of logging functions 
   void           RegisterLogContext(int p_level,LOGLEVEL p_loglevel,LOGPRINT p_logprinter,void* p_logContext);
-  // Printing to generic logfile
   void           LogPrint(int p_level,const char* p_text);
   int            LogLevel();
   bool           WilLog(int p_loglevel);
@@ -282,7 +258,7 @@ protected:
   // Replace **ONE** macro in the statement text
   void           ReplaceMacro(CString& p_statement,int p_pos,int p_length,CString p_replace);
 
-  // From connect
+  // HOW WE ARE CONNECTED TO A DATABASE
   CString           m_datasource;  // Datasource at login
   CString           m_username;    // System user
   CString           m_password;    // System's password
@@ -295,7 +271,7 @@ protected:
   bool              m_mars         = { true          };  // Multiple Active Record Sets
   bool              m_readOnly     = { false         };  // ReadOnly connection
   CString	          m_DBName;
-  CString	          m_DBVersie;
+  CString	          m_DBVersion;
   CString	          m_DriverName;
   CString	          m_DriverVersion;
   CString           m_databaseName;
@@ -316,7 +292,7 @@ protected:
   SchemaAction      m_schemaAction = { SCHEMA_NO_ACTION };
   Macros            m_macros;                      // Macro replacements for SQL
 
-  // Derived identifier names for various systems (BRIEF4all, Key2Brief)
+  // Derived identifier names for various systems
   CString           m_dbIdent;                     // Database   identifier (6 chars name, 2 chars main-version)
   CString           m_dataIdent;                   // Datasource identifier (10 chars at most = DS_IDENT_LEN)
   // Handles
@@ -334,7 +310,7 @@ protected:
   // Locking  
   CRITICAL_SECTION  m_databaseLock;
   // Transaction administration
-  TransactieStack   m_transactions;
+  TransactionStack  m_transactions;
 };
 
 inline bool 
@@ -440,7 +416,7 @@ SQLDatabase::GetDBVendorName()
 inline CString
 SQLDatabase::GetDBVendorVersion()
 {
-  return m_DBVersie;
+  return m_DBVersion;
 }
 
 inline CString 
@@ -502,4 +478,7 @@ inline int
 SQLDatabase::GetLoginTimeout()
 {
   return m_loginTimeout;
+}
+
+// End of namespace
 }

@@ -24,8 +24,6 @@
 // Last Revision:   01-02-2017
 // Version number:  1.3.3
 //
-// MUTEX locking voor shared memory
-//
 #pragma once
 //
 // Simple template to balance Acquire/Release calls for mutexes etc

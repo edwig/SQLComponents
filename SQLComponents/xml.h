@@ -38,6 +38,9 @@
 #define XML_SNPRINTF _snprintf_s
 #define XML_SNSCANF  _snscanf_s
 
+namespace SQLComponents
+{
+
 class XmlDocument;
 class XmlElement;
 class XmlComment;
@@ -1753,8 +1756,11 @@ private:
   XML_STRING lineBreak;
 };
 
+// End of namespace
+}
 
 #ifdef _MSC_VER
 #pragma warning( pop )
 #endif
+
 

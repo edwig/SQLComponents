@@ -38,6 +38,8 @@
 #define ROWNUM(cellnum)   (cellnum & 0xFFFFF)
 #define COLNUM(cellnum)   (cellnum >> 20)
 
+using namespace SQLComponents;
+
 // Forward definition
 class BasicXmlExcel;
 

@@ -28,6 +28,9 @@
 #include "SQLMutation.h"
 #include <vector>
 
+namespace SQLComponents
+{
+
 // Current status of the record
 #define SQL_Record_NULL      0x00
 #define SQL_Record_Selected  0x01
@@ -86,3 +89,5 @@ SQLRecord::GetStatus()
   return m_status;
 }
 
+// End of namespace
+}

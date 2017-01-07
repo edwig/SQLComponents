@@ -25,12 +25,16 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
 #include "bcd.h"
 
 #pragma warning (disable: 4239)
+
+namespace SQLComponents
+{
 
 SQLVariant 
 static SQL_OperSShortModChar(SQLVariant& p_left,SQLVariant& p_right)
@@ -66,14 +70,14 @@ static SQL_OperULongModChar(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -171,14 +175,14 @@ static SQL_OperULongModSShort(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModSShort(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -294,14 +298,14 @@ static SQL_OperUlongModUShort(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModUShort(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -415,14 +419,14 @@ static SQL_OperULongModSLong(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -536,14 +540,14 @@ static SQL_OperULongModULong(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModULong(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModULong(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -617,7 +621,7 @@ static SQL_OperIntDSModULong(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperCharModFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
@@ -656,14 +660,14 @@ static SQL_OperULongModFloat(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -737,7 +741,7 @@ static SQL_OperIntDSModFloat(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperCharModDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -776,14 +780,14 @@ static SQL_OperULongModDouble(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -1005,14 +1009,14 @@ static SQL_OperULongModSTiny(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModSTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -1126,14 +1130,14 @@ static SQL_OperULongModUTiny(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModUTiny(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -1248,14 +1252,14 @@ static SQL_OperULongModSBig(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModSBig(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -1369,14 +1373,14 @@ static SQL_OperULongModUBig(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float result = fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
+  float result = ::fmod(p_left.GetAsFloat(),p_right.GetAsFloat());
   return SQLVariant(result);
 }
 
 SQLVariant 
 static SQL_OperDoubleModUBig(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double result = fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
+  double result = ::fmod(p_left.GetAsDouble(),p_right.GetAsDouble());
   return SQLVariant(result);
 }
 
@@ -1450,7 +1454,7 @@ static SQL_OperIntDSModUBig(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperCharModNum(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double num = fmod(p_left.GetAsDouble(),p_right.GetAsBCD().AsDouble());
+  double num = ::fmod(p_left.GetAsDouble(),p_right.GetAsBCD().AsDouble());
   CString str;
   str.Format("%lf",num);
   SQLVariant var(str);
@@ -1492,7 +1496,7 @@ static SQL_OperULongModNum(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperFloatModNum(SQLVariant& p_left,SQLVariant& p_right)
 {
-  float num = (float) fmod(p_left.GetAsFloat(),p_right.GetAsBCD().AsDouble());
+  float num = (float) ::fmod(p_left.GetAsFloat(),p_right.GetAsBCD().AsDouble());
   SQLVariant var(num);
   return var;
 }
@@ -1500,7 +1504,7 @@ static SQL_OperFloatModNum(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperDoubleModNum(SQLVariant& p_left,SQLVariant& p_right)
 {
-  double num = fmod(p_left.GetAsDouble(),p_right.GetAsBCD().AsDouble());
+  double num = ::fmod(p_left.GetAsDouble(),p_right.GetAsBCD().AsDouble());
   SQLVariant var(num);
   return var;
 }
@@ -1635,3 +1639,5 @@ SQLVariant::operator%(SQLVariant& p_right)
   throw error;
 }
 
+// End of namespace
+}

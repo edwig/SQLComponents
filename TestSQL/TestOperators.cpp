@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "TestSQL.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"

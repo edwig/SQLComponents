@@ -30,6 +30,9 @@
 #include "SQLVariant.h"
 #include <vector>
 
+namespace SQLComponents
+{
+
 // SET status is a OR-ed bitmap status
 #define SQL_Empty       0x00
 #define SQL_Selections  0x01
@@ -335,3 +338,5 @@ AggregateInfo::Init()
   m_mean = 0.0;
 }
 
+// End of namespace
+}

@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLMutation.h"
 #include <algorithm>
 
@@ -33,6 +34,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLMutation::SQLMutation()
 {
@@ -237,4 +241,6 @@ SQLMutation::AllMixedMutations(MutationIDS& p_list,int p_mutationID)
   return (int)p_list.size();
 }
 
+// End of namespace
+}
 

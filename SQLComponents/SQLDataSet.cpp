@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLDataSet.h"
 #include "SQLQuery.h"
 #include "SQLVariantFormat.h"
@@ -36,6 +37,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLDataSet::SQLDataSet()
            :m_database(NULL)
@@ -1343,4 +1347,7 @@ SQLDataSet::XMLLoad(XmlElement* p_dataset)
     // Next record
     record = record->NextSiblingElement();
   }
+}
+
+// End of namespace
 }

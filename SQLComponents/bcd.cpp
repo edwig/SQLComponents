@@ -19,6 +19,7 @@
 // Version number:  1.3.3
 //
 #include "Stdafx.h"
+#include "SQLComponents.h"
 #include "bcd.h"
 #include <math.h> // Still needed for conversions of double
 
@@ -27,6 +28,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -810,12 +814,12 @@ bcd::SquareRoot() const
   bcd two(2);
   bcd three(3);
 
-  // Optimalization sqrt(0) = 0
+  // Optimalisation sqrt(0) = 0
   if(IsNull())
   {
     return number;
   }
-  // Tolerance criterium epsilon
+  // Tolerance criterion epsilon
   bcd epsilon = Epsilon(10);
 
   number = *this; // Number to get the root from
@@ -832,12 +836,12 @@ bcd::SquareRoot() const
     reduction *= two;
   }
   // Reduce by dividing by the square of the reduction
-  // (reduction is realy sqrt(reduction)
+  // (reduction is really sqrt(reduction)
   number /= (reduction * reduction);
 
   // First quick guess
   double approximation1 = number.AsDouble();
-  double approximation2 = 1 / sqrt(approximation1);
+  double approximation2 = 1 / ::sqrt(approximation1);
   bcd    result(approximation2);
   bcd    between;
 
@@ -949,7 +953,7 @@ bcd::Log() const
     res += between;
   }
   // Re-add powers of two (comes from  " < 1.2")
-  res *= bcd(pow(2.0,(double)(k + 1)));
+  res *= bcd(::pow(2.0,(double)(k + 1)));
 
   // Re-apply the exponent
   if(expo != 0)
@@ -1312,9 +1316,9 @@ bcd::ArcSine() const
     number /= sqrt(c2) * sqrt( c1 + sqrt( c1 - number * number ));
   }
   // Quick approximation of the asin
-  d = asin(number.AsDouble());
+  d = ::asin(number.AsDouble());
   result = bcd( d );
-  factor = bcd( 1.0 / cos(d)); // Constant factor 
+  factor = bcd( 1.0 / ::cos(d)); // Constant factor 
 
   // Newton Iteration
   for( step=0;; step++)
@@ -1357,7 +1361,7 @@ bcd::ArcCosine() const
 }
 
 // bcd::ArcTangent
-// Descripiton: Arctangent (angle) of the ratio
+// Description: Arctangent (angle) of the ratio
 // Technical:   Use the Taylor series. ArcTan(x) = x - x^3/3 + x^5/5 ...
 //              However first reduce x to abs(x)< 0.5 to improve taylor series
 //              using the identity. ArcTan(x)=2*ArcTan(x/(1+sqrt(1+x^2)))
@@ -1502,7 +1506,7 @@ bcd::AsDouble() const
   // Take care of exponent
   if(m_exponent)
   {
-    result *= pow(10.0,m_exponent);
+    result *= ::pow(10.0,m_exponent);
   }
   // Take care of the sign
   if(m_sign == Negative)
@@ -2337,10 +2341,10 @@ bcd::SetValueDouble(const double p_value)
     between = -between;
   }
   // Take care of exponent
-  m_exponent = (short)log10(between);
+  m_exponent = (short)::log10(between);
 
   // Normalize
-  between *= pow(10.0,(int)-m_exponent);
+  between *= ::pow(10.0,(int)-m_exponent);
 
   // Set the double mantissa into the m_mantissa
   // A double has 16 digits
@@ -2349,8 +2353,8 @@ bcd::SetValueDouble(const double p_value)
     long base = bcdBase / 10;
     for(int pos = 0; pos < bcdDigits; ++pos)
     {
-      long res = (long) fmod(between,10.0);
-      between  = modf(between,&notused) * 10;
+      long res = (long) ::fmod(between,10.0);
+      between  = ::modf(between,&notused) * 10;
 
       m_mantissa[ind] += res * base;
       base /= 10;
@@ -3485,4 +3489,7 @@ bcd::ReadFromFile(FILE* p_fp)
     return false;
   }
   return true;
+}
+
+// End of namespace
 }

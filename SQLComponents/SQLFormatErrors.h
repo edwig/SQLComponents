@@ -26,7 +26,11 @@
 //
 #pragma once
 
+namespace SQLComponents
+{
+
 // Error values (< 0/OK) returned from SQLVariantFormat
+// Error numbers are out of the range of error number range of other systems
 
 #ifndef OK
 #define OK                                                 0
@@ -47,3 +51,5 @@
 #define ER_FormatNumberTemplateBuflen                  -1013
 #define ER_FormatNumberTemplateNoDigit                 -1014
 #define ER_FormatNumberTemplateSomeKindOfError         -1015
+
+  }

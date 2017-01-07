@@ -25,10 +25,13 @@
 // Version number:  1.3.3
 //
 #pragma once
-
+#include "SQLComponents.h"
 #include "SQLDataSet.h"
 #include "SQLRecord.h"
 #include <vector>
+
+namespace SQLComponents
+{
 
 typedef struct _primaryForeign
 {
@@ -75,3 +78,6 @@ private:
   PFMap       m_assocs;
   SQLRecord*  m_masterRecord;
 };
+
+// End of namespace
+}

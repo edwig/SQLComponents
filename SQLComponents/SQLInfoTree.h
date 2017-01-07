@@ -25,9 +25,10 @@
 // Version number:  1.3.3
 //
 #pragma once
-
-// include files hier al nodig:
 #include "SQLInfo.h"
+
+namespace SQLComponents
+{
 
 class SQLInfoTree : public SQLInfo
 {
@@ -37,9 +38,9 @@ public:
 
   // All ODBC Functions to the tree
   void MakeTreeInfo (CTreeCtrl* tree);
-  // All table info to a treecontrol
+  // All table info to a tree control
   void MakeTableInfo(CTreeCtrl* tree,CString& table);
-  // All procedure info to a treecontrol
+  // All procedure info to a tree control
   bool MakeProcedureInfo(CTreeCtrl* tree,CString& procedure);
   // Report all capabilities to a system file
   virtual void ReportAllCapabilities(CTreeCtrl* p_tree,CString& filename);
@@ -56,9 +57,9 @@ private:
                         ,HTREEITEM  item
                         ,CString    type
                         ,SQLINTEGER totype);
-  // Make ODBC Extensions in a treecontrol
+  // Make ODBC Extensions in a tree control
   void MakeTreeODBCExtensions(CTreeCtrl* tree,HTREEITEM item);
-  // All ODBC Info to a treecontrol
+  // All ODBC Info to a tree control
   void MakeTreeInfoFunctions(CTreeCtrl* tree,HTREEITEM item);
   void WordListToTree(WordList& p_list,CTreeCtrl* p_tree,HTREEITEM p_item);
 
@@ -68,3 +69,6 @@ private:
                          ,int        p_level
                          ,FILE*      p_file);
 };
+
+// End of namespace
+}

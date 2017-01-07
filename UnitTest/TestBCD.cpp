@@ -25,11 +25,13 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "CppUnitTest.h"
 #include "HPFCounter.h"
 #include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace SQLComponents;
 
 namespace DatabaseUnitTest
 {
@@ -500,7 +502,7 @@ namespace DatabaseUnitTest
       }
       counter.Stop();
       bcd ten(&num);
-      msg.Format("SQL_NUMERIC_STRUCT -> bcd %10.6f : %s",counter.GetCounter(),ten.AsString());
+      msg.Format("SQL_NUMERIC_STRUCT -> bcd %10.6f : %s",counter.GetCounter(),ten.AsString().GetString());
       Logger::WriteMessage(msg);
 
 

@@ -10,6 +10,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include <sstream>
 #include <iostream>
 #include "xml.h"
@@ -21,6 +22,9 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning (disable : 4996)
+
+namespace SQLComponents
+{
 
 bool XmlBase::condenseWhiteSpace = true;
 
@@ -2106,3 +2110,5 @@ bool XmlPrinter::Visit( const XmlUnknown& unknown )
   return true;
 }
 
+// End of namespace
+}

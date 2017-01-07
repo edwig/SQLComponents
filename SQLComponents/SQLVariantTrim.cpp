@@ -25,8 +25,12 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantTrim.h"
+
+namespace SQLComponents
+{
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -639,3 +643,5 @@ SQL_UBIGINTToUTinyInt(SQLUBIGINT p_value)
   return (unsigned char)p_value;
 }
 
+// End of namespace
+}

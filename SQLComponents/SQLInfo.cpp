@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLDatabase.h"
 #include "SQLQuery.h"
 #include "SQLInfo.h"
@@ -37,10 +38,13 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+namespace SQLComponents
+{
+
 #pragma warning (disable: 4996)
 #pragma warning (disable: 4312)
 
-// This macro is used for synchronious ODBC calls
+// This macro is used for synchronous ODBC calls
 #define ODBC_CALL_ONCE(SQLFunc) \
   try \
   { \
@@ -227,7 +231,7 @@ SQLInfo::Init()
   m_RDBMSkeywords.clear();
   m_ODBCKeywords.clear();
 
-  // Alle datatypen verwijderen
+  // Remove all datatypes info
   for(auto& type : m_dataTypes)
   {
     delete type.second;
@@ -3202,3 +3206,5 @@ SQLInfo::MakeInfoMetaTypes(WordList* p_list,int type)
   return retValue;
 }
 
+// End of namespace
+}

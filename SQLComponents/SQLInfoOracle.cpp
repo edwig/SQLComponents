@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLInfoOracle.h"
 #include "SQLQuery.h"
 
@@ -33,6 +34,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 // Constructor
 SQLInfoOracle::SQLInfoOracle(SQLDatabase* p_database)
@@ -62,17 +66,17 @@ SQLInfoOracle::GetDatabaseVendorName() const
   return "Oracle";
 }
 
-// Get the fysical database name
+// Get the physical database name
 CString 
-SQLInfoOracle::GetFysicalDatabaseName() const
+SQLInfoOracle::GetPhysicalDatabaseName() const
 {
-  // Oops. We have a Oracle bug. Name is effectivly one of
+  // Oops. We have a Oracle bug. Name is effectively one of
   // 1) the name in TNSNAMES.ORA file
   // 2) the DNS host name (as mirroring for the database)
   // 3) The SUN NIS name
   // 4) The DCE CDS name 
   // and **NOT** the database name from the server.
-  // The names in 1) to 4) could be the same as the databasename 
+  // The names in 1) to 4) could be the same as the database name 
   // but there are a great number of situations where this is not the case.
 
   CString query = "SELECT SYS_CONTEXT('USERENV','DB_NAME')\n"
@@ -115,8 +119,8 @@ SQLInfoOracle::SupportsDeferredConstraints() const
   return true;
 }
 
-// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
-// Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
+// Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
 bool 
 SQLInfoOracle::SupportsOrderByExpression() const
 {
@@ -210,14 +214,14 @@ SQLInfoOracle::GetParameterOUT() const
   return "OUT ";
 }
 
-// Get the datatype of the auditted user (h_user) in a stored procedure
+// Get the datatype of the audited user (h_user) in a stored procedure
 CString 
 SQLInfoOracle::GetAuditUserDatatype() const
 {
   return "VARCHAR2";
 }
 
-// Get the datatype of the auditted user (h_user) as variable in a stored-procedure
+// Get the datatype of the audited user (h_user) as variable in a stored-procedure
 CString 
 SQLInfoOracle::GetAuditUserDatatypeAsVariable() const
 {
@@ -438,7 +442,7 @@ SQLInfoOracle::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 CString 
 SQLInfoOracle::GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table(p_origin.m_tablename);
   if(!p_origin.m_schema.IsEmpty())
   {
@@ -669,7 +673,7 @@ SQLInfoOracle::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return CString("NVL(") + p_test + "," + p_isnull + ")";
 }
 
-// Gets the subtransaction commands
+// Gets the sub transaction commands
 CString 
 SQLInfoOracle::GetStartSubTransaction(CString p_savepointName) const
 {
@@ -1003,7 +1007,7 @@ SQLInfoOracle::DoRemoveProcedure(CString& p_procedureName) const
   query.TryDoSQLStatement("DROP FUNCTION " + p_procedureName);
 }
 
-// Get SQL for your session and controling terminal
+// Get SQL for your session and controlling terminal
 CString 
 SQLInfoOracle::GetSQLSessionAndTerminal() const
 {
@@ -1211,11 +1215,11 @@ void
 SQLInfoOracle::DoCommitDDLcommands() const
 {
   // Does NOTHING In ORACLE and should do nothing
-  // commit for DDL is autmatic and always
+  // commit for DDL is automatic and always
 }
 
 // Do the commit for the DML commands in the database
-// ODBC driver autocommit mode will go wrong!!
+// ODBC driver auto commit mode will go wrong!!
 void
 SQLInfoOracle::DoCommitDMLcommands() const
 {
@@ -1397,51 +1401,6 @@ SQLInfoOracle::GetSQLSPLCall(CString p_procName) const
   // In combination with some ODBC drivers from Oracle
   // it created an Autonomous_transaction . 
   return "DECLARE x VARCHAR2(254); BEGIN x := " + p_procName + "; END;";
-}
-
-// Length of parameters in binding
-int
-SQLInfoOracle::GetParameterLength(int p_SQLType) const
-{
-  int retval;
-
-  switch (p_SQLType)
-  {
-    case SQL_CHAR:                      retval =  2000;  break;
-    case SQL_VARCHAR:                   retval =  4000;  break;
-    case SQL_LONGVARCHAR:               retval = 32000;  break;
-    case SQL_DECIMAL:                   retval = 32000;  break;
-    case SQL_SMALLINT:                  retval = 0;      break;
-    case SQL_INTEGER:                   retval = sizeof(long); break;
-    case SQL_REAL:                      retval = 0;      break;
-    case SQL_DOUBLE:                    retval = 0;      break;
-    case SQL_FLOAT:                     retval = 0;      break;
-    case SQL_BINARY:                    retval = 0;      break;
-    case SQL_VARBINARY:                 retval = 0;      break;
-    case SQL_LONGVARBINARY:             retval = 0;      break;
-    case SQL_DATE:                      retval = 0;      break;
-    case SQL_TIME:                      retval = 0;      break;
-    case SQL_TIMESTAMP:                 retval = 19;     break;
-    case SQL_NUMERIC:                   retval = 0;      break;
-    case SQL_BIGINT:                    retval = 0;      break;
-    case SQL_TINYINT:                   retval = 0;      break;
-    case SQL_BIT:                       retval = 0;      break;
-    case SQL_INTERVAL_YEAR:
-    case SQL_INTERVAL_YEAR_TO_MONTH:
-    case SQL_INTERVAL_MONTH:
-    case SQL_INTERVAL_DAY:
-    case SQL_INTERVAL_DAY_TO_HOUR:
-    case SQL_INTERVAL_DAY_TO_MINUTE:
-    case SQL_INTERVAL_DAY_TO_SECOND:
-    case SQL_INTERVAL_HOUR:
-    case SQL_INTERVAL_HOUR_TO_MINUTE:
-    case SQL_INTERVAL_HOUR_TO_SECOND:
-    case SQL_INTERVAL_MINUTE:
-    case SQL_INTERVAL_MINUTE_TO_SECOND:
-    case SQL_INTERVAL_SECOND:           retval = 25;      break;
-    default:                            retval = 0;       break;
-  }
-  return retval;
 }
 
 // Build a parameter list for calling a stored procedure
@@ -1724,3 +1683,5 @@ SQLInfoOracle::TranslateErrortext(int p_error,CString p_errorText) const
   return errorText;
 }
 
+// End of namespace
+}

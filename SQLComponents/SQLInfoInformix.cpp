@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLInfoInformix.h"
 #include "SQLQuery.h"
 
@@ -34,6 +35,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+namespace SQLComponents
+{
+  
 // Constructor. 
 SQLInfoInformix::SQLInfoInformix(SQLDatabase* p_database)
                 :SQLInfoDB(p_database)
@@ -62,9 +66,9 @@ SQLInfoInformix::GetDatabaseVendorName() const
   return "IBM Informix";
 }
 
-// Get the fysical database name
+// Get the physical database name
 CString 
-SQLInfoInformix::GetFysicalDatabaseName() const
+SQLInfoInformix::GetPhysicalDatabaseName() const
 {
   // Oops. We have an INFORMIX CLI bug
   // Versions of the INFORMIX CLI above 2.5 reflect in the connection string
@@ -108,12 +112,12 @@ SQLInfoInformix::SupportsDatabaseComments() const
 bool 
 SQLInfoInformix::SupportsDeferredConstraints() const
 {
-  // SET CONSTRAINTS DEFERRED present
+  // SET CONSTRAINTS DEFERRED is supported
   return true;
 }
 
-// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
-// Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
+// Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
 bool
 SQLInfoInformix::SupportsOrderByExpression() const
 {
@@ -127,7 +131,7 @@ SQLInfoInformix::SupportsODBCCallEscapes() const
   return true;
 }
 
-// Catalogus query for the default value of a table's column
+// Catalog query for the default value of a table's column
 CString 
 SQLInfoInformix::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
 {   
@@ -160,19 +164,19 @@ SQLInfoInformix::GetSystemDateString() const
 bool 
 SQLInfoInformix::GetTimeIsDecimal() const
 {
-  // TIJD is geimplementeerd als TIME
+  // TIJD is implemented as TIME :-)
   return false;
 }
 
-// If the database does not suppoprt the datatype INTERVAL, it can be implemented as a DECIMAL
+// If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
 bool 
 SQLInfoInformix::GetIntervalIsDecimal() const
 {
-  // Interval is in informix geimplenteerd als INTERVAL
+  // Interval is implemeted in Informix as INTERVAL :-)
   return false;
 }
 
-// Get the concatanation operator
+// Get the concatenation operator
 CString 
 SQLInfoInformix::GetConcatanationOperator() const
 {
@@ -186,35 +190,35 @@ SQLInfoInformix::GetQuoteCharacter() const
   return "'";    
 }
 
-// Get default NULL for parameterlist input
+// Get default NULL for parameter list input
 CString 
 SQLInfoInformix::GetDefaultNULL() const
 {
   return "";    
 }
 
-// Parameter is for INPUT and OUTPUT in parameterlist
+// Parameter is for INPUT and OUTPUT in parameter list
 CString 
 SQLInfoInformix::GetParameterINOUT() const
 {
   return "";    
 }
 
-// Parameter is for OUTPUT only in parameterlist
+// Parameter is for OUTPUT only in parameter list
 CString 
 SQLInfoInformix::GetParameterOUT() const
 {
   return "";    
 }
 
-// Get the datatype of the auditted user (h_user) in a stored procedure
+// Get the datatype of the audited user (h_user) in a stored procedure
 CString 
 SQLInfoInformix::GetAuditUserDatatype() const
 {
   return "varchar(50)";
 }
 
-// Get the datatype of the auditted user (h_user) as variable in a stored-procedure
+// Get the datatype of the audited user (h_user) as variable in a stored-procedure
 CString 
 SQLInfoInformix::GetAuditUserDatatypeAsVariable() const
 {
@@ -311,7 +315,7 @@ SQLInfoInformix::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_selec
 CString
 SQLInfoInformix::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) const
 {
-  // 'Gewoon' een drop van de tabel doen
+  // 'Simply' a drop of a table
   ++p_number;
   return "DROP TABLE " + p_tablename + ";\n";
 }
@@ -327,7 +331,7 @@ SQLInfoInformix::GetSQLSelectIntoTemp(CString& p_tablename,CString& p_select) co
 CString 
 SQLInfoInformix::GetReplaceColumnOIDbySequence(CString p_columns,CString /*p_tablename*/,CString /*p_postfix /*="_seq"*/) const
 {
-  // Doet niets in INFORMIX omdat hier een 0 gebruikt wordt.
+  // Does nothing in Informix because we use a 0 on a SERIAL datatype
   return p_columns;
 }
 
@@ -344,7 +348,7 @@ SQLInfoInformix::GetSQLRemoveProcedureDependencies(CString /*p_procname*/) const
 CString 
 SQLInfoInformix::GetSQLRemoveFieldDependencies(CString /*p_tablename*/) const
 {
-  // Niet nodig/bestaat niet in Informix
+  // Not needed in Informix
   return "";
 }
 
@@ -375,7 +379,7 @@ SQLInfoInformix::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablenam
 CString 
 SQLInfoInformix::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table  (p_foreign.m_tablename);
   CString primary(p_foreign.m_primaryTable);
   if(!p_foreign.m_schema.IsEmpty())
@@ -557,7 +561,7 @@ SQLInfoInformix::GetEndWhileLoop() const
   return "END WHILE;\n";
 }
 
-// Gets the fact if a SELECT must be inbetween parenthesis for an assignment
+// Gets the fact if a SELECT must be in between parenthesis for an assignment
 bool 
 SQLInfoInformix::GetAssignmentSelectParenthesis() const
 {
@@ -602,7 +606,7 @@ SQLInfoInformix::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return CString("NVL(") + p_test + "," + p_isnull + ")";
 }
 
-// Gets the subtransaction commands
+// Gets the sub transaction commands
 CString 
 SQLInfoInformix::GetStartSubTransaction(CString p_savepointName) const
 {
@@ -624,7 +628,7 @@ SQLInfoInformix::GetRollbackSubTransaction(CString p_savepointName) const
 // SQL CATALOG QUERIES
 // ==================================================================
 
-// Get SQL to check if a storedprocedure already exists in the database
+// Get SQL to check if a stored procedure already exists in the database
 CString
 SQLInfoInformix::GetSQLStoredProcedureExists(CString& p_name) const
 {
@@ -724,7 +728,7 @@ SQLInfoInformix::GetSQLTableIndices(CString /*p_user*/,CString p_tableName) cons
   CString query;
   p_tableName.MakeLower();
 
-  // Reads all current indici in the database in a list
+  // Reads all current indices in the database in a list
   // So we can figure out if an index need to be generated
   for(int ind = 1; ind <= 8; ++ind)
   {
@@ -792,7 +796,7 @@ SQLInfoInformix::GetSQLDropIndex(CString p_user,CString p_indexName) const
 }
 
 
-// Get SQL to read the referential constaints from the catalog
+// Get SQL to read the referential constraints from the catalog
 CString 
 SQLInfoInformix::GetSQLTableReferences(CString p_schema
                                       ,CString p_tablename
@@ -948,7 +952,7 @@ SQLInfoInformix::DoRemoveProcedure(CString& p_procedureName) const
 
 }
 
-// Get SQL for your session and controling terminal
+// Get SQL for your session and controlling terminal
 CString
 SQLInfoInformix::GetSQLSessionAndTerminal() const
 {
@@ -962,7 +966,7 @@ SQLInfoInformix::GetSQLSessionAndTerminal() const
   return query;
 }
 
-// Get SQL to check if sessionnumber exists
+// Get SQL to check if session number exists
 CString 
 SQLInfoInformix::GetSQLSessionExists(CString sessieId) const
 {
@@ -999,7 +1003,7 @@ SQLInfoInformix::GetSQLSearchSession(const CString& p_databaseName,const CString
          "                 FROM " + p_sessionTable +"))";
 }
 
-// See if a column exsists within a table
+// See if a column exists within a table
 bool   
 SQLInfoInformix::DoesColumnExistsInTable(CString& /*p_owner*/,CString& p_tableName,CString& p_column) const
 {
@@ -1153,7 +1157,7 @@ SQLInfoInformix::DoCommitDDLcommands() const
 }
 
 // Do the commit for the DML commands in the database
-// ODBC driver autocommit mode will go wrong!!
+// ODBC driver auto commit mode will go wrong!!
 void
 SQLInfoInformix::DoCommitDMLcommands() const
 {
@@ -1190,7 +1194,7 @@ SQLInfoInformix::DoesViewExists(CString& p_viewName)
   return false;
 }
 
-// Must create temoporary tables runtime 
+// Must create temporary tables runtime 
 bool 
 SQLInfoInformix::GetMustMakeTemptablesAtRuntime() const
 {
@@ -1255,7 +1259,7 @@ SQLInfoInformix::DoRenameTable(CString& p_oldName,CString& p_newName) const
 CString 
 SQLInfoInformix::GetUserErrorText(CString& p_procName) const
 {
-  (void)p_procName;   // Not in informix.
+  (void)p_procName;   // Not in Informix.
   return "";
 }
 
@@ -1287,56 +1291,11 @@ SQLInfoInformix::GetSQLSPLCall(CString p_procName) const
   return "execute procedure " + p_procName;
 }
 
-// Length of paramters in binding
-int 
-SQLInfoInformix::GetParameterLength(int p_SQLType) const
-{
-  int retval;
-
-  switch (p_SQLType)
-  {
-    case SQL_CHAR:              retval = 32000;    break;
-    case SQL_VARCHAR:           retval = 32000;    break;
-    case SQL_LONGVARCHAR:       retval = 32000;    break;
-    case SQL_DECIMAL:           retval = 32000;    break;
-    case SQL_SMALLINT:          retval = 0;    break;
-    case SQL_INTEGER:           retval = 0;    break;
-    case SQL_REAL:              retval = 0;    break;
-    case SQL_DOUBLE:            retval = 0;    break;
-    case SQL_FLOAT:             retval = 0;    break;
-    case SQL_BINARY:            retval = 0;    break;
-    case SQL_VARBINARY:         retval = 0;    break;
-    case SQL_LONGVARBINARY:     retval = 0;    break;
-    case SQL_DATE:              retval = 0;    break;
-    case SQL_TIME:              retval = 0;    break;
-    case SQL_TIMESTAMP:         retval = 19;   break;
-    case SQL_NUMERIC:           retval = 0;    break;
-    case SQL_BIGINT:            retval = 0;    break;
-    case SQL_TINYINT:           retval = 0;    break;
-    case SQL_BIT:               retval = 0;    break;
-    case SQL_INTERVAL_YEAR:
-    case SQL_INTERVAL_YEAR_TO_MONTH:
-    case SQL_INTERVAL_MONTH:
-    case SQL_INTERVAL_DAY:
-    case SQL_INTERVAL_DAY_TO_HOUR:
-    case SQL_INTERVAL_DAY_TO_MINUTE:
-    case SQL_INTERVAL_DAY_TO_SECOND:
-    case SQL_INTERVAL_HOUR:
-    case SQL_INTERVAL_HOUR_TO_MINUTE:
-    case SQL_INTERVAL_HOUR_TO_SECOND:
-    case SQL_INTERVAL_MINUTE:
-    case SQL_INTERVAL_MINUTE_TO_SECOND:
-    case SQL_INTERVAL_SECOND:           retval = 25;    break;
-    default:                            retval = 0;     break;
-  }
-  return retval;
-}
-
 // Build a parameter list for calling a stored procedure
 CString 
 SQLInfoInformix::GetBuildedParameterList(size_t p_numOfParameters) const
 {
-  // Stands for the '?' binding parameters in a stored-procedire
+  // Stands for the '?' binding parameters in a stored-procedure
   // ALWAYS an ellipsis, even if there are no parameters!
   CString strParamLijst = "(";
   for (size_t i = 0; i < p_numOfParameters; i++)
@@ -1352,7 +1311,7 @@ SQLInfoInformix::GetBuildedParameterList(size_t p_numOfParameters) const
   return strParamLijst;
 }
 
-// Parametertype for stored procedure for a givven columntype for parameters and return types
+// Parameter type for stored procedure for a given column type for parameters and return types
 CString
 SQLInfoInformix::GetParameterType(CString& p_type) const
 {
@@ -1362,7 +1321,7 @@ SQLInfoInformix::GetParameterType(CString& p_type) const
 // GENERAL SQL ACTIONS
 // =================================================================
 
-// Makes a SQL string from a givven string, with all the right quotes
+// Makes a SQL string from a given string, with all the right quotes
 CString 
 SQLInfoInformix::GetSQLString(const CString& p_string) const
 {
@@ -1376,7 +1335,7 @@ SQLInfoInformix::GetSQLString(const CString& p_string) const
 CString 
 SQLInfoInformix::GetSQLDateString(int p_year,int p_month,int p_day) const
 {
-  // Informix used to be dependend on the DBFORMAT parameter
+  // Informix used to be depended on the DBFORMAT parameter
   // This form is independent of it's setting!
   CString dateString;
   dateString.Format("DATETIME(%04d-%02d-%02d) YEAR TO DAY",p_year,p_month,p_day);
@@ -1396,7 +1355,7 @@ SQLInfoInformix::GetSQLTimeString(int p_hour,int p_minute,int p_second) const
 CString 
 SQLInfoInformix::GetSQLDateTimeString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
 {
-  // Informix used to be dependend on the DBFORMAT parameter
+  // Informix used to be depended on the DBFORMAT parameter
   // This form is independent of it's setting!
   CString string;
   string.Format("DATETIME(%04d-%02d-%02d %02d:%02d:%02d) YEAR TO SECOND"
@@ -1569,3 +1528,5 @@ SQLInfoInformix::TranslateErrortext(int p_error,CString p_errorText) const
   return errorText;
 }
 
+// End of namespace
+}

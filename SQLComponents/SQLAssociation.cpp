@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "Stdafx.h"
+#include "SQLComponents.h"
 #include "SQLAssociation.h"
 
 #ifdef _DEBUG
@@ -32,6 +33,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLAssociation::SQLAssociation()
 {
@@ -143,4 +147,7 @@ SQLAssociation::UpdateDetails()
     return m_detail->Append();
   }
   return m_detail->Open();
+}
+
+// End of namespace
 }

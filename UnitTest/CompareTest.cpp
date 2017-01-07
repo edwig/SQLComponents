@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "CppUnitTest.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
@@ -35,6 +36,7 @@
 #include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace SQLComponents;
 
 namespace OperatorUnitTest
 {

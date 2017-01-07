@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLColumnInfo.h"
 
 #ifdef _DEBUG
@@ -33,14 +34,17 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-ColumnInfo::ColumnInfo()
+namespace SQLComponents
 {
-  v_columnName = "";
-  v_dataType   = 0;
-  v_typeName   = "";
-  v_precision  = 0;
-  v_length     = 0;
-  v_scale      = 0;
-  v_nullable   = 0;
-  v_remarks    = "";
+  ColumnInfo::ColumnInfo()
+  {
+    v_columnName = "";
+    v_dataType   = 0;
+    v_typeName   = "";
+    v_precision  = 0;
+    v_length     = 0;
+    v_scale      = 0;
+    v_nullable   = 0;
+    v_remarks    = "";
+  }
 }

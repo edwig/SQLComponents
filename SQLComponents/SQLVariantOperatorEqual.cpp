@@ -25,11 +25,15 @@ O////////////////////////////////////////////////////////////////////////
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantTrim.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
 #include "bcd.h"
+
+namespace SQLComponents
+{
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -1269,4 +1273,7 @@ SQLVariant::operator!=(SQLVariant& p_right)
   CString error;
   error.Format("Cannot do the inequality operator on (%s != %s)",leftType,rightType);
   throw error;
+}
+
+// End of namespace
 }

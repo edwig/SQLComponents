@@ -29,6 +29,9 @@
 #include "SQLDatabase.h"
 #include <vector>
 
+namespace SQLComponents
+{
+
 class SQLVariant;
 class SQLQuery;
 
@@ -90,7 +93,7 @@ public:
   virtual CString GetDatabaseVendorName() const = 0;
 
   // Get the fysical database name
-  virtual CString GetFysicalDatabaseName() const = 0;
+  virtual CString GetPhysicalDatabaseName() const = 0;
 
   // System catalog is stored in uppercase in the database?
   virtual bool IsCatalogUpper () const = 0;
@@ -442,9 +445,6 @@ public:
   // Get stored procedure call
   virtual CString GetSQLSPLCall(CString p_procName) const = 0;
 
-  // Length of paramters in binding
-  virtual int     GetParameterLength(int p_SQLType) const = 0;
-
   // Build a parameter list for calling a stored procedure
   virtual CString GetBuildedParameterList(size_t p_numOfParameters) const = 0;
 
@@ -532,3 +532,5 @@ SQLInfoDB::GetGrantedUsers() const
   return m_grantedUsers;
 }
 
+// End of namespace
+}

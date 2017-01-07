@@ -28,6 +28,10 @@
 #include <sqltypes.h>
 #include "Locker.h"
 
+namespace SQLComponents
+{ 
+
+// Forward declaration
 class SQLDatabase;
 
 class SQLTransaction 
@@ -115,4 +119,7 @@ inline void
 SQLTransaction::SetSavepoint(CString p_savepoint)
 {
   m_savepoint = p_savepoint;
+}
+
+// End of namespace
 }

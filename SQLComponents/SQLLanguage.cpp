@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLLanguage.h"
 
 #ifdef _DEBUG
@@ -32,6 +33,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 // Default language for Key2Brief = DUTCH !
 Language g_defaultLanguage = LN_DUTCH;
@@ -171,8 +175,8 @@ char* g_dateNames[LN_NUMLANG][DN_LASTNAME] =
 //
 int g_daysInTheMonth[14] =
 {
-   0    // Januari
-  ,31   // Februari
+   0    // January
+  ,31   // February
   ,59   // March
   ,90   // April
   ,120  // May
@@ -184,7 +188,7 @@ int g_daysInTheMonth[14] =
   ,304  // November
   ,334  // December
   ,365  // 1 Year
-  ,396  // Februari next year
+  ,396  // February next year
 };
 
 // Setting the default language
@@ -196,4 +200,7 @@ Language SetDefaultSQLLanguage(Language p_lang)
     g_defaultLanguage = p_lang;
   }
   return oldLanguage;
+}
+
+// End of namespace
 }

@@ -1,19 +1,22 @@
 //////////////////////////////////////////////////////////////////////////
 //
-//  BCD
+// BCD
 //
-//  Floating Point Precision Number class (Binary Coded Decimal)
-//  A number always has the format [sign][[digit]*][.[digit]*][E[sign][digits]+] where sign is either '+' or '-'
-//  Numbers are stored in 1E8 based mantissa with a digital . implied at the second position
-//  The mantissa array exists of a series of integers with 8 functional digits each
+// Floating Point Precision Number class (Binary Coded Decimal)
+// A number always has the format [sign][[digit]*][.[digit]*][E[sign][digits]+] where sign is either '+' or '-'
+// Numbers are stored in 1E8 based mantissa with a digital . implied at the second position
+// The mantissa array exists of a series of integers with 8 functional digits each
 //
-//  Copyright (c) 2013-2016 ir W. E. Huisman
+// Copyright (c) 2013-2016 ir W. E. Huisman
 //
 // Last Revision:   01-02-2017
 // Version number:  1.3.3
 //
 #pragma once
 #include <sqltypes.h>   // Needed for conversions of SQL_NUMERIC_STRUCT
+
+namespace SQLComponents
+{
 
 #ifndef SQLNUM_MAX_PREC
 #define SQLNUM_MAX_PREC 38
@@ -341,3 +344,6 @@ private:
   short  m_exponent;            // +/- 10E32768
   long   m_mantissa[bcdLength]; // Up to (bcdDigits * bcdLength) digits
 };
+
+// End of namespace
+}

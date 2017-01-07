@@ -26,6 +26,9 @@
 //
 #pragma once
 
+namespace SQLComponents
+{
+
 class SQLStatement
 {
 public :
@@ -62,3 +65,5 @@ private:
   bool 	  m_customer;  // Specific for a customer
 };
 
+// End of namespace
+}

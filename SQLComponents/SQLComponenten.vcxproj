@@ -146,6 +146,10 @@
     <ClCompile Include="bcd.cpp">
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Level4</WarningLevel>
     </ClCompile>
+    <ClCompile Include="SMX_String.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="SQLAssociation.cpp" />
     <ClCompile Include="SQLColumnInfo.cpp" />
     <ClCompile Include="SQLDatabase.cpp" />
@@ -212,8 +216,10 @@
     <ClInclude Include="bcd.h" />
     <ClInclude Include="ExcelFormat.h" />
     <ClInclude Include="Locker.h" />
+    <ClInclude Include="SMX_String.h" />
     <ClInclude Include="SQLAssociation.h" />
     <ClInclude Include="SQLColumnInfo.h" />
+    <ClInclude Include="SQLComponents.h" />
     <ClInclude Include="SQLDatabase.h" />
     <ClInclude Include="SQLDataSet.h" />
     <ClInclude Include="SQLDataSetXLS.h" />
@@ -233,8 +239,6 @@
     <ClInclude Include="SQLInterval.h" />
     <ClInclude Include="SQLLanguage.h" />
     <ClInclude Include="SQLMutation.h" />
-    <ClInclude Include="sqlncli.h" />
-    <ClInclude Include="SQLOdbc.h" />
     <ClInclude Include="SQLQuery.h" />
     <ClInclude Include="SQLRecord.h" />
     <ClInclude Include="SQLStatement.h" />

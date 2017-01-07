@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLRecord.h"
 #include "SQLDataSet.h"
 #include "SQLVariant.h"
@@ -35,6 +36,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLRecord::SQLRecord(SQLDataSet* p_set,bool p_modifiable)
           :m_dataSet(p_set)
@@ -345,4 +349,7 @@ SQLRecord::XMLLoad(XmlElement* p_record)
     field = field->NextSiblingElement();
     ++ind;
   }
+}
+
+// End of namespace
 }

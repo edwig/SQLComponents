@@ -25,10 +25,14 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
 #include "bcd.h"
+
+namespace SQLComponents
+{
 
 // The concise datatype is used to scale the ODBC datatypes to a short integer
 // that can be used in the arrays of functions for the comparison and mathematical operators
@@ -538,4 +542,7 @@ SQLVariant::operator SQLInterval()
 SQLVariant::operator bcd()
 {
   return GetAsBCD();
+}
+
+// End of namespace
 }

@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLInfoPostgreSQL.h"
 #include "SQLQuery.h"
 
@@ -34,18 +35,21 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// Constructor. Doet nog niets
+namespace SQLComponents
+{
+
+// Constructor. 
 SQLInfoPostgreSQL::SQLInfoPostgreSQL(SQLDatabase* p_database)
                   :SQLInfoDB(p_database)
 {
 }
 
-// Destructor. Doet nog niets.
+// Destructor.
 SQLInfoPostgreSQL::~SQLInfoPostgreSQL()
 {
 }
 
-// Geef SQLDatabaseType
+// Getting the SQLDatabaseType
 DatabaseType 
 SQLInfoPostgreSQL::GetDatabaseType() const
 {
@@ -63,7 +67,7 @@ SQLInfoPostgreSQL::GetDatabaseVendorName() const
 
 // Get physical database name
 CString 
-SQLInfoPostgreSQL::GetFysicalDatabaseName() const
+SQLInfoPostgreSQL::GetPhysicalDatabaseName() const
 {
   SQLQuery sql(m_database);
   CString query = "SELECT current_database()";
@@ -75,7 +79,7 @@ SQLInfoPostgreSQL::GetFysicalDatabaseName() const
   return "";
 }
 
-// Wordt de inhoud van de systeemcatalogus in uppercase opgeslagen?
+// System catalog is stored in uppercase in the database?
 bool 
 SQLInfoPostgreSQL::IsCatalogUpper () const
 {
@@ -89,14 +93,14 @@ SQLInfoPostgreSQL::GetUnderstandsSchemas() const
   return true;
 }
 
-// Ondersteund database/ODBCdriver commentaar in sql
+// Supports database/ODBCdriver comments in sql
 bool 
 SQLInfoPostgreSQL::SupportsDatabaseComments() const
 {
   return false;
 }
 
-// Database is in staat constraints op te schorten tot aan het eind v.d. transactie
+// Database can defer constraints until the end of a transaction
 bool 
 SQLInfoPostgreSQL::SupportsDeferredConstraints() const
 {
@@ -104,8 +108,8 @@ SQLInfoPostgreSQL::SupportsDeferredConstraints() const
   return true;
 }
 
-// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
-// Work-around is "SELECT UPPER(columnname) AS something.....ORDER BY something
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
+// Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
 bool
 SQLInfoPostgreSQL::SupportsOrderByExpression() const
 {
@@ -142,93 +146,93 @@ SQLInfoPostgreSQL::GetSystemDateTimeKeyword() const
   return "current_timestamp(0)";
 } 
 
-// String voor huidige datum
+// Gtetign the current date
 CString
 SQLInfoPostgreSQL::GetSystemDateString() const
 {
   return "current_date";
 }
 
-// Geeft het feit of TIJD op de database als een DECIMAL is geimplementeerd
+// True if TIME is implemented in the database as a DECIMAL
 bool 
 SQLInfoPostgreSQL::GetTimeIsDecimal() const
 {
-  // TIJD is geimplementeerd als TIME en NIET als DECIMAL
+  // TIJD is implemented as TIME in PostgreSQL :-)
   return false;
 }
 
-// Geeft het feit of INTERVAL op de database als een DECIMAL is geimlementeerd
+// True if INTERVAL is impelemented as a DECIMAL
 bool 
 SQLInfoPostgreSQL::GetIntervalIsDecimal() const
 {
-  // Interval is geimplementeerd als INTERVAL en NIET als DECIMAL
+  // Interval is implemented as INTERVAL in PostgreSQL :-)
   return false;
 }
 
-// Geef het karakter voor string concatenatie
+// Character for the string concatanation operator
 CString 
 SQLInfoPostgreSQL::GetConcatanationOperator() const
 {
   return "||";    
 }
 
-// Geef quote (hoe schrijf je dat) karakter voor strings
+// Quote character for string literals
 CString 
 SQLInfoPostgreSQL::GetQuoteCharacter() const
 {
   return "'";    
 }
 
-// Geef default NULL voor invoer parameterlijst
+// Default NULL for parameters
 CString 
 SQLInfoPostgreSQL::GetDefaultNULL() const
 {
   return "";    
 }
 
-// Geef INOUT voor invoer/uitvoer parameterlijst
+// INOUT prefix for input/output parameter in a parameter list
 CString 
 SQLInfoPostgreSQL::GetParameterINOUT() const
 {
   return "";    
 }
   
-// Geef OUT voor invoer/uitvoer parameterlijst
+// OUT prefix for an output parameter in a parameter list
 CString 
 SQLInfoPostgreSQL::GetParameterOUT() const
 {
   return "";    
 }
 
-// Geef datatype van "h_gebruiker" in een stored procedure als parameter
+// Get datatype for last user in a stored procedure as a parameter
 CString 
 SQLInfoPostgreSQL::GetAuditUserDatatype() const
 {
-  return "VARCHAR";      // of char(8) ? Volgens Lo wel. Lo op 9-1 veranderd in 5.4
+  return "VARCHAR";
 } 
 
-// Geef datatype van "h_gebruiker" in een stored procedure (extern) als variabele
+// Get datatype for last user in a stored procedure as a variable
 CString 
 SQLInfoPostgreSQL::GetAuditUserDatatypeAsVariable() const
 {
   return "VARCHAR(50)";
 } 
 
-// Geef datatype van de primary key
+// Datatype of the primary key
 CString 
 SQLInfoPostgreSQL::GetPrimaryKeyType() const
 {
   return "INTEGER";
 }
 
-// Geef datatype voor Moment
+// Datatype for a timestamp (DATETIME YEAR TO SECOND)
 CString 
 SQLInfoPostgreSQL::GetDatetimeYearToSecondType() const
 {
   return "TIMESTAMP";
 }
 
-// Seperator tussen twee alter-constraints in een alter-table statement
+// Separator between to alter constraints in a alter table statemetn
 CString
 SQLInfoPostgreSQL::GetAlterConstraintSeparator() const
 {
@@ -263,64 +267,59 @@ SQLInfoPostgreSQL::GetViewOuterJoinKeyword() const
   return "LEFT OUTER JOIN";
 }
 
-// Geef closure voor outer-join
+// Closer character for an outer join (+ in some databases)
 CString 
 SQLInfoPostgreSQL::GetOuterJoinClosure() const
 {
   return "";
 }
 
-// Outer join teken
+// OUTER JOIN sign
 CString  
 SQLInfoPostgreSQL::GetOuterJoinSign() const
 {
   return "";
 }
 
-// Prefix voor gebruik van een parameter in een stored procedure
+// Prefix for using a parameter in a stored procedure
 CString
 SQLInfoPostgreSQL::GetSPParamPrefix() const
 {
   return "";
 }
 
-// Geef de query om een nieuw record toe te voegen in de kolom OID
+// Get the query to add a new record in a table by the column OID
 CString 
 SQLInfoPostgreSQL::GetIdentityString(CString& p_tablename,CString p_postfix /*="_seq"*/) const
 {
   return "nextval('" + p_tablename + p_postfix + "')";
 }
 
-// Geef de query om een tijdelijke tabel uit een select statement te maken
+// Get the query to create a temporary table from a SELECT statement
 CString 
 SQLInfoPostgreSQL::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_select) const
 {
   return "CREATE GLOBAL TEMPORARY TABLE " + p_tablename + "\nAS " + p_select;
 }
 
-// Geef de query om een tijdelijke tabel definitief te verwijderen
-// LET OP moet uitgevoerd met DBRecordSet::VoerSqlCommandosUit!!!
+// Get the query to remove a temporary table completely
 CString
 SQLInfoPostgreSQL::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) const
 {
-  // Dit werkt in PostgreSQL alleen zo, omdat er anders een foutmelding komt dat
-  // de tijdelijke tabel nog in gebruik is en de tabeldefinitie dan in de
-  // catalog van de RDBMS blijft staan. De definitie is dan strijdig met een
-  // mogelijke volgende definitie onder deze naam
   p_number += 3;
   return "DELETE FROM "    + p_tablename + ";\n"
          "TRUNCATE TABLE " + p_tablename + ";\n"
          "DROP TABLE "     + p_tablename + ";\n";
 }
 
-// Geef de query om in een tijdelijke tabel te selecteren
+// Get the SQL query to select into a temporary table
 CString 
 SQLInfoPostgreSQL::GetSQLSelectIntoTemp(CString& p_tablename,CString& p_select) const
 {
    return "INSERT INTO " + p_tablename + "\n" + p_select + ";\n";
 }
 
-// Vervang de OID kolom door een sequence.nextval
+// Replace the primary key column by a sequence NEXTVAL
 CString 
 SQLInfoPostgreSQL::GetReplaceColumnOIDbySequence(CString p_columns,CString p_tablename,CString p_postfix /*="_seq"*/) const
 {
@@ -343,31 +342,29 @@ SQLInfoPostgreSQL::GetReplaceColumnOIDbySequence(CString p_columns,CString p_tab
   return p_columns;
 }
 
-// Verwijder catalog afhankelijkheden
+// Remove catalg dependencies
 CString 
 SQLInfoPostgreSQL::GetSQLRemoveProcedureDependencies(CString p_procname) const
 {
   return "";
 }
 
-// Verwijder afhankelijkheden van berekende velden (bug in Firebird)
+// Remove catalog dependencies for calculated fields (bug in Firebird)
 CString 
 SQLInfoPostgreSQL::GetSQLRemoveFieldDependencies(CString p_tablename) const
 {
-  // Niet nodig/bestaat niet in Informix
+  // Not needed in PostgreSQL
   return "";
 }
 
-// Geeft de tabeldefinitie-vorm van een primary key en constraint
+// Getting the create-table form of a primary key constraint
 CString 
 SQLInfoPostgreSQL::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
-  // Primary key-constraint niet direct genereren: deze wordt apart gegenereerd,
-  // zodat de bijbehorende index in de juiste tablespace terechtkomt.
   return GetPrimaryKeyType() + " NOT NULL CONSTRAINT pk_" + p_tableName + " PRIMARY KEY\n";
 }
 
-// Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
+// Getting the primary key constraint in the form of an ALTER TABLE statement
 CString
 SQLInfoPostgreSQL::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const
 {
@@ -380,7 +377,7 @@ SQLInfoPostgreSQL::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,
 CString 
 SQLInfoPostgreSQL::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table  (p_foreign.m_tablename);
   CString primary(p_foreign.m_primaryTable);
   if(!p_foreign.m_schema.IsEmpty())
@@ -434,7 +431,7 @@ SQLInfoPostgreSQL::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 CString 
 SQLInfoPostgreSQL::GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table(p_origin.m_tablename);
   if(!p_origin.m_schema.IsEmpty())
   {
@@ -465,13 +462,10 @@ SQLInfoPostgreSQL::GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_reques
   return query;
 }
 
-// Performance paramters in de database zetten
+// Performance parameters in the database
 CString
 SQLInfoPostgreSQL::GetSQLPerformanceSettings() const
 {
-  // Om geoptimaliseerde queries uit te kunnen voeren op views met outer-joins
-  // en filters die op die views gelegd worden is de volgende parameter
-  // van levensbelang voor de performance
   return "";
 }
 
@@ -482,14 +476,14 @@ SQLInfoPostgreSQL::GetSQLCacheModeSetting(const CString& /*p_mode*/) const
   return "";
 }
 
-// Getallen opslaan in stored-procs hebben dit nodig
+// Formatting of numbers in stored procedures
 CString
 SQLInfoPostgreSQL::GetSQLNlsNumericCharacters() const
 {
   return "";
 }
 
-// Geeft de manier om een kolomnaam te wijzigen, kan meerdere SQL's bevatten
+// Altering the datatype of a column
 CString
 SQLInfoPostgreSQL::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,CString p_newName,CString p_datatype)
 {
@@ -502,44 +496,43 @@ SQLInfoPostgreSQL::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,
   return sqlCode;
 }
 
-// Geeft de maximale lengte van een sql statement
+// Maximum length of an SQL statement
 unsigned long 
 SQLInfoPostgreSQL::GetMaxStatementLength() const
 {
-  return 0;		//	Geen limiet
+  return 0;//	No limit
 }
 
-// Geeft de prefix voor het wijzigen van het datatype in MODIFY/ALTER
+// Prefix for altering the datatype in a MODIFY/ALTER statement
 CString 
 SQLInfoPostgreSQL::GetModifyDatatypePrefix() const
 {
-  // Bij het veranderen van het datatype gewoon het nieuwe type opgeven
-  // DUS: MODIFY <kolomnaam> TYPE <datatypenaam>
+  // SO: MODIFY <kolomnaam> TYPE <datatypenaam>
   return "TYPE ";
 }
 
-// Code om een tijdelijke tabel aan te maken (qualifier)
+// Definition / Qualifier of a temporary table
 CString 
 SQLInfoPostgreSQL::GetCodeTemporaryTable() const
 {
   return "GLOBAL TEMPORARY";
 }
 
-// Code om de locking in de tabel op rij niveau te zetten
+// Locking a table in row mode
 CString 
 SQLInfoPostgreSQL::GetCodeLockModeRow() const
 {
   return "";
 }
 
-// Code om de tabel zonder logging aan te maken
+// To create a table without logging
 CString 
 SQLInfoPostgreSQL::GetCodeTempTableWithNoLog() const
 {
   return "\nWITHOUT OIDS\nON COMMIT PRESERVE ROWS";
 }
 
-// Code om alle rechten op de tabel open te zetten (NON-ANSI database)
+// Code to grant rights on configured users
 CString 
 SQLInfoPostgreSQL::GetSQLGrantAllOnTable(CString p_schema,CString p_tableName,bool p_grantOption /*= false*/)
 {
@@ -552,14 +545,14 @@ SQLInfoPostgreSQL::GetSQLGrantAllOnTable(CString p_schema,CString p_tableName,bo
 }
 
 
-// Code voor de select into temp
+// Code BEFORE a select into temp
 CString
 SQLInfoPostgreSQL::GetSelectIntoTempClausePrefix(CString p_tableName) const
 {
   return "CREATE GLOBAL TEMPORARY TABLE " + p_tableName + "\nWITHOUT OIDS AS\n";
 }
 
-// Code na de select into temp
+// Code AFTER the select into temp
 CString
 SQLInfoPostgreSQL::GetSelectIntoTempClauseSuffix(CString p_tableName) const
 {
@@ -569,11 +562,11 @@ SQLInfoPostgreSQL::GetSelectIntoTempClauseSuffix(CString p_tableName) const
 bool
 SQLInfoPostgreSQL::GetCodeIfStatementBeginEnd() const
 {
-  // IF THEN ELSE END IF; heeft niet perse BEGIN/END nodig
+  // IF THEN ELSE END IF; does not necessarily need a BEGIN/END
   return false;
 }
 
-// Geef het einde van een IF statement
+// At the end of an IF statement
 CString 
 SQLInfoPostgreSQL::GetCodeEndIfStatement() const
 {
@@ -586,28 +579,28 @@ SQLInfoPostgreSQL::GetAssignmentStatement(const CString& p_destiny,const CString
   return p_destiny + " := " + p_source + ";";
 }
 
-// Geef SQL keyword om een kolom te wijzigen
+// SQL To alter a column (MODIFY / ALTER)
 CString 
 SQLInfoPostgreSQL::GetCodeAlterColumn() const
 {
   return "ALTER ";
 }
 
-// Geef de code om een WHILE-loop te starten
+// Code to start an SPL WHIL loop
 CString
 SQLInfoPostgreSQL::GetStartWhileLoop(CString p_condition) const
 {
   return "WHILE " + p_condition + " LOOP\n";
 }
 
-// Geef de code om een WHILE-loop te eindigen
+// Code to end a WHILE loop
 CString
 SQLInfoPostgreSQL::GetEndWhileLoop() const
 {
   return "END LOOP;\n";
 }
 
-// Geef het feit of een SELECT tussen parenthesis moet staan voor een assignment
+// Get the fact that we need to place a SELECT in parenthesis for an assignment in SPL
 bool 
 SQLInfoPostgreSQL::GetAssignmentSelectParenthesis() const
 {
@@ -651,7 +644,7 @@ SQLInfoPostgreSQL::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
 }
 
-// Gets the subtransaction commands
+// Gets the sub transaction commands
 CString 
 SQLInfoPostgreSQL::GetStartSubTransaction(CString p_savepointName) const
 {
@@ -661,7 +654,7 @@ SQLInfoPostgreSQL::GetStartSubTransaction(CString p_savepointName) const
 CString 
 SQLInfoPostgreSQL::GetCommitSubTransaction(CString p_savepointName) const
 {
-  // Geen commit voor subtransaction
+  // No commit for a sub transaction
   return CString("");
 }
 
@@ -674,7 +667,7 @@ SQLInfoPostgreSQL::GetRollbackSubTransaction(CString p_savepointName) const
 // SQL CATALOG QUERIES
 // ===================================================================
 
-// Geef SQL om te kijken of storedprocedure in de database bestaat
+// Get SQL to see if a stored procedure exists in the database
 CString 
 SQLInfoPostgreSQL::GetSQLStoredProcedureExists(CString& p_name) const
 {
@@ -683,10 +676,11 @@ SQLInfoPostgreSQL::GetSQLStoredProcedureExists(CString& p_name) const
          " WHERE proname = '" + p_name + "'\n;";
 }
 
-// Deel van query om 1 record te selecteren
+// Part of a query to select 1 record 
 CString
 SQLInfoPostgreSQL::GetDualTableName() const
 {
+  // Not needed, can do "SELECT <expression>"
   return "";
 }
 
@@ -697,28 +691,28 @@ SQLInfoPostgreSQL::GetDualClause() const
   return "";
 }
 
-// Geef DEFERRABLE (of niet dus)
+// Get DEFERRABLE clause to defer constraints
 CString
 SQLInfoPostgreSQL::GetConstraintDeferrable() const
 {
   return " DEFERRABLE";
 }
 
-// Constraints tijdelijk opschorten tot aan de volgende COMMIT;
+// Constraints deferred until the next commit
 CString 
 SQLInfoPostgreSQL::GetSQLDeferConstraints() const
 {
   return "set transaction deferrable";
 }
 
-// Constraints weer op onmiddellijk terugzetten
+// Constraints back to immediate check
 CString 
 SQLInfoPostgreSQL::GetSQLConstraintsImmediate() const
 {
   return "set transaction not deferrable";
 }
 
-// Geef de query die controleert of de tabel al bestaat in de database
+// Gets the SQL query to check if a table exists in the database
 CString 
 SQLInfoPostgreSQL::GetSQLTableExists(CString p_schema,CString p_tablename) const
 {
@@ -733,13 +727,13 @@ SQLInfoPostgreSQL::GetSQLTableExists(CString p_schema,CString p_tablename) const
   return query;
 }
 
-// Geef de query die de kolommen van een tabel uit de catalogus haalt
+// Gets the SQL query to get the columns of a table from the catalog
 CString 
 SQLInfoPostgreSQL::GetSQLGetColumns(CString& /*p_user*/,CString& p_tableName) const
 {
   CString tableName(p_tableName);
   tableName.MakeLower();
-  // naam, nummer, type, lengte, nullable
+
   CString query =  "SELECT attname\n"
                    "      ,attnum\n"
                    "      ,typname\n"
@@ -766,8 +760,6 @@ SQLInfoPostgreSQL::GetSQLGetColumns(CString& /*p_user*/,CString& p_tableName) co
                    "  FROM pg_class, pg_attribute, pg_type\n"
                    " WHERE pg_class.relname = '" + tableName  + "'\n"
                    "   AND pg_class.relkind = 'r'\n"
-//                       "   AND pg_class.relowner = pg_shadow.usesysid\n"
-//                       "   AND pg_shadow.usename = '" + eigenaar + "'\n"
                    "   AND pg_class.oid = pg_attribute.attrelid\n"
                    "   AND pg_attribute.atttypid = pg_type.oid\n"
                    "   AND attnum > 0\n"
@@ -793,14 +785,10 @@ SQLInfoPostgreSQL::GetSQLGetColumns(CString& /*p_user*/,CString& p_tableName) co
   return query;
 }
 
-// Geef de query om de Check en Unique constraints op te halen
+// Get the SQL query to get the CHECK and UNIQUE constraints from the catalog
 CString 
 SQLInfoPostgreSQL::GetSQLGetConstraintsForTable(CString& p_tableName) const
 {
-  // [EH] Uitgebreid met een beperking op SYS_ omdat dit ervoor
-  // zorgt dat de NOT NULL constraints niet twee keer gedropped worden
-  // [EH] Type 'R' weggehaald, omdat anders alle refrence constraints
-  // ook mee 'gedropped' worden bij het droppen van check constraints
   CString lowerName(p_tableName);
   lowerName.MakeLower();
   CString contabel = "SELECT con.conname\n"
@@ -881,7 +869,7 @@ SQLInfoPostgreSQL::GetSQLDropIndex(CString p_user,CString p_indexName) const
   return sql;
 }
 
-// Geef de query om de referential constaints uit de catalogus te lezen.
+// Get the SQL queyr to get all the referential constraints from the catalog
 CString 
 SQLInfoPostgreSQL::GetSQLTableReferences(CString p_schema
                                         ,CString p_tablename
@@ -1007,7 +995,7 @@ SQLInfoPostgreSQL::GetSQLDropSequence(CString p_schema,CString p_tablename,CStri
   return sql;
 }
 
-// Geef de query om rechten op een sequence toe te kennen
+// Get the query to add rights to a sequence
 CString
 SQLInfoPostgreSQL::GetSQLSequenceRights(CString p_schema,CString p_tableName,CString p_postfix /*="_seq"*/) const
 {
@@ -1019,30 +1007,11 @@ SQLInfoPostgreSQL::GetSQLSequenceRights(CString p_schema,CString p_tableName,CSt
   return "GRANT SELECT, UPDATE ON " + sequence + " TO " + GetGrantedUsers();
 }
 
-// Geef de query om een stored procedure te verwijderen
+// Removing a stored procedure
 void 
 SQLInfoPostgreSQL::DoRemoveProcedure(CString& /*p_procedureName*/) const
 {
-//   if (procnaam.Bevat("_ins_proc") || procnaam.Bevat("_upd_proc") || procnaam.Bevat("_fupd_proc"))
-//   {
-//     String subsys = procnaam.AllesVoor("_");
-//     String alias  = procnaam.AllesNa("_").AllesVoor("_");
-//     String tabelnaam = subsys + "_" + alias;
-//     return "DROP FUNCTION " + procnaam + "(" + tabelnaam + ");\n";
-//   }
-//   else
-//   {
-//     if (procnaam.Bevat("_del_proc"))
-//     {
-//       return "DROP FUNCTION " + procnaam + "(int4, \"timestamp\", \"timestamp\", \"varchar\");\n";
-//     }
-//     else
-//     {
-//       return "DROP FUNCTION " + procnaam + "(" + procnaam + "_proc_in_par);\n" +
-//         "DROP TYPE " + procnaam + "_proc_in_par;\n" +
-//         "DROP TYPE " + procnaam + "_proc_out_par;\n";
-//     }
-//   }
+  // To be implemented
 }
 
 CString
@@ -1055,29 +1024,27 @@ SQLInfoPostgreSQL::GetSQLSessionAndTerminal() const
   return query;
 }
 
-// Get SQL to check if sessionnumber exists
+// Get SQL to check if session number exists
 CString 
 SQLInfoPostgreSQL::GetSQLSessionExists(CString sessieId) const
 {
   return "";
 }
 
-// Geef query voor uniek sessie id.
+// Get SQL query for the unique session id
 CString 
 SQLInfoPostgreSQL::GetSQLUniqueSessionId(const CString& /*p_databaseName*/,const CString& /*p_sessionTable*/) const
 {
-  // In PostgreSQL is de database de engine. Databasenaam is dus niet relevant
   CString query = "SELECT DISTINCT procpid\n"
                   "  FROM pg_stat_activity\n"
                   " WHERE procpid <> 0";
   return query;
 }
 
-// Geef query voor opzoeken sessie.
+// Finding the extra sessions
 CString 
 SQLInfoPostgreSQL::GetSQLSearchSession(const CString& /*p_databaseName*/,const CString& p_sessionTable) const
 {
-  // In PostgreSQL is de database de engine. Databasenaam is dus niet relevant
   CString query = "SELECT  procpid\n"
                   "       ,usename\n"
                   "       ,datname\n"
@@ -1089,7 +1056,7 @@ SQLInfoPostgreSQL::GetSQLSearchSession(const CString& /*p_databaseName*/,const C
   return query;
 }
 
-// Kijk of tabel/kolom combinatie bestaat
+// See if a column exists in a table
 bool   
 SQLInfoPostgreSQL::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const
 {
@@ -1117,7 +1084,7 @@ SQLInfoPostgreSQL::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName
   return (number == 1);
 }
 
-// Query om te bepalen of de tabel al een primary key heeft
+// Get SQL query to see if a table already has a primary key
 CString
 SQLInfoPostgreSQL::GetSQLPrimaryKeyConstraintInformation(CString p_schema,CString p_tableName) const
 {
@@ -1143,7 +1110,7 @@ SQLInfoPostgreSQL::DoesConstraintExist(CString /*p_constraintName*/) const
   return true;
 }
 
-// Geeft een lock-table query
+// Get the lock-table query
 CString 
 SQLInfoPostgreSQL::GetSQLLockTable(CString& p_tableName,bool p_exclusive) const
 {
@@ -1153,11 +1120,10 @@ SQLInfoPostgreSQL::GetSQLLockTable(CString& p_tableName,bool p_exclusive) const
   return query;
 }
 
-// Geef query om de statistics te optimaliseren / analyseren
+// Get the SQL query to optimize a table
 CString 
 SQLInfoPostgreSQL::GetSQLOptimizeTable(CString& p_owner,CString& p_tableName,int& p_number)
 {
-  // Optimaliseer de tabel
   CString optim = "VACUUM ANALYZE " + p_owner + "." + p_tableName + ";\n";
   p_number += 1;
   return optim;
@@ -1240,7 +1206,7 @@ SQLInfoPostgreSQL::GetSQLCreateOrReplaceView(CString p_schema,CString p_view,CSt
 // SQL DDL ACTIONS
 // ===================================================================
 
-// Verwerk DDL commandos in de catalog
+// Committing the DDL commands explicitly
 void 
 SQLInfoPostgreSQL::DoCommitDDLcommands() const
 {
@@ -1248,8 +1214,7 @@ SQLInfoPostgreSQL::DoCommitDDLcommands() const
   sql.DoSQLStatement("commit");
 }
 
-// Expliciet DML commandos verwerken
-// ODBC driver autoocommit mode aanzetten gaat vaak fout
+// ODBC driver auto commit goes wrong for this engine!
 void
 SQLInfoPostgreSQL::DoCommitDMLcommands() const
 {
@@ -1285,16 +1250,14 @@ SQLInfoPostgreSQL::DoesViewExists(CString& p_viewName)
   return false;
 }
 
-
-
-// Creeer tijdelijke klassen runtime
+// Can create temporary tables at runtime?
 bool 
 SQLInfoPostgreSQL::GetMustMakeTemptablesAtRuntime() const
 {
   return false;
 }
 
-// Creeer een tijdelijke tabel op een geoptimaliseerde manier vanuit een meegegeven info
+// Create a temporary table in an optimized way
 void
 SQLInfoPostgreSQL::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const
 {
@@ -1316,25 +1279,21 @@ SQLInfoPostgreSQL::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,
   }
   catch(...)
   {
-    // Kan geen tijdelijke tabel maken: %s 
     throw CString("Cannot create temporary table: " + p_tableName);
   }
 }
 
-// Verwijder tijdelijke tabel weer
+// Remove temporary tabel
 void
 SQLInfoPostgreSQL::DoRemoveTemporaryTable(CString& p_tableName) const
 {
   SQLQuery sql(m_database);
-  // Alles mag genegeerd worden. Kan nog in gebruik zijn bij een andere
-  // gebruiker en/of sessie. De tabelinhoud wordt hierbij door deze sessie
-  // verwijderd. (getruncate)
   sql.TryDoSQLStatement("DELETE FROM "    + p_tableName);
   sql.TryDoSQLStatement("TRUNCATE TABLE " + p_tableName);
   sql.TryDoSQLStatement("DROP TABLE "     + p_tableName);
 }
 
-// Maak een procedure aan in de database
+// Create a stored procedure in the database
 void 
 SQLInfoPostgreSQL::DoMakeProcedure(CString& p_procName,CString p_table,bool p_noParameters,CString& p_codeBlock)
 {
@@ -1366,12 +1325,12 @@ SQLInfoPostgreSQL::DoMakeProcedure(CString& p_procName,CString p_table,bool p_no
   sql.DoSQLStatement(grant_statement);
 }
 
-// Wijze van de database om een tabel van naam te veranderen
+// Way to rename a table
 void 
 SQLInfoPostgreSQL::DoRenameTable(CString& p_oldName,CString& p_newName) const
 {
   SQLQuery sql(m_database);
-  // Let op: Zonder 'TABLE' in het statement
+  // Beware: no 'TABLE' in the statement
   CString rename = "rename " + p_oldName + " to " + p_newName;
   sql.DoSQLStatement(rename);
   DoCommitDDLcommands();
@@ -1380,104 +1339,48 @@ SQLInfoPostgreSQL::DoRenameTable(CString& p_oldName,CString& p_newName) const
 // PERSISTENT-STORED MODULES (SPL / PL/SQL)
 // ====================================================================
 
-
-// Geef de user-errors uit de database:
+// Getting the user errors from the database
 CString 
 SQLInfoPostgreSQL::GetUserErrorText(CString& p_procName) const
 {
-  (void)p_procName;   // niet beschikbaar in postgreSQL.
+  (void)p_procName;   // Not supported in postgreSQL.
   return "";
 }
 
-// Geef toekenning aan een variabele in SPL
+// Getting the assignment to a variable in SPL
 CString 
 SQLInfoPostgreSQL::GetSPLAssignment(CString p_variable) const
 {
   return p_variable + " := ";
 }
 
-// Geef de start van een SPL While loop
+// Getting the start of a WHILE loop
 CString 
 SQLInfoPostgreSQL::GetSPLStartWhileLoop(CString p_condition) const
 {
   return "WHILE " + p_condition + " LOOP\n";
 }
 
-// Geef het einde van een SPL While loop
+// At the end of a WHILE loop
 CString 
 SQLInfoPostgreSQL::GetSPLEndWhileLoop() const
 {
   return "END LOOP;\n";
 }
 
-// Geef stored procedureaanroep regel
+// Calling a stored procedure in SPL
 CString 
 SQLInfoPostgreSQL::GetSQLSPLCall(CString p_procName) const
 {
   CString subsys = p_procName.Left(p_procName.Find("?"));
-//   if (subsys.Bevat("ins_proc(") || subsys.Bevat("upd_proc("))
-//   {
-//     subsys = p_procName.AllesVoor("_");
-//     CString alias  = p_procName.AllesNa("_").AllesVoor("_");
-//     p_procName.Replace("(", "(CAST(ROW(");
-//     p_procName.Replace(")", ") AS ");
-//     p_procName += subsys + "_" + alias + "))";
-//   }
   return "SELECT " + p_procName + ";";
 }
 
-// Lengte parameters bij binden:
-int 
-SQLInfoPostgreSQL::GetParameterLength(int p_SQLType) const
-{
-  int retval;
-
-  switch (p_SQLType)
-  {
-    case SQL_CHAR:          retval = 2000; break;
-    case SQL_VARCHAR:       retval = 4000; break;
-    case SQL_LONGVARCHAR:   retval = 32000;break;
-    case SQL_DECIMAL:       retval = 32000;break;
-    case SQL_SMALLINT:      retval = 0;    break;
-    case SQL_INTEGER:       retval = sizeof(long);break;
-    case SQL_REAL:          retval = 0;    break;
-    case SQL_DOUBLE:        retval = 0;    break;
-    case SQL_FLOAT:         retval = 0;    break;
-    case SQL_BINARY:        retval = 0;    break;
-    case SQL_VARBINARY:     retval = 0;    break;
-    case SQL_LONGVARBINARY: retval = 0;    break;
-    case SQL_DATE:          retval = 0;    break;
-    case SQL_TIME:          retval = 0;    break;
-    case SQL_TIMESTAMP:     retval = 19;   break;
-    case SQL_NUMERIC:       retval = 0;    break;
-    case SQL_BIGINT:        retval = 0;    break;
-    case SQL_TINYINT:       retval = 0;    break;
-    case SQL_BIT:           retval = 0;    break;
-    case SQL_INTERVAL_YEAR:
-    case SQL_INTERVAL_YEAR_TO_MONTH:
-    case SQL_INTERVAL_MONTH:
-    case SQL_INTERVAL_DAY:
-    case SQL_INTERVAL_DAY_TO_HOUR:
-    case SQL_INTERVAL_DAY_TO_MINUTE:
-    case SQL_INTERVAL_DAY_TO_SECOND:
-    case SQL_INTERVAL_HOUR:
-    case SQL_INTERVAL_HOUR_TO_MINUTE:
-    case SQL_INTERVAL_HOUR_TO_SECOND:
-    case SQL_INTERVAL_MINUTE:
-    case SQL_INTERVAL_MINUTE_TO_SECOND:
-    case SQL_INTERVAL_SECOND:           retval = 25;    break;
-    default:                            retval = 0;     break;
-  }
-  return retval;
-}
-
-// Bouw een parameterlijst op voor aanroep van de stored-procedure
+// Build a parameter list for a call of a stored procedure within SPL
 CString 
 SQLInfoPostgreSQL::GetBuildedParameterList(size_t p_numOfParameters) const
 {
-  // dit staat voor de parameters, de vraagtekens die worden meegegeven aan de
-  // stored procedure
-  // INDIEN GEEN paraemters, dan ook GEEN ellipsis
+  // IF NO parameters: NO ellipsis
   CString strParamLijst;
   if(p_numOfParameters >= 0)
   {
@@ -1504,9 +1407,6 @@ SQLInfoPostgreSQL::GetBuildedParameterList(size_t p_numOfParameters) const
 CString
 SQLInfoPostgreSQL::GetParameterType(CString& p_type) const
 {
-  // char, varchar -> varchar
-  // decimal -> number
-
   CString retval;
   if (_strnicmp(p_type,"char",4) == 0 ||
       _strnicmp(p_type,"varchar",7) == 0 )
@@ -1905,4 +1805,7 @@ SQLInfoPostgreSQL::GetVarFromRecord(int p_type,char* p_pointer,int p_column,bool
     p_ready = true;
   }
   return variant;
+}
+
+// End of namespace
 }

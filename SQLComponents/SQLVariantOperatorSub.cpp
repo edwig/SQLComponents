@@ -25,10 +25,14 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
 #include "bcd.h"
+
+namespace SQLComponents
+{
 
 SQLVariant 
 static SQL_OperSShortSubChar(SQLVariant& p_left,SQLVariant& p_right)
@@ -1604,3 +1608,5 @@ SQLVariant::operator-(SQLVariant& p_right)
   throw error;
 }
 
+// End of namespace
+}

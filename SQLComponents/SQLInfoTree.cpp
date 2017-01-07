@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "StdAfx.h"
+#include "SQLComponents.h"
 #include "SQLInfoTree.h"
 #include "SQLDatabase.h"
 
@@ -33,6 +34,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLInfoTree::SQLInfoTree(SQLDatabase* p_database)
             :SQLInfo(p_database)
@@ -1600,4 +1604,7 @@ SQLInfoTree::ReportCapabilities(CTreeCtrl* p_tree
     branch = p_tree->GetNextItem(branch,TVGN_NEXT);
   } 
   while(branch);
+}
+
+// End of namespace
 }

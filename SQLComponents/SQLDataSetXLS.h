@@ -35,6 +35,9 @@
 
 using namespace ExcelFormat;
 
+namespace SQLComponents
+{
+
 class SQLDataSetXLS : public SQLDataSet
 {
 public:
@@ -153,4 +156,7 @@ inline bool
 SQLDataSetXLS::CloseWorksheet()
 {
   return Close();
+}
+
+// End of namespace
 }

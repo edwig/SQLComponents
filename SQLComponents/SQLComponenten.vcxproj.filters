@@ -156,6 +156,9 @@
     <ClCompile Include="SQLVariantTrim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SMX_String.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Locker.h">
@@ -221,12 +224,6 @@
     <ClInclude Include="SQLMutation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sqlncli.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SQLOdbc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SQLQuery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -285,6 +282,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="bcd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLComponents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SMX_String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

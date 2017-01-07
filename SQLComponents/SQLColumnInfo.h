@@ -26,18 +26,20 @@
 //
 #pragma once
 
-class ColumnInfo
+namespace SQLComponents
 {
-public:
-  ColumnInfo();
+  class ColumnInfo
+  {
+  public:
+    ColumnInfo();
 
-  CString v_columnName;
-  int     v_dataType;
-  CString v_typeName;
-  int     v_precision;
-  int     v_length;
-  int     v_scale;
-  int     v_nullable;
-  CString v_remarks;
-};
-
+    CString v_columnName;
+    int     v_dataType;
+    CString v_typeName;
+    int     v_precision;
+    int     v_length;
+    int     v_scale;
+    int     v_nullable;
+    CString v_remarks;
+  };
+}

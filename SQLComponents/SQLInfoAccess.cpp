@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLInfoAccess.h"
 #include "SQLQuery.h"
 
@@ -33,6 +34,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 // Constructor.
 SQLInfoAccess::SQLInfoAccess(SQLDatabase* p_database)
@@ -62,9 +66,9 @@ SQLInfoAccess::GetDatabaseVendorName() const
   return "Microsoft";
 }
 
-// Get the fysical database name
+// Get the physical database name
 CString 
-SQLInfoAccess::GetFysicalDatabaseName() const
+SQLInfoAccess::GetPhysicalDatabaseName() const
 {
   return m_database->GetDatabaseName();
 }
@@ -94,12 +98,12 @@ SQLInfoAccess::SupportsDatabaseComments() const
 bool 
 SQLInfoAccess::SupportsDeferredConstraints() const
 {
-  // SET CONSTRAINTS DEFERRED aanwezig
+  // SET CONSTRAINTS DEFERRED is supported
   return true;
 }
 
-// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
-// Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
+// Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
 bool
 SQLInfoAccess::SupportsOrderByExpression() const
 {
@@ -113,7 +117,7 @@ SQLInfoAccess::SupportsODBCCallEscapes() const
   return true;
 }
 
-// Catalogus query for the default value of a table's column
+// Catalog query for the default value of a table's column
 CString 
 SQLInfoAccess::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
 {
@@ -145,7 +149,7 @@ SQLInfoAccess::GetTimeIsDecimal() const
   return false;
 }
 
-// If the database does not suppoprt the datatype INTERVAL, it can be implemented as a DECIMAL
+// If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
 bool 
 SQLInfoAccess::GetIntervalIsDecimal() const
 {
@@ -153,7 +157,7 @@ SQLInfoAccess::GetIntervalIsDecimal() const
   return true;
 }
 
-// Get the concatanation operator
+// Get the concatenation operator
 CString 
 SQLInfoAccess::GetConcatanationOperator() const
 {
@@ -167,35 +171,35 @@ SQLInfoAccess::GetQuoteCharacter() const
   return "'";    
 }
 
-// Get default NULL for parameterlist input
+// Get default NULL for parameter list input
 CString 
 SQLInfoAccess::GetDefaultNULL() const
 {
   return " = NULL ";    
 }
 
-// Parameter is for INPUT and OUTPUT in parameterlist
+// Parameter is for INPUT and OUTPUT in parameter list
 CString 
 SQLInfoAccess::GetParameterINOUT() const
 {
   return "OUTPUT ";    
 }
 
-// Parameter is for OUTPUT only in parameterlist
+// Parameter is for OUTPUT only in parameter list
 CString 
 SQLInfoAccess::GetParameterOUT() const
 {
   return "OUTPUT ";    
 }
 
-// Get the datatype of the auditted user (h_user) in a stored procedure
+// Get the datatype of the audited user (h_user) in a stored procedure
 CString 
 SQLInfoAccess::GetAuditUserDatatype() const
 {
   return "VARCHAR(50)";
 } 
 
-// Get the datatype of the auditted user (h_user) as variable in a stored-procedure
+// Get the datatype of the audited user (h_user) as variable in a stored-procedure
 CString 
 SQLInfoAccess::GetAuditUserDatatypeAsVariable() const
 {
@@ -293,13 +297,8 @@ SQLInfoAccess::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_select)
 CString
 SQLInfoAccess::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) const
 {
-  // Dit werkt in MS_SQLServer alleen zo, omdat er anders een foutmelding komt dat
-  // de tijdelijke tabel nog in gebruik is en de tabeldefinitie dan in de
-  // catalog van de RDBMS blijft staan. De definitie is dan strijdig met een
-  // mogelijke volgende definitie onder deze naam
-  p_number += 3;
+  p_number += 2;
   return "DELETE FROM #"    + p_tablename + ";\n"
-         "TRUNCATE TABLE #" + p_tablename + ";\n"
          "DROP TABLE #"     + p_tablename + ";\n";
 }
 
@@ -346,7 +345,7 @@ SQLInfoAccess::GetSQLRemoveProcedureDependencies(CString p_procname) const
 CString 
 SQLInfoAccess::GetSQLRemoveFieldDependencies(CString p_tablename) const
 {
-  // Niet nodig/bestaat niet in Informix
+  // Not needed in MS-Access
   return "";
 }
 
@@ -355,8 +354,8 @@ CString
 SQLInfoAccess::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // The primary key constraint is not directly generated after the column
-  // to ensure it wil use the named index in the correct tablespace
-  // Otherwise the index name and tablespace cannot be definied and will be auto-generated
+  // to ensure it will use the named index in the correct tablespace
+  // Otherwise the index name and tablespace cannot be defined and will be auto-generated
   return GetPrimaryKeyType() + " NOT NULL\n";
 }
 
@@ -373,7 +372,7 @@ SQLInfoAccess::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablename,
 CString 
 SQLInfoAccess::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table  (p_foreign.m_tablename);
   CString primary(p_foreign.m_primaryTable);
   if(!p_foreign.m_schema.IsEmpty())
@@ -408,7 +407,7 @@ SQLInfoAccess::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 CString 
 SQLInfoAccess::GetSQLAlterForeignKey(DBForeign& /*p_origin*/,DBForeign& /*p_requested*/) const
 {
-  // MS-Acces cannot alter a foreign-key constraint.
+  // MS-Access cannot alter a foreign-key constraint.
   // You must drop and then re-create your foreign key constraint
   // So return an empty string to signal this!
   return "";
@@ -462,8 +461,8 @@ SQLInfoAccess::GetMaxStatementLength() const
 CString 
 SQLInfoAccess::GetModifyDatatypePrefix() const
 {
-  // Bij het veranderen van het datatype gewoon het nieuwe type opgeven
-  // DUS: MODIFY <kolomnaam> <datatypenaam>
+  // Just give the needed datatype. No prefix needed
+  // SO: MODIFY <kolomnaam> <datatypenaam>
   return "";
 }
 
@@ -569,7 +568,7 @@ SQLInfoAccess::GetEndWhileLoop() const
   return "END LOOP;\n";
 }
 
-// Gets the fact if a SELECT must be inbetween parenthesis for an assignment
+// Gets the fact if a SELECT must be in between parenthesis for an assignment
 bool 
 SQLInfoAccess::GetAssignmentSelectParenthesis() const
 {
@@ -612,7 +611,7 @@ SQLInfoAccess::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return CString("IIF(ISNULL(") + p_test + ")," + p_isnull + "," + p_test + ")";
 }
 
-// Gets the subtransaction commands
+// Gets the sub-transaction commands
 CString 
 SQLInfoAccess::GetStartSubTransaction(CString p_savepointName) const
 {
@@ -637,7 +636,7 @@ SQLInfoAccess::GetRollbackSubTransaction(CString p_savepointName) const
 // SQL CATALOG QUERIES
 // ===================================================================
 
-// Get SQL to check if a storedprocedure already exists in the database
+// Get SQL to check if a stored procedure already exists in the database
 CString 
 SQLInfoAccess::GetSQLStoredProcedureExists(CString& /*p_name*/) const
 {
@@ -751,7 +750,7 @@ SQLInfoAccess::GetSQLDropIndex(CString /*p_user*/,CString p_indexName) const
   return sql;
 }
 
-// Get SQL to read the referential constaints from the catalog
+// Get SQL to read the referential constraints from the catalog
 CString 
 SQLInfoAccess::GetSQLTableReferences(CString p_schema
                                     ,CString p_tablename
@@ -802,7 +801,7 @@ SQLInfoAccess::DoRemoveProcedure(CString& p_procedureName) const
   query.DoSQLStatement("DROP PROCEDURE " + p_procedureName);
 }
 
-// Get SQL for your session and controling terminal
+// Get SQL for your session and controlling terminal
 CString
 SQLInfoAccess::GetSQLSessionAndTerminal() const
 {
@@ -810,7 +809,7 @@ SQLInfoAccess::GetSQLSessionAndTerminal() const
   return "";
 }
 
-// Get SQL to check if sessionnumber exists
+// Get SQL to check if session number exists
 CString 
 SQLInfoAccess::GetSQLSessionExists(CString p_sessionID) const
 {
@@ -835,7 +834,7 @@ SQLInfoAccess::GetSQLSearchSession(const CString& /*p_databaseName*/,const CStri
 }
 
 
-// See if a column exsists within a table
+// See if a column exists within a table
 bool   
 SQLInfoAccess::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const
 {
@@ -849,7 +848,9 @@ SQLInfoAccess::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CSt
   owner.MakeLower();
 
   CString query = "SELECT count(*)\n"
-    "  FROM dbo.sysobjects sobj, dbo.syscolumns scol, dbo.sysusers suse\n"
+    "  FROM dbo.sysobjects sobj\n"
+    "      ,dbo.syscolumns scol\n"
+    "      ,dbo.sysusers   suse\n"
     " WHERE sobj.name  = '" + tableName + "'\n"
     "   AND sobj.xtype = 'U'\n"
     "   AND sobj.id    = scol.id\n"
@@ -984,7 +985,7 @@ SQLInfoAccess::DoCommitDDLcommands() const
 }
 
 // Do the commit for the DML commands in the database
-// ODBC driver autocommit mode will go wrong!!
+// ODBC driver auto commit mode will go wrong!!
 void
 SQLInfoAccess::DoCommitDMLcommands() const
 {
@@ -1009,16 +1010,15 @@ SQLInfoAccess::DoesViewExists(CString& /*p_viewName*/)
   return true;
 }
 
-// Must create temoporary tables runtime 
+// Must create temporary tables runtime 
 bool 
 SQLInfoAccess::GetMustMakeTemptablesAtRuntime() const
 {
   // FALSE: GLOBAL TEMPORARY TABLES IN THE ENGINE
-  // TRUE:  TRUE SESSION TEMPTABLES MUST ALWAYS BE CREATED (Informix)
   return false;
 }
 
-// Create a temporary table in an optimized manner with the givven index column
+// Create a temporary table in an optimized manner with the given index column
 void
 SQLInfoAccess::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const
 {
@@ -1068,7 +1068,7 @@ SQLInfoAccess::DoMakeProcedure(CString& p_procName,CString p_table,bool /*p_noPa
 void 
 SQLInfoAccess::DoRenameTable(CString& p_oldName,CString& p_newName) const
 {
-  // Let op: Zonder 'TABLE' in het statement
+  // Beware: No 'TABLE' in the statement
   CString rename = "RENAME " + p_oldName + " to " + p_newName;
   SQLQuery query(m_database);
   query.DoSQLStatement(rename);
@@ -1133,51 +1133,6 @@ SQLInfoAccess::GetSQLSPLCall(CString p_procName) const
   }
 }
 
-// Length of paramters in binding
-int 
-SQLInfoAccess::GetParameterLength(int p_SQLType) const
-{
-  int retval;
-
-  switch (p_SQLType)
-  {
-  case SQL_CHAR:            retval =  2000;      break;
-  case SQL_VARCHAR:         retval =  4000;      break;
-  case SQL_LONGVARCHAR:     retval = 32000;      break;
-  case SQL_DECIMAL:         retval = 32000;      break;
-  case SQL_SMALLINT:        retval =     0;      break;
-  case SQL_INTEGER:         retval = sizeof(long); break;
-  case SQL_REAL:            retval = 0;      break;
-  case SQL_DOUBLE:          retval = 0;      break;
-  case SQL_FLOAT:           retval = 0;      break;
-  case SQL_BINARY:          retval = 0;      break;
-  case SQL_VARBINARY:       retval = 0;      break;
-  case SQL_LONGVARBINARY:   retval = 0;      break;
-  case SQL_DATE:            retval = 0;      break;
-  case SQL_TIME:            retval = 0;      break;
-  case SQL_TIMESTAMP:       retval = 19;     break;
-  case SQL_NUMERIC:         retval = 0;      break;
-  case SQL_BIGINT:          retval = 0;      break;
-  case SQL_TINYINT:         retval = 0;      break;
-  case SQL_BIT:             retval = 0;      break;
-  case SQL_INTERVAL_YEAR:
-  case SQL_INTERVAL_YEAR_TO_MONTH:
-  case SQL_INTERVAL_MONTH:
-  case SQL_INTERVAL_DAY:
-  case SQL_INTERVAL_DAY_TO_HOUR:
-  case SQL_INTERVAL_DAY_TO_MINUTE:
-  case SQL_INTERVAL_DAY_TO_SECOND:
-  case SQL_INTERVAL_HOUR:
-  case SQL_INTERVAL_HOUR_TO_MINUTE:
-  case SQL_INTERVAL_HOUR_TO_SECOND:
-  case SQL_INTERVAL_MINUTE:
-  case SQL_INTERVAL_MINUTE_TO_SECOND:
-  case SQL_INTERVAL_SECOND:             retval = 25;      break;
-  default:                              retval = 0;       break;
-  }
-  return retval;
-}
-
 // Build a parameter list for calling a stored procedure
 CString 
 SQLInfoAccess::GetBuildedParameterList(size_t p_numOfParameters) const
@@ -1206,7 +1161,7 @@ SQLInfoAccess::GetBuildedParameterList(size_t p_numOfParameters) const
   return strParamLijst;
 }
 
-// Parametertype for stored procedure for a givven columntype for parameters and return types
+// Parameter type for stored procedure for a given column type for parameters and return types
 CString
 SQLInfoAccess::GetParameterType(CString& p_type) const
 {
@@ -1224,7 +1179,7 @@ SQLInfoAccess::GetParameterType(CString& p_type) const
   return p_type;
 }
 
-// Makes a SQL string from a givven string, with all the right quotes
+// Makes a SQL string from a given string, with all the right quotes
 CString 
 SQLInfoAccess::GetSQLString(const CString& p_string) const
 {
@@ -1409,3 +1364,5 @@ SQLInfoAccess::TranslateErrortext(int p_error,CString p_errorText) const
   return errorText;
 }
 
+// End of namespace
+}

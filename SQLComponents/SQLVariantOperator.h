@@ -26,6 +26,9 @@
 //
 #pragma once
 
+namespace SQLComponents
+{
+
 class SQLVariant;
 
 // Datatypes, same as SQL_C_* but now as an ordinal type
@@ -75,4 +78,5 @@ struct _CalculateFunc
 typedef struct _CompareFunc   CompareFunctionArray;
 typedef struct _CalculateFunc CalculateFunctionArray;
 
-
+// End of namespace
+}

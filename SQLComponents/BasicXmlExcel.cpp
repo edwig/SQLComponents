@@ -28,6 +28,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "BasicXmlExcel.h"
 //#include "GetLastErrorAsString.h"
 

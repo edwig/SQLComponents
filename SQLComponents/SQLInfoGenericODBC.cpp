@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLInfoGenericODBC.h"
 #include "SQLQuery.h"
 
@@ -34,6 +35,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+namespace SQLComponents
+{
+  
 // Constructor
 SQLInfoGenericODBC::SQLInfoGenericODBC(SQLDatabase* p_database)
                    :SQLInfoDB(p_database)
@@ -62,9 +66,9 @@ SQLInfoGenericODBC::GetDatabaseVendorName() const
   return "Generic ODBC Driver";
 }
 
-// Get the fysical database name
+// Get the physical database name
 CString 
-SQLInfoGenericODBC::GetFysicalDatabaseName() const
+SQLInfoGenericODBC::GetPhysicalDatabaseName() const
 {
   // See to it that "SQLDatabase:GetDatabaseName" does it's work
   return m_database->GetDatabaseName();
@@ -95,15 +99,13 @@ SQLInfoGenericODBC::SupportsDatabaseComments() const
 bool 
 SQLInfoGenericODBC::SupportsDeferredConstraints() const
 {
-  SQLInfo* info = (SQLInfo*)this;
-  info->GetInfo();
   // If transactions are supported we assume that constraints can be deferred
-  // until the end of the transaction in the commit fase
+  // until the end of the transaction in the commit phase
   return m_txn_cap > 0;
 }
 
-// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
-// Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
+// Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
 bool 
 SQLInfoGenericODBC::SupportsOrderByExpression() const
 {
@@ -119,7 +121,7 @@ SQLInfoGenericODBC::SupportsODBCCallEscapes() const
   return true;
 }
 
-// Catalogus query for the default value of a table's column
+// Catalog query for the default value of a table's column
 CString 
 SQLInfoGenericODBC::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
 {
@@ -151,7 +153,7 @@ SQLInfoGenericODBC::GetTimeIsDecimal() const
   return false;
 }
 
-// If the database does not suppoprt the datatype INTERVAL, it can be implemented as a DECIMAL
+// If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
 bool 
 SQLInfoGenericODBC::GetIntervalIsDecimal() const
 {
@@ -159,7 +161,7 @@ SQLInfoGenericODBC::GetIntervalIsDecimal() const
   return false;
 }
 
-// Get the concatanation operator
+// Get the concatenation operator
 CString 
 SQLInfoGenericODBC::GetConcatanationOperator() const
 {
@@ -174,7 +176,7 @@ SQLInfoGenericODBC::GetQuoteCharacter() const
   return "'";
 }
 
-// Get default NULL for parameterlist input
+// Get default NULL for parameter list input
 CString 
 SQLInfoGenericODBC::GetDefaultNULL() const
 {
@@ -182,28 +184,28 @@ SQLInfoGenericODBC::GetDefaultNULL() const
   return "";
 }
 
-// Parameter is for INPUT and OUTPUT in parameterlist
+// Parameter is for INPUT and OUTPUT in parameter list
 CString 
 SQLInfoGenericODBC::GetParameterINOUT() const
 {
   return "";
 }
 
-// Parameter is for OUTPUT only in parameterlist
+// Parameter is for OUTPUT only in parameter list
 CString 
 SQLInfoGenericODBC::GetParameterOUT() const
 {
   return "";
 }
 
-// Get the datatype of the auditted user (h_user) in a stored procedure
+// Get the datatype of the audited user (h_user) in a stored procedure
 CString 
 SQLInfoGenericODBC::GetAuditUserDatatype() const
 {
   return "VARCHAR(50)";
 }
 
-// Get the datatype of the auditted user (h_user) as variable in a stored-procedure
+// Get the datatype of the audited user (h_user) as variable in a stored-procedure
 CString 
 SQLInfoGenericODBC::GetAuditUserDatatypeAsVariable() const
 {
@@ -345,8 +347,8 @@ CString
 SQLInfoGenericODBC::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool /*p_temporary*/) const
 {
   // The primary key constraint is not directly generated after the column
-  // to ensure it wil use the named index in the correct tablespace
-  // Otherwise the index name and tablespace cannot be definied and will be auto-generated
+  // to ensure it will use the named index in the correct tablespace
+  // Otherwise the index name and tablespace cannot be defined and will be auto-generated
   return GetPrimaryKeyType() + " NOT NULL\n";
 }
 
@@ -365,7 +367,7 @@ SQLInfoGenericODBC::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename
 CString 
 SQLInfoGenericODBC::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table  (p_foreign.m_tablename);
   CString primary(p_foreign.m_primaryTable);
   if(!p_foreign.m_schema.IsEmpty())
@@ -424,7 +426,7 @@ SQLInfoGenericODBC::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 CString 
 SQLInfoGenericODBC::GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table(p_origin.m_tablename);
   if(!p_origin.m_schema.IsEmpty())
   {
@@ -624,7 +626,7 @@ SQLInfoGenericODBC::GetEndWhileLoop() const
   return "END LOOP;\n";
 }
 
-// Gets the fact if a SELECT must be inbetween parenthesis for an assignment
+// Gets the fact if a SELECT must be in between parenthesis for an assignment
 bool    
 SQLInfoGenericODBC::GetAssignmentSelectParenthesis() const
 {
@@ -671,7 +673,7 @@ SQLInfoGenericODBC::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
 }
 
-// Gets the subtransaction commands
+// Gets the sub-transaction commands
 CString 
 SQLInfoGenericODBC::GetStartSubTransaction(CString p_savepointName) const
 {
@@ -696,22 +698,14 @@ SQLInfoGenericODBC::GetRollbackSubTransaction(CString p_savepointName) const
 // SQL CATALOG QUERIES
 // ===================================================================
 
-// Get SQL to check if a storedprocedure already exists in the database
+// Get SQL to check if a stored procedure already exists in the database
 CString 
-SQLInfoGenericODBC::GetSQLStoredProcedureExists(CString& p_name) const
+SQLInfoGenericODBC::GetSQLStoredProcedureExists(CString& /*p_name*/) const
 {
   // No way to do this in the ODBC standard
-  // To be implemeted by way of the SQLInfo calls
-  SQLInfo* info = (SQLInfo*)this;
+  // To be implemented by way of the SQLInfo calls
 
-  WordList list;
-  if(info->MakeInfoProcedureProcedurepart(&list,p_name))
-  {
-    if(!list.empty())
-    {
-      return list.front();
-    }
-  }
+  // SQLInfo* info = (SQLInfo*)this;
   return "";
 }
 
@@ -848,7 +842,7 @@ SQLInfoGenericODBC::GetSQLDropIndex(CString p_user,CString p_indexName) const
 }
 
 
-// Get SQL to read the referential constaints from the catalog
+// Get SQL to read the referential constraints from the catalog
 CString 
 SQLInfoGenericODBC::GetSQLTableReferences(CString p_schema,CString p_tablename,CString p_constraint /*=""*/,int /*p_maxColumns = SQLINFO_MAX_COLUMNS*/) const
 {
@@ -893,7 +887,7 @@ SQLInfoGenericODBC::DoRemoveProcedure(CString& /*p_procedureName*/) const
   // To be implemented
 }
 
-// Get SQL for your session and controling terminal
+// Get SQL for your session and controlling terminal
 CString 
 SQLInfoGenericODBC::GetSQLSessionAndTerminal() const
 {
@@ -901,7 +895,7 @@ SQLInfoGenericODBC::GetSQLSessionAndTerminal() const
   return "";
 }
 
-// Get SQL to check if sessionnumber exists
+// Get SQL to check if session number exists
 CString 
 SQLInfoGenericODBC::GetSQLSessionExists(CString sessieId) const
 {
@@ -925,7 +919,7 @@ SQLInfoGenericODBC::GetSQLSearchSession(const CString& /*p_databaseName*/,const 
   return "";
 }
 
-// See if a column exsists within a table
+// See if a column exists within a table
 bool   
 SQLInfoGenericODBC::DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const
 {
@@ -973,7 +967,7 @@ SQLInfoGenericODBC::DoesConstraintExist(CString /*p_constraintName*/) const
   return "";
 }
 
-// Geeft een lock-table query
+// Get a lock-table query
 CString 
 SQLInfoGenericODBC::GetSQLLockTable(CString& p_tableName,bool p_exclusive) const
 {
@@ -1075,11 +1069,11 @@ void
 SQLInfoGenericODBC::DoCommitDDLcommands() const
 {
   // Does NOTHING In ORACLE and should do nothing
-  // commit for DDL is autmatic and always
+  // commit for DDL is automatic and always
 }
 
 // Do the commit for the DML commands in the database
-// ODBC driver autocommit mode will go wrong!!
+// ODBC driver auto commit mode will go wrong!!
 void
 SQLInfoGenericODBC::DoCommitDMLcommands() const
 {
@@ -1108,7 +1102,7 @@ SQLInfoGenericODBC::DoesViewExists(CString& p_viewName)
   return false;
 }
 
-// Must create temoporary tables runtime 
+// Must create temporary tables runtime 
 bool
 SQLInfoGenericODBC::GetMustMakeTemptablesAtRuntime() const
 {
@@ -1116,7 +1110,7 @@ SQLInfoGenericODBC::GetMustMakeTemptablesAtRuntime() const
   return true;
 }
 
-// Create a temporary table in an optimized manner with the givven index column
+// Create a temporary table in an optimized manner with the given index column
 void    
 SQLInfoGenericODBC::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const
 {
@@ -1138,7 +1132,6 @@ SQLInfoGenericODBC::DoMakeTemporaryTable(CString& p_tableName,CString& p_content
   }
   catch(...)
   {
-    // Kan geen tijdelijke tabel maken: %s
     throw CString("Cannot make a temporary table: ") + p_tableName;
   }
 }
@@ -1154,7 +1147,7 @@ SQLInfoGenericODBC::DoRemoveTemporaryTable(CString& p_tableName) const
   query.TryDoSQLStatement("DROP TABLE " + p_tableName);
 }
 
-// Maak een procedure aan in de database
+// Create a stored procedure in the database
 void
 SQLInfoGenericODBC::DoMakeProcedure(CString& p_procName,CString p_table,bool /*p_noParameters*/,CString& p_codeBlock)
 {
@@ -1213,51 +1206,6 @@ SQLInfoGenericODBC::GetSQLSPLCall(CString p_procName) const
   return "{[?=] " + p_procName + ";}";
 }
 
-// Length of paramters in binding
-int
-SQLInfoGenericODBC::GetParameterLength(int p_SQLType) const
-{
-  int retval;
-
-  switch (p_SQLType)
-  {
-    case SQL_CHAR:                      retval = 32000;  break;
-    case SQL_VARCHAR:                   retval = 32000;  break;
-    case SQL_LONGVARCHAR:               retval = 32000;  break;
-    case SQL_DECIMAL:                   retval = 32000;  break;
-    case SQL_SMALLINT:                  retval = 0;      break;
-    case SQL_INTEGER:                   retval = sizeof(long); break;
-    case SQL_REAL:                      retval = 0;      break;
-    case SQL_DOUBLE:                    retval = 0;      break;
-    case SQL_FLOAT:                     retval = 0;      break;
-    case SQL_BINARY:                    retval = 0;      break;
-    case SQL_VARBINARY:                 retval = 0;      break;
-    case SQL_LONGVARBINARY:             retval = 0;      break;
-    case SQL_DATE:                      retval = 0;      break;
-    case SQL_TIME:                      retval = 0;      break;
-    case SQL_TIMESTAMP:                 retval = 19;     break;
-    case SQL_NUMERIC:                   retval = 0;      break;
-    case SQL_BIGINT:                    retval = 0;      break;
-    case SQL_TINYINT:                   retval = 0;      break;
-    case SQL_BIT:                       retval = 0;      break;
-    case SQL_INTERVAL_YEAR:
-    case SQL_INTERVAL_YEAR_TO_MONTH:
-    case SQL_INTERVAL_MONTH:
-    case SQL_INTERVAL_DAY:
-    case SQL_INTERVAL_DAY_TO_HOUR:
-    case SQL_INTERVAL_DAY_TO_MINUTE:
-    case SQL_INTERVAL_DAY_TO_SECOND:
-    case SQL_INTERVAL_HOUR:
-    case SQL_INTERVAL_HOUR_TO_MINUTE:
-    case SQL_INTERVAL_HOUR_TO_SECOND:
-    case SQL_INTERVAL_MINUTE:
-    case SQL_INTERVAL_MINUTE_TO_SECOND:
-    case SQL_INTERVAL_SECOND:           retval = 25;      break;
-    default:                            retval = 0;       break;
-  }
-  return retval;
-}
-
 // Build a parameter list for calling a stored procedure
 CString
 SQLInfoGenericODBC::GetBuildedParameterList(size_t p_numOfParameters) const
@@ -1288,7 +1236,7 @@ SQLInfoGenericODBC::GetBuildedParameterList(size_t p_numOfParameters) const
 }
 
 
-// Parametertype for stored procedure for a givven columntype for parameters and return types
+// Parameter type for stored procedure for a given column type for parameters and return types
 CString 
 SQLInfoGenericODBC::GetParameterType(CString& p_type) const
 {
@@ -1296,7 +1244,7 @@ SQLInfoGenericODBC::GetParameterType(CString& p_type) const
   return p_type;
 }
 
-// Makes a SQL string from a givven string, with all the right quotes
+// Makes a SQL string from a given string, with all the right quotes
 CString 
 SQLInfoGenericODBC::GetSQLString(const CString& p_string) const
 {
@@ -1477,3 +1425,5 @@ SQLInfoGenericODBC::TranslateErrortext(int p_error,CString p_errorText) const
   return errorText;
 }
 
+// End of namespace
+}

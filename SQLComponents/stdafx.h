@@ -2,21 +2,24 @@
 // or project specific include files that are used frequently, but
 // are changed infrequently
 //
-
 #pragma once
 
-#define  NO_WARN_MBCS_MFC_DEPRECATION
+#define SQL_COMPONENTS_MFC
+#define NO_WARN_MBCS_MFC_DEPRECATION
+
+// Using current OS SDK (Windows 8/10)
 #include "targetver.h"
 
 #include <stdio.h>
 #include <tchar.h>
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
-// #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS         // remove support for MFC controls in dialogs
 
+// Exclude rarely-used stuff from Windows headers
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
+#define VC_EXTRALEAN            
 #endif
 
+#ifdef SQL_COMPONENTS_MFC
 #include <afx.h>
 #include <afxwin.h>             // MFC core and standard components
 #include <afxext.h>             // MFC extensions
@@ -26,6 +29,7 @@
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>             // MFC support for Windows Common Controls
 #endif 
+#endif
 
 #if defined _M_IX86
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'\"")

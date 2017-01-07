@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLInfoDB.h"
 
 #ifdef _DEBUG
@@ -32,6 +33,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLInfoDB::SQLInfoDB(SQLDatabase* p_database)
           :SQLInfo(p_database)
@@ -48,3 +52,5 @@ SQLInfoDB::~SQLInfoDB()
 {
 }
 
+// End of namespace
+}

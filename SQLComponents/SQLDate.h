@@ -31,6 +31,9 @@
 #include "SQLInterval.h"
 #include "SQLLanguage.h"
 
+namespace SQLComponents
+{
+
 #define SECONDS_PER_DAY   (60 * 60 * 24)
 #define OLEDATE_MJD_SHIFT 15018             // Difference between MJD and OLE_DATE
 
@@ -255,4 +258,7 @@ inline bool
 SQLDate::operator>=(const SQLDate& datum) const
 {
   return !(operator<(datum));
+}
+
+// End of namespace
 }

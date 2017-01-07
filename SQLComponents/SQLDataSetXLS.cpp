@@ -27,6 +27,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLDataSetXLS.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -37,6 +38,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 // Open spreadsheet for reading and writing
 SQLDataSetXLS::SQLDataSetXLS(CString p_file, CString p_sheetOrSeperator, bool p_backup) 
@@ -721,30 +725,29 @@ SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
   // Trim the row first
   TrimRow(tempString);
 
-  // Check op voorkomen delimiter/seperator
+  // Check to find delimiter / separator
   if(!m_separator.IsEmpty() && tempString.Find(m_separator) < 0)
   {
-    m_lastError += "Kan geen scheidingsteken vinden in het CSV bestand";
+    m_lastError += "Cannot find a separator in the CSV File ";
     return false;
   }
   if(!m_delimLeft.IsEmpty() && tempString.Find(m_delimLeft) < 0)
   {
-    m_lastError += "Kan geen linker string begrenzingsteken vinden in het CSV bestand";
+    m_lastError += "Cannot find a left delimiter for a string in the CSV file";
     return false;
   }
   if(!m_delimRight.IsEmpty() && tempString.Find(m_delimRight) < 0)
   {
-    m_lastError += "Kan geen rechter string begrenzingsteken vinden in het CSV bestand";
+    m_lastError += "Cannot find a right delimiter for a string in the CSV file";
     return false;
   }
   if(m_delimLeft.IsEmpty() && m_separator.IsEmpty() && m_delimRight.IsEmpty())
   {
-    m_lastError += "Een CSV bestand moet minimaal of een scheidingsteken of een begrenzingsteken hebben!";
+    m_lastError += "A CSV file needs at least a string delimiter or a separator!";
     return false;
   }
 
-  // Handel geval af waarin we alleen een scheidingsteken hebben
-  // en alles ertussen gewoon een string is
+  // Handle the case where we only have a delimiter and everything in beteween is a string
   if(m_delimLeft.IsEmpty())
   {
     int pos = tempString.Find(m_separator);
@@ -755,7 +758,7 @@ SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
       p_rowValues.Add(deel.Trim());
       pos = tempString.Find(m_separator);
     }
-    // Hele overige string is een veld. Maar potentieel leeg, als regel op scheidingsteken eindigt
+    // Rest of the string is a field value, but potentially empty if line ends on a delimiter
     tempString = tempString.Trim();
     if(tempString.GetLength())
     {
@@ -763,24 +766,24 @@ SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
     }
     return true;
   }
-  // Nu hebben we het geval met begrenzingstekens
-  // Deze per stuk vinden en het scheidingsteken doorskippen
+  // Now we have the case with delimiters
+  // Find per value and skip the delimiters
   int pos = tempString.Find(m_delimLeft);
   while(pos >= 0)
   {
     int pos_rechts = tempString.Find(m_delimRight,pos+1);
     if(pos_rechts < 0)
     {
-      // Wel linker delimter gevonden, maar geen rechter
-      m_lastError += "CSV Bestand: wel linker begrenzingsteken gevonden, maar geen rechter begrenzingsteken";
+      // Found a left delimiter, but not a right one
+      m_lastError += "CSV file: found a left delimiter, but not a right delimiter for a string";
       return false;
     }
-    // Deelstring er uit halen
+    // Partially string between delimiters
     CString deel = tempString.Mid(pos + 1,pos_rechts - pos -1);
     tempString   = tempString.Mid(pos_rechts + 1);
     p_rowValues.Add(deel);
 
-    // Nu over scheidingsteken heen gaan
+    // Skip separator
     if(!m_separator.IsEmpty() && !tempString.IsEmpty())
     {
       pos = tempString.Find(m_separator);
@@ -790,11 +793,11 @@ SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
       }
       else
       {
-        m_lastError += "Geen scheidingsteken gevonden in CSV bestand";
+        m_lastError += "No separator found in the CSV file";
         return false;
       }
     }
-    // Volgende string
+    // Next string
     pos = tempString.Find(m_delimLeft);
   }
 
@@ -841,7 +844,7 @@ SQLDataSetXLS::TrimRow(CString& p_row)
       p_row.Delete(index,1);
       continue;
     }
-    // Volgende pos
+    // Next position
     ++index;
   }
 }
@@ -857,3 +860,6 @@ SQLDataSetXLS::GetLastError()
   }
   return m_lastError;   
 } 
+
+// End of namespace
+}

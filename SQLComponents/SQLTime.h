@@ -27,6 +27,9 @@
 #pragma once
 #include <sqltypes.h>
 
+namespace SQLComponents
+{
+
 class SQLDate;
 class SQLTimestamp;
 class SQLInterval;
@@ -212,4 +215,7 @@ inline bool
 SQLTime::operator>=(const SQLTime& p_time) const
 {
   return m_seconds >= p_time.m_seconds;
+}
+
+// End of namespace
 }

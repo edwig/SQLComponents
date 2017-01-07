@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "StdAfx.h"
+#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantTrim.h"
 #include "SQLDate.h"
@@ -42,6 +43,9 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning (disable : 4996)
+
+namespace SQLComponents
+{
 
 // Translation list of SQL datatype constants and names
 typedef struct _types
@@ -774,6 +778,45 @@ SQLVariant::SetParameterType(int p_type)
   }
 }
 
+// Setting the variant from a binary buffer
+// For instance 'stream data' like data dump
+void
+SQLVariant::SetFromBinaryStreamData(int   p_type
+                                   ,int   p_length
+                                   ,void* p_data
+                                   ,bool  p_isnull)
+{
+  // Reset data member
+  ResetDataType(0);
+
+  // Set C and SQL datatypes alike
+  m_datatype    = p_type;
+  m_sqlDatatype = p_type;
+
+  // Depends on datatype
+  if(p_type == SQL_C_CHAR || p_type == SQL_C_BINARY || p_type == SQL_C_VARBOOKMARK)
+  {
+    // Allocated buffer types
+    m_binaryLength = p_length;
+    m_indicator    = p_isnull ? SQL_NULL_DATA : p_length;
+    m_data.m_dataBINARY = (unsigned char*)malloc(2 + m_binaryLength);
+    memcpy(m_data.m_dataBINARY,p_data,(size_t)p_length);
+    ((char*)m_data.m_dataBINARY)[p_length] = 0;
+  }
+  else
+  {
+    // Store in the m_data union block as an internal
+    if(p_length < sizeof(m_data))
+    {
+      memcpy(&m_data.m_dataSHORT,p_data,p_length);
+      m_indicator = p_isnull ? SQL_NULL_DATA : 0;
+    }
+    else
+    {
+      throw CString("Cannot set variant from binary stream data.");
+    }
+  }
+}
 //////////////////////////////////////////////////////////////////////////
 //
 //  GENERAL ACCESS
@@ -2250,7 +2293,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                             m_data.m_dataTIMESTAMP.hour   = (SQLUSMALLINT) hour;
                                             m_data.m_dataTIMESTAMP.minute = (SQLUSMALLINT) min;
                                             // Nanosecond resolution
-                                            sec = (int)floor(seconds);
+                                            sec = (int)::floor(seconds);
                                             m_data.m_dataTIMESTAMP.second   = (SQLUSMALLINT) sec;
                                             m_data.m_dataTIMESTAMP.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                           }
@@ -2277,7 +2320,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
     case SQL_C_INTERVAL_SECOND:           seconds = atof(p_data);
                                           m_data.m_dataINTERVAL.interval_type = SQL_IS_SECOND;
                                           // Nanosecond resolution
-                                          sec = (int)floor(seconds);
+                                          sec = (int)::floor(seconds);
                                           m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
                                           m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
 
@@ -2328,7 +2371,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                             m_data.m_dataINTERVAL.intval.day_second.hour   = hour;
                                             m_data.m_dataINTERVAL.intval.day_second.minute = min;
                                             // Nanosecond resolution
-                                            sec = (int)floor(seconds);
+                                            sec = (int)::floor(seconds);
                                             m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
                                             m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                           }
@@ -2356,7 +2399,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                             m_data.m_dataINTERVAL.intval.day_second.hour   = hour;
                                             m_data.m_dataINTERVAL.intval.day_second.minute = min;
                                             // Nanosecond resolution
-                                            sec = (int)floor(seconds);
+                                            sec = (int)::floor(seconds);
                                             m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
                                             m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                           }
@@ -2371,7 +2414,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.minute = min;
                                             // Nanosecond resolution
-                                            sec = (int)floor(seconds);
+                                            sec = (int)::floor(seconds);
                                             m_data.m_dataINTERVAL.intval.day_second.second   = (SQLUSMALLINT)sec;
                                             m_data.m_dataINTERVAL.intval.day_second.fraction = (SQLUINTEGER)(((seconds - (double)sec) * 1000000000.0) + 0.0000005);
                                           }
@@ -2469,4 +2512,7 @@ SQLVariant::ThrowErrorDatatype(int p_getas)
   char* getas = SQLVariant::FindDatatype(p_getas);
   error.Format("Cannot get a %s as a %s datatype.",type,getas);
   throw error;
+}
+
+// End of namespace
 }

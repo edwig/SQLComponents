@@ -30,6 +30,9 @@
 #include <vector>
 #include <list>
 
+namespace SQLComponents
+{
+
 // Status of mutation against the mutationID
 typedef enum _mutType
 {
@@ -125,3 +128,5 @@ SQLMutation::IsMutated()
   return m_stack.size() > 1;
 }
 
+// End of namespace
+}

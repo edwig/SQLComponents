@@ -25,18 +25,15 @@
 // Version number:  1.3.3
 //
 #pragma once
-
-// include files needed here
+#include "SQLComponents.h"
 #include "SQLDatabase.h"
 #include <sql.h>
 #include <sqlext.h>
 #include <map>
 #include <list>
 
-// SQL/CLI Standard states that 128 is the maximum length
-// for any identifier in any namespace
-#define SQL_MAX_IDENTIFIER  128
-#define SQL_MAX_BUFFER      129
+namespace SQLComponents
+{
 
 // Finding META types
 #define META_CATALOGS      1
@@ -456,4 +453,7 @@ inline void
 SQLInfo::SetAttributeFileDSNSave(CString p_fileDSN)
 {
   m_fileDSNSave = p_fileDSN;
+}
+
+// End of namespace
 }

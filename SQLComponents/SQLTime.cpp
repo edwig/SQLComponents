@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "StdAfx.h"
+#include "SQLComponents.h"
 #include "SQLTime.h" 
 #include "SQLDate.h"
 #include "SQLTimestamp.h"
@@ -39,6 +40,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 // CTOR as a NULL time
 SQLTime::SQLTime()
@@ -614,4 +618,7 @@ SQLTime::operator-(const SQLInterval& p_interval) const
   SQLTime time((__int64)value);
 
   return time;
+}
+
+// End of namespace
 }

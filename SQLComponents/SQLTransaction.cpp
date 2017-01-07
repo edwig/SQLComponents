@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLTransaction.h"
 #include "SQLDatabase.h"
 #include "SQLInfoDB.h"
@@ -36,6 +37,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLTransaction::SQLTransaction(SQLDatabase* p_database
                               ,const char*  p_name
@@ -242,4 +246,7 @@ SQLTransaction::SetTransactionImmediate()
     return true;
   }
   return false;
+}
+
+// End of namespace
 }

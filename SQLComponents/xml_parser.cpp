@@ -10,6 +10,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include <ctype.h>
 #include <stddef.h>
 
@@ -20,6 +21,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 //#define DEBUG_PARSER
 #if defined( DEBUG_PARSER )
@@ -1599,3 +1603,5 @@ XmlText::Blank() const
   return true;
 }
 
+// End of namespace
+}

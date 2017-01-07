@@ -5,6 +5,7 @@
 
 #pragma once
 
+#define SQL_COMPONENTS_MFC
 #define NO_WARN_MBCS_MFC_DEPRECATION
 
 #include "targetver.h"

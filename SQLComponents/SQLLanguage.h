@@ -26,6 +26,9 @@
 //
 #pragma once
 
+namespace SQLComponents
+{
+
 // Make some macro's (as if that's going to change!)
 #define DAYS_IN_WEEK    7
 #define MONTHS_IN_YEAR 12
@@ -37,7 +40,7 @@ typedef enum _language
   ,LN_ENGLISH
   ,LN_GERMAN
   ,LN_FRENCH
-  ,LN_NUMLANG // Arraysize
+  ,LN_NUMLANG // Array size
 }
 Language;
 
@@ -92,10 +95,13 @@ extern char*    g_weekdays[LN_NUMLANG][DAYS_IN_WEEK];
 extern int      g_daysInTheMonth[MONTHS_IN_YEAR + 2];
 // Names of the months
 extern char*    g_monthnames[LN_NUMLANG][MONTHS_IN_YEAR];
-// Short (3 char) variants of the monthnames
+// Short (3 char) variants of the month names
 extern char*    g_shortMonths[LN_NUMLANG][MONTHS_IN_YEAR]; 
 // Several key names 
 extern char*    g_dateNames[LN_NUMLANG][DN_LASTNAME];
 
 // Setting the default language
 Language SetDefaultSQLLanguage(Language p_lang);
+
+// End of namespace
+}

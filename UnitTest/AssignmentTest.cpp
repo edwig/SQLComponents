@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "CppUnitTest.h"
 #include "SQLVariant.h"
 #include "SQLDate.h"
@@ -34,6 +35,7 @@
 #include "bcd.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace SQLComponents;
 
 BEGIN_TEST_MODULE_ATTRIBUTE()
   TEST_MODULE_ATTRIBUTE(L"SQLComponents",L"ODBC")

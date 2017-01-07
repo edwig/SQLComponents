@@ -26,6 +26,9 @@
 //
 #pragma once
 
+namespace SQLComponents
+{
+
 typedef struct _sql_state
 {
   CString m_code;         // Standard SQLSTATE code (5 chars)
@@ -54,4 +57,7 @@ inline SQLState*
 SQLError::GetLastSQLState()
 { 
   return m_lastState; 
+}
+
+// End of namespace
 }

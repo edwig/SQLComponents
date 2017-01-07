@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLInfoFirebird.h"
 #include "SQLQuery.h"
 
@@ -34,13 +35,16 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+namespace SQLComponents
+{
+  
 // Constructor.
 SQLInfoFirebird::SQLInfoFirebird(SQLDatabase* p_database)
                 :SQLInfoDB(p_database)
 {
 }
 
-// Destructor. Doet nog niets.
+// Destructor. Does nothing
 SQLInfoFirebird::~SQLInfoFirebird()
 {
 }
@@ -62,15 +66,15 @@ SQLInfoFirebird::GetDatabaseVendorName() const
   return "Firebird";
 }
 
-// Geef de fysieke database naam
+// Get the physical database name
 CString 
-SQLInfoFirebird::GetFysicalDatabaseName() const
+SQLInfoFirebird::GetPhysicalDatabaseName() const
 {
   // See to it that "SQLDatabase:GetDatabaseName" does it's work
   return m_database->GetDatabaseName();
 }
 
-// Wordt de inhoud van de systeemcatalogus in uppercase opgeslagen?
+// System catalog is stored in uppercase in the database?
 bool 
 SQLInfoFirebird::IsCatalogUpper() const
 {
@@ -84,24 +88,23 @@ SQLInfoFirebird::GetUnderstandsSchemas() const
   return false;
 }
 
-// Ondersteund database/ODBCdriver commentaar in sql
+// Supports database/ODBCdriver comments in sql
 bool 
 SQLInfoFirebird::SupportsDatabaseComments() const
 {
   return false;
 }
 
-// Database is in staat constraints op te schorten tot aan het eind v.d. transactie
+// Database can defer constraints until the end of a transaction
 bool 
 SQLInfoFirebird::SupportsDeferredConstraints() const
 {
-  // Geen SET CONSTRAINTS DEFERRED aanwezig
-  // Moet alle constraints droppen en aanmaken!
+  // No SET CONSTRAINTS DEFERRED 
   return false;
 }
 
-// Database kan ORDER BY met een expressie aan, dus bijv. UPPER(kolom). Alternatief
-// is het selecteren van een kolom expressie AS naampje en dan ORDER BY naampje.
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
+// Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
 bool
 SQLInfoFirebird::SupportsOrderByExpression() const
 {
@@ -115,7 +118,7 @@ SQLInfoFirebird::SupportsODBCCallEscapes() const
   return false;
 }
 
-// Catalogus tabel met alle default waarden van een kolom in de database
+// Catalog table with all default values for a column in a table
 CString 
 SQLInfoFirebird::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
 {
@@ -135,94 +138,93 @@ SQLInfoFirebird::GetSystemDateTimeKeyword() const
   return "current_timestamp";
 }  
 
-// String voor huidige datum
+// String for the current date
 CString
 SQLInfoFirebird::GetSystemDateString() const
 {
   return "current_date";
 }
 
-// Geeft het feit of TIJD op de database als een DECIMAL is geimplementeerd
+// Datatype TIME can be implemented as a decimal value on the database
 bool 
 SQLInfoFirebird::GetTimeIsDecimal() const
 {
-  // TIJD is geimplementeerd als DECIMAL(18,16)
+  // TIJD is implemented as DECIMAL(18,16)
   return true;
 }
 
-// Geeft het feit of INTERVAL op de database als een DECIMAL is geimlementeerd
+// Datatype INTERVAL can be implemented as a decimal value on the database
 bool 
 SQLInfoFirebird::GetIntervalIsDecimal() const
 {
-  // Interval is in Firebird geimplenteerd als DECIMAL
+  // Interval is implemented in Firebird as a DECIMAL
   return true;
 }
 
-// Geef het karakter voor string concatenatie
+// Concatenation operator character string
 CString 
 SQLInfoFirebird::GetConcatanationOperator() const
 {
   return "||";    
 }
 
-// Geef quote (hoe schrijf je dat) karakter voor strings
+// Quote character for a string
 CString 
 SQLInfoFirebird::GetQuoteCharacter() const
 {
   return "\'";    
 }
 
-
-// Geef default NULL voor invoer parameterlijst
+// Default NULL for an input parameter list
 CString 
 SQLInfoFirebird::GetDefaultNULL() const
 {
   return "";    
 }
 
-// Geef INOUT voor invoer/uitvoer parameterlijst
+// INOUT prefix for an input/output parameter in a parameter list
 CString 
 SQLInfoFirebird::GetParameterINOUT() const
 {
   return "";    
 }
 
-// Geef OUT voor invoer/uitvoer parameterlijst
+// OUT prefix for an input/output parameter in a parameter list
 CString 
 SQLInfoFirebird::GetParameterOUT() const
 {
   return "";    
 }
 
-// Geef datatype van "h_gebruiker" in een stored procedure als parameter
+// Datatype for the last user in a stored procedure as a parameter
 CString 
 SQLInfoFirebird::GetAuditUserDatatype() const
 {
   return "CHAR(8)";
 }
 
-// Geef datatype van "h_gebruiker" in een stored procedure (extern) als variabele
+// Datatype for a last-user in a stored procedure as a variable
 CString 
 SQLInfoFirebird::GetAuditUserDatatypeAsVariable() const
 {
   return "CHAR(8)";
 }
 
-// Geef datatype van de primary key
+// Datatype of a primary key
 CString 
 SQLInfoFirebird::GetPrimaryKeyType() const
 {
   return "INTEGER";
 }
 
-// Geef datatype voor Moment
+// Datatype for a timestamp (DATETIME YEAR TO SECOND)
 CString 
 SQLInfoFirebird::GetDatetimeYearToSecondType() const
 {
   return "timestamp";
 }
 
-// Seperator tussen twee alter-constraints in een alter-table statement
+// Separator between two alter-constraint statements in one alter-table statement
 CString 
 SQLInfoFirebird::GetAlterConstraintSeparator() const
 {
@@ -257,35 +259,35 @@ SQLInfoFirebird::GetViewOuterJoinKeyword() const
   return "LEFT OUTER JOIN";
 }
 
-// Geef closure voor outer-join
+// OUTER JOIN closer (+ in some databases)
 CString 
 SQLInfoFirebird::GetOuterJoinClosure() const
 {
   return "";
 }
 
-// Outer join teken
+// Outer join sign
 CString  
 SQLInfoFirebird::GetOuterJoinSign() const
 {
   return "";
 }
 
-// Prefix voor gebruik van een parameter in een stored procedure
+// Prefix before using a stored procedure parameter
 CString
 SQLInfoFirebird::GetSPParamPrefix() const
 {
   return ":";
 }
 
-// Geef de query om een nieuw record toe te voegen in de kolom OID
+// Get the query to add a new record to the primary key column
 CString 
 SQLInfoFirebird::GetIdentityString(CString& p_tablename,CString p_postfix /*="_seq"*/) const
 {
   return "GEN_ID(" + p_tablename + p_postfix + ",1)";
 }
 
-// Geef de query om een tijdelijke tabel uit een select statement te maken
+// Get the SQL Query to create a temporary table from a select statement;
 CString 
 SQLInfoFirebird::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_select) const
 {
@@ -293,23 +295,23 @@ SQLInfoFirebird::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_selec
          "ON COMMIT PRESERVE ROWS";
 }
 
-// Geef de query om een tijdelijke tabel definitief te verwijderen
+// Get the SQL query to remove a temporary table
 CString
 SQLInfoFirebird::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) const
 {
-  // 'Gewoon' een drop van de tabel doen
+  // 'Simply' a drop from a table
   p_number += 1;
   return "DROP TABLE "     + p_tablename + ";\n";
 }
 
-// Geef de query om in een tijdelijke tabel te selecteren
+// Getting the SQL query to select into a temporary table
 CString 
 SQLInfoFirebird::GetSQLSelectIntoTemp(CString& p_tablename,CString& p_select) const
 {
   return "INSERT INTO " + p_tablename + "\n" + p_select + ";\n";
 }
 
-// Vervang de OID kolom door een sequence.nextval
+// Replace primary key column OID by a sequence.nextval / GENID()
 CString 
 SQLInfoFirebird::GetReplaceColumnOIDbySequence(CString p_columns,CString p_tablename,CString p_postfix /*="_seq"*/) const
 {
@@ -332,7 +334,7 @@ SQLInfoFirebird::GetReplaceColumnOIDbySequence(CString p_columns,CString p_table
   return p_columns;
 }
 
-// Verwijder catalog afhankelijkheden
+// Remove catalog dependencies
 CString 
 SQLInfoFirebird::GetSQLRemoveProcedureDependencies(CString p_procname) const
 {
@@ -356,7 +358,7 @@ SQLInfoFirebird::GetSQLRemoveFieldDependencies(CString p_tablename) const
   return query;
 }
 
-// Geeft de tabeldefinitie-vorm van een primary key en constraint
+// Getting the create table form for a primary key
 CString 
 SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool p_temporary) const
 {
@@ -365,7 +367,7 @@ SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bo
   return keyDefinitie;
 }
 
-// Geef de constraint-vorm van een primary key definitie (achteraf toevoegen aan tabel)
+// Getting the constraint form for adding a primary key to a table
 CString
 SQLInfoFirebird::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablename,CString p_primary) const
 {
@@ -378,7 +380,7 @@ SQLInfoFirebird::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablenam
 CString 
 SQLInfoFirebird::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
 {
-  // Construct the correct tablenames
+  // Construct the correct tablename
   CString table  (p_foreign.m_tablename);
   CString primary(p_foreign.m_primaryTable);
   if(!p_foreign.m_schema.IsEmpty())
@@ -424,13 +426,10 @@ SQLInfoFirebird::GetSQLAlterForeignKey(DBForeign& /*p_origin*/,DBForeign& /*p_re
   return "";
 } 
 
-// Performance parameters in de database zetten
+// Setting SQL performance parameters in the database
 CString
 SQLInfoFirebird::GetSQLPerformanceSettings() const
 {
-  // Om geoptimaliseerde queries uit te kunnen voeren op views met outer-joins
-  // en filters die op die views gelegd worden is de volgende parameter
-  // van levensbelang voor de performance
   return "";
 }
 
@@ -441,18 +440,14 @@ SQLInfoFirebird::GetSQLCacheModeSetting(const CString& /*p_mode*/) const
   return "";
 }
 
-// Getallen opslaan in stored-procs hebben dit nodig
+// Settings for NUMERIC/DECIMAL numbers in stored procedures
 CString
 SQLInfoFirebird::GetSQLNlsNumericCharacters() const
 {
-  // Indien de ,. combinatie niet op Nederlandse wijze wordt uitgevoerd kan
-  // Pronto geen numerieke waarden in *_ins_proc, *_upd_proc en *_del_procs
-  // uitvoeren. Omdat dit soms fout gaat bij het installeren van de database
-  // wordt deze parameter vooraf voor de sessie gezet.
   return "";
 }
 
-// Geeft de manier om een kolomnaam te wijzigen, kan meerdere SQL's bevatten
+// Getting the RENAME column (can contain more than 1 SQL)
 CString
 SQLInfoFirebird::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,CString p_newName,CString /*p_datatype*/)
 {
@@ -460,44 +455,42 @@ SQLInfoFirebird::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,CS
   return rename;
 }
 
-// Geeft de maximale lengte van een sql statement
+// Max length of an SQL statement
 unsigned long 
 SQLInfoFirebird::GetMaxStatementLength() const
 {
-  return 0;		//	Geen limiet
+  return 0;		// NO limit
 }
 
-// Geeft de prefix voor het wijzigen van het datatype in MODIFY/ALTER
+// Getting the prefix for altering the datatyp in MODIFY/ALTER
 CString 
 SQLInfoFirebird::GetModifyDatatypePrefix() const
 {
-  // Bij het veranderen van het datatype gewoon het nieuwe type opgeven
-  // DUS: ALTER <kolomnaam> TYPE <datatypenaam>
   return "TYPE ";
 }
 
-// Code om een tijdelijke tabel aan te maken (qualifier)
+// Code to create a temporary table
 CString 
 SQLInfoFirebird::GetCodeTemporaryTable() const
 {
   return "";
 }
 
-// Code om de locking in de tabel op rij niveau te zetten
+// Getting the correct locking mode
 CString 
 SQLInfoFirebird::GetCodeLockModeRow() const
 {
   return "";
 }
 
-// Code om de tabel zonder logging aan te maken
+// Extra create table clause for creating a table with no logging
 CString 
 SQLInfoFirebird::GetCodeTempTableWithNoLog() const
 {
   return "";
 }
 
-// Code om alle rechten op de tabel open te zetten (NON-ANSI database)
+// Giving rights to configured users in a NON-ANSI database
 CString 
 SQLInfoFirebird::GetSQLGrantAllOnTable(CString /*p_schema*/,CString p_tableName,bool p_grantOption /*= false*/)
 {
@@ -509,14 +502,14 @@ SQLInfoFirebird::GetSQLGrantAllOnTable(CString /*p_schema*/,CString p_tableName,
   return sql;
 }
 
-// Code voor de select into temp
+// Code BEFORE a 'select into temp' clause
 CString
 SQLInfoFirebird::GetSelectIntoTempClausePrefix(CString p_tableName) const
 {
   return "";
 }
 
-// Code na de select into temp
+// Code AFTER a 'select into temp' clause
 CString
 SQLInfoFirebird::GetSelectIntoTempClauseSuffix(CString p_tableName) const
 {
@@ -526,11 +519,11 @@ SQLInfoFirebird::GetSelectIntoTempClauseSuffix(CString p_tableName) const
 bool
 SQLInfoFirebird::GetCodeIfStatementBeginEnd() const
 {
-  // IF THEN ELSE END IF; heeft perse wel BEGIN/END nodig
+  // IF THEN ELSE END IF; always needs a BEGIN/END
   return true;
 }
 
-// Geef het einde van een IF statement
+// End of the IF statement
 CString 
 SQLInfoFirebird::GetCodeEndIfStatement() const
 {
@@ -544,28 +537,28 @@ SQLInfoFirebird::GetAssignmentStatement(const CString& p_destiny,const CString& 
 }
 
 
-// Geef SQL keyword om een kolom te wijzigen
+// SQL keyword to alter a column in a table
 CString 
 SQLInfoFirebird::GetCodeAlterColumn() const
 {
   return "ALTER COLUMN ";
 }
 
-// Geef de code om een WHILE-loop te starten
+// Code to start a while loop
 CString
 SQLInfoFirebird::GetStartWhileLoop(CString p_condition) const
 {
   return "WHILE " + p_condition + " LOOP\n";
 }
 
-// Geef de code om een WHILE-loop te eindigen
+// Code to end a WHILE loop
 CString
 SQLInfoFirebird::GetEndWhileLoop() const
 {
   return "END LOOP;\n";
 }
 
-// Geef het feit of een SELECT tussen parenthesis moet staan voor een assignment
+// The fact that a SELECT **must** be between parenthesis for an assignment
 bool 
 SQLInfoFirebird::GetAssignmentSelectParenthesis() const
 {
@@ -609,7 +602,7 @@ SQLInfoFirebird::GetNVLStatement(CString& p_test,CString& p_isnull) const
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
 }
 
-// Gets the subtransaction commands
+// Gets the sub-transaction commands
 CString 
 SQLInfoFirebird::GetStartSubTransaction(CString p_savepointName) const
 {
@@ -631,7 +624,7 @@ SQLInfoFirebird::GetRollbackSubTransaction(CString p_savepointName) const
 // SQL CATALOG QUERIES
 // ====================================================================
 
-// Geef SQL om te kijken of storedprocedure in de database bestaat
+// SQL to find out whether a stored procedure does exist in the database
 CString 
 SQLInfoFirebird::GetSQLStoredProcedureExists(CString& p_name) const
 {
@@ -643,42 +636,42 @@ SQLInfoFirebird::GetSQLStoredProcedureExists(CString& p_name) const
   return query;
 }
 
-// Deel van query om 1 record te selecteren
+// To select one (1) record in a query
 CString 
 SQLInfoFirebird::GetDualTableName() const
 {
-  return "dual";
+  return "rdb$database";
 }
 
 // FROM-Part for a query to select only 1 (one) record
 CString 
 SQLInfoFirebird::GetDualClause() const
 {
-  return " FROM DUAL";
+  return " FROM rdb$database";
 }
 
-// Geef DEFERRABLE (of niet dus)
+// CONSTRAINTS DEFERRABLE clause
 CString
 SQLInfoFirebird::GetConstraintDeferrable() const
 {
   return "";
 }
 
-// Constraints tijdelijk opschorten tot aan de volgende COMMIT;
+// Defer constraints until the next commit
 CString 
 SQLInfoFirebird::GetSQLDeferConstraints() const
 {
   return "";
 }
 
-// Constraints weer op onmiddellijk terugzetten
+// Constraints back to immediate checking
 CString 
 SQLInfoFirebird::GetSQLConstraintsImmediate() const
 {
   return "";
 }
 
-// Geef de query die controleert of de tabel al bestaat in de database
+// Get the SQL to see if a table exists in the database
 CString 
 SQLInfoFirebird::GetSQLTableExists(CString /*p_schema*/,CString p_tablename) const
 {
@@ -690,14 +683,13 @@ SQLInfoFirebird::GetSQLTableExists(CString /*p_schema*/,CString p_tablename) con
   return query;
 }
 
-// Geef de query die de kolommen van een tabel uit de catalogus haalt
+// Get the SQL query to get the columns of a table from the catalog
 CString 
 SQLInfoFirebird::GetSQLGetColumns(CString& /*p_user*/,CString& p_tableName) const
 {
   CString upperName(p_tableName);
   upperName.MakeUpper();
 
-  // naam, nummer, type, lengte,nullable
   CString table = "SELECT col.rdb$field_name\n"        // 0 -> Naam
                   "      ,col.rdb$field_position\n"    // 1 -> Positie
                   "      ,typ.rdb$field_type\n"        // 2 -> type
@@ -713,7 +705,7 @@ SQLInfoFirebird::GetSQLGetColumns(CString& /*p_user*/,CString& p_tableName) cons
   return table;
 }
 
-// Geef de query om de Check en Unique constraints op te halen
+// Get the SQL query to get the CHECK and UNIQUE constraints for a table
 CString 
 SQLInfoFirebird::GetSQLGetConstraintsForTable(CString& p_tableName) const
 {
@@ -786,7 +778,7 @@ SQLInfoFirebird::GetSQLDropIndex(CString p_user,CString p_indexName) const
   return sql;
 }
 
-// Geef de query om de referential constaints uit de catalogus te lezen.
+// Get the SQL Query to read the referential constriants for a table
 CString 
 SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
                                       ,CString p_tablename
@@ -888,7 +880,7 @@ SQLInfoFirebird::GetSQLSequenceRights(CString /*p_schema*/,CString p_tableName,C
   return sql;
 }
 
-// Geef de query om een stored procedure te verwijderen
+// Query to remove a stored procedure
 void
 SQLInfoFirebird::DoRemoveProcedure(CString& p_procedureName) const
 {
@@ -911,39 +903,37 @@ SQLInfoFirebird::GetSQLSessionAndTerminal() const
   return query;
 }
 
-// Get SQL to check if sessionnumber exists
+// Get SQL to check if session number exists
 CString 
 SQLInfoFirebird::GetSQLSessionExists(CString p_sessionID) const
 {
   CString query;
   query.Format("SELECT COUNT(*)\n"
                "  FROM mon$attachments\n"
-               " WHERE mon$attachment_id = %d",p_sessionID);
+               " WHERE mon$system_flag = 0\n"
+               "   AND mon$attachment_id = %d",p_sessionID);
   return query;
 }
 
-// Geef query voor uniek sessie id.
+// Get a query for an unique session id
 CString
-SQLInfoFirebird::GetSQLUniqueSessionId(const CString& /*p_databaseName*/,const CString& p_sessionTable) const
+SQLInfoFirebird::GetSQLUniqueSessionId(const CString& /*p_databaseName*/,const CString& /*p_sessionTable*/) const
 {
-  // Er is geen manier in Firebird om alle lopende sessies op te vragen
-  // Daarom vragen we simpelweg alle sessies op voor vandaag
-  // Dit houdt in dat we vermoeden dat oudere sessies zijn blijven hangen
-  CString query = "SELECT distinct(sessie_nr)\n"
-                  "  FROM " + p_sessionTable + "\n"
-                  " WHERE h_trans_van > current_date";
+  CString query = "SELECT distinct(mon$attachment_id)\n"
+                  "  FROM mon$attachments\n"
+                  " WHERE mon$system_flag = 0";
   return query;
 }
 
-// Geef query voor opzoeken sessie.
+// Get query to find the extra logged in sessions
 CString
 SQLInfoFirebird::GetSQLSearchSession(const CString& /*p_databaseName*/,const CString& /*p_sessionTable*/) const
 {
-  // Er is geen manier in Firebird om andere sessies te zoeken of te registeren
+  // No way in Firebird to find that
   return "";
 }
 
-// Kijk of tabel/kolom combinatie bestaat
+// See if a column exists in a table
 bool   
 SQLInfoFirebird::DoesColumnExistsInTable(CString& /*p_owner*/,CString& p_tableName,CString& p_column) const
 {
@@ -960,7 +950,7 @@ SQLInfoFirebird::DoesColumnExistsInTable(CString& /*p_owner*/,CString& p_tableNa
   return qry.DoSQLStatementScalar(query)->GetAsBoolean();
 }
 
-// Query om te bepalen of de tabel al een primary key heeft
+// See if a table already has a primary key
 CString
 SQLInfoFirebird::GetSQLPrimaryKeyConstraintInformation(CString /*p_schema*/,CString p_tableName) const
 {
@@ -992,7 +982,7 @@ SQLInfoFirebird::GetSQLLockTable(CString& /*p_tableName*/,bool /*p_exclusive*/) 
 CString 
 SQLInfoFirebird::GetSQLOptimizeTable(CString& /*p_owner*/,CString& /*p_tableName*/,int& /*p_number*/)
 {
-  // Firebird has no SQL for this, it uses "gfix -sweep <database>"
+  // Firebird has no SQL for this, it uses the "gfix -sweep <database>" tool
   return "";
 }
 
@@ -1068,7 +1058,7 @@ SQLInfoFirebird::GetSQLDropView(CString /*p_schema*/,CString p_view,CString& p_p
   // Firebird cannot drop a view if dependencies from stored procedures or functions
   // still exist in the dependencies table. After Firebird 3.0 we need modification
   // rights on this system catalog table!!
-  // Changes being that we re-create the view rigth away after the drop.
+  // Changes being that we re-create the view right away after the drop.
   p_precursor = "DELETE FROM rdb$dependencies\n"
                 " WHERE rdb$depended_on_name = '" + p_view + "'\n"
                 "   AND rdb$depended_on_type = 0";
@@ -1085,7 +1075,7 @@ SQLInfoFirebird::GetSQLCreateOrReplaceView(CString /*p_schema*/,CString p_view,C
 // SQL DDL ACTIONS
 // ====================================================================
 
-// Verwerk DDL commandos in de catalog
+// Process DDL commandos in the catalog
 void 
 SQLInfoFirebird::DoCommitDDLcommands() const
 {
@@ -1101,7 +1091,7 @@ SQLInfoFirebird::DoCommitDDLcommands() const
   }
 }
 
-// Expliciet DML commandos verwerken
+// Explicit DML commando committing
 void
 SQLInfoFirebird::DoCommitDMLcommands() const
 {
@@ -1135,7 +1125,7 @@ SQLInfoFirebird::DoesViewExists(CString& p_viewName)
   return query.DoSQLStatementScalar(sql)->GetAsBoolean();
 }
 
-// Creeer tijdelijke klassen runtime
+// Can create temporary tables at runtime
 bool 
 SQLInfoFirebird::GetMustMakeTemptablesAtRuntime() const
 {
@@ -1168,7 +1158,7 @@ SQLInfoFirebird::DoRemoveTemporaryTable(CString& p_tableName) const
   query.TryDoSQLStatement("DROP TABLE " + p_tableName);
 }
 
-// Maak een procedure aan in de database
+// Making a stored procedure in the database
 void 
 SQLInfoFirebird::DoMakeProcedure(CString& p_procName,CString p_table,bool /*p_noParameters*/,CString& p_codeBlock)
 {
@@ -1188,97 +1178,49 @@ SQLInfoFirebird::DoRenameTable(CString& /*p_oldName*/,CString& /*p_newName*/) co
 // PERSISTENT-STORED MODULES (SPL / PL/SQL)
 // ===================================================================
 
-// Geef de user-errors uit de database:
+// Getting the user errors from the database
 CString 
 SQLInfoFirebird::GetUserErrorText(CString& p_procName) const
 {
-  (void)p_procName;   // niet beschikbaar in Firebird.
+  (void)p_procName;   // Not supported in Firebird.
   return "";
 }
 
-// Geef toekenning aan een variabele in SPL
+// Getting assignment to a variable in SPL
 CString 
 SQLInfoFirebird::GetSPLAssignment(CString p_variable) const
 {
-  // CBS nog te doen voor Firebird
-  return "";
+  return p_variable + "=";
 }
 
-// Geef de start van een SPL While loop
+// Getting the start of a SPL while loop
 CString 
 SQLInfoFirebird::GetSPLStartWhileLoop(CString p_condition) const
 {
-  // CBS nog te doen voor Firebird
-  return "";
+  CString sql = "WHILE " + p_condition + " DO ";
+  return sql;
 }
 
-// Geef het einde van een SPL While loop
+// The end of a while loop
 CString 
 SQLInfoFirebird::GetSPLEndWhileLoop() const
 {
-  // CBS nog te doen voor Firebird
+  // uses the BEGIN END after the DO
   return "";
 }
 
-// Geef stored procedureaanroep regel
+// Getting a stored procedure call from within SPL
 CString 
 SQLInfoFirebird::GetSQLSPLCall(CString p_procName) const
 {
   return "SELECT vv_result,vv_sqlerror,vv_isamerror,vv_errordata FROM " + p_procName;
 }
 
-// Lengte parameters bij binden:
-int 
-SQLInfoFirebird::GetParameterLength(int p_SQLType) const
-{
-  int retval;
-
-  switch (p_SQLType)
-  {
-    case SQL_CHAR:          retval = 32000;    break;
-    case SQL_VARCHAR:       retval = 32000;    break;
-    case SQL_LONGVARCHAR:   retval = 32000;    break;
-    case SQL_DECIMAL:       retval = 32000;    break;
-    case SQL_SMALLINT:      retval = 0;    break;
-    case SQL_INTEGER:       retval = 0;    break;
-    case SQL_REAL:          retval = 0;    break;
-    case SQL_DOUBLE:        retval = 0;    break;
-    case SQL_FLOAT:         retval = 0;    break;
-    case SQL_BINARY:        retval = 0;    break;
-    case SQL_VARBINARY:     retval = 0;    break;
-    case SQL_LONGVARBINARY: retval = 0;    break;
-    case SQL_DATE:          retval = 0;    break;
-    case SQL_TIME:          retval = 0;    break;
-    case SQL_TIMESTAMP:     retval = 19;   break;
-    case SQL_NUMERIC:       retval = 0;    break;
-    case SQL_BIGINT:        retval = 0;    break;
-    case SQL_TINYINT:       retval = 0;    break;
-    case SQL_BIT:           retval = 0;    break;
-    case SQL_INTERVAL_YEAR:
-    case SQL_INTERVAL_YEAR_TO_MONTH:
-    case SQL_INTERVAL_MONTH:
-    case SQL_INTERVAL_DAY:
-    case SQL_INTERVAL_DAY_TO_HOUR:
-    case SQL_INTERVAL_DAY_TO_MINUTE:
-    case SQL_INTERVAL_DAY_TO_SECOND:
-    case SQL_INTERVAL_HOUR:
-    case SQL_INTERVAL_HOUR_TO_MINUTE:
-    case SQL_INTERVAL_HOUR_TO_SECOND:
-    case SQL_INTERVAL_MINUTE:
-    case SQL_INTERVAL_MINUTE_TO_SECOND:
-    case SQL_INTERVAL_SECOND:     retval = 25;    break;
-    default:                      retval = 0;     break;
-  }
-  return retval;
-}
-
-// Bouw een parameterlijst op voor aanroep van de stored-procedure
+// Building a parameter list for calling a stored procedure
 CString 
 SQLInfoFirebird::GetBuildedParameterList(size_t p_numOfParameters) const
 {
-  // dit staat voor de parameters, de vraagtekens die worden meegegeven aan de
-  // stored procedure.
-  // ALTIJD Ellipsis, ook als er geen parameters zijn.
+  // Always doing an ellipsis, even if no parameters are used
   CString strParamLijst = "(";
   for (size_t i = 0; i < p_numOfParameters; i++)
   {
@@ -1358,7 +1300,7 @@ SQLInfoFirebird::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,i
 CString 
 SQLInfoFirebird::GetSPLSourcecodeFromDatabase(const CString& /*p_owner*/,const CString& /*p_procName*/) const
 {
-  // @EH Nog implementeren
+  // @EH To be implemented
   return "";
 }
 
@@ -1670,4 +1612,7 @@ SQLInfoFirebird::ConstructSQLForProcedureCall(SQLQuery* p_query
   // The procedure IS the singular object
   // Procedure **MUST** end with "SUSPEND;" 
   return sql;
+}
+
+// End of namespace
 }

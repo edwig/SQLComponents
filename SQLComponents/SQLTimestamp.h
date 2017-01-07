@@ -30,6 +30,9 @@
 #include <iostream>
 #include <set>
 
+namespace SQLComponents
+{
+
 class SQLTime;
 class SQLDate;
 class SQLInterval;
@@ -230,4 +233,7 @@ inline void
 SQLTimestamp::SetFraction(int p_fraction)
 {
   m_fraction = p_fraction;
+}
+
+// End of namespace
 }

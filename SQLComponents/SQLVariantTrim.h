@@ -26,6 +26,8 @@
 //
 #pragma once
 
+namespace SQLComponents
+{
 // Internal conversion and trimming
 // Used for requesting a value as another type
 // and for the operators where both sides have different types
@@ -93,3 +95,6 @@ unsigned char  SQL_DoubleToUTinyInt(double p_value);
 unsigned char  SQL_TinyIntToUTinyInt(char p_value);
 unsigned char  SQL_SBIGINTToUTinyInt(SQLBIGINT p_value);
 unsigned char  SQL_UBIGINTToUTinyInt(SQLUBIGINT p_value);
+
+// End of namespace
+}

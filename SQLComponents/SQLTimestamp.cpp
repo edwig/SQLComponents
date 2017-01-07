@@ -25,13 +25,14 @@
 // Version number:  1.3.3
 //
 #include "StdAfx.h"
-#include <math.h>
+#include "SQLComponents.h"
 #include "SQLTimestamp.h"
 #include "SQLTime.h"
 #include "SQLDate.h"
 #include "SQLInterval.h"
 #include "SQLDatabase.h"
 #include "SQLLanguage.h"
+#include <math.h>
 #include <strstream>
 #include <ctime>
 
@@ -42,6 +43,9 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning(disable: 4244)
+
+namespace SQLComponents
+{
 
 SQLTimestamp::SQLTimestamp()
 {
@@ -1229,5 +1233,8 @@ SQLTimestamp::operator>=(const SQLTimestamp& p_stamp) const
     return m_fraction >= p_stamp.m_fraction;
   }
   return false;
+}
+
+// End of namespace
 }
 

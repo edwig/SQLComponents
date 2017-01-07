@@ -25,11 +25,15 @@
 // Version number:  1.3.3
 //
 #include "StdAfx.h"
-#include <math.h>
+#include "SQLComponents.h"
 #include "SQLInterval.h"
 #include "SQLDate.h"
 #include "SQLTime.h"
 #include "SQLDatabase.h"
+#include <math.h>
+
+namespace SQLComponents
+{
 
 // XTOR Clean NULL
 SQLInterval::SQLInterval()
@@ -1845,4 +1849,7 @@ SQLInterval::operator<=(const SQLInterval& p_interval) const
   }
   // Incompatible ordinal types
   return false;
+}
+
+// End of namespace
 }

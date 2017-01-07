@@ -27,6 +27,9 @@
 #pragma  once
 #include <sqlext.h>
 
+namespace SQLComponents
+{
+
 #ifndef SQLNUM_MAX_PREC
 // Max precision of a NUMERIC as a bcd (Binary Coded Decimal)
 #define SQLNUM_MAX_PREC    38
@@ -128,6 +131,7 @@ public:
    void    SetNULL();
    void    ReserveSpace(int p_type,int p_space);
    void    ShrinkSpace();
+   void    SetFromBinaryStreamData(int p_type,int p_length,void* p_data,bool p_isnull);
 
    // General access
    bool                 SetData(int p_type,const char* p_data);
@@ -371,3 +375,6 @@ SQLVariant::GetSQLDataType()
 //////////////////////////////////////////////////////////////////////////
 
 using var = SQLVariant;
+
+// End of namespace
+}

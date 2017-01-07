@@ -25,10 +25,12 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "CppUnitTest.h"
 #include "SQLDate.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace SQLComponents;
 
 namespace DatabaseUnitTest
 {

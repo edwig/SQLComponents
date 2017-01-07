@@ -25,13 +25,14 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
-#include <sqlext.h>
+#include "SQLComponents.h"
 #include "SQLDatabase.h"
 #include "SQLInfoDB.h"
 #include "SQLQuery.h"
 #include "SQLWrappers.h"
 #include "SQLDate.h"
 #include "bcd.h"
+#include <sqlext.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,6 +41,9 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #pragma warning (disable: 4312)
+
+namespace SQLComponents
+{
 
 // CTOR: To be later connected to a database
 // by calling Init() seperatly
@@ -97,6 +101,7 @@ SQLQuery::Init(SQLDatabase* p_database)
   m_isSelectQuery    = false;
   m_speedThreshold   = QUERY_TOO_LONG;
   m_connection       = NULL;
+  m_concurrency      = SQL_CONCUR_READ_ONLY;
 }
 
 void
@@ -154,6 +159,7 @@ SQLQuery::Close()
 
   // Reset other variables
   m_lastError.Empty();
+  m_cursorName.Empty();
   m_hasLongColumns  = false;
   m_maxColumnLength = 0;
   m_bufferSize      = 0;
@@ -163,6 +169,7 @@ SQLQuery::Close()
   m_fetchIndex      = 0;
   m_prepareDone     = false;
   m_boundDone       = false;
+  m_concurrency = SQL_CONCUR_READ_ONLY;
   // LEAVE ALONE THESE PARAMETERS FOR REUSE OF THE QUERY
   // m_database
   // m_connection
@@ -200,8 +207,7 @@ SQLQuery::Open()
       throw CString("No database handle. Are you logged in to a database?");
     }
     // Create the statement handle
-    SQLRETURN res = odbc_std_app ? SqlAllocHandle(SQL_HANDLE_STMT,m_connection,&m_hstmt)
-                                 : SqlAllocStmt(m_connection,&m_hstmt);
+    SQLRETURN res = SqlAllocHandle(SQL_HANDLE_STMT,m_connection,&m_hstmt);
     if(!SQL_SUCCEEDED(res))
     {
       GetLastError("Error creating a statement handle: ");
@@ -239,10 +245,22 @@ SQLQuery::Open()
     m_retCode = SqlSetStmtAttr(m_hstmt,SQL_MAX_ROWS,(SQLPOINTER)m_maxRows,SQL_IS_UINTEGER);
     if(!SQL_SUCCEEDED(m_retCode))
     {
-      GetLastError("Cannot set SQL_MAX_ROWS attribute: ");
+      GetLastError("Cannot set MAX_ROWS attribute: ");
       throw m_lastError;
     }
   }
+
+  // Setting the concurrency level of the cursor
+  if(m_concurrency > SQL_CONCUR_READ_ONLY)
+  {
+    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_CONCURRENCY,(SQLPOINTER)m_concurrency,SQL_IS_UINTEGER);
+    if(!SQL_SUCCEEDED(m_retCode))
+    {
+      GetLastError("Cannot set CONCURRENCY attribute: ");
+      throw m_lastError;
+    }
+  }
+
   // Solving formatting for various databases (Oracle / MS-Access)
   // So they must be set or gotten in a predefined format (e.g. Oracle needs LONG for SLONG and ULONG)
   // Also see method "SQLType2CType" for the use of the rebind maps
@@ -270,6 +288,22 @@ SQLQuery::SetBufferSize(int p_bufferSize)
   if(p_bufferSize > 0 && p_bufferSize < OPTIM_BUFFERSIZE)
   {
     m_bufferSize = p_bufferSize;
+  }
+}
+
+// Setting the locking concurrency level
+// Valid values are (See: sqlext.h)
+// SQL_CONCUR_READ_ONLY   = 1
+// SQL_CONCUR_LOCK        = 2
+// SQL_CONCUR_ROWVER      = 3
+// SQL_CONCUR_VALUES      = 4
+void 
+SQLQuery::SetConcurrency(int p_concurrency)
+{
+  if(p_concurrency >= SQL_CONCUR_READ_ONLY &&
+     p_concurrency <= SQL_CONCUR_VALUES)
+  {
+    m_concurrency = p_concurrency;
   }
 }
 
@@ -511,6 +545,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
       GetLastError(fout);
       throw m_lastError;
     }
+    FetchCursorName();
   }
   else if(m_retCode < 0)
   {
@@ -703,6 +738,7 @@ SQLQuery::DoSQLExecute()
       GetLastError(fout);
       throw m_lastError;
     }
+    FetchCursorName();
   }
   if(m_retCode < 0)
   {
@@ -1058,6 +1094,22 @@ SQLQuery::ProvideAtExecData()
 
   // Last result from SQLParamData is result from SQLExecute
   return m_retCode;
+}
+
+// Fetch the resulting cursor name
+void
+SQLQuery::FetchCursorName()
+{
+  SQLSMALLINT length = 0;
+  SQLCHAR cursorName[SQL_MAX_IDENTIFIER + 1];
+  cursorName[0] = 0;
+
+  m_retCode = SqlGetCursorName(m_hstmt,cursorName,SQL_MAX_IDENTIFIER,&length);
+  if(!SQL_SUCCEEDED(m_retCode))
+  {
+    throw CString("Cannot get the cursor name of the query.");
+  }
+  m_cursorName = cursorName;
 }
 
 // Try to get the row count for an INSERT/UPDATE/DELETE command
@@ -1731,4 +1783,7 @@ SQLQuery::GetParameter(int p_num)
     return it->second;
   }
   return nullptr;
+}
+
+// End of namespace
 }

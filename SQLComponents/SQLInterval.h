@@ -30,6 +30,9 @@
 #include <iostream>
 #include <set>
 
+namespace SQLComponents
+{
+
 class SQLDate;
 class SQLTime;
 class SQLTimestamp;
@@ -185,3 +188,6 @@ private:
   // DAY-SECOND -> Number of nanoseconds
   InterValue m_value;
 };
+
+// End of namespace
+}

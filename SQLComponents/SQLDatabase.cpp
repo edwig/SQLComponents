@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLDatabase.h"
 #include "SQLQuery.h"
 #include "SQLWrappers.h"
@@ -38,13 +39,15 @@
 #include "SQLInfoPostgreSQL.h"
 #include "SQLInfoGenericODBC.h"
 #include "SQLTimestamp.h"
-#include "sqlncli.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLDatabase::SQLDatabase()
             :m_info(NULL)
@@ -122,7 +125,7 @@ SQLDatabase::Close()
   m_username.Empty();
   m_password.Empty();
   m_DBName.Empty();
-  m_DBVersie.Empty();
+  m_DBVersion.Empty();
   m_DriverName.Empty();
   m_DriverVersion.Empty();
   m_databaseName.Empty();
@@ -377,12 +380,12 @@ SQLDatabase::CollectInfo()
 
 
   if ( m_DBName.CompareNoCase(szInfo1)   == 0 && 
-       m_DBVersie.CompareNoCase(szInfo2) == 0)
+       m_DBVersion.CompareNoCase(szInfo2) == 0)
   {
     LoadVersie = FALSE;
   }
   m_DBName   = szInfo1;
-  m_DBVersie = szInfo2;
+  m_DBVersion = szInfo2;
 
   if (LoadVersie)
   {
@@ -410,7 +413,7 @@ SQLDatabase::CollectInfo()
     m_DBName = szInfo1;
 
     SqlGetInfo(m_hdbc, SQL_DBMS_VER, szInfo1, sizeof(szInfo1), &nResult);
-    m_DBVersie = szInfo1;
+    m_DBVersion = szInfo1;
 
     SqlGetInfo(m_hdbc, SQL_ASYNC_MODE, &m_async_possible, sizeof(m_async_possible), &nResult);
 
@@ -423,8 +426,8 @@ SQLDatabase::CollectInfo()
   // Get the default identifier for the kind of database
   // Consists of 6 chars name and 2 chars of main-version of the database
   // For instance "INFORM09" or "ORACLE09"
-  m_DBVersie.Trim();
-  m_dbIdent.Format("%-6s%02d",m_DBName,atoi(m_DBVersie));
+  m_DBVersion.Trim();
+  m_dbIdent.Format("%-6s%02d",m_DBName,atoi(m_DBVersion));
 
 
   // Get the type of the database
@@ -496,13 +499,13 @@ SQLDatabase::SetKnownRebinds()
     m_rebindColumns[SQL_REAL   ] = SQL_C_DOUBLE;
     m_rebindColumns[SQL_FLOAT  ] = SQL_C_DOUBLE;
   }
-  else if(m_rdbmsType == RDBMS_ACCESS)
+  else if(m_rdbmsType == RDBMS_SQLSERVER)
   {
     m_rebindParameters.clear();
     m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
     m_rebindParameters[SQL_C_ULONG] = SQL_C_LONG;
   }
-  else if(m_rdbmsType == RDBMS_SQLSERVER)
+  else if(m_rdbmsType == RDBMS_ACCESS)
   {
     m_rebindParameters.clear();
     m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
@@ -517,7 +520,7 @@ SQLDatabase::SetKnownRebinds()
 }
 
 // Get the SQL Info object by database
-// SQLInfoDB Factory for subclass
+// SQLInfoDB Factory for subclass per database
 SQLInfoDB*
 SQLDatabase::GetSQLInfoDB()
 {
@@ -577,7 +580,7 @@ SQLDatabase::RealDatabaseName()
     if(GetSQLInfoDB())
     {
       // Get the SQLInfo<Database> implementation's name
-      databaseName   = m_info->GetFysicalDatabaseName();
+      databaseName   = m_info->GetPhysicalDatabaseName();
       m_namingMethod = "Physical database name";
     }
   }
@@ -686,17 +689,17 @@ SQLDatabase::MakeEnvHandle()
 {
   // Create the handle
   m_henv = SQL_NULL_HANDLE;
-  SQLRETURN res = odbc_std_app ? SqlAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &m_henv) 
-                               : SqlAllocEnv(&m_henv) ;
-  // Check results
+  SQLRETURN res = SqlAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&m_henv);
+
+    // Check results
   if(!Check(res))
   {
     throw CString("Error at opening: cannot create an ODBC environment.");
   }
 
   // Tell the driver how we use the handles
-  // By default we are a ODBC 3.x program
-  SQLPOINTER startVersion = (SQLPOINTER)(odbc_std_app ? SQL_OV_ODBC3 : SQL_OV_ODBC2);
+  // Henceforth we are a ODBC 3.x program
+  SQLPOINTER startVersion = (SQLPOINTER)SQL_OV_ODBC3;
   res = SQLSetEnvAttr(m_henv,SQL_ATTR_ODBC_VERSION,startVersion,0);
   if(!Check(res))
   {
@@ -709,8 +712,8 @@ SQLDatabase::MakeDbcHandle()
 {
   // Create the handle
   m_hdbc = SQL_NULL_HANDLE;
-  SQLRETURN res = odbc_std_app ? SqlAllocHandle(SQL_HANDLE_DBC, m_henv, &m_hdbc) 
-                               : SqlAllocConnect(m_henv, &m_hdbc) ;
+  SQLRETURN res = SqlAllocHandle(SQL_HANDLE_DBC,m_henv,&m_hdbc);
+
   // Check the results
   if(!Check(res))
   {
@@ -729,8 +732,7 @@ SQLDatabase::MakeStmtHandle()
     throw CString("No database handle. Are you logged in to a database?");
   }
   // Create the statement handle
-  SQLRETURN res = odbc_std_app ? SqlAllocHandle(SQL_HANDLE_STMT, m_hdbc, &stmt) 
-                               : SqlAllocStmt(m_hdbc, &stmt);
+  SQLRETURN res = SqlAllocHandle(SQL_HANDLE_STMT,m_hdbc,&stmt);
 
   // Check the results
   if(!Check(res))
@@ -766,28 +768,15 @@ SQLDatabase::GetSQLHandle(HSTMT *p_statementHandle, BOOL p_exception)
 SQLDatabase::FreeSQLHandle(HSTMT* p_statementHandle,UWORD p_option)
 {
   SQLRETURN ret = SQL_SUCCESS;
-  if (p_statementHandle != SQL_NULL_HSTMT )
+  if(p_statementHandle != SQL_NULL_HSTMT)
   {
-    // In case of an ODBC 1.x of 2.x application
-    // always cancel the statement first
-    if(odbc_std_app == false)
+    // Call the correct deallocator
+    // Will otherwise not free the cursor on the database
+    ret = SQLFreeStmt(*p_statementHandle,p_option);
+    // On success, remove the handle, if the option was to drop it
+    if(ret == SQL_SUCCESS && p_option == SQL_DROP)
     {
-      ret = SqlCancel(*p_statementHandle);
-    }
-    if(ret == SQL_SUCCESS)
-    {
-      // Call the correct deallocator
-      // Will otherwise not free the cursor on the database (Oracle !!)
-      ret = odbc_std_app ? ::SQLFreeStmt(*p_statementHandle,p_option)
-                         : ::SQLFreeHandle(SQL_HANDLE_STMT,*p_statementHandle);
-      if(ret == SQL_SUCCESS)
-      {
-        // On success, remove the handle
-        if(p_option == SQL_DROP)
-        {
-          *p_statementHandle = SQL_NULL_HSTMT;
-        }
-      }
+      *p_statementHandle = SQL_NULL_HSTMT;
     }
   }
   return ret;
@@ -1203,7 +1192,7 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
   // Beware: the transaction is always removed from the stack
   // even if the rollback may fail.
   // So we cannot try to rollback or commit it again
-  TransactieStack transactions;
+  TransactionStack transactions;
   while(m_transactions.size())
   {
     // Get the top of the stack
@@ -1829,3 +1818,5 @@ SQLDatabase::IsLocked()
   return true;
 }
 
+// End of namespace
+}

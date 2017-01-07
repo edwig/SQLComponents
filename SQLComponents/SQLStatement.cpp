@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "stdafx.h"
+#include "SQLComponents.h"
 #include "SQLStatement.h"
 
 #ifdef _DEBUG
@@ -32,6 +33,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 SQLStatement::SQLStatement()
               :m_number(0)
@@ -76,4 +80,7 @@ void
 SQLStatement::AddToStatement(CString& p_statement)
 {
   m_statement += p_statement;
+}
+
+// End of namespace
 }

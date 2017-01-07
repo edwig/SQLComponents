@@ -5,6 +5,7 @@
 
 #pragma once
 
+#define SQL_COMPONENTS_MFC
 #include "targetver.h"
 
 // Headers for CppUnitTest

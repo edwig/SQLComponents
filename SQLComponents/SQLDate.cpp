@@ -25,6 +25,7 @@
 // Version number:  1.3.3
 //
 #include "Stdafx.h"
+#include "SQLComponents.h"
 #include "SQLDate.h"  
 #include "SQLLanguage.h"
 #include <windows.h>
@@ -39,6 +40,9 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1194,4 +1198,7 @@ SQLDate::operator-(const SQLInterval& p_interval) const
     }
   }
   return date;
+}
+
+// End of namespace
 }

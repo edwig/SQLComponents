@@ -28,6 +28,9 @@
 #include "SQLVariant.h"
 #include "SQLDatabase.h"
 
+namespace SQLComponents
+{
+
 // User status
 #define USER_DISPLAY		   1
 #define NUMBER_BUFFER_SIZE 100
@@ -129,4 +132,7 @@ inline CString&
 SQLVariantFormat::GetFormat()
 {
   return m_format;
+}
+
+// End of namespace
 }

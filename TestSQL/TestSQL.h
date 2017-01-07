@@ -25,8 +25,10 @@
 // Version number:  1.3.3
 //
 #pragma once
-
 #include "resource.h"
+#include "SQLComponents.h"
+
+using namespace SQLComponents;
 
 extern CString g_dsn;
 extern CString g_user;

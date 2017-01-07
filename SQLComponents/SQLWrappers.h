@@ -26,19 +26,12 @@
 //
 #pragma once
 
-// Create a constant so we can see the flag in C++
-#ifdef ODBC_NOT_STANDARD
-enum { odbc_std_app = false } ;
-#else
-enum { odbc_std_app = true  } ;
-#endif
-
 #pragma warning(disable: 4702)
 
 //////////////////////////////////////////////////////////////////////////
 //
 // This files contains wrappers for all SQLXxxxx functions to circumvent
-// access violations and other errors by catching them all
+// access violations and other exceptions from ODBC drivers by catching them all
 //
 
 inline SQLRETURN SqlDriverConnect(SQLHDBC hdbc, SQLHWND hwnd, SQLCHAR *szConnStrIn, SQLSMALLINT cbConnStrIn, SQLCHAR *szConnStrOut, SQLSMALLINT cbConnStrOutMax, SQLSMALLINT *pcbConnStrOut, SQLUSMALLINT fDriverCompletion)
@@ -564,6 +557,18 @@ inline SQLRETURN SqlMoreResults(SQLHSTMT p_hstmt)
   }
 }
 
+inline SQLRETURN SqlGetCursorName(SQLHSTMT p_hstmt,SQLCHAR* p_buffer,SQLSMALLINT p_buflen,SQLSMALLINT* p_resultLength)
+{
+  try
+  {
+    return ::SQLGetCursorName(p_hstmt,p_buffer,p_buflen,p_resultLength);
+  }
+  catch(...)
+  {
+    return SQL_ERROR;
+  }
+}
+
 // OLD STYLE ODBC 1.x / 2.x call. Do only use if absolutely necessary!!
 inline SQLRETURN SqlColAttributes(SQLHSTMT     p_hstmt
                                  ,SQLUSMALLINT p_icol
@@ -582,5 +587,3 @@ inline SQLRETURN SqlColAttributes(SQLHSTMT     p_hstmt
     return SQL_ERROR;
   }
 }
-
-
