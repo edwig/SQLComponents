@@ -227,6 +227,11 @@ namespace DatabaseUnitTest
       msg.Format("Found record with id: [%d]",var->GetAsSLong());
       Logger::WriteMessage(msg);
 
+      // Test saving as an XML file
+      SetDefaultSQLLanguage(LN_DUTCH);
+      bool saved = details.XMLSave("SQLDataSet_Details.xml","TestDetails");
+      Assert::AreEqual(true,saved);
+
       return info.m_sum;
     }
 

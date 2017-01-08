@@ -1,15 +1,14 @@
 Planning of features for SQLComponents library
 ==============================================
 
-1) xml/xmlparser replacement by cloning XMLMessage from Marlin library
-7) AUTOCOMMIT MODE
 8) Then update to version 1.4
-
 AND STILL MORE UNIT TESTS!
 
 DONE
 =========================
+1) xml/xmlparser replacement by cloning XMLMessage from Marlin library
 2) Default language DUTCH -> ENGLISH
 4) Use "SQLComponents.h" as include in all files
 5) Comments in SQLInfo<database> classes from dutch to english
 6) Creating a namespace for SQLComponents
+7) AUTOCOMMIT MODE

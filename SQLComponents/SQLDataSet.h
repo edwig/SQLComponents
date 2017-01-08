@@ -28,6 +28,7 @@
 #include "SQLDatabase.h"
 #include "SQLRecord.h"
 #include "SQLVariant.h"
+#include "XMLMessage.h"
 #include <vector>
 
 namespace SQLComponents
@@ -41,27 +42,18 @@ namespace SQLComponents
 #define SQL_Insertions  0x08
 
 // Names for saving the dataset to XML structures
-#define DATASET_DUTCH
+#define DATASET_NAME      0
+#define DATASET_STRUCTURE 1
+#define DATASET_FIELD     2
+#define DATASET_RECORD    3
+#define DATASET_RECORDS   4
+#define DATASET_ID        5
+#define DATASET_TYPE      6
+#define DATASET_TYPENAME  7
+#define NUM_DATASET_NAMES 8
 
-#ifdef DATASET_DUTCH
-#define DATASET_NAME      "Naam"
-#define DATASET_STRUCTURE "Structuur"
-#define DATASET_FIELD     "Veld"
-#define DATASET_RECORD    "Record"
-#define DATASET_RECORDS   "Records"
-#define DATASET_ID        "id"
-#define DATASET_TYPE      "type"
-#define DATASET_TYPENAME  "typenaam"
-#else
-#define DATASET_NAME      "Name"
-#define DATASET_STRUCTURE "Structure"
-#define DATASET_FIELD     "Field"
-#define DATASET_RECORD    "Record"
-#define DATASET_RECORDS   "Records"
-#define DATASET_ID        "ID"
-#define DATASET_TYPE      "Type"
-#define DATASET_TYPENAME  "TypeName"
-#endif
+// Names for saving datasets to XML in various languages
+extern const char* dataset_names[LN_NUMLANG][NUM_DATASET_NAMES];
 
 // Parameter for the query
 typedef struct _sql_parameter
@@ -180,7 +172,7 @@ public:
   SQLRecord*   GetRecord(int p_recnum);
   // Gets the status of records of the dataset
   int          GetStatus();
-  // Get a fieldname
+  // Get a field name
   CString      GetFieldName(int p_num);
   // Get datatype of a field
   int          GetFieldType(int p_num);
@@ -190,8 +182,10 @@ public:
   SQLVariant*  GetCurrentField(int p_num);
 
   // XML Saving and loading
-  void         XMLSave(XmlElement* p_dataset);
-  void         XMLLoad(XmlElement* p_dataset);
+  bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
+  bool         XMLLoad(CString p_filename);
+  void         XMLSave(XMLMessage* p_msg,XMLElement* p_dataset);
+  void         XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset);
 private:
   // Set parameters in the query
   CString      ParseQuery();

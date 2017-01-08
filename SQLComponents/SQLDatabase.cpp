@@ -346,13 +346,10 @@ SQLDatabase::SetAttributesAfterConnect(bool p_readOnly)
       // Programs **MUST** put SQLTransaction on the stack to modify the database
       SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_OFF,SQL_IS_UINTEGER);
     }
-    else
-    {
-      // Set autocommit mode to be sure. 
-      // Programs **CAN** use a transaction by setting SQLTransaction on the stack.
-      SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_ON,SQL_IS_UINTEGER);
-    }
   }
+
+  // Set our initial autocommit mode
+  SetAutoCommitMode(m_autoCommitMode);
 }
 
 bool 
@@ -663,6 +660,34 @@ SQLDatabase::SetReadOnly(bool p_readOnly)
   // Record in this class
   m_readOnly = p_readOnly;
   return true;
+}
+
+// Setting the autocommit mode
+bool
+SQLDatabase::SetAutoCommitMode(bool p_autoCommit)
+{
+  // If we try to turn it off, but the database does not understand transactions
+  // We cannot set the autocommit mode to OFF and go do transactions
+  if(p_autoCommit == false && m_canDoTransactions == SQL_TC_NONE)
+  {
+    return false;
+  }
+
+  // If we have a database type that can change the autocommit mode
+  if(m_rdbmsType != RDBMS_ACCESS)
+  {
+    // Set autocommit mode to be sure. 
+    // If 'ON', Programs **CAN** use a transaction by setting SQLTransaction on the stack.
+    int commit = p_autoCommit ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
+    SQLRETURN ret = SqlSetConnectAttr(m_hdbc,SQL_ATTR_AUTOCOMMIT,(SQLPOINTER)commit,SQL_IS_INTEGER);
+    if(Check(ret))
+    {
+      // If succeeded, save the autocommit mode
+      m_autoCommitMode = p_autoCommit;
+      return true;
+    }
+  }
+  return false;
 }
 
 CString        

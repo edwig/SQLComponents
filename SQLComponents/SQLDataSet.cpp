@@ -30,7 +30,6 @@
 #include "SQLQuery.h"
 #include "SQLVariantFormat.h"
 #include "SQLInfoDB.h"
-#include "xml.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,6 +39,53 @@ static char THIS_FILE[] = __FILE__;
 
 namespace SQLComponents
 {
+
+// Names for saving datasets to XML in various languages
+const char* dataset_names[LN_NUMLANG][NUM_DATASET_NAMES] =
+{
+  // LN_DUTCH
+  { "Naam"          // DATASET_NAME
+   ,"Structuur"     // DATASET_STRUCTURE
+   ,"Veld"          // DATASET_FIELD
+   ,"Record"        // DATASET_RECORD
+   ,"Records"       // DATASET_RECORDS
+   ,"id"            // DATASET_ID
+   ,"type"          // DATASET_TYPE
+   ,"typenaam"      // DATASET_TYPENAME
+  },
+  // LN_ENGLISH
+  { "Name"          // DATASET_NAME
+   ,"Structure"     // DATASET_STRUCTURE
+   ,"Field"         // DATASET_FIELD
+   ,"Record"        // DATASET_RECORD
+   ,"Records"       // DATASET_RECORDS
+   ,"ID"            // DATASET_ID
+   ,"Type"          // DATASET_TYPE
+   ,"TypeName"      // DATASET_TYPENAME
+  },
+  // LN_GERMAN
+  { "Name"          // DATASET_NAME
+   ,"Struktur"      // DATASET_STRUCTURE
+   ,"Feld"          // DATASET_FIELD
+   ,"Rekord"        // DATASET_RECORD
+   ,"Rekords"       // DATASET_RECORDS
+   ,"ID"            // DATASET_ID
+   ,"Typ"           // DATASET_TYPE
+   ,"Typename"      // DATASET_TYPENAME
+  },
+  // LN_FRENCH
+  { "Nom"           // DATASET_NAME
+   ,"Structure"     // DATASET_STRUCTURE
+   ,"Domaine"       // DATASET_FIELD
+   ,"Record"        // DATASET_RECORD
+   ,"Records"       // DATASET_RECORDS
+   ,"ID"            // DATASET_ID
+   ,"Type"          // DATASET_TYPE
+   ,"NomDeType"     // DATASET_TYPENAME
+  },
+};
+
+// The DATASET class
 
 SQLDataSet::SQLDataSet()
            :m_database(NULL)
@@ -1273,79 +1319,203 @@ SQLDataSet::GetWhereClause(SQLQuery* p_query,SQLRecord* p_record,int& p_paramete
 //
 //////////////////////////////////////////////////////////////////////////
 
-void
-SQLDataSet::XMLSave(XmlElement* p_dataset)
+// bool
+// SQLDataSet::XMLSave(CString p_filename,CString p_name)
+// {
+//   XmlDocument doc;
+//   XmlDeclaration* decl = new XmlDeclaration("1.0","","");
+//   XmlElement*     root = new XmlElement(p_name);
+//   doc.LinkEndChild(decl);
+//   doc.LinkEndChild(root);
+// 
+//   if(root)
+//   {
+//     XMLSave(root);
+//     return doc.SaveFile(p_filename);
+//   }
+//   return false;
+// }
+
+bool
+SQLDataSet::XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding /*= XMLEncoding::ENC_UTF8*/)
 {
-  // Name of the dataset
-  XmlElement* naam = new XmlElement(DATASET_NAME);
-  XmlText* ntext = new XmlText(m_name);
-  p_dataset->LinkEndChild(naam);
-  naam->LinkEndChild(ntext);
+  XMLMessage msg;
+  msg.SetRootNodeName(p_name);
 
-  // Field structure of the dataset
-  XmlElement* structur = new XmlElement(DATASET_STRUCTURE);
-  p_dataset->LinkEndChild(structur);
+  XMLSave(&msg,msg.GetRoot());
+  return msg.SaveFile(p_filename,p_encoding);
+}
 
+// bool
+// SQLDataSet::XMLLoad(CString p_filename)
+// {
+//   XmlDocument doc(p_filename);
+//   if(doc.LoadFile())
+//   {
+//     XmlElement* root = doc.RootElement();
+//     if(root)
+//     {
+//       XMLLoad(root);
+//       return true;
+//     }
+//   }
+//   return false;
+// }
+
+bool
+SQLDataSet::XMLLoad(CString p_filename)
+{
+  XMLMessage msg;
+  if(msg.LoadFile(p_filename))
+  {
+    XMLElement* root = msg.GetRoot();
+    if(root)
+    {
+      XMLLoad(&msg,root);
+      return true;
+    }
+  }
+  return false;
+}
+
+// void
+// SQLDataSet::XMLSave(XmlElement* p_dataset)
+// {
+//   // Name of the dataset
+//   XmlElement* naam = new XmlElement(dataset_names[g_defaultLanguage][DATASET_NAME]);
+//   XmlText* ntext = new XmlText(m_name);
+//   p_dataset->LinkEndChild(naam);
+//   naam->LinkEndChild(ntext);
+// 
+//   // Field structure of the dataset
+//   XmlElement* structur = new XmlElement(dataset_names[g_defaultLanguage][DATASET_STRUCTURE]);
+//   p_dataset->LinkEndChild(structur);
+// 
+//   SQLRecord* record = GetRecord(0);
+//   if(record)
+//   {
+//     for(unsigned int ind = 0; ind < m_names.size(); ++ind)
+//     {
+//       CString fieldname = GetFieldName(ind);
+//       SQLVariant* var = record->GetField(ind);
+//       int type = var->GetDataType();
+//       
+//       XmlElement* veld = new XmlElement(dataset_names[g_defaultLanguage][DATASET_FIELD]);
+//       structur->LinkEndChild(veld);
+//       veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_ID]  ,ind);
+//       veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_TYPE],type);
+//       veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_TYPENAME],var->FindDatatype(type));
+// 
+//       XmlText* newtext = new XmlText(fieldname);
+//       veld->LinkEndChild(newtext);
+//     }
+//   }
+// 
+//   // All records of the dataset
+//   XmlElement* records = new XmlElement(dataset_names[g_defaultLanguage][DATASET_RECORDS]);
+//   p_dataset->LinkEndChild(records);
+//   for(unsigned int ind = 0; ind < m_records.size(); ++ind)
+//   {
+//     m_records[ind]->XMLSave(records);
+//   }
+// }
+
+void
+SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
+{
+  XMLElement* dataset   = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_NAME],XDT_String,m_name);
+  XMLElement* structure = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_STRUCTURE],XDT_String,"");
+  CString nameField = dataset_names[g_defaultLanguage][DATASET_FIELD];
+
+  // Add record structure
   SQLRecord* record = GetRecord(0);
   if(record)
   {
-    for(unsigned int ind = 0; ind < m_names.size(); ++ind)
+    for(unsigned int ind = 0;ind < m_names.size(); ++ind)
     {
       CString fieldname = GetFieldName(ind);
-      SQLVariant* var = record->GetField(ind);
+      SQLVariant* var   = record->GetField(ind);
       int type = var->GetDataType();
-      
-      XmlElement* veld = new XmlElement(DATASET_FIELD);
-      structur->LinkEndChild(veld);
-      veld->SetAttribute(DATASET_ID,ind);
-      veld->SetAttribute(DATASET_TYPE,type);
-      veld->SetAttribute(DATASET_TYPENAME,var->FindDatatype(type));
 
-      XmlText* newtext = new XmlText(fieldname);
-      veld->LinkEndChild(newtext);
+      XMLElement* field = p_msg->AddElement(structure,nameField,XDT_String,fieldname);
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_ID],(int)ind);
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPE],type);
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],var->FindDatatype(type));
     }
   }
 
-  // All records of the dataset
-  XmlElement* records = new XmlElement(DATASET_RECORDS);
-  p_dataset->LinkEndChild(records);
-  for(unsigned int ind = 0; ind < m_records.size(); ++ind)
+  // Add records of the dataset
+  XMLElement* records = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_RECORDS],XDT_String,"");
+  for(unsigned int ind = 0;ind < m_records.size(); ++ind)
   {
-    m_records[ind]->XMLSave(records);
+    m_records[ind]->XMLSave(p_msg,records);
   }
 }
 
+// void
+// SQLDataSet::XMLLoad(XmlElement* p_dataset)
+// {
+//   XmlElement* structur = p_dataset->FindElement(dataset_names[g_defaultLanguage][DATASET_STRUCTURE]);
+//   XmlElement* records  = p_dataset->FindElement(dataset_names[g_defaultLanguage][DATASET_RECORDS]);
+//   if(structur == NULL) throw CString("Structure part missing in the XML dataset.") + m_name;
+//   if(records  == NULL) throw CString("Records part missing in the XML dataset") + m_name;
+// 
+//   // Read the structure
+//   XmlElement* veld = structur->FirstChildElement();
+//   while(veld)
+//   {
+//     // Remember the name of the field
+//     CString naam = veld->GetText();
+//     m_names.push_back(naam);
+//     // Datatype of the field
+//     int type = atoi(veld->Attribute(dataset_names[g_defaultLanguage][DATASET_TYPE]));
+//     m_types.push_back(type);
+//     // Next field
+//     veld = veld->NextSiblingElement();
+//   }
+// 
+//   // Read records
+//   XmlElement* record = records->FirstChildElement();
+//   while(record)
+//   {
+//     // Make record and load it
+//     SQLRecord* rec = InsertRecord();
+//     rec->XMLLoad(record);
+//     // Next record
+//     record = record->NextSiblingElement();
+//   }
+// }
+
 void
-SQLDataSet::XMLLoad(XmlElement* p_dataset)
+SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset)
 {
-  XmlElement* structur = p_dataset->FindElement(DATASET_STRUCTURE);
-  XmlElement* records  = p_dataset->FindElement(DATASET_RECORDS);
+  XMLElement* structur = p_msg->FindElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_STRUCTURE],false);
+  XMLElement* records  = p_msg->FindElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_RECORDS],  false);
   if(structur == NULL) throw CString("Structure part missing in the XML dataset.") + m_name;
   if(records  == NULL) throw CString("Records part missing in the XML dataset") + m_name;
 
   // Read the structure
-  XmlElement* veld = structur->FirstChildElement();
-  while(veld)
+  XMLElement* field = p_msg->GetElementFirstChild(structur);
+  while(field)
   {
     // Remember the name of the field
-    CString naam = veld->GetText();
-    m_names.push_back(naam);
+    CString name = field->GetName();
+    m_names.push_back(name);
     // Datatype of the field
-    int type = atoi(veld->Attribute(DATASET_TYPE));
+    int type = p_msg->GetAttributeInteger(field,dataset_names[g_defaultLanguage][DATASET_TYPE]);
     m_types.push_back(type);
     // Next field
-    veld = veld->NextSiblingElement();
+    field = p_msg->GetElementSibling(field);
   }
 
   // Read records
-  XmlElement* record = records->FirstChildElement();
+  XMLElement* record = p_msg->GetElementFirstChild(records);
   while(record)
   {
-    // Make record and load it
     SQLRecord* rec = InsertRecord();
-    rec->XMLLoad(record);
+    rec->XMLLoad(p_msg,record);
     // Next record
-    record = record->NextSiblingElement();
+    record = p_msg->GetElementSibling(record);
   }
 }
 

@@ -29,7 +29,6 @@
 //
 #pragma once
 #include "unzip.h"
-#include "xml.h"
 #include <vector>
 #include <map>
 
@@ -38,10 +37,13 @@
 #define ROWNUM(cellnum)   (cellnum & 0xFFFFF)
 #define COLNUM(cellnum)   (cellnum >> 20)
 
-using namespace SQLComponents;
+namespace SQLComponents
+{
 
 // Forward definition
 class BasicXmlExcel;
+class XMLMessage;
+class XMLElement;
 
 // Type of cells
 typedef enum _celltype
@@ -95,7 +97,7 @@ public:
  ~BasicXmlWorksheet();
 
   // OPERATIONS
-  void          Load(XmlElement* p_root);
+  void          Load(XMLMessage& p_msg,XMLElement* p_root);
 
   // GETTERS
   CString       GetSheetName();
@@ -152,3 +154,6 @@ private:
   bool       m_sheetRead;
   CString    m_error;
 };
+
+// End of namespace
+}

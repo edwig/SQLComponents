@@ -29,7 +29,7 @@
 #include "SQLRecord.h"
 #include "SQLDataSet.h"
 #include "SQLVariant.h"
-#include "xml.h"
+#include "XMLMessage.h" 
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -295,61 +295,120 @@ SQLRecord::AllMixedMutations(MutationIDS& p_list,int p_mutationID)
 //
 //////////////////////////////////////////////////////////////////////////
 
+// void
+// SQLRecord::XMLSave(XmlElement* p_records)
+// {
+//   XmlElement* record = new XmlElement(dataset_names[g_defaultLanguage][DATASET_RECORD]);
+//   p_records->LinkEndChild(record);
+// 
+//   for(unsigned int ind = 0;ind < m_fields.size(); ++ind)
+//   {
+//     SQLVariant* var = m_fields[ind]->Current();
+//     CString naam = m_dataSet->GetFieldName(ind);
+//     int type = var->GetDataType();
+// 
+//     XmlElement* veld = new XmlElement(dataset_names[g_defaultLanguage][DATASET_FIELD]);
+//     record->LinkEndChild(veld);
+//     veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_ID]  ,ind);
+//     veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_TYPE],type);
+//     veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_NAME],naam);
+// 
+//     CString val;
+//     var->GetAsString(val);
+//     XmlText* value = new XmlText(val);
+//     veld->LinkEndChild(value);
+//   }
+// }
+
 void
-SQLRecord::XMLSave(XmlElement* p_records)
+SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
 {
-  XmlElement* record = new XmlElement(DATASET_RECORD);
-  p_records->LinkEndChild(record);
+  CString recName(dataset_names[g_defaultLanguage][DATASET_RECORD]);
+  CString fldName(dataset_names[g_defaultLanguage][DATASET_FIELD]);
 
-  for(unsigned int ind = 0;ind < m_fields.size(); ++ind)
+  CString idName = dataset_names[g_defaultLanguage][DATASET_ID];
+  CString typName = dataset_names[g_defaultLanguage][DATASET_TYPE];
+  CString attName = dataset_names[g_defaultLanguage][DATASET_NAME];
+
+  XMLElement* p_elem = p_msg->AddElement(p_base,recName,XDT_String,"");
+  if(p_elem)
   {
-    SQLVariant* var = m_fields[ind]->Current();
-    CString naam = m_dataSet->GetFieldName(ind);
-    int type = var->GetDataType();
+    for(unsigned int ind = 0; ind < m_fields.size(); ++ind)
+    {
+      SQLVariant* var = m_fields[ind]->Current();
+      CString fieldName = m_dataSet->GetFieldName(ind);
+      int type = var->GetDataType();
 
-    XmlElement* veld = new XmlElement(DATASET_FIELD);
-    record->LinkEndChild(veld);
-    veld->SetAttribute("id",ind);
-    veld->SetAttribute("type",type);
-    veld->SetAttribute("naam",naam);
+      XMLElement* fld = p_msg->AddElement(p_elem,fldName,XDT_String,"");
+      p_msg->SetAttribute(fld,idName, (int)ind);
+      p_msg->SetAttribute(fld,typName,type);
+      p_msg->SetAttribute(fld,attName,fieldName);
 
-    CString val;
-    var->GetAsString(val);
-    XmlText* value = new XmlText(val);
-    veld->LinkEndChild(value);
+      CString value;
+      var->GetAsString(value);
+      fld->m_value = value;
+    }
   }
 }
 
+// void
+// SQLRecord::XMLLoad(XmlElement* p_record)
+// {
+//   int ind = 0;
+//   XmlElement* field = p_record->FirstChildElement();
+//   while(field)
+//   {
+//     int type = 0;
+//     int id   = 0;
+//     field->Attribute(dataset_names[g_defaultLanguage][DATASET_TYPE],&type);
+//     field->Attribute(dataset_names[g_defaultLanguage][DATASET_ID],  &id);
+//     if(ind != id)
+//     {
+//       throw CString("Invalid field sequence in in record of: ") + m_dataSet->GetName();
+//     }
+//     char* text = (char*)field->GetText();
+//     if(!text) 
+//     {
+//       // No empty nodes
+//       text = "";
+//     }
+//     SQLVariant value;
+//     value.SetData(type,text);
+//     AddField(&value);
+// 
+//     // Next field
+//     field = field->NextSiblingElement();
+//     ++ind;
+//   }
+// }
+
 void
-SQLRecord::XMLLoad(XmlElement* p_record)
+SQLRecord::XMLLoad(XMLMessage* p_msg,XMLElement* p_base)
 {
+  CString typeName(dataset_names[g_defaultLanguage][DATASET_TYPE]);
+  CString idName  (dataset_names[g_defaultLanguage][DATASET_ID]);
+
   int ind = 0;
-  XmlElement* field = p_record->FirstChildElement();
+  XMLElement* field = p_msg->GetElementFirstChild(p_base);
   while(field)
   {
-    int type = 0;
-    int id   = 0;
-    field->Attribute(DATASET_TYPE,&type);
-    field->Attribute(DATASET_ID,  &id);
-    if(ind != id)
+    int type = p_msg->GetAttributeInteger(field,typeName);
+    int id   = p_msg->GetAttributeInteger(field,idName);
+    if(id != ind)
     {
-      throw CString("Ongeldige veld sequence in record of: ") + m_dataSet->GetName();
-    }
-    char* text = (char*)field->GetText();
-    if(!text) 
-    {
-      // No empty nodes
-      text = "";
+      throw CString("Invalid field sequence in in record of: ") + m_dataSet->GetName();
     }
     SQLVariant value;
-    value.SetData(type,text);
+    value.SetData(type,field->GetValue());
+    // Save in this record
     AddField(&value);
 
     // Next field
-    field = field->NextSiblingElement();
+    field = p_msg->GetElementSibling(field);
     ++ind;
   }
 }
+
 
 // End of namespace
 }

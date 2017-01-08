@@ -43,7 +43,8 @@ typedef std::vector<SQLMutation*> FieldMap;
 
 // Foreward declaration
 class SQLDataSet;
-class XmlElement;
+class XMLMessage;
+class XMLElement;
 class SQLVariant;
 
 class SQLRecord
@@ -74,8 +75,12 @@ public:
   int         AllMixedMutations(MutationIDS& p_list,int p_mutationID);
 
   // XML Saving and reading
-  void        XMLSave(XmlElement* p_records);
-  void        XMLLoad(XmlElement* p_record);
+//void        XMLSave(XmlElement* p_records);
+//void        XMLLoad(XmlElement* p_record);
+
+  void        XMLSave(XMLMessage* p_msg,XMLElement* p_base);
+  void        XMLLoad(XMLMessage* p_msg,XMLElement* p_base);
+
 private:
   SQLDataSet* m_dataSet;
   bool        m_modifiable;

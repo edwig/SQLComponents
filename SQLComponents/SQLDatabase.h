@@ -126,6 +126,8 @@ public:
   void           SetMARS(bool p_set);
   // Setting the database connection to read-only (if supported at all)
   bool           SetReadOnly(bool p_readOnly);
+  // Setting the autocommit mode
+  bool           SetAutoCommitMode(bool p_autoCommit);
   // Add a general ODBC option for use in the connection string
   void           AddConnectOption(CString p_keyword,CString p_value);
 
@@ -171,6 +173,7 @@ public:
   CString        GetSQLState();
   bool           GetReadOnly();
   int            GetLoginTimeout();
+  bool           GetAutoCommitMode();
 
   // SUPPORT FOR SQLQuery
   HDBC           GetDBHandle();
@@ -281,6 +284,7 @@ protected:
   int               m_odbcVersion         = { 0     };
   int               m_driverMainVersion   = { 0     };   
   bool              m_needLongDataLen     = { false };
+  bool              m_autoCommitMode      = { true  };
   DWORD             m_lastAction          = { 0     };  // Last moment of usage (for database pool)
   RebindMap         m_rebindParameters;                 // Rebinding of parameters for SQLBindParam
   RebindMap         m_rebindColumns;                    // Rebinding of result columns for SQLBindCol
@@ -475,6 +479,12 @@ inline int
 SQLDatabase::GetLoginTimeout()
 {
   return m_loginTimeout;
+}
+
+inline bool
+SQLDatabase::GetAutoCommitMode()
+{
+  return m_autoCommitMode;
 }
 
 // End of namespace

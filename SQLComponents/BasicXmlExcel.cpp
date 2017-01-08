@@ -30,13 +30,16 @@
 #include "stdafx.h"
 #include "SQLComponents.h"
 #include "BasicXmlExcel.h"
-//#include "GetLastErrorAsString.h"
+#include "XMLMessage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+namespace SQLComponents
+{
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -174,50 +177,49 @@ BasicXmlWorksheet::GetCell(int p_row,int p_col)
 }
 
 void
-BasicXmlWorksheet::Load(XmlElement* p_root)
+BasicXmlWorksheet::Load(XMLMessage& p_msg,XMLElement* p_root)
 {
   // See if there is data in the worksheet
-  XmlElement* data = p_root->FindElement("sheetData");
+  XMLElement* data = p_msg.FindElement(p_root,"sheetData");
   if(data == NULL)
   {
     return;
   }
   // Finding all the rows of data
-  XmlElement* row = data->FindElement("row");
+  XMLElement* row = p_msg.FindElement(data,"row");
   while(row)
   {
     // Get the row number and preserve
-    const char* rowNum = row->Attribute("r");
-    int rowNumber = atoi(rowNum);
+    CString rowName = p_msg.GetAttribute(row,"r");
+    int   rowNumber = p_msg.GetAttributeInteger(row,"r");
     if(rowNumber > m_maxRow)
     {
       m_maxRow = rowNumber;
     }
 
     // Finding the columns
-    XmlElement* col = row->FindElement("c");
+    XMLElement* col = p_msg.FindElement(row,"c");
     while(col)
     {
       // Getting the column name/number and preserve
-      const char* colName = col->Attribute("r");
-      int colNumber = CalculateColumnNumber(colName,rowNum);
+      CString colName = p_msg.GetAttribute(col,"r");
+      int colNumber = CalculateColumnNumber(colName,rowName);
       if(colNumber > m_maxCol)
       {
         m_maxCol = colNumber;
       }
       // Find datatype
       bool isString = false;
-      const char* dataType = col->Attribute("t");
-      if(dataType && *dataType == 's')
+      CString dataType = p_msg.GetAttribute(col,"t");
+      if(dataType && dataType.GetAt(0) == 's')
       {
         isString = true;
       }
       // Find the value of the cell
-      XmlElement* val = col->FindElement("v");
+      XMLElement* val = p_msg.FindElement(col,"v");
       if(val)
       {
-        const char* value = val->GetText();
-
+        CString value = val->GetValue();
         BasicXmlCell* cell = NULL;
         if(isString)
         {
@@ -243,10 +245,10 @@ BasicXmlWorksheet::Load(XmlElement* p_root)
         m_cells.insert(std::make_pair(cellnum,cell));
       }
       // Next column of data
-      col = col->NextSiblingElement();
+      col = p_msg.GetElementSibling(col);
     }
     // Next row of data
-    row = row->NextSiblingElement();
+    row = p_msg.GetElementSibling(row);
   }
 }
 
@@ -448,31 +450,31 @@ BasicXmlExcel::ReadSheetNames()
       }
       // delimit the buffer
       buffer[ze.unc_size] = 0;
+      CString sheetInfo(buffer);
 
-      XmlDocument doc;
-      doc.Parse((const char*) buffer);
-      XmlElement* root = doc.RootElement();
+      XMLMessage doc;
+      doc.ParseMessage(sheetInfo);
+      XMLElement* root = doc.GetRoot();
       if(root == NULL)
       {
         m_error.Format("Workbook definition incorrect in: %s",m_filename);
         break;
       }
-      XmlElement* sheets = root->FindElement("sheets");
+      XMLElement* sheets = doc.FindElement(root,"sheets");
       if(sheets == NULL)
       {
-        SetError("Workbook is empty. No worksheets in spreasheet");
+        SetError("Workbook is empty. No worksheets in spreadsheet");
         break;
       }
-      XmlElement* sheet  = (XmlElement*)sheets->FirstChild();
+      XMLElement* sheet  = doc.GetElementFirstChild(sheets);
       while(sheet)
       {
-        const char* name = sheet->Attribute("name");
-        CString sheetname(name);
+        CString sheetname = doc.GetAttribute(sheet,"name");
         m_sheetnames.push_back(sheetname);
         // Get next sheet
-        sheet = sheet->NextSiblingElement();
+        sheet = doc.GetElementSibling(sheet);
       }
-      // Klaar met buffer
+      // Ready with the buffer
       free(buffer);
       break;
     }
@@ -573,24 +575,25 @@ BasicXmlExcel::LoadStrings()
       }
       // delimit the buffer
       buffer[ze.unc_size] = 0;
+      CString stringInfo(buffer);
 
-      XmlDocument doc;
-      doc.Parse((const char*) buffer);
-      XmlElement* root = doc.RootElement();
+      XMLMessage doc;
+      doc.ParseMessage(stringInfo);
+      XMLElement* root = doc.GetRoot();
       if(root == NULL)
       {
         m_error.Format("Shared-strings definition incorrect in: %s",m_filename);
         return false;
       }
       // Reading the strings
-      XmlElement* si = root->FindElement("si");
+      XMLElement* si = doc.FindElement(root,"si");
       while(si)
       {
-        XmlElement* tt = (XmlElement*) si->FirstChild();
-        CString text = tt->GetText();
+        XMLElement* tt = doc.GetElementFirstChild(si);
+        CString text = tt->GetValue();
         m_sharedStrings.push_back(text);
         // next string
-        si = si->NextSiblingElement();
+        si = doc.GetElementSibling(si);
       }
       // Ready with the buffer
       free(buffer);
@@ -663,10 +666,11 @@ BasicXmlExcel::LoadWorksheets()
         }
         // delimit the buffer
         buffer[ze.unc_size] = 0;
+        CString sheetInfo(buffer);
 
-        XmlDocument doc;
-        doc.Parse((const char*) buffer);
-        XmlElement* root = doc.RootElement();
+        XMLMessage doc;
+        doc.ParseMessage(sheetInfo);
+        XMLElement* root = doc.GetRoot();
         if(root == NULL)
         {
           m_error.Format("Worksheet definition incorrect in: %s",m_filename);
@@ -677,7 +681,7 @@ BasicXmlExcel::LoadWorksheets()
         m_worksheets.push_back(sheet);
         
         // Load data in the worksheet
-        sheet->Load(root);
+        sheet->Load(doc,root);
 
         // Ready with the buffer
         free(buffer);
@@ -702,3 +706,5 @@ BasicXmlExcel::GetSharedString(int p_string)
   return value;
 }
 
+// End of namespace
+}
