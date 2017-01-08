@@ -1,0 +1,44 @@
+RELEASENOTES SQLCOMPONENTS VERSION 1.4
+======================================
+====== Released since:08-01-2017 =====
+======================================
+
+Version 1.4.0 of 08-01-2017
+---------------------------
+1) There is now a general include file "SQLComponents.h", for inclusion
+   in all program modules using this library. 
+   You can find macro's for the version, version date and copyrights there.
+2) The xml module is replaced by a clone of XMLMessage from the Marlin
+   library under "https://github.com/edwig/Marlin".
+   If your program has been previous calling XMLLoad or XMLSave in the
+   SQLDataSet, you must port your own programs from:
+   - TinyXML::XmlDocument   => SQLComponents::XMLMessage 
+   - TinyXML::XmlElement    => SQLComponents::XMLELement
+3) The default language of various components has been altered from
+   Dutch to English. The consequences are that this wil alter your software
+   if you do not take measures. In order to use the library you must at least
+   call one of the following once:
+   - InitSQLComponents(language)
+   - SetDefaultSQLLanguage(language)
+   Where the 'language' argument can be one of:
+   o LN_DUTCH
+   o LN_ENGLISH
+   o LN_GERMAN
+   o LN_FRENCH
+   Dates, times, timestamps and the naming of the XML nodes of the datasets
+   will be named accordingly to the selected default language.
+   Since the previous default language was 'Dutch', existing programs can
+   best put a call in there startup code to:
+   - InitSQLComponents(LN_DUTCH);
+4) All comments in SQLInfo<database> classes have been translated from Dutch to English.
+5) A new namespace has been created with the name "SQLComponents". All classes in this 
+   library have been moved into that namespace. Use the following in your programs to 
+   gain access to the classes of this library:
+   - using namespace SQLComponents;
+6) It is now possible in the SQLDatabase class to set the autocommit mode, before 
+   connecting to a database. You can do this by calling:
+   - SetAutoCommitMode(false);
+   prior to making a connection. The result is that after the commit, autocommit mode is
+   on, and a SQLTransaction on the stack will be needed to commit your changes, protecting
+   you from unwanted modifications to the database.
+   Of course there is a mirroring: "bool SQLDatabase::GetAutoCommitMode()" call.

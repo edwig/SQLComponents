@@ -2,7 +2,7 @@
 //
 // File: SQLRercord.cpp
 //
-// Copyright (c) 1998-2016 ir. W.E. Huisman
+// Copyright (c) 1998-2017 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   01-02-2017
-// Version number:  1.3.3
+// Last Revision:   08-01-2017
+// Version number:  1.4.0
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -295,31 +295,6 @@ SQLRecord::AllMixedMutations(MutationIDS& p_list,int p_mutationID)
 //
 //////////////////////////////////////////////////////////////////////////
 
-// void
-// SQLRecord::XMLSave(XmlElement* p_records)
-// {
-//   XmlElement* record = new XmlElement(dataset_names[g_defaultLanguage][DATASET_RECORD]);
-//   p_records->LinkEndChild(record);
-// 
-//   for(unsigned int ind = 0;ind < m_fields.size(); ++ind)
-//   {
-//     SQLVariant* var = m_fields[ind]->Current();
-//     CString naam = m_dataSet->GetFieldName(ind);
-//     int type = var->GetDataType();
-// 
-//     XmlElement* veld = new XmlElement(dataset_names[g_defaultLanguage][DATASET_FIELD]);
-//     record->LinkEndChild(veld);
-//     veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_ID]  ,ind);
-//     veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_TYPE],type);
-//     veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_NAME],naam);
-// 
-//     CString val;
-//     var->GetAsString(val);
-//     XmlText* value = new XmlText(val);
-//     veld->LinkEndChild(value);
-//   }
-// }
-
 void
 SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
 {
@@ -351,37 +326,6 @@ SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
   }
 }
 
-// void
-// SQLRecord::XMLLoad(XmlElement* p_record)
-// {
-//   int ind = 0;
-//   XmlElement* field = p_record->FirstChildElement();
-//   while(field)
-//   {
-//     int type = 0;
-//     int id   = 0;
-//     field->Attribute(dataset_names[g_defaultLanguage][DATASET_TYPE],&type);
-//     field->Attribute(dataset_names[g_defaultLanguage][DATASET_ID],  &id);
-//     if(ind != id)
-//     {
-//       throw CString("Invalid field sequence in in record of: ") + m_dataSet->GetName();
-//     }
-//     char* text = (char*)field->GetText();
-//     if(!text) 
-//     {
-//       // No empty nodes
-//       text = "";
-//     }
-//     SQLVariant value;
-//     value.SetData(type,text);
-//     AddField(&value);
-// 
-//     // Next field
-//     field = field->NextSiblingElement();
-//     ++ind;
-//   }
-// }
-
 void
 SQLRecord::XMLLoad(XMLMessage* p_msg,XMLElement* p_base)
 {
@@ -408,7 +352,6 @@ SQLRecord::XMLLoad(XMLMessage* p_msg,XMLElement* p_base)
     ++ind;
   }
 }
-
 
 // End of namespace
 }

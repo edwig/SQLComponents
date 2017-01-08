@@ -7,10 +7,10 @@
 // Numbers are stored in 1E8 based mantissa with a digital . implied at the second position
 // The mantissa array exists of a series of integers with 8 functional digits each
 //
-// Copyright (c) 2013-2016 ir W. E. Huisman
+// Copyright (c) 2013-2017 ir W. E. Huisman
 //
-// Last Revision:   01-02-2017
-// Version number:  1.3.3
+// Last Revision:   08-01-2017
+// Version number:  1.4.0
 //
 #pragma once
 #include <sqltypes.h>   // Needed for conversions of SQL_NUMERIC_STRUCT

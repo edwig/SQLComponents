@@ -8,15 +8,15 @@
 //  And is always stored in normalized mode after an operation or conversion
 //  with an implied decimal point between the first and second position
 //
-//  Copyright (c) 2013-2016 ir. W.E. Huisman
+//  Copyright (c) 2013-2017 ir. W.E. Huisman
 //
 //  Examples:
 //  E+03 15456712 45000000 00000000 -> 1545.671245
 //  E+01 34125600 00000000 00000000 -> 3.41256
 //  E-05 78976543 12388770 00000000 -> 0.0000789765431238877
 //
-// Last Revision:   01-02-2017
-// Version number:  1.3.3
+// Last Revision:   08-01-2017
+// Version number:  1.4.0
 //
 #include "Stdafx.h"
 #include "SQLComponents.h"

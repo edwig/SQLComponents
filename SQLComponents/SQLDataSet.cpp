@@ -2,7 +2,7 @@
 //
 // File: SQLDataSet.cpp
 //
-// Copyright (c) 1998-2016 ir. W.E. Huisman
+// Copyright (c) 1998-2017 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   01-02-2017
-// Version number:  1.3.3
+// Last Revision:   08-01-2017
+// Version number:  1.4.0
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -1319,23 +1319,6 @@ SQLDataSet::GetWhereClause(SQLQuery* p_query,SQLRecord* p_record,int& p_paramete
 //
 //////////////////////////////////////////////////////////////////////////
 
-// bool
-// SQLDataSet::XMLSave(CString p_filename,CString p_name)
-// {
-//   XmlDocument doc;
-//   XmlDeclaration* decl = new XmlDeclaration("1.0","","");
-//   XmlElement*     root = new XmlElement(p_name);
-//   doc.LinkEndChild(decl);
-//   doc.LinkEndChild(root);
-// 
-//   if(root)
-//   {
-//     XMLSave(root);
-//     return doc.SaveFile(p_filename);
-//   }
-//   return false;
-// }
-
 bool
 SQLDataSet::XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding /*= XMLEncoding::ENC_UTF8*/)
 {
@@ -1345,22 +1328,6 @@ SQLDataSet::XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding /*=
   XMLSave(&msg,msg.GetRoot());
   return msg.SaveFile(p_filename,p_encoding);
 }
-
-// bool
-// SQLDataSet::XMLLoad(CString p_filename)
-// {
-//   XmlDocument doc(p_filename);
-//   if(doc.LoadFile())
-//   {
-//     XmlElement* root = doc.RootElement();
-//     if(root)
-//     {
-//       XMLLoad(root);
-//       return true;
-//     }
-//   }
-//   return false;
-// }
 
 bool
 SQLDataSet::XMLLoad(CString p_filename)
@@ -1378,47 +1345,7 @@ SQLDataSet::XMLLoad(CString p_filename)
   return false;
 }
 
-// void
-// SQLDataSet::XMLSave(XmlElement* p_dataset)
-// {
-//   // Name of the dataset
-//   XmlElement* naam = new XmlElement(dataset_names[g_defaultLanguage][DATASET_NAME]);
-//   XmlText* ntext = new XmlText(m_name);
-//   p_dataset->LinkEndChild(naam);
-//   naam->LinkEndChild(ntext);
-// 
-//   // Field structure of the dataset
-//   XmlElement* structur = new XmlElement(dataset_names[g_defaultLanguage][DATASET_STRUCTURE]);
-//   p_dataset->LinkEndChild(structur);
-// 
-//   SQLRecord* record = GetRecord(0);
-//   if(record)
-//   {
-//     for(unsigned int ind = 0; ind < m_names.size(); ++ind)
-//     {
-//       CString fieldname = GetFieldName(ind);
-//       SQLVariant* var = record->GetField(ind);
-//       int type = var->GetDataType();
-//       
-//       XmlElement* veld = new XmlElement(dataset_names[g_defaultLanguage][DATASET_FIELD]);
-//       structur->LinkEndChild(veld);
-//       veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_ID]  ,ind);
-//       veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_TYPE],type);
-//       veld->SetAttribute(dataset_names[g_defaultLanguage][DATASET_TYPENAME],var->FindDatatype(type));
-// 
-//       XmlText* newtext = new XmlText(fieldname);
-//       veld->LinkEndChild(newtext);
-//     }
-//   }
-// 
-//   // All records of the dataset
-//   XmlElement* records = new XmlElement(dataset_names[g_defaultLanguage][DATASET_RECORDS]);
-//   p_dataset->LinkEndChild(records);
-//   for(unsigned int ind = 0; ind < m_records.size(); ++ind)
-//   {
-//     m_records[ind]->XMLSave(records);
-//   }
-// }
+#pragma warning (disable: 4189)
 
 void
 SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
@@ -1451,40 +1378,6 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
     m_records[ind]->XMLSave(p_msg,records);
   }
 }
-
-// void
-// SQLDataSet::XMLLoad(XmlElement* p_dataset)
-// {
-//   XmlElement* structur = p_dataset->FindElement(dataset_names[g_defaultLanguage][DATASET_STRUCTURE]);
-//   XmlElement* records  = p_dataset->FindElement(dataset_names[g_defaultLanguage][DATASET_RECORDS]);
-//   if(structur == NULL) throw CString("Structure part missing in the XML dataset.") + m_name;
-//   if(records  == NULL) throw CString("Records part missing in the XML dataset") + m_name;
-// 
-//   // Read the structure
-//   XmlElement* veld = structur->FirstChildElement();
-//   while(veld)
-//   {
-//     // Remember the name of the field
-//     CString naam = veld->GetText();
-//     m_names.push_back(naam);
-//     // Datatype of the field
-//     int type = atoi(veld->Attribute(dataset_names[g_defaultLanguage][DATASET_TYPE]));
-//     m_types.push_back(type);
-//     // Next field
-//     veld = veld->NextSiblingElement();
-//   }
-// 
-//   // Read records
-//   XmlElement* record = records->FirstChildElement();
-//   while(record)
-//   {
-//     // Make record and load it
-//     SQLRecord* rec = InsertRecord();
-//     rec->XMLLoad(record);
-//     // Next record
-//     record = record->NextSiblingElement();
-//   }
-// }
 
 void
 SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset)
