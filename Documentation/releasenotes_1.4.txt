@@ -8,13 +8,22 @@ Version 1.4.0 of 08-01-2017
 1) There is now a general include file "SQLComponents.h", for inclusion
    in all program modules using this library. 
    You can find macro's for the version, version date and copyrights there.
-2) The xml module is replaced by a clone of XMLMessage from the Marlin
-   library under "https://github.com/edwig/Marlin".
+2) This library can no longer be source-included in other projects.
+   You must build it seperatly in one of two modes. These modes are:
+   A) Intended to be used in small projects without MFC, and only with
+      the defines for the ATL based "CString" class.
+	  In this mode you **cannot** use the SQLInfoTree class.
+   B) intended to be used in larger MFC projects, where you also can use the
+      SQLInfoTree class. (Originally written for the "Open ODBC Querytool")
+	  To do so you must define the follwing macro in the project file:
+	  #define SQL_COMPONENTS_MFC
+3) The xml module is replaced by a clone of XMLMessage from the Marlin
+   library under "https://github.com/edwig/Marlin", taken from version 4.0
    If your program has been previous calling XMLLoad or XMLSave in the
    SQLDataSet, you must port your own programs from:
    - TinyXML::XmlDocument   => SQLComponents::XMLMessage 
    - TinyXML::XmlElement    => SQLComponents::XMLELement
-3) The default language of various components has been altered from
+4) The default language of various components has been altered from
    Dutch to English. The consequences are that this wil alter your software
    if you do not take measures. In order to use the library you must at least
    call one of the following once:
@@ -30,12 +39,12 @@ Version 1.4.0 of 08-01-2017
    Since the previous default language was 'Dutch', existing programs can
    best put a call in there startup code to:
    - InitSQLComponents(LN_DUTCH);
-4) All comments in SQLInfo<database> classes have been translated from Dutch to English.
-5) A new namespace has been created with the name "SQLComponents". All classes in this 
+5) All comments in SQLInfo<database> classes have been translated from Dutch to English.
+6) A new namespace has been created with the name "SQLComponents". All classes in this 
    library have been moved into that namespace. Use the following in your programs to 
    gain access to the classes of this library:
    - using namespace SQLComponents;
-6) It is now possible in the SQLDatabase class to set the autocommit mode, before 
+7) It is now possible in the SQLDatabase class to set the autocommit mode, before 
    connecting to a database. You can do this by calling:
    - SetAutoCommitMode(false);
    prior to making a connection. The result is that after the commit, autocommit mode is
