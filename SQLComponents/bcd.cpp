@@ -3450,10 +3450,11 @@ bcd::WriteToFile (FILE* p_fp)
   // Write out the mantissa
   for(unsigned int ind = 0;ind < bcdLength; ++ind)
   {
-    if(putc(m_mantissa[ind],p_fp) == EOF)
-    {
-      return false;
-    }
+    ulong num = (ulong) m_mantissa[ind];
+    if(putc((num & 0xFF000000) >> 24,p_fp) == EOF) return false;
+    if(putc((num & 0x00FF0000) >> 16,p_fp) == EOF) return false;
+    if(putc((num & 0x0000FF00) >>  8,p_fp) == EOF) return false;
+    if(putc((num & 0x000000FF)      ,p_fp) == EOF) return false;
   }
   return true;
 }
@@ -3479,8 +3480,12 @@ bcd::ReadFromFile(FILE* p_fp)
   // Read in the mantissa
   for(unsigned int ind = 0; ind < bcdLength; ++ind)
   {
-    ch = getc(p_fp);
-    m_mantissa[ind] = ch;
+    ulong num = 0L;
+    ch = getc(p_fp); num += ((ulong)ch) << 24;
+    ch = getc(p_fp); num += ((ulong)ch) << 16;
+    ch = getc(p_fp); num += ((ulong)ch) <<  8;
+    ch = getc(p_fp); num +=  (ulong)ch;
+    m_mantissa[ind] = num;
   }
 
   // BCD is invalid in case of file error
