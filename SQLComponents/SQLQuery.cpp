@@ -695,7 +695,7 @@ SQLQuery::DoSQLPrepare(const CString& p_statement)
 }
 
 void
-SQLQuery::DoSQLExecute()
+SQLQuery::DoSQLExecute(bool p_rebind /*=false*/)
 {
   m_retCode = SQL_ERROR;
 
@@ -705,7 +705,7 @@ SQLQuery::DoSQLExecute()
     throw m_lastError;
   }
   
-  if(!m_boundDone)
+  if(!m_boundDone || p_rebind)
   {
     BindParameters();
   }

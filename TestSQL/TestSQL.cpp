@@ -37,16 +37,16 @@
 // DSN "testing" points to the "testing.fdb" database
 // in the project root folder
 //
-// CString g_dsn("testing");
-// CString g_user("sysdba");
-// CString g_password("altijd");
-// CString g_schema("");
+CString g_dsn("testing");
+CString g_user("sysdba");
+CString g_password("altijd");
+CString g_schema("");
 
-
-CString g_dsn("magdev04");
-CString g_user("informix");
-CString g_password("inform01");
-CString g_schema("informix");
+// TESTING ON INFORMIX
+// CString g_dsn("magdev04");
+// CString g_user("informix");
+// CString g_password("inform01");
+// CString g_schema("informix");
 
 void CALLBACK LogPrint(void* p_context,const char* p_text)
 {
@@ -67,6 +67,8 @@ using namespace std;
 int main(int argc,char* argv[],char* envp[])
 {
   int nRetCode = 0;
+
+  InitSQLComponents(LN_ENGLISH);
 
   // Basic connection test
   TestConnection();

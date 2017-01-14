@@ -678,7 +678,7 @@ SQLDatabase::SetAutoCommitMode(bool p_autoCommit)
   {
     // Set autocommit mode to be sure. 
     // If 'ON', Programs **CAN** use a transaction by setting SQLTransaction on the stack.
-    int commit = p_autoCommit ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
+    DWORD_PTR commit = p_autoCommit ? SQL_AUTOCOMMIT_ON : SQL_AUTOCOMMIT_OFF;
     SQLRETURN ret = SqlSetConnectAttr(m_hdbc,SQL_ATTR_AUTOCOMMIT,(SQLPOINTER)commit,SQL_IS_INTEGER);
     if(Check(ret))
     {

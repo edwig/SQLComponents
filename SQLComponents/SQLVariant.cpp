@@ -1088,7 +1088,7 @@ SQLVariant::GetDataSize()
 //
 //////////////////////////////////////////////////////////////////////////
 
-__declspec(thread) static CString g_value;
+__declspec(thread) static CString* g_value = nullptr;
 
 char*
 SQLVariant::GetAsChar()
@@ -1103,8 +1103,13 @@ SQLVariant::GetAsChar()
   }
   // Should be: GetErrorDatatype(SQL_C_CHAR);
   // Sometimes we come her unexpectedly in various programs
-  GetAsString(g_value);
-  return (char*)g_value.GetString();
+  if(g_value)
+  {
+    delete g_value;
+  }
+  g_value = new CString;
+  GetAsString(*g_value);
+  return (char*)g_value->GetString();
 }
 
 void*
@@ -1241,6 +1246,9 @@ SQLVariant::GetAsUShort()
   return NULL;
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4715)
+
 long
 SQLVariant::GetAsSLong()
 {
@@ -1292,8 +1300,9 @@ SQLVariant::GetAsSLong()
   // We never come here, but this is to prevent 
   // Warning C4715 not all control paths return a value
   // In various versions of the MSC++ compiler
-  return NULL;
+//  return NULL;
 }
+
 
 unsigned long
 SQLVariant::GetAsULong()
@@ -1349,6 +1358,8 @@ SQLVariant::GetAsULong()
   // In various versions of the MSC++ compiler
   return NULL;
 }
+
+#pragma warning(pop)
 
 float
 SQLVariant::GetAsFloat()
@@ -1730,6 +1741,9 @@ SQLVariant::GetAsUBigInt()
   return NULL; 
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4715)
+
 __declspec(thread) static SQL_NUMERIC_STRUCT g_number;
 
 SQL_NUMERIC_STRUCT*
@@ -1808,8 +1822,9 @@ SQLVariant::GetAsNumeric()
   }
   // Other datatypes cannot convert
   ThrowErrorDatatype(SQL_C_NUMERIC);
-  return NULL;
 }
+
+#pragma warning(pop)
 
 SQLGUID*
 SQLVariant::GetAsGUID()
@@ -2177,9 +2192,9 @@ SQLVariant::SetData(int p_type,const char* p_data)
   // Record data of the type
   switch(p_type)
   {
-    case SQL_C_CHAR:                      m_binaryLength = (int)(dataLen + 1);
-                                          m_data.m_dataCHAR = (char*) malloc(m_binaryLength);
-                                          strcpy_s(m_data.m_dataCHAR,m_binaryLength,p_data);
+    case SQL_C_CHAR:                      m_binaryLength = (int)(dataLen);
+                                          m_data.m_dataCHAR = (char*) malloc(m_binaryLength + 1);
+                                          strcpy_s(m_data.m_dataCHAR,m_binaryLength + 1,p_data);
                                           m_indicator = dataLen > 0 ? SQL_NTS : SQL_NULL_DATA;
                                           break;
     case SQL_C_BINARY:                    m_binaryLength = (int)(dataLen / 2);

@@ -176,7 +176,7 @@ TestDataSet()
   printf("=============================\n");
 
   SQLDatabase dbs;
-  dbs.AddMacro("%SCHEMA%",g_schema);
+  dbs.AddMacro("%SCHEMA%.",g_schema);
   dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
   long beginTime = clock();
 
