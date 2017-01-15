@@ -30,4 +30,9 @@
 #include <atlstr.h>             // Just ATLString and CString
 #endif
 
+// Include our library
+#include "SQLComponents.h"
+
+
+
 

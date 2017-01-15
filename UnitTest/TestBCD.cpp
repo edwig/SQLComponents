@@ -25,8 +25,6 @@
 // Version number:  1.4.0
 //
 #include "stdafx.h"
-#include "SQLComponents.h"
-#include "CppUnitTest.h"
 #include "HPFCounter.h"
 #include "bcd.h"
 

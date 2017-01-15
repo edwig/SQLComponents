@@ -65,19 +65,6 @@ typedef enum _databaseType
 }
 DatabaseType;
 
-// Structure to hold information about a DSN (DataSourceName)
-typedef struct _datasource
-{
-  CString m_datasource;
-  CString m_username;
-  CString m_password;
-  bool    m_system;
-  bool    m_outputOMF;
-  bool    m_default;
-  bool    m_dataConnection;
-}
-DataSourceInternal;
-
 // Initialization of the SQLComponents library
 void InitSQLComponents(Language p_language = LN_ENGLISH);
 
@@ -89,3 +76,20 @@ void SQLComponentsInitialized();
 
 // End of namespace
 }
+
+#if defined _M_IX86
+#define SQL_PLATFORM "x86"
+#else
+#define SQL_PLATFORM "x64"
+#endif
+
+#if defined _DEBUG
+#define SQL_CONFIGURATION "D"
+#else
+#define SQL_CONFIGURATION "R"
+#endif 
+
+#ifndef SQL_COMPONENTS_NOAUTOLINK
+#pragma comment(lib,"SQLComponents_"                        SQL_PLATFORM SQL_CONFIGURATION ".lib")
+#pragma message("Automatically linking with SQLComponents_" SQL_PLATFORM SQL_CONFIGURATION ".lib")
+#endif 

@@ -35,3 +35,7 @@
 // Headers for unit testing
 #include "CppUnitTest.h"
 
+// Headers for our library
+#include "SQLComponents.h"
+
+

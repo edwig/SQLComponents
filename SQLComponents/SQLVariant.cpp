@@ -1112,6 +1112,10 @@ SQLVariant::GetAsChar()
   return (char*)g_value->GetString();
 }
 
+#pragma warning(push)
+#pragma warning(disable: 4715)
+#pragma warning(disable: 4702)
+
 void*
 SQLVariant::GetAsBinary()
 {
@@ -1246,9 +1250,6 @@ SQLVariant::GetAsUShort()
   return NULL;
 }
 
-#pragma warning(push)
-#pragma warning(disable: 4715)
-
 long
 SQLVariant::GetAsSLong()
 {
@@ -1300,7 +1301,7 @@ SQLVariant::GetAsSLong()
   // We never come here, but this is to prevent 
   // Warning C4715 not all control paths return a value
   // In various versions of the MSC++ compiler
-//  return NULL;
+  return NULL;
 }
 
 
@@ -1358,8 +1359,6 @@ SQLVariant::GetAsULong()
   // In various versions of the MSC++ compiler
   return NULL;
 }
-
-#pragma warning(pop)
 
 float
 SQLVariant::GetAsFloat()
@@ -1834,7 +1833,6 @@ SQLVariant::GetAsGUID()
     return &m_data.m_dataGUID;
   }
   ThrowErrorDatatype(SQL_C_GUID);
-  return NULL;
 }
 
 __declspec(thread) static DATE_STRUCT g_date;
@@ -1930,6 +1928,8 @@ SQLVariant::GetAsTimestamp()
   ThrowErrorDatatype(SQL_C_TIMESTAMP);
   return NULL;
 }
+
+#pragma warning(pop)
 
 // European timestamp has the day-month-year order
 // instead of the standard 'year-month-day' order of a timestamp

@@ -26,7 +26,6 @@
 //
 #pragma once
 #include "resource.h"
-#include "SQLComponents.h"
 #include <time.h>
 
 using namespace SQLComponents;
