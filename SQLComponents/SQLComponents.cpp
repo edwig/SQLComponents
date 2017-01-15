@@ -30,9 +30,7 @@
 // To execute at the end of the program
 void __cdecl AtExitOfSQLComponents(void)
 {
-#ifndef SQL_COMPONENTS_MFC
   _CrtMemDumpAllObjectsSince(NULL);
-#endif
 }
 
 namespace SQLComponents
@@ -42,9 +40,11 @@ namespace SQLComponents
   // Initialization of the SQLComponents library
   void InitSQLComponents(Language p_language)
   {
+#ifndef SQL_COMPONENTS_MFC
     // Do reporting of memory leaks if we have no MFC loaded
     // By registering our AtExit function
     atexit(::AtExitOfSQLComponents);
+#endif
 
     // Setting our default language for SQLDate, SQLTime and SQLTimestamp processing
     SetDefaultSQLLanguage(p_language);

@@ -34,8 +34,8 @@ namespace SQLComponents
 // General version, date and copyright
 // of the SQLComponents library
 
-#define SQL_COMPONENTS_VERSION   "1.4.0"
-#define SQL_COMPONENTS_DATE      "08-01-2017"
+#define SQL_COMPONENTS_VERSION   "1.4.1"
+#define SQL_COMPONENTS_DATE      "15-01-2017"
 #define SQL_COMPONENTS_COPYRIGHT "Copyright (c) 2017 ir. W.E. Huisman"
 
 // SQL/CLI Standard states that 128 is the maximum length
@@ -66,10 +66,8 @@ typedef enum _databaseType
 DatabaseType;
 
 // Initialization of the SQLComponents library
+// Call at least **ONCE** at the beginning of your program
 void InitSQLComponents(Language p_language = LN_ENGLISH);
-
-// Marker boolean to see if we where properly initialized
-extern bool g_SQLComponentsInitialized;
 
 // Test if we are properly initialized
 void SQLComponentsInitialized();
@@ -77,6 +75,8 @@ void SQLComponentsInitialized();
 // End of namespace
 }
 
+// Selecting the right library to link with automatically
+// So we do not need to worry about which library to use in the linker settings
 #if defined _M_IX86
 #define SQL_PLATFORM "x86"
 #else

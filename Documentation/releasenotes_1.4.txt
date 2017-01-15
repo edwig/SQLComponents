@@ -3,6 +3,12 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.4
 ====== Released since:08-01-2017 =====
 ======================================
 
+Version 1.4.1 of 15-01-2017
+---------------------------
+1) Libraries have been made to link automatically with your source code.
+   Just include "SQLComponents.h" in your general "stdafx.h" file and
+   nowhere else. It will automatically select the needed library for you.
+
 Version 1.4.0 of 08-01-2017
 ---------------------------
 1) There is now a general include file "SQLComponents.h", for inclusion
