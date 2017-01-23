@@ -166,6 +166,7 @@
     </ClCompile>
     <ClCompile Include="SQLDate.cpp" />
     <ClCompile Include="SQLError.cpp" />
+    <ClCompile Include="SQLFilter.cpp" />
     <ClCompile Include="SQLInfo.cpp" />
     <ClCompile Include="SQLInfoAccess.cpp" />
     <ClCompile Include="SQLInfoDB.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="SQLDataSetXLS.h" />
     <ClInclude Include="SQLDate.h" />
     <ClInclude Include="SQLError.h" />
+    <ClInclude Include="SQLFilter.h" />
     <ClInclude Include="SQLFormatErrors.h" />
     <ClInclude Include="SQLInfo.h" />
     <ClInclude Include="SQLInfoAccess.h" />

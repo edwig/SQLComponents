@@ -499,15 +499,9 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   BindParameters();
 
   // In special cases queries can go wrong through ORACLE ODBC if they contain newlines
-  // Hence all newlines are replaces by spaces, if the query does NOT contain any comments
+  // So we need to remove trailing white and red space
   CString statement(p_statement);
-  if(statement.Find("--") < 0)
-  {
-    statement.Replace("\n"," ");
-    statement.Replace("\r"," ");
-  }
-  // Optimization: remove trailing spaces
-  statement.Trim();
+  statement.TrimRight("\n\r\t\f ");
 
   // Do the Query text macro replacement
   if(m_database)
@@ -519,10 +513,11 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   // in the processing of the query-strings which crashes it in CharNextW
   // by a missing NULL-Terminator. By changing the length of the statement
   // _including_ the terminating NUL, it won't crash at all
+  // NOTE: This alsoo means we cannot use the SQL_NTS terminator
   SQLINTEGER lengthStatement = statement.GetLength() + 1;
 
   // GO DO IT RIGHT AWAY
-  m_retCode = SqlExecDirect(m_hstmt,(SQLCHAR*)(LPCSTR)statement,lengthStatement);
+  m_retCode = SqlExecDirect(m_hstmt,(SQLCHAR*)statement.GetString(),lengthStatement);
 
   if(SQL_SUCCEEDED(m_retCode))
   {
@@ -710,8 +705,8 @@ SQLQuery::DoSQLExecute(bool p_rebind /*=false*/)
     BindParameters();
   }
 
+  // Go execute it (again)
   m_retCode = SqlExecute(m_hstmt);
-  //m_prepareDone = false;
   if(m_retCode == SQL_NEED_DATA)
   {
     m_retCode = (short)ProvideAtExecData();
@@ -740,12 +735,17 @@ SQLQuery::DoSQLExecute(bool p_rebind /*=false*/)
     }
     FetchCursorName();
   }
-  if(m_retCode < 0)
+  else if(m_retCode < 0)
   {
     // rcExec == SQL_ERROR
     // rcExec == SQL_INVALID_HANDLE
     GetLastError("Error in SQL statement: ");
     throw m_lastError;
+  }
+  else
+  {
+    // rcExec == SQL_NO_DATA
+    // rcExec == SQL_STILL_EXECUTING
   }
   // Do bindings only once in a prepare -> multiple-execute cycle
   m_boundDone = true;

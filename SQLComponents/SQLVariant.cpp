@@ -824,7 +824,7 @@ SQLVariant::SetFromBinaryStreamData(int   p_type
 //////////////////////////////////////////////////////////////////////////
 
 void
-SQLVariant::GetAsString(CString& result)
+  SQLVariant::GetAsString(CString& result)
 {
   if(m_indicator == SQL_NULL_DATA)
   {
@@ -2118,6 +2118,63 @@ SQLVariant::GetAsBCD()
   // Warning C4715 not all control paths return a value
   // In various versions of the MSC++ compiler
   return NULL; 
+}
+
+// Get the data as an string for a SQL expression or condition
+// So quotes and ODBC escapes matter
+CString
+SQLVariant::GetAsSQLString()
+{
+  CString value;
+  GetAsString(value);
+
+  switch(m_datatype)
+  {
+    case SQL_C_CHAR:            value = "'" + value + "'";
+                                break;
+    case SQL_C_GUID:            value.Replace("{","{guid '");
+                                value.Replace("}","'}");
+                                break;
+    case SQL_C_DATE:            // Fall through: Reformat
+    case SQL_C_TYPE_DATE:       value.Format("{d '%04d-%02d-%02d'}"
+                                            ,m_data.m_dataDATE.year
+                                            ,m_data.m_dataDATE.month
+                                            ,m_data.m_dataDATE.day);
+                                break;
+    case SQL_C_TIME:            // Fall through
+    case SQL_C_TYPE_TIME:       value = "{t '" + value + "'}";
+                                break;
+    case SQL_C_TIMESTAMP:
+    case SQL_C_TYPE_TIMESTAMP:  value = "{ts '" + value + "'}";
+                                break;
+    case SQL_C_INTERVAL_YEAR:             value = "{INTERVAL '" + value + "' YEAR}";
+                                          break;
+    case SQL_C_INTERVAL_MONTH:            value = "{INTERVAL '" + value + "' MONTH}";
+                                          break;
+    case SQL_C_INTERVAL_YEAR_TO_MONTH:    value = "{INTERVAL '" + value + "' YEAR TO MONTH}";
+                                          break;
+    case SQL_C_INTERVAL_DAY:              value = "{INTERVAL '" + value + "' DAY}";
+                                          break;
+    case SQL_C_INTERVAL_HOUR:             value = "{INTERVAL '" + value + "' HOUR}";
+                                          break;
+    case SQL_C_INTERVAL_MINUTE:           value = "{INTERVAL '" + value + "' MINUTE}";
+                                          break;
+    case SQL_C_INTERVAL_SECOND:           value = "{INTERVAL '" + value + "' SECOND}";
+                                          break;
+    case SQL_C_INTERVAL_DAY_TO_HOUR:      value = "{INTERVAL '" + value + "' DAY TO HOUR}";
+                                          break;
+    case SQL_C_INTERVAL_DAY_TO_MINUTE:    value = "{INTERVAL '" + value + "' DAY TO MINUTE}";
+                                          break;
+    case SQL_C_INTERVAL_DAY_TO_SECOND:    value = "{INTERVAL '" + value + "' DAY TO SECOND}";
+                                          break;
+    case SQL_C_INTERVAL_HOUR_TO_MINUTE:   value = "{INTERVAL '" + value + "' HOUR TO MINUTE}";
+                                          break;
+    case SQL_C_INTERVAL_HOUR_TO_SECOND:   value = "{INTERVAL '" + value + "' HOUR TO SECOND}";
+                                          break;
+    case SQL_C_INTERVAL_MINUTE_TO_SECOND: value = "{INTERVAL '" + value + "' MINUTE TO SECOND}";
+                                          break;
+  }
+  return value;
 }
 
 // Some databases (Oracle) need to know the size of the data member

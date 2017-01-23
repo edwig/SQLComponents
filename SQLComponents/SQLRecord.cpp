@@ -95,6 +95,12 @@ SQLRecord::SetField(int p_num,SQLVariant* p_field,int p_mutationID /*=0*/)
   }
 }
 
+void
+SQLRecord::SetField(CString p_name,SQLVariant* p_field,int p_mutationID /*=0*/)
+{
+  SetField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
+}
+
 SQLVariant*     
 SQLRecord::GetField(int p_num)
 {
@@ -104,6 +110,13 @@ SQLRecord::GetField(int p_num)
   }
   return NULL;
 }
+
+SQLVariant* 
+SQLRecord::GetField(CString p_name)
+{
+  return GetField(m_dataSet->GetFieldNumber(p_name));
+}
+
 
 // Rollback of all field updates
 void
@@ -164,6 +177,12 @@ SQLRecord::ModifyField(int p_num,void* p_data,int p_mutationID /*=0*/)
   }
 }
 
+void
+SQLRecord::ModifyField(CString p_name,void* p_field,int p_mutationID /*=0*/)
+{
+  ModifyField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
+}
+
 void        
 SQLRecord::ModifyField(int p_num,SQLVariant* p_data,int p_mutationID /*=0*/)
 {
@@ -180,14 +199,31 @@ SQLRecord::ModifyField(int p_num,SQLVariant* p_data,int p_mutationID /*=0*/)
     // Need a data pointer
     return;
   }
-  SQLVariant* field = m_fields[p_num]->MutationValue(p_mutationID);
-  size_t size = max(field->GetDataSize(),p_data->GetDataSize());
-  if(memcmp(field->GetDataPointer(),p_data->GetDataPointer(),size))
+//   SQLVariant* field = m_fields[p_num]->MutationValue(p_mutationID);
+//   size_t size = max(field->GetDataSize(),p_data->GetDataSize());
+//   if(memcmp(field->GetDataPointer(),p_data->GetDataPointer(),size))
+//   {
+//     m_status |= SQL_Record_Updated;
+//     m_dataSet->SetStatus(SQL_Updates);
+//   }
+  if(m_fields[p_num]->Mutate(p_data,p_mutationID))
   {
     m_status |= SQL_Record_Updated;
     m_dataSet->SetStatus(SQL_Updates);
   }
-  m_fields[p_num]->Mutate(p_data,p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(CString p_name,SQLVariant* p_field,int p_mutationID /*= 0*/)
+{
+  ModifyField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
+}
+
+// Record is changed?
+bool
+SQLRecord::IsModified()
+{
+  return (m_status & (SQL_Record_Insert | SQL_Record_Updated | SQL_Record_Deleted)) > 0;
 }
 
 // Field is modified
@@ -205,6 +241,12 @@ SQLRecord::IsModified(int p_num)
     return false;
   }
   return m_fields[p_num]->IsMutated();
+}
+
+bool
+SQLRecord::IsModified(CString p_name)
+{
+  return IsModified(m_dataSet->GetFieldNumber(p_name));
 }
 
 void
@@ -271,6 +313,8 @@ SQLRecord::MixedMutations(int p_mutationID)
                            type = mut;
                            break;
       case MUT_Mixed:      return mut;
+      default:             type = mut;
+                           break;
     }
   }
   // Record has only these mutations or none at all
@@ -301,7 +345,7 @@ SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
   CString recName(dataset_names[g_defaultLanguage][DATASET_RECORD]);
   CString fldName(dataset_names[g_defaultLanguage][DATASET_FIELD]);
 
-  CString idName = dataset_names[g_defaultLanguage][DATASET_ID];
+  CString idName  = dataset_names[g_defaultLanguage][DATASET_ID];
   CString typName = dataset_names[g_defaultLanguage][DATASET_TYPE];
   CString attName = dataset_names[g_defaultLanguage][DATASET_NAME];
 

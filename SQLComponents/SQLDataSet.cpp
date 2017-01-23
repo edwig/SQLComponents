@@ -30,6 +30,7 @@
 #include "SQLQuery.h"
 #include "SQLVariantFormat.h"
 #include "SQLInfoDB.h"
+#include <algorithm>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -218,6 +219,32 @@ SQLDataSet::Forget(bool p_force /*=false*/)
   m_current = -1;
 
   return true;
+}
+
+// Forget 1 record and primary is an INTEGER (Fast!!)
+bool
+SQLDataSet::ForgetObject(int p_primary,bool p_force /*=false*/)
+{
+  // Find the record to forget
+  SQLRecord* record = FindObjectRecord(p_primary);
+  if(!record)
+  {
+    return false;
+  }
+  return ForgetRecord(record,p_force);
+}
+
+// Forget 1 record and primary is a compound key (Slower)
+bool
+SQLDataSet::ForgetObject(VariantSet& p_primary,bool p_force /*=false*/)
+{
+  // Find the record to forget
+  SQLRecord* record = FindObjectRecord(p_primary);
+  if(!record)
+  {
+    return false;
+  }
+  return ForgetRecord(record,p_force);
 }
 
 void
@@ -453,14 +480,6 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
           unsigned long prim = var->GetAsULong();
           m_objects[prim] = number++;
         }
-
-// #ifdef DEBUG
-//         // Debugging e.g. for reading the data from the dataset
-//         // In case of format problems with DOUBLE/NUMERIC/DECIMAL
-//         CString res;
-//         var->GetAsString(res);
-//         TRACE("Dataset: %s Field: %d Value: %s\n",m_name,ind,res);
-// #endif
       }
     }
     // Reached the end: we are OPEN!
@@ -536,7 +555,7 @@ SQLDataSet::Append()
     {
       // Make a new record
       SQLRecord* record = new SQLRecord(this,modifiable);
-      m_records.push_back(record);
+      bool foundNew = true;
       // Get all the columns of the record
       SQLVariant* var = NULL;
       int num = qr.GetNumberOfColumns();
@@ -549,8 +568,20 @@ SQLDataSet::Append()
         if(ind == primary)
         {
           unsigned long prim = var->GetAsULong();
-          m_objects[prim] = m_current + number++;
+          if(m_objects.find(prim) == m_objects.end())
+          {
+            m_objects[prim] = m_current + number++;
+          }
+          else
+          {
+            foundNew = false;
+          }
         }
+      }
+      // If we found a new record: keep it!
+      if(foundNew)
+      {
+        m_records.push_back(record);
       }
     }
     // Legal 0 or more records
@@ -562,10 +593,10 @@ SQLDataSet::Append()
     Close();
     throw s;
   }
+  // Goto the first freshly read record
   if(m_records.size() > sizeBefore)
   {
     m_status |= SQL_Selections;
-    // Goto first read record
     Next();
   }
   return result;
@@ -1409,6 +1440,70 @@ SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset)
     rec->XMLLoad(p_msg,record);
     // Next record
     record = p_msg->GetElementSibling(record);
+  }
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// FORGETTING ABOUT A RECORD
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Record pointer cannot be a nullptr
+bool
+SQLDataSet::ForgetRecord(SQLRecord* p_record,bool p_force)
+{
+  if(p_force == false)
+  {
+    if(p_record->GetStatus() & (SQL_Record_Insert | SQL_Record_Updated | SQL_Record_Deleted))
+    {
+      // Do the synchronization first!
+      return false;
+    }
+  }
+  RecordSet::iterator it = find(m_records.begin(),m_records.end(),p_record);
+  if(it != m_records.end())
+  {
+    // Remove from m_objects. Maybe does nothing!
+    ForgetPrimaryObject(p_record);
+
+    // Remove the record itself
+    delete p_record;
+
+    // Remove from m_records
+    m_records.erase(it);
+
+    return true;
+  }
+  return false;
+}
+
+// Forget the registration of the optimized primary key
+void
+SQLDataSet::ForgetPrimaryObject(SQLRecord* p_record)
+{
+  // See if we have a unique primary key
+  int primary = FindSearchColumn();
+  if(!primary)
+  {
+    return;
+  }
+  // Find the record
+  long value = p_record->GetField(primary)->GetAsSLong();
+  ObjectMap::iterator it = m_objects.find(value);
+  if(it != m_objects.end())
+  {
+    // Remove the reference to the record
+    it = m_objects.erase(it);
+
+    // All other objects shift one place down!
+    while(it != m_objects.end())
+    {
+      it->second--;
+      ++it;
+    }
+    // Reset the current pointer
+    First();
   }
 }
 

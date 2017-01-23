@@ -125,13 +125,16 @@ public:
   bool         Synchronize(int p_mutationID = 0);
   // In case synchronize doesn't work, ask for mixed mutations
   int          AllMixedMutations(MutationIDS& p_list,int p_mutationID);
-  // Forget the records
-  bool         Forget(bool p_force = false);
   // Find the object record of a primary key
   int          FindObjectRecNum(int p_primary);           // If your primary is an INTEGER     (Fast!!)
   int          FindObjectRecNum(VariantSet& p_primary);   // If your primary is a compound key (Slower)
   SQLRecord*   FindObjectRecord(int p_primary);           // If your primary is an INTEGER     (Fast!!)
   SQLRecord*   FindObjectRecord(VariantSet& p_primary);   // If your primary is a compound key (Slower)
+  // Forget the records
+  bool         Forget(bool p_force = false);
+  // Forget just one record AND reset current cursor to first position
+  bool         ForgetObject(int p_primary,        bool p_force = false); // Forget 1 record and primary is an INTEGER     (Fast!!)
+  bool         ForgetObject(VariantSet& p_primary,bool p_force = false); // Forget 1 record and primary is a compound key (Slower)
 
   // SETTERS
 
@@ -180,6 +183,9 @@ public:
   int          GetFieldNumber(CString p_name);
   // Get a field from the current record
   SQLVariant*  GetCurrentField(int p_num);
+  // Getting info about the primary key
+  CString      GetPrimarySchema();
+  CString      GetPrimaryTableName();
 
   // XML Saving and loading
   bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
@@ -207,6 +213,9 @@ private:
   bool         CheckPrimaryKeyColumns();
   // Find primary key in the column names
   int          FindSearchColumn();
+  // Forget about a record in the recordset
+  bool         ForgetRecord(SQLRecord* p_record,bool p_force);
+  void         ForgetPrimaryObject(SQLRecord* p_record);
 
   // WRITEBACK OPERATIONS
 
@@ -303,6 +312,18 @@ inline CString
 SQLDataSet::GetName()
 {
   return m_name;
+}
+
+inline CString
+SQLDataSet::GetPrimarySchema()
+{
+  return m_primarySchema;
+}
+
+inline CString
+SQLDataSet::GetPrimaryTableName()
+{
+  return m_primaryTableName;
 }
 
 inline void

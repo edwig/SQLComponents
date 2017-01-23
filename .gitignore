@@ -27,9 +27,10 @@ Marlin_3.rar
 x64/ 
 x86/ 
 bld/ 
-Bb]in/ 
+[Bb]in/ 
 [Oo]bj/ 
 [Ll]og/ 
+[Ll]ib/
 
 # Visual Studio 2015 cache/options directory 
 **/.vs/ 

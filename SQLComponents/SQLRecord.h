@@ -39,7 +39,7 @@ namespace SQLComponents
 #define SQL_Record_Insert    0x08
 
 // Fields are mutation stacks 
-typedef std::vector<SQLMutation*> FieldMap;
+typedef std::vector<SQLMutation*> SQLFields;
 
 // Foreward declaration
 class SQLDataSet;
@@ -55,15 +55,25 @@ public:
   // Get the status of the record
   int         GetStatus();
   SQLVariant* GetField(int p_num);
+  SQLVariant* GetField(CString p_name);
+  // Adding a field to the record
   void        AddField(SQLVariant* p_field,bool p_insert = false);
-  void        SetField(int p_num,SQLVariant* p_field,int p_mutationID = 0);
-  void        ModifyField(int p_num,void*       p_data,int p_mutationID = 0);
-  void        ModifyField(int p_num,SQLVariant* p_data,int p_mutationID = 0);
+  // Setting different value without changing status
+  void        SetField   (int     p_num, SQLVariant* p_field,int p_mutationID = 0);
+  void        SetField   (CString p_name,SQLVariant* p_field,int p_mutationID = 0);
+  // Setting different value AND changing record/set status
+  void        ModifyField(int     p_num, void*       p_field,int p_mutationID = 0);
+  void        ModifyField(CString p_name,void*       p_field,int p_mutationID = 0);
+  void        ModifyField(int     p_num, SQLVariant* p_field,int p_mutationID = 0);
+  void        ModifyField(CString p_name,SQLVariant* p_field,int p_mutationID = 0);
+  // See if the record has been changed
+  bool        IsModified();
   // See if a field is modified
-  bool        IsModified (int p_num);
+  bool        IsModified(int p_num);
+  bool        IsModified(CString p_name);
   // Set the status of the record to 'Deleted'
   void        Delete();
-  // Reset the status after database upgrade of the record
+  // Reset the mutation stacks after database upgrade of the record
   void        Reduce();
   // Rollback all mutations on all fields
   void        Rollback();
@@ -82,7 +92,7 @@ private:
   SQLDataSet* m_dataSet;
   bool        m_modifiable;
   int         m_status;
-  FieldMap    m_fields;
+  SQLFields   m_fields;
 };
 
 inline int

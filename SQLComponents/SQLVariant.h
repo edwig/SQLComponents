@@ -160,6 +160,7 @@ public:
    TIMESTAMP_STRUCT*    GetAsTimestamp();
    CString              GetAsEuropeanTimestamp();
    SQL_INTERVAL_STRUCT* GetAsInterval();
+   CString              GetAsSQLString();
    // Access per complex type
    SQLDate              GetAsSQLDate();
    SQLTime              GetAsSQLTime();
