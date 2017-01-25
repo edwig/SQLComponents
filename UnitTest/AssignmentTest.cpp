@@ -57,6 +57,7 @@ namespace OperatorUnitTest
     TEST_METHOD(AssignmentOperators)
     {
       Logger::WriteMessage("In unit test assignment operators");
+      InitSQLComponents();
     }
 
     TEST_METHOD(TestAssignChar)

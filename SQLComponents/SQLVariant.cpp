@@ -435,18 +435,16 @@ SQLVariant::~SQLVariant()
   ResetDataType(0);
 }
 
+// Reset the complete variant
 void
 SQLVariant::Init()
 {
-  memset(&m_data,0,sizeof(m_data));
-  m_datatype        = 0;
-  m_sqlDatatype     = 0;
+  ResetDataType(0);
   m_binaryLength    = 0;
   m_binaryPieceSize = 0;
   m_columnNumber    = 0;
   m_paramType       = 0;
   m_useAtExec       = false;
-  m_indicator       = SQL_NULL_DATA;
 }
 
 void
@@ -824,7 +822,7 @@ SQLVariant::SetFromBinaryStreamData(int   p_type
 //////////////////////////////////////////////////////////////////////////
 
 void
-  SQLVariant::GetAsString(CString& result)
+SQLVariant::GetAsString(CString& result)
 {
   if(m_indicator == SQL_NULL_DATA)
   {
@@ -1088,9 +1086,7 @@ SQLVariant::GetDataSize()
 //
 //////////////////////////////////////////////////////////////////////////
 
-__declspec(thread) static CString* g_value = nullptr;
-
-char*
+const char*
 SQLVariant::GetAsChar()
 {
   if(m_datatype == SQL_C_CHAR)
@@ -1101,15 +1097,11 @@ SQLVariant::GetAsChar()
   {
     return (char*)m_data.m_dataBINARY;
   }
-  // Should be: GetErrorDatatype(SQL_C_CHAR);
+  // Should be: ThrowErrorDatatype(SQL_C_CHAR);
   // Sometimes we come her unexpectedly in various programs
-  if(g_value)
-  {
-    delete g_value;
-  }
-  g_value = new CString;
-  GetAsString(*g_value);
-  return (char*)g_value->GetString();
+  CString value;
+  GetAsString(value);
+  return value;
 }
 
 #pragma warning(push)

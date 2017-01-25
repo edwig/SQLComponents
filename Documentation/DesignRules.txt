@@ -1,0 +1,17 @@
+DESIGN RULES FOR SQLCOMPONENTS
+==============================
+
+1) Alle components are within the "SQLComponents" namespace.
+2) All throws are of type "CString". So calling programs **MUST**
+   rely on a try...catch cycle that catches "CString" objects
+3) There are two modes of operandi
+   SQL_COMPONENTS_MFC  -> All CStrings are MFC objects
+   No definition       -> All CStrings are ATL objects
+   The library and program must be compiled alike!
+4) Everything must work in both 32-bits and 64-bits modes
+5) Platform of choice is MSVC 2015, C++14.0 standard
+6) Coding-guidelines are:
+   - 1 tab = 2 spaces
+   - Hungarian camelcase naming rules
+   - class members have the "m_" prefix
+   - method parameters have the "p_" prefix

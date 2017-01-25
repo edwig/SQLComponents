@@ -40,6 +40,7 @@ namespace SQLComponents
 
 // Fields are mutation stacks 
 typedef std::vector<SQLMutation*> SQLFields;
+typedef unsigned long ulong;
 
 // Foreward declaration
 class SQLDataSet;
@@ -88,10 +89,15 @@ public:
   void        XMLSave(XMLMessage* p_msg,XMLElement* p_base);
   void        XMLLoad(XMLMessage* p_msg,XMLElement* p_base);
 
+  // Locking of the record
+  void        Acquire();
+  bool        Release();
+
 private:
   SQLDataSet* m_dataSet;
   bool        m_modifiable;
   int         m_status;
+  ulong       m_reference;
   SQLFields   m_fields;
 };
 

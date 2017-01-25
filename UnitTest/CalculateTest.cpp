@@ -85,6 +85,15 @@ namespace OperatorUnitTest
       other[CT_NUMERIC]  = SQLVariant(&num2);
     }
 
+    void FreeArrays()
+    {
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
+      {
+        variants[x].Init();
+        other[x].Init();
+      }
+    }
+
     TEST_METHOD(CalculateAddTest)
     {
       Logger::WriteMessage("In unit test add operators");
@@ -122,6 +131,7 @@ namespace OperatorUnitTest
           }
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CalculateSubtractTest)
@@ -161,6 +171,7 @@ namespace OperatorUnitTest
           }
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CalculateMultiplyTest)
@@ -201,6 +212,7 @@ namespace OperatorUnitTest
           }
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CalculateDivisionTest)
@@ -244,6 +256,7 @@ namespace OperatorUnitTest
           }
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CalculateModuloTest)
@@ -285,6 +298,7 @@ namespace OperatorUnitTest
           }
         }
       }
+      FreeArrays();
     }
   };
 }

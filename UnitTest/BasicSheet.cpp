@@ -39,6 +39,7 @@ namespace DatabaseUnitTest
     TEST_METHOD(BasicXML)
     {
       Logger::WriteMessage("Unit testing XLSX spreadsheet reading");
+      InitSQLComponents();
 
       BasicXmlExcel excel("..\\UnitTest\\BasicExcel.xlsx");
       Assert::IsTrue(excel.Load());
@@ -83,6 +84,7 @@ namespace DatabaseUnitTest
     TEST_METHOD(BasicXLS)
     {
       Logger::WriteMessage("Unit testing XLS spreadsheet reading");
+      InitSQLComponents();
 
       BasicExcel excel("..\\UnitTest\\BasicExcel.xls");
       CString error = excel.GetError();

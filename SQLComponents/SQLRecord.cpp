@@ -44,7 +44,9 @@ SQLRecord::SQLRecord(SQLDataSet* p_set,bool p_modifiable)
           :m_dataSet(p_set)
           ,m_modifiable(p_modifiable)
           ,m_status(SQL_Record_NULL)
+          ,m_reference(0)
 {
+  Acquire();
 }
 
 SQLRecord::~SQLRecord()
@@ -54,6 +56,23 @@ SQLRecord::~SQLRecord()
     delete m_fields[ind];
   }
   m_status = SQL_Record_NULL;
+}
+
+void
+SQLRecord::Acquire()
+{
+  InterlockedIncrement(&m_reference);
+}
+
+bool
+SQLRecord::Release()
+{
+  if(InterlockedDecrement(&m_reference) == 0)
+  {
+    delete this;
+    return true;
+  }
+  return false;
 }
 
 // Set this record's status to a deleted record

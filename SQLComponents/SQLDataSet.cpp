@@ -1089,15 +1089,16 @@ SQLDataSet::Deletes(int p_mutationID)
       MutType type = record->MixedMutations(p_mutationID);
       switch(type)
       {
-        case MUT_NoMutation: // Fall through: do nothing with record
-        case MUT_OnlyOthers: ++it;
+        case MUT_OnlyOthers: ++it;  // do nothing with record
                              break;
         case MUT_Mixed:      throw CString("Mixed mutations");
+        case MUT_NoMutation: // Fall through: Remove record
         case MUT_MyMutation: sql = GetSQLDelete(&query,record);
                              query.DoSQLStatement(sql);
                              // Delete this record, continuing to the next
-                             delete record;
-                             it = m_records.erase(it);
+//                              delete record;
+//                              it = m_records.erase(it);
+                             ForgetRecord(record,true);
                              ++deletes;
                              break;
       }
@@ -1109,9 +1110,9 @@ SQLDataSet::Deletes(int p_mutationID)
   }
 
   // Adjust the current record if necessary
-  if(m_current > (int)m_records.size())
+  if(m_current >= (int)m_records.size())
   {
-    m_current = (int)m_records.size();
+    m_current = (int)m_records.size() - 1;
   }
 
   // If we did all records, no more deletes are present
@@ -1464,15 +1465,15 @@ SQLDataSet::ForgetRecord(SQLRecord* p_record,bool p_force)
   RecordSet::iterator it = find(m_records.begin(),m_records.end(),p_record);
   if(it != m_records.end())
   {
-    // Remove from m_objects. Maybe does nothing!
-    ForgetPrimaryObject(p_record);
+    // Try to release the record
+    if(p_record->Release())
+    {
+      // Remove from m_objects. Maybe does nothing!
+      ForgetPrimaryObject(p_record);
 
-    // Remove the record itself
-    delete p_record;
-
-    // Remove from m_records
-    m_records.erase(it);
-
+      // Remove from m_records
+      m_records.erase(it);
+    }
     return true;
   }
   return false;

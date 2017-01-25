@@ -65,6 +65,7 @@ namespace DatabaseUnitTest
     TEST_METHOD(DatabaseConnection)
     {
       Logger::WriteMessage("In unit test Database connection");
+      InitSQLComponents();
 
       SQLDatabase dbs;
       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
@@ -83,17 +84,17 @@ namespace DatabaseUnitTest
         }
         else
         {
-          Logger::WriteMessage("Database ***NOT*** opened.");
+          Assert::Fail(L"Database ***NOT*** opened.");
         }
       }
       catch(CString& s)
       {
-        Logger::WriteMessage("Database ***NOT*** opened. Reason:");
         Logger::WriteMessage(s);
+        Assert::Fail(L"Database ***NOT*** opened. Reason:");
       }
       catch(...)
       {
-        Logger::WriteMessage("Database ***NOT*** opened for unknown reasons");
+        Assert::Fail(L"Database ***NOT*** opened for unknown reasons");
       }
       long endTime = clock();
       CString performance;
@@ -126,6 +127,7 @@ namespace DatabaseUnitTest
                   "      ,total\n" 
                   "  FROM master");
 
+      InitSQLComponents();
 
       SQLDatabase dbs;
       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
@@ -155,19 +157,19 @@ namespace DatabaseUnitTest
         }
         else
         {
-          Logger::WriteMessage("Database ***NOT*** opened.");
+          Assert::Fail(L"Database ***NOT*** opened.");
         }
         // Real test 750 + 600 = 1350
         Assert::AreEqual((double)1350.0,grandTotal);
       }
       catch(CString& s)
       {
-        Logger::WriteMessage("Database ***NOT*** opened. Reason:");
         Logger::WriteMessage(s);
+        Assert::Fail(L"Database ***NOT*** opened. Reason:");
       }
       catch(...)
       {
-        Logger::WriteMessage("Database ***NOT*** opened for unknown reasons");
+        Assert::Fail(L"Database ***NOT*** opened for unknown reasons");
       }
     }
 
@@ -498,7 +500,7 @@ namespace DatabaseUnitTest
         {
           Assert::Fail(L"Database ***NOT*** opened.");
         }
-        dbs.Close();
+       dbs.Close();
       }
       catch(CString& s)
       {

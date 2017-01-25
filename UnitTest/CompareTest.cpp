@@ -85,6 +85,15 @@ namespace OperatorUnitTest
       other[CT_NUMERIC]  = SQLVariant(&num2);
     }
 
+    void FreeArrays()
+    {
+      for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
+      {
+        variants[x].Init();
+        other[x].Init();
+      }
+    }
+
     TEST_METHOD(CompareEqualityTest)
     {
       Logger::WriteMessage("In unit test equality operators");
@@ -106,6 +115,7 @@ namespace OperatorUnitTest
           Assert::IsTrue(*left == *right);  // TEST
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CompareInequalityTest)
@@ -135,6 +145,7 @@ namespace OperatorUnitTest
           Assert::IsTrue(*left != *right);  // TEST
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CompareGreaterTest)
@@ -164,6 +175,7 @@ namespace OperatorUnitTest
           Assert::IsTrue(*left > *right);  // TEST
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CompareGreaterEqualTest)
@@ -194,6 +206,7 @@ namespace OperatorUnitTest
           Assert::IsTrue(*left >= *left);   // EQUAL
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CompareSmallerTest)
@@ -223,6 +236,7 @@ namespace OperatorUnitTest
           Assert::IsTrue(*right < *left);  // SMALLER
         }
       }
+      FreeArrays();
     }
 
     TEST_METHOD(CompareSmallerEqualTest)
@@ -253,6 +267,7 @@ namespace OperatorUnitTest
           Assert::IsTrue(*left <= *left);  // SMALLER/EQUAL
         }
       }
+      FreeArrays();
     }
   };
 }

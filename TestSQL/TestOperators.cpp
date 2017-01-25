@@ -101,6 +101,12 @@ void TestEqual()
       printf(*left == *right ? "OK\n" : "ERROR\n");
     }
   }
+
+  // Clean out the test data
+  for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+  {
+    variants[x].SetData(SQL_C_LONG,"0");
+  }
 }
 
 void
@@ -161,6 +167,12 @@ TestAdd()
         printf(res.Compare("47") ? "ERROR\n" : "OK\n");
       }
     }
+  }
+
+  // Clean out the test data
+  for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
+  {
+    others[x].SetData(SQL_C_LONG,"0");
   }
 }
 

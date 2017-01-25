@@ -277,3 +277,6 @@ paket-files/
 # JetBrains Rider 
 .idea/ 
 *.sln.iml 
+
+# Test database
+testing.fdb

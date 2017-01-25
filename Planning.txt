@@ -2,5 +2,7 @@ Planning of features for SQLComponents library
 ==============================================
 
 1) Trying to remove the need for: #ifndef SQL_COMPONENTS_MFC
+2) Adding SQLFilters for datasets
+3) Adding working SQLAssociations
 
 AND STILL MORE UNIT TESTS!

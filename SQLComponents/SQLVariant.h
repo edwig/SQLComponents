@@ -138,7 +138,7 @@ public:
    bool                 SetBinary(int p_length,void* p_data);
    void*                GetDataPointer();
    // Access per type
-   char*                GetAsChar();
+   const char*          GetAsChar();
    void                 GetAsString(CString& p_result);
    void*                GetAsBinary();
    bool                 GetAsBoolean();

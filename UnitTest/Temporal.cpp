@@ -38,7 +38,7 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Unit testing names of the days of the week");
 
-      InitSQLComponents(LN_ENGLISH);
+      InitSQLComponents();
 
       SQLDate birth("15-10-1959");
 
@@ -85,7 +85,7 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Unit testing full date string");
 
-      InitSQLComponents(LN_ENGLISH);
+      InitSQLComponents();
 
       SQLDate birth("15-10-1959");
 
