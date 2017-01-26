@@ -28,6 +28,7 @@
 #include "SQLDatabase.h"
 #include "SQLRecord.h"
 #include "SQLVariant.h"
+#include "SQLFilter.h"
 #include "XMLMessage.h"
 #include <vector>
 
@@ -130,6 +131,8 @@ public:
   int          FindObjectRecNum(VariantSet& p_primary);   // If your primary is a compound key (Slower)
   SQLRecord*   FindObjectRecord(int p_primary);           // If your primary is an INTEGER     (Fast!!)
   SQLRecord*   FindObjectRecord(VariantSet& p_primary);   // If your primary is a compound key (Slower)
+  SQLRecord*   FindObjectFilter(SQLFilterSet& p_filters,bool p_primary = false);  // Fast & slow
+  RecordSet*   FindRecordSet   (SQLFilterSet& p_filters);                         // Always slow
   // Forget the records
   bool         Forget(bool p_force = false);
   // Forget just one record AND reset current cursor to first position
@@ -154,6 +157,8 @@ public:
   // Set parameter for a query
   void         SetParameter(SQLParameter p_parameter);
   void         SetParameter(CString p_naam,SQLVariant p_waarde);
+  // Set filters for a query
+  void         SetFilters(SQLFilterSet& p_filters);
   // Set the status to modified/saved
   void         SetStatus(int m_add,int m_delete = 0);
   // Set a field value in the current record
@@ -197,6 +202,8 @@ private:
   CString      ParseQuery();
   // Parse the selection
   CString      ParseSelection(SQLQuery& p_query);
+  // Parse the fitlers
+  CString      ParseFilters();
   // Get the variant of a parameter
   SQLVariant*  GetParameter(CString& p_name);
   // Get all the columns of the record
@@ -239,6 +246,7 @@ private:
   CString      m_primarySchema;
   CString      m_primaryTableName;
   ParameterSet m_parameters;
+  SQLFilterSet m_filters;
   NamenMap     m_primaryKey;
   // Object mapping
   CString      m_searchColumn; 

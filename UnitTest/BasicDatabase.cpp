@@ -30,6 +30,7 @@
 #include "SQLDataSet.h"
 #include "SQLInfoTree.h"
 #include "SQLInfoDB.h"
+#include "SQLAssociation.h"
 #include "bcd.h"
 #include <time.h>
 
@@ -516,6 +517,111 @@ namespace DatabaseUnitTest
       CString msg;
       msg.Format("NUMERIC test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(msg);
+    }
+
+    bcd  FindAssociationSet(SQLDataSet&     master
+                           ,SQLDataSet&     detail
+                           ,SQLAssociation& assoc
+                           ,long            p_set)
+    {
+      // Set up a value
+      SQLVariant val(p_set);
+      assoc.SetAssociation(0,&val);
+
+      // Finding the master record
+      SQLRecord* masterRecord = assoc.FollowToMaster();
+      if(masterRecord)
+      {
+        SQLVariant* desc = masterRecord->GetField("description");
+        CString name;
+        desc->GetAsString(name);
+        Logger::WriteMessage("Master record: " + name);
+      }
+      else
+      {
+        Assert::Fail(L"Master record 2 not found");
+      }
+
+      // Finding the detail records
+      RecordSet* recSet = assoc.FollowToDetails();
+      bcd total;
+      for(auto& rec : *recSet)
+      {
+        bcd num = rec->GetField("amount")->GetAsBCD();
+        Logger::WriteMessage("Detail record: " + num.AsString());
+        total += num;
+      }
+      Logger::WriteMessage("Total of details: " + total.AsString());
+
+      // Delete details resultset
+      delete recSet;
+
+      return total;
+    }
+
+
+    TEST_METHOD(AssociationTest)
+    {
+      Logger::WriteMessage("Testing association following master/detail:");
+      Logger::WriteMessage("============================================");
+
+      InitSQLComponents();
+
+      SQLDatabase dbs;
+      dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+
+      try
+      {
+        // Set options for the database
+        dbs.SetLoginTimeout(0);
+        dbs.SetMARS(false);
+
+        if(dbs.Open(g_dsn,g_user,g_password))
+        {
+          Logger::WriteMessage("Database opened.");
+
+          // Set up the datasets
+          SQLDataSet master("master",&dbs);
+          SQLDataSet detail("detail",&dbs);
+          CString    masterQuery = "SELECT * FROM master";
+          CString    detailQuery = "SELECT * FROM detail";
+
+          master.SetQuery(masterQuery);
+          detail.SetQuery(detailQuery);
+          master.SetPrimaryTable(g_schema,"master");
+          detail.SetPrimaryTable(g_schema,"detail");
+          master.SetPrimaryKeyColumn("id");
+          detail.SetPrimaryKeyColumn("id");
+          master.SetSearchableColumn("id");
+          detail.SetSearchableColumn("id");
+
+          // Set up an association
+          SQLAssociation assoc(&master,&detail);
+          assoc.SetAssociation("id","mast_id");
+
+          // Print the set
+          bcd set2 = FindAssociationSet(master,detail,assoc,2L);
+          bcd set1 = FindAssociationSet(master,detail,assoc,1L);
+
+          Assert::AreEqual(750L,set1.AsLong());
+          Assert::AreEqual(600L,set2.AsLong());
+        }
+        else
+        {
+          Assert::Fail(L"Database ***NOT*** opened.");
+        }
+        dbs.Close();
+      }
+      catch(CString& s)
+      {
+        Logger::WriteMessage("Database error. Reason:");
+        Logger::WriteMessage(s);
+        Assert::Fail(L"Database error");
+      }
+      catch(...)
+      {
+        Assert::Fail(L"Unknown error in database test");
+      }
     }
 
 //     TEST_METHOD(BasicUpdateCursor)

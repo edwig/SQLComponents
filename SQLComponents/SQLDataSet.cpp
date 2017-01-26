@@ -294,6 +294,14 @@ SQLDataSet::SetParameter(CString p_naam,SQLVariant p_waarde)
   m_parameters.push_back(par);
 }
 
+// Set filters for a query
+// Releasing the previous set of filters
+void
+SQLDataSet::SetFilters(SQLFilterSet& p_filters)
+{
+  m_filters = p_filters;
+}
+
 void         
 SQLDataSet::SetPrimaryKeyColumn(WordList& p_list)
 {
@@ -407,6 +415,39 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
   return sql;
 }
 
+// Parse the fitlers
+CString
+SQLDataSet::ParseFilters()
+{
+  CString query(m_query);
+  query.MakeUpper();
+  query.Replace("\t"," ");
+  bool whereFound = m_query.Find("WHERE ") > 0;
+  bool first = true;
+
+  // Restart with original query
+  query = m_query;
+
+  // Add all filters
+  for(auto& filt : m_filters)
+  {
+    if(first == true)
+    {
+      if(!whereFound)
+      {
+        query += "\nWHERE ";
+      }
+    }
+    else
+    {
+      query += "\n   AND ";
+    }
+    query += filt.GetSQLFilter();
+  }
+  return query;
+}
+
+
 bool
 SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
 {
@@ -439,6 +480,10 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
       if(m_parameters.size())
       {
         query = ParseQuery();
+      }
+      else if(m_filters.size())
+      {
+        query = ParseFilters();
       }
     }
     else
@@ -485,8 +530,6 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
     // Reached the end: we are OPEN!
     m_open = true;
     result = true;
-    // Remember the query
-    m_query = query;
 
     trans.Commit();
   }
@@ -533,16 +576,27 @@ SQLDataSet::Append()
   {
     SQLQuery qr(m_database);
     SQLTransaction trans(m_database,m_name);
+    CString query(m_query);
 
-    // Use the parameters (if any)
-    qr.ResetParameters();
-    for(unsigned ind = 0;ind < m_parameters.size();++ind)
+    // Fill in the query with parameters / filters
+    if(!m_query.IsEmpty())
     {
-      qr.SetParameter(ind + 1,&m_parameters[ind].m_value);
+      if(m_parameters.size())
+      {
+        query = ParseQuery();
+      }
+      else if(m_filters.size())
+      {
+        query = ParseFilters();
+      }
+    }
+    else
+    {
+      query = ParseSelection(qr);
     }
 
     // Do the SELECT query
-    qr.DoSQLStatement(m_query);
+    qr.DoSQLStatement(query);
 
     // Names and types must be the same as previous queries
     CheckNames(qr);
@@ -804,6 +858,78 @@ SQLDataSet::FindObjectRecord(VariantSet& p_primary)
   }
   return nullptr;
 }
+
+// Finding an object through a filter set
+// Finds the first object. In case of an unique record, it will be the only one
+SQLRecord*
+SQLDataSet::FindObjectFilter(SQLFilterSet& p_filters,bool p_primary /*=false*/)
+{
+  SQLRecord* record = nullptr;
+
+  // Optimize for network databases
+  if(p_primary && p_filters.size() == 1)
+  {
+    SQLVariant* prim = p_filters[0].GetValue();
+    if(p_filters[0].GetOperator() == OP_Equal && prim->GetDataType() == SQL_C_SLONG )
+    {
+      return FindObjectRecord(prim->GetAsSLong());
+    }
+  }
+
+  // Walk the chain of records
+  for(auto& rec : m_records)
+  {
+    record = rec;
+    // Walk the chain of filters
+    for(auto& filt : p_filters)
+    {
+      if(! filt.MatchRecord(record))
+      {
+        record = nullptr;
+        break;
+      }
+    }
+    // Result reached at first matching record
+    if(record)
+    {
+      return record;
+    }
+  }
+  return nullptr;
+}
+
+// Finding a set of records through a filter set
+// Searches the complete recordset for all matches
+// Caller must delete the resulting set!!
+RecordSet* 
+SQLDataSet::FindRecordSet(SQLFilterSet& p_filters)
+{
+  RecordSet* records = new RecordSet();
+
+  // Walk the chain of records
+  for(auto& rec : m_records)
+  {
+    SQLRecord* record = rec;
+    // Walk the chain of filters
+    for(auto& filt : p_filters)
+    {
+      if(! filt.MatchRecord(record))
+      {
+        record = nullptr;
+        break;
+      }
+    }
+    // If record found, keep it
+    if(record)
+    {
+      records->push_back(record);
+    }
+  }
+
+  // Return complete recordset
+  return records;
+}
+
 
 // Get a fieldname
 CString    
