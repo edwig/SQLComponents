@@ -3,6 +3,27 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.4
 ====== Released since:08-01-2017 =====
 ======================================
 
+Version 1.4.2 of xx-01-2017
+---------------------------
+1) Complete rewrite of the SQLAssociation class. To use the new class
+   lookup the manual in the *.cpp file there. You can connect master
+   and detail classes with an association, and then follow the association
+   from detail to master (rendering one SQLRecord). Or follow it from
+   master to detail (redering a RecordSet of std::vector<SQLRecord>)
+2) Fixed a seamingly memory leak. Fix was to correct the leak detection
+   with a C-Runtime memory snapshot at the correct moment in time.
+3) New SQLFilter class to be used with the new SQLAssociation class
+   (see above under 1). Filters can be used within associations, but you
+   can also create a set of filters and apply that to a SQLDataSet 
+   before opening the set with "AddFilters".
+   SQLFilters can be used in two ways:
+   - To create an SQL condition text for usage in an SQL statement
+   - To check if a record does exist within an SQLDataSet (in memory)
+4) Added a 'DesignRules.txt' file in the documentation directory
+5) Added unit tests for the SQLDBInfo discovery functions like
+   MakeInfo* for finding out about tables and procedures.
+   While creating the tests, some minor bugs in SQLInfoDB were fixed.
+
 Version 1.4.1 of 15-01-2017
 ---------------------------
 1) Libraries have been made to link automatically with your source code.

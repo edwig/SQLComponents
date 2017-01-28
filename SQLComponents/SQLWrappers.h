@@ -25,6 +25,7 @@
 // Version number:  1.4.0
 //
 #pragma once
+#include "SQLComponents.h"
 
 #pragma warning(disable: 4702)
 
@@ -33,6 +34,9 @@
 // This files contains wrappers for all SQLXxxxx functions to circumvent
 // access violations and other exceptions from ODBC drivers by catching them all
 //
+
+namespace SQLComponents
+{
 
 inline SQLRETURN SqlDriverConnect(SQLHDBC hdbc, SQLHWND hwnd, SQLCHAR *szConnStrIn, SQLSMALLINT cbConnStrIn, SQLCHAR *szConnStrOut, SQLSMALLINT cbConnStrOutMax, SQLSMALLINT *pcbConnStrOut, SQLUSMALLINT fDriverCompletion)
 {
@@ -586,4 +590,7 @@ inline SQLRETURN SqlColAttributes(SQLHSTMT     p_hstmt
   {
     return SQL_ERROR;
   }
+}
+
+// End of namespace
 }

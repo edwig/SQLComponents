@@ -380,6 +380,8 @@ SQLInfo::GetInfo()
   {
     return;
   }
+  m_initDone = true;
+
   SupportedODBCFunctions();
   
   if(!SupportedFunction(SQL_API_SQLGETINFO))
@@ -566,7 +568,6 @@ SQLInfo::GetInfo()
   m_convertVarchar    = GetInfoInteger(SQL_CONVERT_VARCHAR);
 
   ReadingDataTypes();
-  m_initDone = true;
 }
 
 void
@@ -753,6 +754,7 @@ SQLInfo::GetTypeInfo(int p_sqlDatatype)
 bool
 SQLInfo::SupportedFunction(unsigned int api_function)
 {
+  GetInfo();
   if(m_functions_use_3)
   {
     // IF ODBC 3.x Standard
@@ -3011,6 +3013,18 @@ SQLInfo::NativeSQL(HDBC hdbc,CString& sqlCommand)
   }
   SQLINTEGER retLen = 0;
   SQLCHAR buffer[30000];
+
+  // In case we need to get the HDBC handle from the database object
+  if(!hdbc && m_database)
+  {
+    hdbc = m_database->GetDBHandle();
+  }
+  if(!hdbc)
+  {
+    throw CString("NativeSQL called without an opened database!");
+  }
+
+  // Perform the conversion call
   m_retCode = SqlNativeSql(hdbc
                          ,(SQLCHAR *)sqlCommand.GetString()
                          ,sqlCommand.GetLength()
