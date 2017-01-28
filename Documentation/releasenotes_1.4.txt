@@ -3,7 +3,7 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.4
 ====== Released since:08-01-2017 =====
 ======================================
 
-Version 1.4.2 of xx-01-2017
+Version 1.4.2 of 28-01-2017
 ---------------------------
 1) Complete rewrite of the SQLAssociation class. To use the new class
    lookup the manual in the *.cpp file there. You can connect master
