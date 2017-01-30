@@ -32,8 +32,6 @@
 #define new DEBUG_NEW
 #endif
 
-#pragma warning (disable: 4477)
-
 void TestConnection()
 {
   printf("Testing the connection:\n");
@@ -64,7 +62,7 @@ void TestConnection()
   }
   catch(CString& s)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",s);
+    printf("Database ***NOT*** opened. Reason:\n%s\n",s.GetString());
   }
   catch(...)
   {

@@ -34,8 +34,6 @@
 #define new DEBUG_NEW
 #endif
 
-#pragma warning (disable: 4477)
-
 void TestCalling()
 {
   printf("Test calling function/procedure:\n");
@@ -73,7 +71,7 @@ void TestCalling()
       query.SetParameter(0,bcd(10000.01),SQL_PARAM_OUTPUT);
       query.SetParameter(1,"234.99");
       result = query.DoSQLCall(g_schema,"getdecimal",true);
-      printf("Conversion of number 234.99 is: %s\n",result->GetAsBCD().AsString());
+      printf("Conversion of number 234.99 is: %s\n",result->GetAsBCD().AsString().GetString());
 
       // Call with 1 input parameter and NO return value
       beginTime = clock();
@@ -101,7 +99,7 @@ void TestCalling()
       int status = 0;
       bcd number = q2.GetParameter(0)->GetAsBCD();
       CString text = q2.GetParameter(2)->GetAsChar();
-      printf("Result of MULTINOUT = status:%d [%s] [%s]\n",status,number.AsString(),text.GetString());
+      printf("Result of MULTINOUT = status:%d [%s] [%s]\n",status,number.AsString().GetString(),text.GetString());
 
       trans.Commit();
     }
@@ -112,7 +110,7 @@ void TestCalling()
   }
   catch(CString& s)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",s);
+    printf("Database ***NOT*** opened. Reason:\n%s\n",s.GetString());
   }
   catch(...)
   {

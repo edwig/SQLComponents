@@ -31,8 +31,6 @@
 #define new DEBUG_NEW
 #endif
 
-#pragma warning (disable: 4477)
-
 // Firebird Open Source RDBMS 3.0
 // DSN "testing" points to the "testing.fdb" database
 // in the project root folder

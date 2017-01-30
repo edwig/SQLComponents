@@ -27,8 +27,6 @@
 #pragma once
 #include "SQLComponents.h"
 
-#pragma warning(disable: 4702)
-
 //////////////////////////////////////////////////////////////////////////
 //
 // This files contains wrappers for all SQLXxxxx functions to circumvent
@@ -187,19 +185,6 @@ inline SQLRETURN SqlCloseCursor(SQLHSTMT StatementHandle)
   try
   {
     return SQLCloseCursor(StatementHandle);
-  }
-  catch(...)
-  {
-    return SQL_ERROR;
-  }
-}
-
-#pragma warning (disable: 4996)
-inline SQLRETURN SqlSetStmtOption(SQLHSTMT StatementHandle, SQLUSMALLINT Option, SQLULEN Value)
-{
-  try
-  {
-    return SQLSetStmtOption(StatementHandle, Option, Value);
   }
   catch(...)
   {

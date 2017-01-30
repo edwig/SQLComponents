@@ -240,7 +240,7 @@ private:
    bool    StringToBinary (const char* p_data);
    bool    BinaryToString (unsigned char* buffer,int buflen);
    // Throw error as a result of internal trimming
-   void    ThrowErrorDatatype(int p_getas);
+   void*   ThrowErrorDatatype(int p_getas);
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX

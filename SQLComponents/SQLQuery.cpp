@@ -40,8 +40,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#pragma warning (disable: 4312)
-
 namespace SQLComponents
 {
 
@@ -242,7 +240,7 @@ SQLQuery::Open()
   // Set max-rows if our database DOES support it (Oracle!)
   if(m_maxRows)
   {
-    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_MAX_ROWS,(SQLPOINTER)m_maxRows,SQL_IS_UINTEGER);
+    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_MAX_ROWS,(SQLPOINTER)(DWORD_PTR)m_maxRows,SQL_IS_UINTEGER);
     if(!SQL_SUCCEEDED(m_retCode))
     {
       GetLastError("Cannot set MAX_ROWS attribute: ");
@@ -253,7 +251,7 @@ SQLQuery::Open()
   // Setting the concurrency level of the cursor
   if(m_concurrency > SQL_CONCUR_READ_ONLY)
   {
-    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_CONCURRENCY,(SQLPOINTER)m_concurrency,SQL_IS_UINTEGER);
+    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_CONCURRENCY,(SQLPOINTER)(DWORD_PTR)m_concurrency,SQL_IS_UINTEGER);
     if(!SQL_SUCCEEDED(m_retCode))
     {
       GetLastError("Cannot set CONCURRENCY attribute: ");
@@ -785,7 +783,7 @@ SQLQuery::BindParameters()
     if(var->GetAtExec())
     {
       // AT EXEC data piece by piece
-      dataPointer = (SQLPOINTER) icol;
+      dataPointer = (SQLPOINTER)(DWORD_PTR) icol;
       // Some database types need to know the length beforehand (Oracle!)
       // If no database type known, set to true, just to be sure!
       var->SetSizeIndicator(m_database ? m_database->GetNeedLongDataLen() : true);
@@ -1018,8 +1016,8 @@ SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLVariant* p_var,int p_type)
   {
     int     precision = p_var->GetNumericPrecision();
     int     scale     = p_var->GetNumericScale();
-    RETCODE retCode1  = SqlSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)precision,NULL);
-    RETCODE retCode2  = SqlSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)scale,    NULL);
+    RETCODE retCode1  = SqlSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)(DWORD_PTR)precision,NULL);
+    RETCODE retCode2  = SqlSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)(DWORD_PTR)scale,    NULL);
 
     if(SQL_SUCCEEDED(retCode1) && SQL_SUCCEEDED(retCode2))
     {

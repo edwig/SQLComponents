@@ -31,8 +31,6 @@
 #include "SQLVariant.h"
 #include "bcd.h"
 
-#pragma warning(disable: 4477)
-
 void TestNumeric()
 {
   printf("Testing Numeric reading/writing:\n");
@@ -65,7 +63,7 @@ void TestNumeric()
         double field1 = query[1];
         bcd    field2 = query[2];
 
-        printf("Field 1 [%.4f] Field 2 [%s]\n",field1,field2.AsString());
+        printf("Field 1 [%.4f] Field 2 [%s]\n",field1,field2.AsString().GetString());
       }
 
 
@@ -90,7 +88,7 @@ void TestNumeric()
   }
   catch(CString& s)
   {
-    printf("Database error. Reason: %s\n",s);
+    printf("Database error. Reason: %s\n",s.GetString());
   }
   catch(...)
   {
@@ -122,7 +120,7 @@ void TestBcd()
 
   bcd ten(&num);
 
-  printf("SQL_NUMERIC_STRUCT -> bcd: %s\n",ten.AsString());
+  printf("SQL_NUMERIC_STRUCT -> bcd: %s\n",ten.AsString().GetString());
 
 
   // Now back again to a SQL_NUMERIC_STRUCT
@@ -138,5 +136,5 @@ void TestBcd()
   }
 
   bcd check(&res);
-  printf("bcd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString());
+  printf("bcd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString().GetString());
 }

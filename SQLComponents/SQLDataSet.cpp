@@ -1503,12 +1503,10 @@ SQLDataSet::XMLLoad(CString p_filename)
   return false;
 }
 
-#pragma warning (disable: 4189)
-
 void
 SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
 {
-  XMLElement* dataset   = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_NAME],XDT_String,m_name);
+                          p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_NAME],XDT_String,m_name);
   XMLElement* structure = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_STRUCTURE],XDT_String,"");
   CString nameField = dataset_names[g_defaultLanguage][DATASET_FIELD];
 

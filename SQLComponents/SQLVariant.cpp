@@ -42,8 +42,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#pragma warning (disable : 4996)
-
 namespace SQLComponents
 {
 
@@ -1104,10 +1102,6 @@ SQLVariant::GetAsChar()
   return value;
 }
 
-#pragma warning(push)
-#pragma warning(disable: 4715)
-#pragma warning(disable: 4702)
-
 void*
 SQLVariant::GetAsBinary()
 {
@@ -1120,11 +1114,7 @@ SQLVariant::GetAsBinary()
     return (void*)m_data.m_dataCHAR;
   }
   // Use GetDataPointer instead
-  ThrowErrorDatatype(SQL_C_BINARY);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL; 
+  return ThrowErrorDatatype(SQL_C_BINARY);
 }
 
 bool
@@ -1181,10 +1171,7 @@ SQLVariant::GetAsSShort()
     default:                              break;
   }
   ThrowErrorDatatype(SQL_C_SHORT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  return 0;
 }
 
 unsigned short
@@ -1236,10 +1223,7 @@ SQLVariant::GetAsUShort()
     default:                              break;
   }
   ThrowErrorDatatype(SQL_C_USHORT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  return 0;
 }
 
 long
@@ -1290,10 +1274,7 @@ SQLVariant::GetAsSLong()
     default:                              break;
   }
   ThrowErrorDatatype(SQL_C_SLONG);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  return 0L;
 }
 
 
@@ -1346,10 +1327,7 @@ SQLVariant::GetAsULong()
     default:                              break;
   }
   ThrowErrorDatatype(SQL_C_ULONG);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  return 0UL;
 }
 
 float
@@ -1400,10 +1378,7 @@ SQLVariant::GetAsFloat()
     default:                              break;
   }
   ThrowErrorDatatype(SQL_C_FLOAT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  return 0.0;
 }
 
 double
@@ -1732,9 +1707,6 @@ SQLVariant::GetAsUBigInt()
   return NULL; 
 }
 
-#pragma warning(push)
-#pragma warning(disable: 4715)
-
 __declspec(thread) static SQL_NUMERIC_STRUCT g_number;
 
 SQL_NUMERIC_STRUCT*
@@ -1813,9 +1785,8 @@ SQLVariant::GetAsNumeric()
   }
   // Other datatypes cannot convert
   ThrowErrorDatatype(SQL_C_NUMERIC);
+  return NULL;
 }
-
-#pragma warning(pop)
 
 SQLGUID*
 SQLVariant::GetAsGUID()
@@ -1825,6 +1796,7 @@ SQLVariant::GetAsGUID()
     return &m_data.m_dataGUID;
   }
   ThrowErrorDatatype(SQL_C_GUID);
+  return NULL;
 }
 
 __declspec(thread) static DATE_STRUCT g_date;
@@ -1920,8 +1892,6 @@ SQLVariant::GetAsTimestamp()
   ThrowErrorDatatype(SQL_C_TIMESTAMP);
   return NULL;
 }
-
-#pragma warning(pop)
 
 // European timestamp has the day-month-year order
 // instead of the standard 'year-month-day' order of a timestamp
@@ -2259,19 +2229,19 @@ SQLVariant::SetData(int p_type,const char* p_data)
     case SQL_C_LONG:                      // Fall through
     case SQL_C_SLONG:                     m_data.m_dataLONG = (long)atoi(p_data);
                                           break;
-    case SQL_C_ULONG:                     scannum = sscanf(p_data,"%lu",&m_data.m_dataULONG);
+    case SQL_C_ULONG:                     scannum = sscanf_s(p_data,"%lu",&m_data.m_dataULONG);
                                           if(scannum != 1)
                                           {
                                             m_data.m_dataULONG = NULL;
                                           }
                                           break;
-    case SQL_C_FLOAT:                     scannum = sscanf(p_data,"%f",&m_data.m_dataFLOAT);
+    case SQL_C_FLOAT:                     scannum = sscanf_s(p_data,"%f",&m_data.m_dataFLOAT);
                                           if(scannum != 1)
                                           {
                                             m_data.m_dataFLOAT = NULL;
                                           }
                                           break;
-    case SQL_C_DOUBLE:                    scannum = sscanf(p_data,"%lf",&m_data.m_dataDOUBLE);
+    case SQL_C_DOUBLE:                    scannum = sscanf_s(p_data,"%lf",&m_data.m_dataDOUBLE);
                                           if(scannum != 1)
                                           {
                                             m_data.m_dataDOUBLE = NULL;
@@ -2284,13 +2254,13 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           break;
     case SQL_C_UTINYINT:                  m_data.m_dataTINYINT = (unsigned char)atoi(p_data);
                                           break;
-    case SQL_C_SBIGINT:                   scannum = sscanf(p_data,"%I64d",&m_data.m_dataSBIGINT);
+    case SQL_C_SBIGINT:                   scannum = sscanf_s(p_data,"%I64d",&m_data.m_dataSBIGINT);
                                           if(scannum != 1)
                                           {
                                             m_data.m_dataSBIGINT = NULL;
                                           }
                                           break;
-    case SQL_C_UBIGINT:                   scannum = sscanf(p_data,"%I64u",&m_data.m_dataUBIGINT);
+    case SQL_C_UBIGINT:                   scannum = sscanf_s(p_data,"%I64u",&m_data.m_dataUBIGINT);
                                           if(scannum != 1)
                                           {
                                             m_data.m_dataUBIGINT = NULL;
@@ -2301,18 +2271,18 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_GUID:                      //aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee 
-                                          scannum = sscanf(p_data,"{%lX-%hX-%hX-%2hhX%2hhX-%2hhX%2hhX%2hhX%2hhX%2hhX%2hhX}"
-                                                          ,&m_data.m_dataGUID.Data1 
-                                                          ,&m_data.m_dataGUID.Data2 
-                                                          ,&m_data.m_dataGUID.Data3 
-                                                          ,&m_data.m_dataGUID.Data4[0]
-                                                          ,&m_data.m_dataGUID.Data4[1]
-                                                          ,&m_data.m_dataGUID.Data4[2]
-                                                          ,&m_data.m_dataGUID.Data4[3]
-                                                          ,&m_data.m_dataGUID.Data4[4]
-                                                          ,&m_data.m_dataGUID.Data4[5]
-                                                          ,&m_data.m_dataGUID.Data4[6]
-                                                          ,&m_data.m_dataGUID.Data4[7]);
+                                          scannum = sscanf_s(p_data,"{%lX-%hX-%hX-%2hhX%2hhX-%2hhX%2hhX%2hhX%2hhX%2hhX%2hhX}"
+                                                            ,&m_data.m_dataGUID.Data1 
+                                                            ,&m_data.m_dataGUID.Data2 
+                                                            ,&m_data.m_dataGUID.Data3 
+                                                            ,&m_data.m_dataGUID.Data4[0]
+                                                            ,&m_data.m_dataGUID.Data4[1]
+                                                            ,&m_data.m_dataGUID.Data4[2]
+                                                            ,&m_data.m_dataGUID.Data4[3]
+                                                            ,&m_data.m_dataGUID.Data4[4]
+                                                            ,&m_data.m_dataGUID.Data4[5]
+                                                            ,&m_data.m_dataGUID.Data4[6]
+                                                            ,&m_data.m_dataGUID.Data4[7]);
                                           if(scannum != 11)
                                           {
                                             memset(&m_data.m_dataGUID,0,sizeof(SQLGUID));
@@ -2320,7 +2290,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_DATE:                      // Fall Through
-    case SQL_C_TYPE_DATE:                 scannum = sscanf(p_data,"%d-%d-%d",&day,&month,&year);
+    case SQL_C_TYPE_DATE:                 scannum = sscanf_s(p_data,"%d-%d-%d",&day,&month,&year);
                                           if(scannum == 3)
                                           {
                                             m_data.m_dataDATE.day   = (SQLUSMALLINT) day;
@@ -2333,7 +2303,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_TIME:                      // Fall through
-    case SQL_C_TYPE_TIME:                 scannum = sscanf(p_data,"%d:%d:%d" ,&hour,&min,&sec);
+    case SQL_C_TYPE_TIME:                 scannum = sscanf_s(p_data,"%d:%d:%d" ,&hour,&min,&sec);
                                           if(scannum == 3)
                                           {
                                             m_data.m_dataTIME.hour   = (SQLUSMALLINT) hour;
@@ -2346,9 +2316,9 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_TIMESTAMP:                 // Fall through
-    case SQL_C_TYPE_TIMESTAMP:            scannum = sscanf(p_data,"%d-%d-%d %d:%d:%lf"
-                                                          ,&year,&month,&day
-                                                          ,&hour,&min,&seconds);
+    case SQL_C_TYPE_TIMESTAMP:            scannum = sscanf_s(p_data,"%d-%d-%d %d:%d:%lf"
+                                                            ,&year,&month,&day
+                                                            ,&hour,&min,&seconds);
                                           if(scannum == 6)
                                           {
                                             m_data.m_dataTIMESTAMP.year   = (SQLSMALLINT)  year;
@@ -2390,7 +2360,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
 
                                           break;
     case SQL_C_INTERVAL_YEAR_TO_MONTH:    m_data.m_dataINTERVAL.interval_type = SQL_IS_YEAR_TO_MONTH;
-                                          scannum = sscanf(p_data,"%d %d",&year,&month);
+                                          scannum = sscanf_s(p_data,"%d %d",&year,&month);
                                           if(scannum == 2)
                                           {
                                             m_data.m_dataINTERVAL.intval.year_month.year  = year;
@@ -2403,7 +2373,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_DAY_TO_HOUR:      m_data.m_dataINTERVAL.interval_type = SQL_IS_DAY_TO_HOUR;
-                                          scannum = sscanf(p_data,"%d %d",&day,&hour);
+                                          scannum = sscanf_s(p_data,"%d %d",&day,&hour);
                                           if(scannum == 2)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.day  = day;
@@ -2415,7 +2385,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_DAY_TO_MINUTE:    m_data.m_dataINTERVAL.interval_type = SQL_IS_DAY_TO_MINUTE;
-                                          scannum = sscanf(p_data,"%d %d:%d",&day,&hour,&min);
+                                          scannum = sscanf_s(p_data,"%d %d:%d",&day,&hour,&min);
                                           if(scannum == 3)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.day    = day;
@@ -2428,7 +2398,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_DAY_TO_SECOND:    m_data.m_dataINTERVAL.interval_type = SQL_IS_DAY_TO_SECOND;
-                                          scannum = sscanf(p_data,"%d %d:%d:%lf",&day,&hour,&min,&seconds);
+                                          scannum = sscanf_s(p_data,"%d %d:%d:%lf",&day,&hour,&min,&seconds);
                                           if(scannum == 4)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.day    = day;
@@ -2445,7 +2415,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_HOUR_TO_MINUTE:   m_data.m_dataINTERVAL.interval_type = SQL_IS_HOUR_TO_MINUTE;
-                                          scannum = sscanf(p_data,"%d:%d",&hour,&min);
+                                          scannum = sscanf_s(p_data,"%d:%d",&hour,&min);
                                           if(scannum == 2)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.hour   = hour;
@@ -2457,7 +2427,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_HOUR_TO_SECOND:   m_data.m_dataINTERVAL.interval_type = SQL_IS_HOUR_TO_SECOND;
-                                          scannum = sscanf(p_data,"%d:%d:%lf",&hour,&min,&seconds);
+                                          scannum = sscanf_s(p_data,"%d:%d:%lf",&hour,&min,&seconds);
                                           if(scannum == 3)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.hour   = hour;
@@ -2473,7 +2443,7 @@ SQLVariant::SetData(int p_type,const char* p_data)
                                           }
                                           break;
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: m_data.m_dataINTERVAL.interval_type = SQL_IS_MINUTE_TO_SECOND;
-                                          scannum = sscanf(p_data,"%d:%lf",&min,&seconds);
+                                          scannum = sscanf_s(p_data,"%d:%lf",&min,&seconds);
                                           if(scannum == 2)
                                           {
                                             m_data.m_dataINTERVAL.intval.day_second.minute = min;
@@ -2568,7 +2538,7 @@ SQLVariant::StringToBinary(const char* p_data)
 //
 //////////////////////////////////////////////////////////////////////////
 
-void 
+void*
 SQLVariant::ThrowErrorDatatype(int p_getas)
 {
   CString error;

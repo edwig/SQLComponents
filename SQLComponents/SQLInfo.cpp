@@ -42,9 +42,9 @@ static char THIS_FILE[] = __FILE__;
 
 namespace SQLComponents
 {
-#pragma warning (disable: 4996)
-#pragma warning (disable: 4312)
 
+// Used for metasearches
+#define META_SEARCH_LEN 10
 // This macro is used for synchronous ODBC calls
 #define ODBC_CALL_ONCE(SQLFunc) \
   try \
@@ -858,10 +858,10 @@ SQLInfo::SetAttributeInteger(CString     description
                             ,SQLUINTEGER value)
 {
   RETCODE nRetCode = SQL_ERROR;
-  nRetCode = ::SQLSetConnectAttr(m_hdbc
-                                ,attrib
-                                ,(SQLPOINTER)value
-                                ,SQL_IS_UINTEGER);
+  nRetCode = SqlSetConnectAttr(m_hdbc
+                              ,attrib
+                              ,(SQLPOINTER)(DWORD_PTR)value
+                              ,SQL_IS_UINTEGER);
   if(!m_database->Check(nRetCode))
   {
     CString error;
@@ -1187,10 +1187,10 @@ SQLInfo::GetStatement(bool p_metadataID /*= true*/)
   SQLUINTEGER meta = p_metadataID ? SQL_TRUE : SQL_FALSE;
   // On Various ODBC databases metadata is or is not case-sensitive. To work around
   // these differences, the statement should be aware that it is about metadata!
-  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_METADATA_ID,(SQLPOINTER)meta,SQL_IS_UINTEGER);
+  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_METADATA_ID,(SQLPOINTER)(DWORD_PTR)meta,SQL_IS_UINTEGER);
   if(!SQL_SUCCEEDED(m_retCode))
   {
-    m_retCode = SqlSetConnectAttr(m_hdbc,SQL_ATTR_METADATA_ID,(SQLPOINTER)meta,SQL_IS_UINTEGER);
+    m_retCode = SqlSetConnectAttr(m_hdbc,SQL_ATTR_METADATA_ID,(SQLPOINTER)(DWORD_PTR)meta,SQL_IS_UINTEGER);
     if(!SQL_SUCCEEDED(m_retCode))
     {
       // OOPS Cannot set the METADATA attribute.
@@ -1245,50 +1245,71 @@ SQLInfo::GetObjectName(CString& pattern
       if(type.Left(1).CompareNoCase("T") == 0)
       {
         type = type.Mid(1);
-        if(filled) strcat((char*)search_type,",");
-        strcat((char*)search_type,"TABLE");
+        if(filled)
+        {
+          strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,",");
+        }
+        strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,"TABLE");
         filled = true;
       }
       else if(type.Left(1).CompareNoCase("V") == 0)
       {
         type = type.Mid(1);
-        if(filled) strcat((char*)search_type,",");
-        strcat((char*)search_type,"VIEW");
+        if(filled)
+        {
+          strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,",");
+        }
+        strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,"VIEW");
         filled = true;
       }
       else if(type.Left(1).CompareNoCase("C") == 0)
       {
         type = type.Mid(1);
-        if(filled) strcat((char*)search_type,",");
-        strcat((char*)search_type,"SYSTEM TABLE");
+        if(filled)
+        {
+          strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,",");
+        }
+        strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,"SYSTEM TABLE");
         filled = true;
       }
       else if(type.Left(1).CompareNoCase("G") == 0)
       {
         type = type.Mid(1);
-        if(filled) strcat((char*)search_type,",");
-        strcat((char*)search_type,"GLOBAL TEMPORARY");
+        if(filled)
+        {
+          strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,",");
+        }
+        strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,"GLOBAL TEMPORARY");
         filled = true;
       }
       else if(type.Left(1).CompareNoCase("L") == 0)
       {
         type = type.Mid(1);
-        if(filled) strcat((char*)search_type,",");
-        strcat((char*)search_type,"LOCAL TEMPORARY");
+        if(filled)
+        {
+          strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,",");
+        }
+        strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,"LOCAL TEMPORARY");
         filled = true;
       }
       else if(type.Left(1).CompareNoCase("A") == 0)
       {
         type = type.Mid(1);
-        if(filled) strcat((char*)search_type,",");
-        strcat((char*)search_type,"ALIAS");
+        if(filled)
+        {
+          strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,",");
+        }
+        strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,"ALIAS");
         filled = true;
       }
       else if(type.Left(1).CompareNoCase("S") == 0)
       {
         type = type.Mid(1);
-        if(filled) strcat((char*)search_type,",");
-        strcat((char*)search_type,"SYNONYM");
+        if(filled)
+        {
+          strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,",");
+        }
+        strcat_s((char*)search_type,SQL_MAX_IDENTIFIER,"SYNONYM");
         filled = true;
       }
       else
@@ -1303,23 +1324,23 @@ SQLInfo::GetObjectName(CString& pattern
   if(pos < 0)
   {
     // Only a table name
-    strcpy((char *)search_table,name.GetString());
+    strcpy_s((char *)search_table,SQL_MAX_IDENTIFIER,name.GetString());
   }
   else
   {
-    strcpy((char *)search_table,name.Right(name.GetLength()-pos-1).GetString());
+    strcpy_s((char *)search_table,SQL_MAX_IDENTIFIER,name.Right(name.GetLength()-pos-1).GetString());
     CString qualifier = name.Left(pos);
     pos = qualifier.ReverseFind('.');
     if(pos < 0)
     {
       // Only a schema name
-      strcpy((char *)search_schema,qualifier.GetString());
+      strcpy_s((char *)search_schema,SQL_MAX_IDENTIFIER,qualifier.GetString());
     }
     else
     {
       // Split in catalog / schema
-      strcpy((char*)search_schema,qualifier.Right(qualifier.GetLength()-pos-1).GetString());
-      strcpy((char*)search_catalog,qualifier.Left(pos));
+      strcpy_s((char*)search_schema, SQL_MAX_IDENTIFIER,qualifier.Right(qualifier.GetLength()-pos-1).GetString());
+      strcpy_s((char*)search_catalog,SQL_MAX_IDENTIFIER,qualifier.Left(pos));
     }
   }
   if(m_maxCatalogName && strlen((char*)search_catalog) > (size_t)m_maxCatalogName)
@@ -1652,9 +1673,9 @@ SQLInfo::MakeInfoTableColumns(WordList* p_list)
     p_list->push_back("SQLColumns unsupported. Get a better ODBC driver!");
     return true;
   }
-  strcpy((char*)szCatalogName,m_searchCatalogName.GetString());
-  strcpy((char*)szSchemaName, m_searchSchemaName.GetString());
-  strcpy((char*)szTableName,  m_searchTableName.GetString());
+  strcpy_s((char*)szCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+  strcpy_s((char*)szSchemaName, SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+  strcpy_s((char*)szTableName,  SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
   szColumnName[0] = 0;
 
   CloseStatement();
@@ -1806,9 +1827,9 @@ SQLInfo::MakeInfoTablePrimary(WordList*   p_list
     }
     return true;
   }
-  strcpy((char*)szCatalogName,m_searchCatalogName.GetString());
-  strcpy((char*)szSchemaName, m_searchSchemaName.GetString());
-  strcpy((char*)szTableName,  m_searchTableName.GetString());
+  strcpy_s((char*)szCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+  strcpy_s((char*)szSchemaName, SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+  strcpy_s((char*)szTableName,  SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
 
   CloseStatement();
   bool meta = GetStatement(false);
@@ -1957,9 +1978,9 @@ SQLInfo::MakeInfoTableForeign(WordList* p_list,bool ref)
 
   if(ref)
   {
-    strcpy((char*)szPKCatalogName,m_searchCatalogName.GetString());
-    strcpy((char*)szPKSchemaName, m_searchSchemaName.GetString());
-    strcpy((char*)szPKTableName,  m_searchTableName.GetString());
+    strcpy_s((char*)szPKCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+    strcpy_s((char*)szPKSchemaName, SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+    strcpy_s((char*)szPKTableName,  SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
     szFKCatalogName[0] = 0;
     szFKSchemaName [0] = 0;
     szFKTableName  [0] = 0;
@@ -1969,9 +1990,9 @@ SQLInfo::MakeInfoTableForeign(WordList* p_list,bool ref)
     szPKCatalogName[0] = 0;
     szPKSchemaName [0] = 0;
     szPKTableName  [0] = 0;
-    strcpy((char*)szFKCatalogName,m_searchCatalogName.GetString());
-    strcpy((char*)szFKSchemaName, m_searchSchemaName.GetString());
-    strcpy((char*)szFKTableName,  m_searchTableName.GetString());
+    strcpy_s((char*)szFKCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+    strcpy_s((char*)szFKSchemaName, SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+    strcpy_s((char*)szFKTableName,  SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
   }
   unsigned char* PKcatalog = GetMetaPointer(szPKCatalogName,meta);
   unsigned char* PKschema  = GetMetaPointer(szPKSchemaName, meta);
@@ -2208,9 +2229,9 @@ SQLInfo::MakeInfoTableStatistics(WordList*   p_list
     }
     return true;
   }
-  strcpy((char*)szCatalogName,m_searchCatalogName.GetString());
-  strcpy((char*)szSchemaName, m_searchSchemaName.GetString());
-  strcpy((char*)szTableName,  m_searchTableName.GetString());
+  strcpy_s((char*)szCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+  strcpy_s((char*)szSchemaName, SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+  strcpy_s((char*)szTableName,  SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
 
   CloseStatement();
   bool meta = GetStatement(false);
@@ -2425,9 +2446,9 @@ SQLInfo::MakeInfoTableSpecials(WordList* p_list)
     p_list->push_back("SQLSpecialColumns unsupported. Get a better ODBC driver!");
     return true;
   }
-  strcpy((char*)szCatalogName,m_searchCatalogName.GetString());
-  strcpy((char*)szSchemaName, m_searchSchemaName.GetString());
-  strcpy((char*)szTableName,  m_searchTableName.GetString());
+  strcpy_s((char*)szCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+  strcpy_s((char*)szSchemaName, SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+  strcpy_s((char*)szTableName,  SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
 
   CloseStatement();
   bool meta = GetStatement(false);
@@ -2543,9 +2564,9 @@ SQLInfo::MakeInfoTablePrivileges(WordList* p_list)
     p_list->push_back("SQLTablePrivileges unsupported. Get a better ODBC driver!");
     return true;
   }
-  strcpy((char*)szCatalogName,m_searchCatalogName.GetString());
-  strcpy((char*)szSchemaName, m_searchSchemaName.GetString());
-  strcpy((char*)szTableName,  m_searchTableName.GetString());
+  strcpy_s((char*)szCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+  strcpy_s((char*)szSchemaName, SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+  strcpy_s((char*)szTableName,  SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
 
   CloseStatement();
   bool meta = GetStatement(false);
@@ -2668,12 +2689,12 @@ SQLInfo::MakeInfoProcedureProcedurepart(WordList* p_list
   }
   // Split name in a maximum of three parts
   GetObjectName(p_procedure,szCatalogName,szSchemaName,szProcedureName,szProcedureNType);  // Get a statement handle for metadata use
-  strcpy((char*)searchName,(char*)szProcedureName);
+  strcpy_s((char*)searchName,SQL_MAX_IDENTIFIER,(char*)szProcedureName);
   if(strcmp((char*)szProcedureName,"*") == 0)
   {
     doAllProcedures = true;
     RetValue = false; // Do not continue with parameters
-    strcpy((char*)szProcedureName,"%");
+    strcpy_s((char*)szProcedureName,SQL_MAX_IDENTIFIER,"%");
   }
   CloseStatement();
   bool meta = GetStatement(false);
@@ -2718,7 +2739,7 @@ SQLInfo::MakeInfoProcedureProcedurepart(WordList* p_list
       }
       if(m_retCode == SQL_SUCCESS || m_retCode == SQL_SUCCESS_WITH_INFO)
       {
-        if(stricmp((char*)searchName,(char*)szProcedureName) && !doAllProcedures)
+        if(_stricmp((char*)searchName,(char*)szProcedureName) && !doAllProcedures)
         {
           // Oracle Propriety ODBC driver does this for synonym names
           // Search further on for the real function/procedure name
@@ -2839,9 +2860,9 @@ SQLInfo::MakeInfoProcedureParameters(WordList* p_list)
     p_list->push_back("SQLProcedureColumns unsupported. Get a better ODBC driver!");
     return true;
   }
-  strcpy((char*)szCatalogName,  m_searchCatalogName.GetString());
-  strcpy((char*)szSchemaName,   m_searchSchemaName.GetString());
-  strcpy((char*)szProcedureName,m_searchTableName.GetString());
+  strcpy_s((char*)szCatalogName,  SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
+  strcpy_s((char*)szSchemaName,   SQL_MAX_IDENTIFIER,m_searchSchemaName.GetString());
+  strcpy_s((char*)szProcedureName,SQL_MAX_IDENTIFIER,m_searchTableName.GetString());
   szColumnName[0] = 0;
 
   CloseStatement();
@@ -3084,10 +3105,10 @@ SQLInfo::MakeInfoMetaTypes(WordList* p_list,int type)
   SQLCHAR      szRemarks     [SQL_MAX_BUFFER];
   SQLLEN       cbRemarks     = 0;
   // Where to search
-  unsigned char search_catalog[10] = "";
-  unsigned char search_schema [10] = "";
-  unsigned char search_table  [10] = "";
-  unsigned char search_type   [10] = "";
+  unsigned char search_catalog[META_SEARCH_LEN] = "";
+  unsigned char search_schema [META_SEARCH_LEN] = "";
+  unsigned char search_table  [META_SEARCH_LEN] = "";
+  unsigned char search_type   [META_SEARCH_LEN] = "";
   // For duplicates
   std::map<CString,CString> found;
   std::map<CString,CString>::iterator it;
@@ -3106,9 +3127,9 @@ SQLInfo::MakeInfoMetaTypes(WordList* p_list,int type)
 
   switch(type)
   {
-    case META_CATALOGS: strcpy((char*)search_catalog,SQL_ALL_CATALOGS);     break;
-    case META_SCHEMAS:  strcpy((char*)search_schema, SQL_ALL_SCHEMAS);      break;
-    case META_TABLES:   strcpy((char*)search_type,   SQL_ALL_TABLE_TYPES);  break;
+    case META_CATALOGS: strcpy_s((char*)search_catalog,META_SEARCH_LEN,SQL_ALL_CATALOGS);     break;
+    case META_SCHEMAS:  strcpy_s((char*)search_schema, META_SEARCH_LEN,SQL_ALL_SCHEMAS);      break;
+    case META_TABLES:   strcpy_s((char*)search_type,   META_SEARCH_LEN,SQL_ALL_TABLE_TYPES);  break;
     default: return false;
   }
   unsigned char* catalog = GetMetaPointer(search_catalog,meta);

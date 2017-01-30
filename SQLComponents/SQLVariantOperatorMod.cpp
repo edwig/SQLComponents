@@ -31,8 +31,6 @@
 #include "SQLDate.h"
 #include "bcd.h"
 
-#pragma warning (disable: 4239)
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE

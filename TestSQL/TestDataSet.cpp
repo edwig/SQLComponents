@@ -33,8 +33,6 @@
 #define new DEBUG_NEW
 #endif
 
-#pragma warning (disable: 4477)
-
 double
 TestAppend(SQLDatabase* p_dbs,long p_master)
 {
@@ -211,7 +209,7 @@ TestDataSet()
   }
   catch(CString& s)
   {
-    printf("Database error. Reason:\n%s\n",s);
+    printf("Database error. Reason:\n%s\n",s.GetString());
   }
   catch(...)
   {

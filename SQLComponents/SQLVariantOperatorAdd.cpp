@@ -1537,7 +1537,6 @@ static SQL_OperIntDSAddStamp(SQLVariant& p_left,SQLVariant& p_right)
 }
 
 // TYPE == INTERVAL_YEAR_MONTH
-#pragma warning (disable: 4239)
 
 SQLVariant 
 static SQL_OperIntYMAddIntYM(SQLVariant& p_left,SQLVariant& p_right)

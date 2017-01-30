@@ -33,8 +33,6 @@
 #define new DEBUG_NEW
 #endif
 
-#pragma warning (disable: 4477)
-
 void TestClosingCursor()
 {
   printf("Test closing the cursor:\n");
@@ -76,7 +74,7 @@ void TestClosingCursor()
   }
   catch(CString& s)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",s);
+    printf("Database ***NOT*** opened. Reason:\n%s\n",s.GetString());
   }
   catch(...)
   {
