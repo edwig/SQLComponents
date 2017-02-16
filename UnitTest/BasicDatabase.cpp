@@ -28,7 +28,6 @@
 #include "SQLDatabase.h"
 #include "SQLQuery.h"
 #include "SQLDataSet.h"
-#include "SQLInfoTree.h"
 #include "SQLInfoDB.h"
 #include "SQLAssociation.h"
 #include "bcd.h"

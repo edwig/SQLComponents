@@ -275,14 +275,14 @@ SQLDataSetXLS::AddHeaders(WordList& p_fieldNames, bool p_replace)
 bool
 SQLDataSetXLS::AddRow(WordList& p_rowValues, long /*p_row*/, bool /*p_replace*/)
 {
-  int ind  = 0;
   int cols = GetNumberOfFields();
   int vals = (int)p_rowValues.size();
   SQLRecord* record = InsertRecord();
+  WordList::iterator it = p_rowValues.begin();
 
   while(cols-- && vals--)
   {
-    SQLVariant* var = new SQLVariant(p_rowValues[ind++]);
+    SQLVariant* var = new SQLVariant(*it++); //p_rowValues[ind++]);
     record->AddField(var);
   }
   if(!m_transaction)
@@ -717,12 +717,12 @@ SQLDataSetXLS::CalculateColumnNumber(CString p_column, bool p_name /*=true*/)
 
 // Read a row from spreadsheet. 
 bool 
-SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
+SQLDataSetXLS::SplitRow(CString& p_input,WordList& p_rowValues)
 {
   CString temp;
   CString tempString(p_input);
   // Read the desired row
-  p_rowValues.RemoveAll();
+  p_rowValues.clear();
 
   // Trim the row first
   TrimRow(tempString);
@@ -749,7 +749,7 @@ SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
     return false;
   }
 
-  // Handle the case where we only have a delimiter and everything in beteween is a string
+  // Handle the case where we only have a delimiter and everything in between is a string
   if(m_delimLeft.IsEmpty())
   {
     int pos = tempString.Find(m_separator);
@@ -757,14 +757,14 @@ SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
     {
       CString deel = tempString.Left(pos);
       tempString = tempString.Mid(pos + 1);
-      p_rowValues.Add(deel.Trim());
+      p_rowValues.push_back(deel.Trim());
       pos = tempString.Find(m_separator);
     }
     // Rest of the string is a field value, but potentially empty if line ends on a delimiter
     tempString = tempString.Trim();
     if(tempString.GetLength())
     {
-      p_rowValues.Add(tempString.Trim());
+      p_rowValues.push_back(tempString.Trim());
     }
     return true;
   }
@@ -783,7 +783,7 @@ SQLDataSetXLS::SplitRow(CString& p_input,CStringArray &p_rowValues)
     // Partially string between delimiters
     CString deel = tempString.Mid(pos + 1,pos_rechts - pos -1);
     tempString   = tempString.Mid(pos_rechts + 1);
-    p_rowValues.Add(deel);
+    p_rowValues.push_back(deel);
 
     // Skip separator
     if(!m_separator.IsEmpty() && !tempString.IsEmpty())
