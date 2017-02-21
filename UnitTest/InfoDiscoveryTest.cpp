@@ -79,18 +79,20 @@ namespace DatabaseUnitTest
     void MetaType(int p_type,CString p_name)
     {
       SQLInfoDB* info = m_database->GetSQLInfoDB();
-      WordList list;
+      MMetaMap objects;
+      CString  errors;
 
-      if(info->MakeInfoMetaTypes(&list,p_type))
+      if(info->MakeInfoMetaTypes(objects,p_type,errors))
       {
-        for(auto& word : list)
+        for(auto& obj : objects)
         {
-          Logger::WriteMessage("Metatype " + p_name + " : " + word);
+          Logger::WriteMessage("Metatype " + p_name + " : " + obj.m_objectName);
         }
       }
       else
       {
-        Assert::Fail(L"Cannot get the meta types");
+        // Essentially not an error. It's an optional feature of ODBC
+        Logger::WriteMessage("Cannot get the meta types for: " + p_name);
       }
     }
 
@@ -99,19 +101,14 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("\nDO TABLE DISCOVERY: " + p_table);
 
       SQLInfoDB* info = m_database->GetSQLInfoDB();
+      MTableMap tables;
+      CString   errors;
 
-      WordList remarks;
-      WordList tables;
-
-      if(info->MakeInfoTableTablepart(&remarks,&tables,p_table))
+      if(info->MakeInfoTableTablepart(p_table,tables,errors))
       {
-        for(auto& remark : remarks)
-        {
-          Logger::WriteMessage("Remark: " + remark);
-        }
         for(auto& table : tables)
         {
-          Logger::WriteMessage("Table found: " + table);
+          Logger::WriteMessage("Table found: " + table.m_fullObjectName);
           ColumnsDiscovery(info);
           PrimaryDiscovery(info);
           ForeignDiscovery(info);
@@ -120,7 +117,7 @@ namespace DatabaseUnitTest
           TabPrivDiscovery(info);
         }
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get info for table");
       }
@@ -128,15 +125,17 @@ namespace DatabaseUnitTest
 
     void ColumnsDiscovery(SQLInfoDB* p_info)
     {
-      WordList columns;
-      if(p_info->MakeInfoTableColumns(&columns))
+      CString    errors;
+      MColumnMap columns;
+
+      if(p_info->MakeInfoTableColumns(columns,errors))
       {
         for(auto& column : columns)
         {
-          Logger::WriteMessage("Column: " + column);
+          Logger::WriteMessage("Column: " + column.m_column);
         }
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get column info for table");
       }
@@ -144,23 +143,24 @@ namespace DatabaseUnitTest
 
     void PrimaryDiscovery(SQLInfoDB* p_info)
     {
-      CString    primaryConstraint;
-      PrimaryMap primaries;
+      MPrimaryMap primaries;
+      CString     errors;
 
-      if(p_info->MakeInfoTablePrimary(nullptr,primaryConstraint,primaries))
+      if(p_info->MakeInfoTablePrimary(primaries,errors))
       {
-        Logger::WriteMessage("Primary key constraint: " + primaryConstraint);
 
         for(auto& primary : primaries)
         {
+          Logger::WriteMessage("Primary key constraint: " + primary.m_constraintName);
+
           CString text;
           text.Format("Primary key %d: %s"
-                      ,primary.second.m_colPos
-                      ,primary.second.m_colName);
+                      ,primary.m_columnPosition
+                      ,primary.m_columnName);
           Logger::WriteMessage(text);
         }
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get primary key info for table");
       }
@@ -168,15 +168,17 @@ namespace DatabaseUnitTest
     
     void ForeignDiscovery(SQLInfoDB* p_info)
     {
-      WordList references;
-      if(p_info->MakeInfoTableForeign(&references))
+      MForeignMap references;
+      CString     errors;
+
+      if(p_info->MakeInfoTableForeign(references,errors))
       {
         for(auto& ref : references)
         {
-          Logger::WriteMessage("Foreign: " + ref);
+          Logger::WriteMessage("Foreign: " + ref.m_foreignConstraint);
         }
       }
-      else
+      else if (!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get foreign key info for table");
       }
@@ -184,17 +186,17 @@ namespace DatabaseUnitTest
 
     void IndicesDiscovery(SQLInfoDB* p_info)
     {
-      WordList references;
-      CString  keyname;
-      PrimaryMap pmap;
-      if(p_info->MakeInfoTableStatistics(&references,keyname,pmap))
+      MStatisticsMap statistics;
+      CString        errors;
+
+      if(p_info->MakeInfoTableStatistics(statistics,nullptr,errors))
       {
-        for(auto& ref : references)
+        for(auto& ind : statistics)
         {
-          Logger::WriteMessage("Indices: " + ref);
+          Logger::WriteMessage("Indices: " + ind.m_indexName);
         }
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get statistics info for table");
       }
@@ -202,15 +204,16 @@ namespace DatabaseUnitTest
 
     void SpecialDiscovery(SQLInfoDB* p_info)
     {
-      WordList references;
-      if(p_info->MakeInfoTableSpecials(&references))
+      MSpecialColumnMap specials;
+      CString errors;
+      if(p_info->MakeInfoTableSpecials(specials,errors))
       {
-        for(auto& ref : references)
+        for(auto& spec : specials)
         {
-          Logger::WriteMessage("Specials: " + ref);
+          Logger::WriteMessage("Specials: " + spec.m_columnName);
         }
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get special info for table");
       }
@@ -218,15 +221,22 @@ namespace DatabaseUnitTest
 
     void TabPrivDiscovery(SQLInfoDB* p_info)
     {
-      WordList references;
-      if(p_info->MakeInfoTablePrivileges(&references))
+      MPrivilegeMap privileges;
+      CString errors;
+
+      if(p_info->MakeInfoTablePrivileges(privileges,errors))
       {
-        for(auto& ref : references)
+        for(auto& priv : privileges)
         {
-          Logger::WriteMessage("Table privileges: " + ref);
+          CString line;
+          line.Format("Table privilege: %s was granted %s by %s"
+                     ,priv.m_grantee
+                     ,priv.m_privilege
+                     ,priv.m_grantor);
+          Logger::WriteMessage(line);
         }
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get table priviliges for table");
       }
@@ -238,16 +248,17 @@ namespace DatabaseUnitTest
 
       SQLInfoDB* info = m_database->GetSQLInfoDB();
 
-      WordList list;
-      if(info->MakeInfoProcedureProcedurepart(&list,p_procedure))
+      MProcedureMap procedures;
+      CString errors;
+      if(info->MakeInfoProcedureProcedurepart(p_procedure,procedures,errors))
       {
-        for(auto& word : list)
+        for(auto& proc : procedures)
         {
-          Logger::WriteMessage("Procedure : " + word);
+          Logger::WriteMessage("Procedure : " + proc.m_procedureName);
         }
         ParametersDiscovery(info);
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Logger::WriteMessage("Cannot find procedure: " + p_procedure);
       }
@@ -255,15 +266,17 @@ namespace DatabaseUnitTest
 
     void ParametersDiscovery(SQLInfoDB* p_info)
     {
-      WordList list;
-      if(p_info->MakeInfoProcedureParameters(&list))
+      MProcColumnMap params;
+      CString errors;
+
+      if(p_info->MakeInfoProcedureParameters(params,errors))
       {
-        for(auto& word : list)
+        for(auto& parm : params)
         {
-          Logger::WriteMessage("Parameter : " + word);
+          Logger::WriteMessage("Parameter : " + parm.m_columnName);
         }
       }
-      else
+      else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get parameters for procedure");
       }
