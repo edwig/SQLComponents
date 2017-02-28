@@ -114,6 +114,7 @@ namespace DatabaseUnitTest
           ForeignDiscovery(info);
           IndicesDiscovery(info);
           SpecialDiscovery(info);
+          TriggerDiscovery(info);
           TabPrivDiscovery(info);
         }
       }
@@ -216,6 +217,42 @@ namespace DatabaseUnitTest
       else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get special info for table");
+      }
+    }
+
+    void TriggerDiscovery(SQLInfoDB* p_info)
+    {
+      MTriggerMap triggers;
+      CString errors;
+
+      if(p_info->MakeInfoTableTriggers(triggers,errors))
+      {
+        CString line;
+        for(auto& trigger : triggers)
+        {
+          line.Format("Trigger: [%d] %s",trigger.m_position,trigger.m_triggerName);
+          Logger::WriteMessage(line);
+
+          line.Format("Trigger fires: %s",trigger.m_before ? "before" : "after");
+          Logger::WriteMessage(line);
+
+          // Triggers for which statement
+          line.Format("Trigger DML INSERT: %s",trigger.m_insert ? "yes" : "no");
+          Logger::WriteMessage(line);
+          line.Format("Trigger DML UPDATE: %s",trigger.m_update ? "yes" : "no");
+          Logger::WriteMessage(line);
+          line.Format("Trigger DML DELETE: %s",trigger.m_delete ? "yes" : "no");
+          Logger::WriteMessage(line);
+          line.Format("Trigger DML SELECT: %s",trigger.m_select ? "yes" : "no");
+          Logger::WriteMessage(line);
+
+          line.Format("Trigger source: %s",trigger.m_source);
+          Logger::WriteMessage(line);
+        }
+      }
+      else if(!errors.IsEmpty())
+      {
+        Assert::Fail(L"Cannot get the trigger info for table");
       }
     }
 

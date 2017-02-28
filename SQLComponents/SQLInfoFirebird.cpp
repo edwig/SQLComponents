@@ -376,6 +376,34 @@ SQLInfoFirebird::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablenam
          "      PRIMARY KEY (" + p_primary + ")";
 }
 
+CString
+SQLInfoFirebird::GetPrimaryKeyConstraint(MPrimaryMap& p_primaries) const
+{
+  CString query("ALTER TABLE ");
+
+  for(auto& prim : p_primaries)
+  {
+    if(prim.m_columnPosition == 1)
+    {
+      if(!prim.m_schema.IsEmpty())
+      {
+        query += prim.m_schema + ".";
+      }
+      query += prim.m_table + "\n";
+      query += "  ADD CONSTRAINT " + prim.m_constraintName + "\n";
+      query += "      PRIMARY KEY (";
+
+    }
+    else
+    {
+      query += ",";
+    }
+    query += prim.m_columnName;
+  }
+  query += ")";
+  return query;
+}
+
 // Get the sql to add a foreign key to a table
 CString 
 SQLInfoFirebird::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
@@ -397,21 +425,88 @@ SQLInfoFirebird::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
   // Add all relevant options
   switch(p_foreign.m_updateRule)
   {
-    case 1: query += "\n      ON UPDATE CASCADE";     break;
+    case 0: query += "\n      ON UPDATE CASCADE";     break;
     case 2: query += "\n      ON UPDATE SET NULL";    break;
-    case 3: query += "\n      ON UPDATE SET DEFAULT"; break;
-    case 4: query += "\n      ON UPDATE NO ACTION";   break;
+    case 4: query += "\n      ON UPDATE SET DEFAULT"; break;
+    case 3: query += "\n      ON UPDATE NO ACTION";   break;
     default:// In essence: ON UPDATE RESTRICT, but that's already the default
-    case 0: break;
+    case 1: break;
   }
   switch(p_foreign.m_deleteRule)
   {
-    case 1: query += "\n      ON DELETE CASCADE";     break;
+    case 0: query += "\n      ON DELETE CASCADE";     break;
     case 2: query += "\n      ON DELETE SET NULL";    break;
-    case 3: query += "\n      ON DELETE SET DEFAULT"; break;
-    case 4: query += "\n      ON DELETE NO ACTION";   break;
+    case 4: query += "\n      ON DELETE SET DEFAULT"; break;
+    case 3: query += "\n      ON DELETE NO ACTION";   break;
     default:// In essence: ON DELETE RESTRICT, but that's already the default
-    case 0: break;
+    case 1: break;
+  }
+  return query;
+}
+
+CString 
+SQLInfoFirebird::GetSQLForeignKeyConstraint(MForeignMap& p_foreigns) const
+{
+  // Get first record
+  MetaForeign& foreign = p_foreigns.front();
+
+  // Construct the correct tablename
+  CString table(foreign.m_fkTableName);
+  CString primary(foreign.m_pkTableName);
+  if(!foreign.m_fkSchemaName.IsEmpty())
+  {
+    table = foreign.m_fkSchemaName + "." + table;
+  }
+  if(!foreign.m_pkSchemaName.IsEmpty())
+  {
+    primary = foreign.m_pkSchemaName + "." + primary;
+  }
+
+  // The base foreign key command
+  CString query = "ALTER TABLE " + table + "\n"
+                  "  ADD CONSTRAINT " + foreign.m_foreignConstraint + "\n"
+                  "      FOREIGN KEY (";
+
+  // Add the foreign key columns
+  bool extra = false;
+  for(auto& key : p_foreigns)
+  {
+    if(extra) query += ",";
+    query += key.m_fkColumnName;
+    extra  = true;
+  }
+
+  // Add references primary table
+  query += ")\n      REFERENCES " + primary + "(";
+
+  // Add the primary key columns
+  extra = false;
+  for(auto& key : p_foreigns)
+  {
+    if(extra) query += ",";
+    query += key.m_pkColumnName;
+    extra  = true;
+  }
+  query += ")";
+
+  // Add all relevant options
+  switch(foreign.m_updateRule)
+  {
+    case SQL_CASCADE:     query += "\n      ON UPDATE CASCADE";     break;
+    case SQL_SET_NULL:    query += "\n      ON UPDATE SET NULL";    break;
+    case SQL_SET_DEFAULT: query += "\n      ON UPDATE SET DEFAULT"; break;
+    case SQL_NO_ACTION:   query += "\n      ON UPDATE NO ACTION";   break;
+    default:              // In essence: ON UPDATE RESTRICT, but that's already the default
+                          break;
+  }
+  switch(foreign.m_deleteRule)
+  {
+    case SQL_CASCADE:     query += "\n      ON DELETE CASCADE";     break;
+    case SQL_SET_NULL:    query += "\n      ON DELETE SET NULL";    break;
+    case SQL_SET_DEFAULT: query += "\n      ON DELETE SET DEFAULT"; break;
+    case SQL_NO_ACTION:   query += "\n      ON DELETE NO ACTION";   break;
+    default:              // In essence: ON DELETE RESTRICT, but that's already the default
+                          break;
   }
   return query;
 }
@@ -770,6 +865,69 @@ SQLInfoFirebird::GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* p
   return sql;
 }
 
+CString
+SQLInfoFirebird::GetSQLCreateIndex(MStatisticsMap& p_indices) const
+{
+  CString query;
+  for(auto& index : p_indices)
+  {
+    if(index.m_position == 1)
+    {
+      // New index
+      query = "CREATE ";
+      if(index.m_unique)
+      {
+        query += "UNIQUE ";
+      }
+      if(index.m_ascending != "A")
+      {
+        query += "DESC ";
+      }
+      query += "INDEX ";
+      if(!index.m_schemaName.IsEmpty())
+      {
+        query += index.m_schemaName + ".";
+      }
+      query += index.m_indexName;
+      query += " ON ";
+      if(!index.m_schemaName.IsEmpty())
+      {
+        query += index.m_schemaName + ".";
+      }
+      query += index.m_tableName;
+      query += "(";
+    }
+    else
+    {
+      query += ",";
+    }
+    if(index.m_columnName.Left(1) == "(")
+    {
+      query.TrimRight("(");
+      query += " COMPUTED BY ";
+      query += index.m_columnName;
+      query.TrimRight(")");
+    }
+    else if(!index.m_filter.IsEmpty())
+    {
+      query += index.m_filter;
+    }
+    else
+    {
+      query += index.m_columnName;
+    }
+  }
+  query += ")";
+  return query;
+}
+
+// Get extra filter expression for an index column
+CString
+SQLInfoFirebird::GetIndexFilter(MetaStatistics& /*p_index*/) const
+{
+  return "";
+}
+
 // Get SQL to drop an index
 CString 
 SQLInfoFirebird::GetSQLDropIndex(CString p_user,CString p_indexName) const
@@ -778,7 +936,7 @@ SQLInfoFirebird::GetSQLDropIndex(CString p_user,CString p_indexName) const
   return sql;
 }
 
-// Get the SQL Query to read the referential constriants for a table
+// Get the SQL Query to read the referential constraints for a table
 CString 
 SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
                                       ,CString p_tablename
@@ -797,18 +955,18 @@ SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
                   "      ,case con.rdb$initially_deferred WHEN 'YES'  THEN 1 ELSE 0 END as initially_deferred\n"
                   "      ,1                               as enabled\n"
                   "      ,case ref.rdb$match_option       WHEN 'FULL' THEN 1 ELSE 0 END as match_option\n"
-                  "      ,case ref.rdb$update_rule        WHEN 'RESTRICT'     THEN 0\n"
-                  "                                       WHEN 'CASCADE'      THEN 1\n"
+                  "      ,case ref.rdb$update_rule        WHEN 'RESTRICT'     THEN 1\n"
+                  "                                       WHEN 'CASCADE'      THEN 0\n"
                   "                                       WHEN 'SET NULL'     THEN 2\n"
-                  "                                       WHEN 'SET DEFAULT'  THEN 3\n"
-                  "                                       WHEN 'NO ACTION'    THEN 4\n"
+                  "                                       WHEN 'SET DEFAULT'  THEN 4\n"
+                  "                                       WHEN 'NO ACTION'    THEN 3\n"
                   "                                       ELSE 0\n"
                   "                                       END as update_rule\n"
-                  "      ,case ref.rdb$delete_Rule        WHEN 'RESTRICT'     THEN 0\n"
-                  "                                       WHEN 'CASCADE'      THEN 1\n"
+                  "      ,case ref.rdb$delete_Rule        WHEN 'RESTRICT'     THEN 1\n"
+                  "                                       WHEN 'CASCADE'      THEN 0\n"
                   "                                       WHEN 'SET NULL'     THEN 2\n"
-                  "                                       WHEN 'SET DEFAULT'  THEN 3\n"
-                  "                                       WHEN 'NO ACTION'    THEN 4\n"
+                  "                                       WHEN 'SET DEFAULT'  THEN 4\n"
+                  "                                       WHEN 'NO ACTION'    THEN 3\n"
                   "                                       ELSE 0\n"
                   "                                       END as delete_rule\n"
                   "  FROM rdb$relation_constraints con\n"
@@ -999,6 +1157,88 @@ SQLInfoFirebird::GetOnlyOneUserSession()
   return sessions->GetAsSLong() <= 1;
 }
 
+// Gets the triggers for a table
+CString
+SQLInfoFirebird::GetSQLTriggers(CString p_schema,CString p_table) const
+{
+  CString sql;
+  sql.Format("SELECT '' AS catalog_name\n"
+             "      ,'%s' AS schema_name\n"
+             "      ,rdb$relation_name\n"
+             "      ,rdb$trigger_name\n"
+             "      ,rdb$description\n"
+             "      ,rdb$trigger_sequence\n"
+             "      ,CASE rdb$trigger_type\n"
+             "            WHEN    1 THEN true\n"
+             "            WHEN    3 THEN true\n"
+             "            WHEN    5 THEN true\n"
+             "            WHEN   17 THEN true\n"
+             "            WHEN   25 THEN true\n"
+             "            WHEN   27 THEN true\n"
+             "            WHEN  113 THEN true\n"
+             "            WHEN 8192 THEN true\n"
+             "            WHEN 8194 THEN true\n"
+             "                      ELSE false\n"
+             "       END AS trigger_before\n"
+             "      ,CASE rdb$trigger_type\n"
+             "            WHEN    1 THEN true\n"
+             "            WHEN    2 THEN true\n"
+             "            WHEN   17 THEN true\n"
+             "            WHEN   18 THEN true\n"
+             "            WHEN   25 THEN true\n"
+             "            WHEN   26 THEN true\n"
+             "            WHEN  113 THEN true\n"
+             "            WHEN  114 THEN true\n"
+             "                      ELSE false\n"
+             "       END AS trigger_insert\n"
+             "      ,CASE rdb$trigger_type\n"
+             "            WHEN    3 THEN true\n"
+             "            WHEN    4 THEN true\n"
+             "            WHEN   17 THEN true\n"
+             "            WHEN   18 THEN true\n"
+             "            WHEN  113 THEN true\n"
+             "            WHEN  114 THEN true\n"
+             "                      ELSE false\n"
+             "       END AS trigger_update\n"
+             "      ,CASE rdb$trigger_type\n"
+             "            WHEN    5 THEN true\n"
+             "            WHEN    6 THEN true\n"
+             "            WHEN   25 THEN true\n"
+             "            WHEN   26 THEN true\n"
+             "            WHEN  113 THEN true\n"
+             "            WHEN  114 THEN true\n"
+             "                      ELSE false\n"
+             "       END AS trigger_delete\n"
+             "      ,false as trigger_select\n"
+             "      ,CASE rdb$trigger_type\n"
+             "            WHEN 8192 THEN true\n"
+             "            WHEN 8993 THEN true\n"
+             "                      ELSE false\n"
+             "       END AS trigger_session\n"
+             "      ,CASE rdb$trigger_type\n"
+             "            WHEN 8194 THEN true\n"
+             "            WHEN 8995 THEN true\n"
+             "                      ELSE false\n"
+             "       END AS trigger_transaction\n"
+             "      ,CASE rdb$trigger_type\n"
+             "            WHEN 8196 THEN true\n"
+             "                      ELSE false\n"
+             "       END AS trigger_rollback\n"
+             "      ,'' AS trigger_referencing\n"
+             "      ,CASE rdb$trigger_inactive\n"
+             "            WHEN 0 THEN true\n"
+             "                   ELSE false\n"
+             "       END AS trigger_enabled\n"
+             "      ,rdb$trigger_source\n"
+             "  FROM rdb$triggers\n"
+             " WHERE rdb$relation_name = '%s'\n"
+             "   AND rdb$system_flag   = 0\n"
+             " ORDER BY rdb$trigger_sequence"
+            ,p_schema
+            ,p_table);
+  return sql;
+}
+
 // SQL DDL STATEMENTS
 // ==================
 
@@ -1070,6 +1310,64 @@ CString
 SQLInfoFirebird::GetSQLCreateOrReplaceView(CString /*p_schema*/,CString p_view,CString p_asSelect) const
 {
   return "RECREATE VIEW " + p_view + "\n" + p_asSelect;
+}
+
+// Create or replace a trigger
+CString
+SQLInfoFirebird::CreateOrReplaceTrigger(MetaTrigger& p_trigger) const
+{
+  CString sql;
+  sql.Format("CREATE OR ALTER TRIGGER %s FOR %s\n"
+            ,p_trigger.m_triggerName
+            ,p_trigger.m_tableName);
+
+  // Do the table level trigger
+  if(p_trigger.m_insert || p_trigger.m_update || p_trigger.m_delete)
+  {
+    sql += p_trigger.m_before ? "BEFORE " : "AFTER ";
+    if(p_trigger.m_insert)
+    {
+      sql += "INSERT ";
+    }
+    if(p_trigger.m_update)
+    {
+      if(p_trigger.m_insert)
+      {
+        sql += "OR ";
+      }
+      sql += "UPDATE ";
+    }
+    if(p_trigger.m_delete)
+    {
+      if(p_trigger.m_insert || p_trigger.m_update)
+      {
+        sql += "OR ";
+      }
+      sql += "DELETE ";
+    }
+  }
+  else if(p_trigger.m_session)
+  {
+    sql += p_trigger.m_before ? "ON CONNECT" : "ON DISCONNECT";
+  }
+  else // transaction
+  {
+    sql += "ON TRANSACTION ";
+    if(p_trigger.m_before)
+    {
+      sql += "START";
+    }
+    else
+    {
+      sql += p_trigger.m_rollback ? "ROLLBACK" : "COMMIT";
+    }
+  }
+
+  // Now add the trigger PSM source
+  sql += "\n";
+  sql += p_trigger.m_source;
+
+  return sql;
 }
 
 // SQL DDL ACTIONS

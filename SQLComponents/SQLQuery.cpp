@@ -897,6 +897,15 @@ SQLQuery::BindColumns()
     CString name(colName);
     if(type == SQL_C_CHAR || type == SQL_C_BINARY)
     {
+      if(precision == 0)
+      {
+        // Some ODBC drivers do not give you the length of a NVARCHAR type column
+        // All we can do here is to proceed with fingers crossed (and max buffers)
+        // Found in MS-SQLServer
+        precision = MAX_CHAR_BUFFER;
+      }
+      else
+      {
       int BUFFERSIZE = m_bufferSize ? m_bufferSize : OPTIM_BUFFERSIZE;
       if(precision > (unsigned)BUFFERSIZE)
       {
@@ -914,6 +923,7 @@ SQLQuery::BindColumns()
       // reserve the privilege to allocate double the memory
       // IF YOU DON'T DO THIS, YOU WILL CRASH!!
       precision *= 2;
+      }
     }
     // Create new variant and reserve space for CHAR and BINARY types
     SQLVariant* var = new SQLVariant(type,(int)precision);

@@ -59,7 +59,7 @@ typedef struct _dbForeign
 DBForeign;
 
 // DBIndex is used to store the current state
-// of the database indici and columns of a table
+// of the database indices and columns of a table
 typedef struct _dbIndex
 {
   CString m_indexName;    // Name of the total index
@@ -81,6 +81,7 @@ public:
 
   void    SetGrantedUsers(CString p_users);
   CString GetGrantedUsers() const;
+  bool    MakeInfoTableTriggers(MTriggerMap& p_triggers,CString& p_errors);
 
   // PURE VIRTUAL INTERFACE
 
@@ -92,7 +93,7 @@ public:
   // The name of the database vendor
   virtual CString GetDatabaseVendorName() const = 0;
 
-  // Get the fysical database name
+  // Get the physical database name
   virtual CString GetPhysicalDatabaseName() const = 0;
 
   // System catalog is stored in uppercase in the database?
@@ -101,20 +102,20 @@ public:
   // System catalog supports full ISO schemas (same tables per schema)
   virtual bool GetUnderstandsSchemas() const = 0;
   
-  // Supports database/ODBCdriver comments in sql
+  // Supports database/ODBCdriver comments in SQL
   virtual bool SupportsDatabaseComments() const = 0;
   
-  // Database can deferr constraints until the end of a transaction
+  // Database can defer constraints until the end of a transaction
   virtual bool SupportsDeferredConstraints() const = 0;
   
   // Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
-  // Work-around is "SELECT UPPER(columname) AS something.....ORDER BY something
+  // Work-around is "SELECT UPPER(columnname) AS something.....ORDER BY something
   virtual bool SupportsOrderByExpression() const = 0;
 
   // Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
   virtual bool SupportsODBCCallEscapes() const = 0;
 
-  // Catalogus query for the default value of a table's column
+  // Catalogs query for the default value of a table's column
   virtual CString GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const = 0;
 
   // Keyword for the current date and time
@@ -126,10 +127,10 @@ public:
   // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
   virtual bool GetTimeIsDecimal() const = 0;
 
-  // If the database does not suppoprt the datatype INTERVAL, it can be implemented as a DECIMAL
+  // If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
   virtual bool GetIntervalIsDecimal() const = 0;
 
-  // Get the concatanation operator
+  // Get the concatenation operator
   virtual CString GetConcatanationOperator() const = 0;
 
   // Get quote character for strings
@@ -144,10 +145,10 @@ public:
   // Parameter is for OUTPUT only in parameterlist
   virtual CString GetParameterOUT() const = 0;
 
-  // Get the datatype of the auditted user (h_user) in a stored procedure
+  // Get the datatype of the audited user (h_user) in a stored procedure
   virtual CString GetAuditUserDatatype() const = 0;
 
-  // Get the datatype of the auditted user (h_user) as variable in a stored-procedure
+  // Get the datatype of the audited user (h_user) as variable in a stored-procedure
   virtual CString GetAuditUserDatatypeAsVariable() const = 0;
 
   // Get datatype of the IDENTITY primary key
@@ -207,9 +208,11 @@ public:
 
   // Get the constraint form of a primary key to be added to a table after creation of that table
   virtual CString GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,CString p_primary) const = 0;
+  virtual CString GetPrimaryKeyConstraint(MPrimaryMap& p_primaries) const = 0;
 
   // Get the sql to add a foreign key to a table
   virtual CString GetSQLForeignKeyConstraint(DBForeign& p_foreign) const = 0;
+  virtual CString GetSQLForeignKeyConstraint(MForeignMap& p_foreign) const = 0;
 
   // Get the sql (if possible) to change the foreign key constraint
   virtual CString GetSQLAlterForeignKey(DBForeign& p_origin,DBForeign& p_requested) const = 0;
@@ -326,11 +329,15 @@ public:
 
   // Get SQL to create an index for a table
   virtual CString GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* p_index) const = 0;
+  virtual CString GetSQLCreateIndex(MStatisticsMap& p_indices) const = 0;
+
+  // Get extra filter expression for an index column
+  virtual CString GetIndexFilter(MetaStatistics& p_index) const = 0;
 
   // Get SQL to drop an index
   virtual CString GetSQLDropIndex(CString p_user,CString p_indexName) const = 0;
 
-  // Get SQL to read the referential constaints from the catalog
+  // Get SQL to read the referential constraints from the catalog
   virtual CString GetSQLTableReferences(CString p_schema,CString p_tablename,CString p_constraint = "",int p_maxColumns = SQLINFO_MAX_COLUMNS) const = 0;
 
   // Get the SQL to determine the sequence state in the database
@@ -348,7 +355,7 @@ public:
   // Remove a stored procedure from the database
   virtual void    DoRemoveProcedure(CString& p_procedureName) const = 0;
 
-  // Get SQL for your session and controling terminal
+  // Get SQL for your session and controlling terminal
   virtual CString GetSQLSessionAndTerminal() const = 0;
 
   // Get SQL to check if sessionnumber exists
@@ -360,7 +367,7 @@ public:
   // Get SQL for searching a session
   virtual CString GetSQLSearchSession(const CString& p_databaseName,const CString& p_sessionTable) const = 0;
 
-  // See if a column exsists within a table
+  // See if a column exists within a table
   virtual bool    DoesColumnExistsInTable(CString& p_owner,CString& p_tableName,CString& p_column) const = 0;
 
   // Get SQL to get all the information about a Primary Key constraint
@@ -377,6 +384,9 @@ public:
 
   // Getting the fact that there is only **one** (1) user session in the database
   virtual bool    GetOnlyOneUserSession() = 0;
+
+  // Gets the triggers for a table
+  virtual CString GetSQLTriggers(CString m_schema,CString p_table) const = 0;
 
   // SQL DDL STATEMENTS
   // ==================
@@ -400,6 +410,9 @@ public:
   // Create or replace a database view
   virtual CString GetSQLCreateOrReplaceView(CString p_schema,CString p_view,CString p_asSelect) const = 0;
 
+  // Create or replace a trigger
+  virtual CString CreateOrReplaceTrigger(MetaTrigger& p_trigger) const = 0;
+
   // SQL DDL OPERATIONS
   // ==================
 
@@ -415,7 +428,7 @@ public:
   // Must create temoporary tables runtime 
   virtual bool    GetMustMakeTemptablesAtRuntime() const = 0;
 
-  // Create a temporary table in an optimized manner with the givven index column
+  // Create a temporary table in an optimized manner with the given index column
   virtual void    DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& p_indexColumn) const = 0;
 
   // Remove a temporary table
@@ -448,10 +461,10 @@ public:
   // Build a parameter list for calling a stored procedure
   virtual CString GetBuildedParameterList(size_t p_numOfParameters) const = 0;
 
-  // Parametertype for stored procedure for a givven columntype for parameters and return types
+  // Parameter type for stored procedure for a given column type for parameters and return types
   virtual CString GetParameterType(CString &p_type) const = 0;
 
-  // Makes a SQL string from a givven string, with all the right quotes
+  // Makes a SQL string from a given string, with all the right quotes
   virtual CString GetSQLString(const CString& p_string) const = 0;
   
   // Get date string in engine format

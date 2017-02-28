@@ -384,6 +384,34 @@ SQLInfoSQLServer::GetPrimaryKeyConstraint(CString p_schema,CString p_tablename,C
          "      PRIMARY KEY (" + p_primary + ")";
 }
 
+CString
+SQLInfoSQLServer::GetPrimaryKeyConstraint(MPrimaryMap& p_primaries) const
+{
+  CString query("ALTER TABLE ");
+
+  for(auto& prim : p_primaries)
+  {
+    if(prim.m_columnPosition == 1)
+    {
+      if(!prim.m_schema.IsEmpty())
+      {
+        query += prim.m_schema + ".";
+      }
+      query += prim.m_table + "\n";
+      query += "  ADD CONSTRAINT " + prim.m_constraintName + "\n";
+      query += "      PRIMARY KEY (";
+
+    }
+    else
+    {
+      query += ",";
+    }
+    query += prim.m_columnName;
+  }
+  query += ")";
+  return query;
+}
+
 // Get the sql to add a foreign key to a table
 CString 
 SQLInfoSQLServer::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
@@ -404,21 +432,90 @@ SQLInfoSQLServer::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
                   "      REFERENCES " + primary + "(" + p_foreign.m_primaryColumn + ")";
   switch(p_foreign.m_updateRule)
   {
-    case 1: query += "\n      ON UPDATE CASCADE";     break;
+    case 0: query += "\n      ON UPDATE CASCADE";     break;
     case 2: query += "\n      ON UPDATE SET NULL";    break;
-    case 3: query += "\n      ON UPDATE SET DEFAULT"; break;
-    case 4: query += "\n      ON UPDATE NO ACTION";   break;
+    case 4: query += "\n      ON UPDATE SET DEFAULT"; break;
+    case 3: query += "\n      ON UPDATE NO ACTION";   break;
     default:// In essence: ON UPDATE RESTRICT, but that's already the default
-    case 0: break;
+    case 1: break;
   }
   switch(p_foreign.m_deleteRule)
   {
-    case 1: query += "\n      ON DELETE CASCADE";     break;
+    case 0: query += "\n      ON DELETE CASCADE";     break;
     case 2: query += "\n      ON DELETE SET NULL";    break;
-    case 3: query += "\n      ON DELETE SET DEFAULT"; break;
-    case 4: query += "\n      ON DELETE NO ACTION";   break;
+    case 4: query += "\n      ON DELETE SET DEFAULT"; break;
+    case 3: query += "\n      ON DELETE NO ACTION";   break;
     default:// In essence: ON DELETE RESTRICT, but that's already the default
-    case 0: break;
+    case 1: break;
+  }
+  return query;
+}
+
+CString
+SQLInfoSQLServer::GetSQLForeignKeyConstraint(MForeignMap& p_foreigns) const
+{
+  // Get first record
+  MetaForeign& foreign = p_foreigns.front();
+
+  // Construct the correct tablename
+  CString table(foreign.m_fkTableName);
+  CString primary(foreign.m_pkTableName);
+  if(!foreign.m_fkSchemaName.IsEmpty())
+  {
+    table = foreign.m_fkSchemaName + "." + table;
+  }
+  if(!foreign.m_pkSchemaName.IsEmpty())
+  {
+    primary = foreign.m_pkSchemaName + "." + primary;
+  }
+
+  // The base foreign key command
+  CString query = "ALTER TABLE " + table + "\n"
+                  "  ADD CONSTRAINT " + foreign.m_foreignConstraint + "\n"
+                  "      FOREIGN KEY (";
+
+  // Add the foreign key columns
+  bool extra = false;
+  for(auto& key : p_foreigns)
+  {
+    if(extra) query += ",";
+    query += key.m_fkColumnName;
+    extra  = true;
+  }
+
+  // Add references primary table
+  query += ")\n      REFERENCES " + primary + "(";
+
+  // Add the primary key columns
+  extra = false;
+  for(auto& key : p_foreigns)
+  {
+    if(extra) query += ",";
+    query += key.m_pkColumnName;
+    extra  = true;
+  }
+  query += ")";
+
+  // Add all relevant options
+  switch(foreign.m_updateRule)
+  {
+    case SQL_CASCADE :    query += "\n      ON UPDATE CASCADE";     break;
+    case SQL_SET_NULL:    query += "\n      ON UPDATE SET NULL";    break;
+    case SQL_SET_DEFAULT: query += "\n      ON UPDATE SET DEFAULT"; break;
+    case SQL_NO_ACTION:   query += "\n      ON UPDATE NO ACTION";   break;
+    case SQL_RESTRICT:    // Fall through
+    default:              // In essence: ON UPDATE RESTRICT, but that's already the default
+                          break;
+  }
+  switch(foreign.m_deleteRule)
+  {
+    case SQL_CASCADE:     query += "\n      ON DELETE CASCADE";     break;
+    case SQL_SET_NULL:    query += "\n      ON DELETE SET NULL";    break;
+    case SQL_SET_DEFAULT: query += "\n      ON DELETE SET DEFAULT"; break;
+    case SQL_NO_ACTION:   query += "\n      ON DELETE NO ACTION";   break;
+    case SQL_RESTRICT:    // Fall through
+    default:              // In essence: ON DELETE RESTRICT, but that's already the default
+                          break;
   }
   return query;
 }
@@ -804,6 +901,54 @@ SQLInfoSQLServer::GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* 
   return sql;
 }
 
+// Get SQL to create an index for a table
+// CREATE [UNIQUE] INDEX indexname ON [<schema>.]tablename(column [ASC|DESC] [,...]);
+// Beware: no schema name for indexname. Automatically in the table schema
+CString
+SQLInfoSQLServer::GetSQLCreateIndex(MStatisticsMap& p_indices) const
+{
+  CString query;
+  for(auto& index : p_indices)
+  {
+    if(index.m_position == 1)
+    {
+      // New index
+      query = "CREATE ";
+      if(index.m_unique)
+      {
+        query += "UNIQUE ";
+      }
+      query += "INDEX ";
+      query += index.m_indexName;
+      query += " ON ";
+      if(!index.m_schemaName.IsEmpty())
+      {
+        query += index.m_schemaName + ".";
+      }
+      query += index.m_tableName;
+      query += "(";
+    }
+    else
+    {
+      query += ",";
+    }
+    query += index.m_columnName;
+    if(index.m_ascending != "A")
+    {
+      query += " DESC";
+    }
+  }
+  query += ")";
+  return query;
+}
+
+// Get extra filter expression for an index column
+CString
+SQLInfoSQLServer::GetIndexFilter(MetaStatistics& /*p_index*/) const
+{
+  return "";
+}
+
 // Get SQL to drop an index
 CString 
 SQLInfoSQLServer::GetSQLDropIndex(CString p_user,CString p_indexName) const
@@ -1046,9 +1191,17 @@ SQLInfoSQLServer::GetSQLLockTable(CString& p_tableName,bool p_exclusive) const
 
 // Get query to optimize the table statistics
 CString 
-SQLInfoSQLServer::GetSQLOptimizeTable(CString& /*p_owner*/,CString& /*p_tableName*/,int& /*p_number*/)
+SQLInfoSQLServer::GetSQLOptimizeTable(CString& p_owner,CString& p_tableName,int& /*p_number*/)
 {
-  return "";
+  CString query("UPDATE STATISTICS ");
+  if(!p_owner.IsEmpty())
+{
+    query += p_owner;
+    query += ".";
+  }
+  query += p_tableName;
+  query += " WITH FULLSCAN";
+  return query;
 }
 
 // Getting the fact that there is only **one** (1) user session in the database
@@ -1056,7 +1209,56 @@ bool
 SQLInfoSQLServer::GetOnlyOneUserSession()
 {
   // Yet to implement
-  return true;
+  CString sql = "SELECT COUNT(*)\n"
+                "  FROM sys.sysprocesses\n"
+                " WHERE dbid = db_id()";
+  SQLQuery qry(m_database);
+  SQLVariant* var = qry.DoSQLStatementScalar(sql);
+  return (var->GetAsSLong() <= 1);
+}
+
+// Gets the triggers for a table
+CString
+SQLInfoSQLServer::GetSQLTriggers(CString p_schema,CString p_table) const
+{
+  CString sql;
+  sql.Format("SELECT ''       AS catalog_name\n"
+             "      ,sch.name AS schema_name\n"
+             "      ,tab.name AS table_name\n"
+             "      ,trg.name AS trigger_name\n"
+             "      ,trg.name + ' ON TABLE ' + tab.name AS trigger_description\n"
+             "      ,0        AS position\n"
+             "      ,0        AS trigger_before\n"
+             "      ,(SELECT CASE type_desc WHEN 'INSERT' THEN 1 ELSE 0 END\n"
+             "          FROM sys.trigger_events ev\n"
+             "         WHERE ev.object_id = trg.object_id) AS trigger_insert\n"
+             "      ,(SELECT CASE type_desc WHEN 'UPDATE' THEN 1 ELSE 0 END\n"
+             "          FROM sys.trigger_events ev\n"
+             "         WHERE ev.object_id = trg.object_id) AS trigger_update\n"
+             "      ,(SELECT CASE type_desc WHEN 'DELETE' THEN 1 ELSE 0 END\n"
+             "          FROM sys.trigger_events ev\n"
+             "         WHERE ev.object_id = trg.object_id) AS trigger_delete\n"
+             "      ,(SELECT CASE type_desc WHEN 'SELECT' THEN 1 ELSE 0 END\n"
+             "          FROM sys.trigger_events ev\n"
+             "         WHERE ev.object_id = trg.object_id) AS trigger_select\n"
+             "      ,0  AS trigger_session\n"
+             "   	  ,0  AS trigger_transaction\n"
+             "      ,0  AS trigger_rollback\n"
+             "      ,'' AS trigger_referencing\n"
+             "  	  ,CASE trg.is_disabled WHEN 0 THEN 1 ELSE 0 END AS trigger_enabled\n"
+             "  	  ,mod.definition AS trigger_source\n"
+             "  FROM sys.triggers    trg\n"
+             "      ,sys.sql_modules mod\n"
+             "      ,sys.objects     tab\n"
+             "      ,sys.schemas     sch\n"
+             " WHERE sch.name      = '%s'\n"
+             "   AND tab.name      = '%s'\n"
+             "   AND trg.object_id = mod.object_id\n"
+             "   AND tab.object_id = trg.parent_id\n"
+             "   AND tab.schema_id = sch.schema_id"
+            ,p_schema
+            ,p_table);
+  return sql;
 }
 
 // SQL DDL STATEMENTS
@@ -1122,6 +1324,16 @@ CString
 SQLInfoSQLServer::GetSQLCreateOrReplaceView(CString p_schema,CString p_view,CString p_asSelect) const
 {
   return "CREATE VIEW " + p_schema + "." + p_view + "\n" + p_asSelect;
+}
+
+// Create or replace a trigger
+CString
+SQLInfoSQLServer::CreateOrReplaceTrigger(MetaTrigger& p_trigger) const
+{
+  // Simply return the SYS.SQL_MODULE.definition block
+  CString sql(p_trigger.m_source);
+  sql.TrimRight(';');
+  return sql;
 }
 
 // SQL DDL ACTIONS
