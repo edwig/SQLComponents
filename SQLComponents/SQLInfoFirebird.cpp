@@ -49,335 +49,669 @@ SQLInfoFirebird::~SQLInfoFirebird()
 {
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// GENERALS (Strings & Booleans) 
+//
+//////////////////////////////////////////////////////////////////////////
+
 // Get the database type
-DatabaseType 
-SQLInfoFirebird::GetDatabaseType() const
+// DatabaseType GetDatabaseType() const;
+DatabaseType
+SQLInfoFirebird::GetRDBMSDatabaseType() const
 {
   return RDBMS_FIREBIRD;
 }
 
-// BOOLEANS EN STRINGS
-// ====================================================================
-
 // The name of the database vendor
 CString
-SQLInfoFirebird::GetDatabaseVendorName() const
+SQLInfoFirebird::GetRDBMSVendorName() const
 {
+  // The name of the database vendor
   return "Firebird";
 }
 
 // Get the physical database name
-CString 
-SQLInfoFirebird::GetPhysicalDatabaseName() const
+CString
+SQLInfoFirebird::GetRDBMSPhysicalDatabaseName() const
 {
   // See to it that "SQLDatabase:GetDatabaseName" does it's work
   return m_database->GetDatabaseName();
 }
 
 // System catalog is stored in uppercase in the database?
-bool 
-SQLInfoFirebird::IsCatalogUpper() const
+bool
+SQLInfoFirebird::GetRDBMSIsCatalogUpper() const
 {
   return true;
 }
 
 // System catalog supports full ISO schemas (same tables per schema)
 bool
-SQLInfoFirebird::GetUnderstandsSchemas() const
+SQLInfoFirebird::GetRDBMSUnderstandsSchemas() const
 {
   return false;
 }
 
-// Supports database/ODBCdriver comments in sql
-bool 
-SQLInfoFirebird::SupportsDatabaseComments() const
+// Supports database/ODBCdriver comments in SQL
+bool
+SQLInfoFirebird::GetRDBMSSupportsComments() const
 {
   return false;
 }
 
 // Database can defer constraints until the end of a transaction
-bool 
-SQLInfoFirebird::SupportsDeferredConstraints() const
+bool
+SQLInfoFirebird::GetRDBMSSupportsDeferredConstraints() const
 {
-  // No SET CONSTRAINTS DEFERRED 
-  return false;
+  // NO CONSTRAINTS DEFERRED
+  return true;
 }
 
-// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(column-name)
-// Work-around is "SELECT UPPER(column-name) AS something.....ORDER BY something
+// Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
 bool
-SQLInfoFirebird::SupportsOrderByExpression() const
+SQLInfoFirebird::GetRDBMSSupportsOrderByExpression() const
 {
   return true;
 }
 
 // Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
-bool    
-SQLInfoFirebird::SupportsODBCCallEscapes() const
+bool
+SQLInfoFirebird::GetRDBMSSupportsODBCCallEscapes() const
 {
   return false;
 }
 
-// Catalog table with all default values for a column in a table
-CString 
-SQLInfoFirebird::GetSQLStringDefaultValue(CString p_tableName,CString p_columnName) const
+// If the database does not support the datatype TIME, it can be implemented as a DECIMAL
+bool
+SQLInfoFirebird::GetRDBMSSupportsDatatypeTime() const
 {
-  p_tableName.MakeUpper();
-  p_columnName.MakeUpper();
-  
-  CString query = "SELECT rdb$default_source\n"
-                  "  FROM rdb$relation_fields\n"
-                  " WHERE rdb$relation_name = '" + p_tableName   + "'\n"
-                  "   AND rdb$field_name    = '" + p_columnName  + "'";  
-  return query;
+  // Time can be implemented as TIME
+  return true;
 }
 
-CString 
-SQLInfoFirebird::GetSystemDateTimeKeyword() const
+// If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
+bool
+SQLInfoFirebird::GetRDBMSSupportsDatatypeInterval() const
+{
+  // Interval not supported, can be implemented as DECIMALS
+  return false;
+}
+
+// Gets the maximum length of an SQL statement
+unsigned long 
+SQLInfoFirebird::GetRDBMSMaxStatementLength() const
+{
+  // No Limit
+  return 0;
+}
+
+// Database must commit DDL commands in a transaction
+bool
+SQLInfoFirebird::GetRDBMSMustCommitDDL() const
+{
+  return true;
+}
+
+// KEYWORDS
+
+// Keyword for the current date and time
+CString
+SQLInfoFirebird::GetKEYWORDCurrentTimestamp() const
 {
   return "current_timestamp";
-}  
+}
 
 // String for the current date
 CString
-SQLInfoFirebird::GetSystemDateString() const
+SQLInfoFirebird::GetKEYWORDCurrentDate() const
 {
   return "current_date";
 }
 
-// Datatype TIME can be implemented as a decimal value on the database
-bool 
-SQLInfoFirebird::GetTimeIsDecimal() const
+// Get the concatenation operator
+CString
+SQLInfoFirebird::GetKEYWORDConcatanationOperator() const
 {
-  // TIJD is implemented as DECIMAL(18,16)
-  return true;
+  return "||";
 }
 
-// Datatype INTERVAL can be implemented as a decimal value on the database
-bool 
-SQLInfoFirebird::GetIntervalIsDecimal() const
+// Get quote character for strings
+CString
+SQLInfoFirebird::GetKEYWORDQuoteCharacter() const
 {
-  // Interval is implemented in Firebird as a DECIMAL
-  return true;
+  return "\'";
 }
 
-// Concatenation operator character string
-CString 
-SQLInfoFirebird::GetConcatanationOperator() const
+// Get default NULL for parameter list input
+CString
+SQLInfoFirebird::GetKEYWORDParameterDefaultNULL() const
 {
-  return "||";    
+  // Standard, no definition defines the NULL state
+  return "";
 }
 
-// Quote character for a string
-CString 
-SQLInfoFirebird::GetQuoteCharacter() const
+// Parameter is for INPUT and OUTPUT in parameter list
+CString
+SQLInfoFirebird::GetKEYWORDParameterINOUT() const
 {
-  return "\'";    
+  // Firebird works with the "RETURNS" list !
+  return "";
 }
 
-// Default NULL for an input parameter list
-CString 
-SQLInfoFirebird::GetDefaultNULL() const
+// Parameter is for OUTPUT only in parameter list
+CString
+SQLInfoFirebird::GetKEYWORDParameterOUT() const
 {
-  return "";    
+  return "";
 }
 
-// INOUT prefix for an input/output parameter in a parameter list
-CString 
-SQLInfoFirebird::GetParameterINOUT() const
+// Get datatype of the IDENTITY primary key in a Network database
+CString
+SQLInfoFirebird::GetKEYWORDNetworkPrimaryKeyType() const
 {
-  return "";    
-}
-
-// OUT prefix for an input/output parameter in a parameter list
-CString 
-SQLInfoFirebird::GetParameterOUT() const
-{
-  return "";    
-}
-
-// Datatype for the last user in a stored procedure as a parameter
-CString 
-SQLInfoFirebird::GetAuditUserDatatype() const
-{
-  return "CHAR(8)";
-}
-
-// Datatype for a last-user in a stored procedure as a variable
-CString 
-SQLInfoFirebird::GetAuditUserDatatypeAsVariable() const
-{
-  return "CHAR(8)";
-}
-
-// Datatype of a primary key
-CString 
-SQLInfoFirebird::GetPrimaryKeyType() const
-{
+  // Use SEQUENCE / GENERATOR to fill!
   return "INTEGER";
 }
 
-// Datatype for a timestamp (DATETIME YEAR TO SECOND)
-CString 
-SQLInfoFirebird::GetDatetimeYearToSecondType() const
-{
-  return "timestamp";
-}
-
-// Separator between two alter-constraint statements in one alter-table statement
-CString 
-SQLInfoFirebird::GetAlterConstraintSeparator() const
-{
-  return ",";
-}
-
-// Inner Join Keyword
-CString 
-SQLInfoFirebird::GetInnerJoinKeyword() const
-{
-  return "INNER JOIN ";
-}
-
-// Outer join keyword
-CString  
-SQLInfoFirebird::GetOuterJoinKeyword() const
-{
-  return "LEFT OUTER JOIN ";
-}
-
-// Inner Join Keyword for use in views.
-CString 
-SQLInfoFirebird::GetViewInnerJoinKeyword() const
-{
-  return "INNER JOIN";
-}
-
-// Outer join keyword for use in views
-CString 
-SQLInfoFirebird::GetViewOuterJoinKeyword() const
-{
-  return "LEFT OUTER JOIN";
-}
-
-// OUTER JOIN closer (+ in some databases)
-CString 
-SQLInfoFirebird::GetOuterJoinClosure() const
-{
-  return "";
-}
-
-// Outer join sign
-CString  
-SQLInfoFirebird::GetOuterJoinSign() const
-{
-  return "";
-}
-
-// Prefix before using a stored procedure parameter
+// Get datatype for timestamp (year to second)
 CString
-SQLInfoFirebird::GetSPParamPrefix() const
+SQLInfoFirebird::GetKEYWORDTypeTimestamp() const
+{
+  return "TIMESTAMP";
+}
+
+// Prefix for a parameter in a stored procedure
+CString
+SQLInfoFirebird::GetKEYWORDParameterPrefix() const
 {
   return ":";
 }
 
-// Get the query to add a new record to the primary key column
-CString 
-SQLInfoFirebird::GetIdentityString(CString& p_tablename,CString p_postfix /*="_seq"*/) const
+// Get select part to add new record identity to a table
+// Can be special column like 'OID' or a sequence select
+CString
+SQLInfoFirebird::GetKEYWORDIdentityString(CString& p_tablename,CString p_postfix /*= "_seq"*/) const
 {
   return "GEN_ID(" + p_tablename + p_postfix + ",1)";
 }
 
-// Get the SQL Query to create a temporary table from a select statement;
+// Gets the UPPER function
+CString
+SQLInfoFirebird::GetKEYWORDUpper(CString& p_expression) const
+{
+  return "UPPER(" + p_expression + ")";
+}
+
+// Gets the construction for 1 minute ago
+CString
+SQLInfoFirebird::GetKEYWORDInterval1MinuteAgo() const
+{
+  // Not supported by Firebird
+  return "ERROR";
+}
+
+// Gets the Not-NULL-Value statement of the database
+CString
+SQLInfoFirebird::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
+{
+  return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
+}
+
+// Gets the construction / select for generating a new serial identity
+CString
+SQLInfoFirebird::GetSQLGenerateSerial(CString p_table) const
+{
+  return "SELECT " + p_table + "_seq.nextval FROM DUAL";
+}
+
+// Gets the construction / select for the resulting effective generated serial
+CString
+SQLInfoFirebird::GetSQLEffectiveSerial(CString p_identity) const
+{
+  // Just return it, it's the correct value
+  return p_identity;
+}
+
+// Gets the sub-transaction commands
+CString
+SQLInfoFirebird::GetSQLStartSubTransaction(CString p_savepointName) const
+{
+  return CString("SAVEPOINT ") + p_savepointName;
+}
+
+CString
+SQLInfoFirebird::GetSQLCommitSubTransaction(CString p_savepointName) const
+{
+  return CString("COMMIT TRANSACTION ") + p_savepointName;
+}
+
+CString
+SQLInfoFirebird::GetSQLRollbackSubTransaction(CString p_savepointName) const
+{
+  return CString("ROLLBACK TO ") + p_savepointName;
+}
+
+// FROM-Part for a query to select only 1 (one) record / or empty!
+CString
+SQLInfoFirebird::GetSQLFromDualClause() const
+{
+  return " FROM rdb$database";
+}
+
+// Get SQL to lock  a table 
+CString
+SQLInfoFirebird::GetSQLLockTable(CString p_schema, CString p_tablename, bool /*p_exclusive*/) const
+{
+  // Firebird does NOT have a LOCK-TABLE statement
+  return "";
+}
+
+// Get query to optimize the table statistics
+CString
+SQLInfoFirebird::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
+{
+  // Firebird has no SQL for this, it uses the "GFIX.EXE -sweep <database>" tool
+  return "";
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// SQL STRINGS
+//
+//////////////////////////////////////////////////////////////////////////
+
+CString
+SQLInfoFirebird::GetSQLString(const CString& p_string) const
+{
+  CString s = p_string;
+  s.Replace("'","''");
+  CString kwoot = GetKEYWORDQuoteCharacter();
+  return  kwoot + s + kwoot;
+}
+
+CString
+SQLInfoFirebird::GetSQLDateString(int p_year,int p_month,int p_day) const
+{
+  CString retval;
+  retval.Format("CAST '%02d/%02d/04d' AS DATE)",p_day,p_month,p_year); // American order!!
+  return retval;
+}
+
+CString
+SQLInfoFirebird::GetSQLTimeString(int p_hour,int p_minute,int p_second) const
+{
+  CString time;
+  time.Format("%2.2d:%2.2d:%2.2d",p_hour,p_minute,p_second);
+  return time;
+}
+
+CString
+SQLInfoFirebird::GetSQLDateTimeString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
+{
+  CString retval;
+  retval.Format("CAST('%02d/%02d/%04d %02d:%02d:%02d' AS TIMESTAMP)"
+                ,p_day,p_month,p_year       // American order !!
+                ,p_hour,p_minute,p_second); // 24 hour clock
+  return retval;
+}
+
+// Get date-time bound parameter string in database format
+CString
+SQLInfoFirebird::GetSQLDateTimeBoundString() const
+{
+  return "CAST(? AS TIMESTAMP)";
+}
+
+// Stripped data for the parameter binding
+CString
+SQLInfoFirebird::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
+{
+  CString retval;
+  retval.Format("%02d/%02d/%04d %02d:%02d:%02d"
+                ,p_day,p_month,p_year       // American order !!
+                ,p_hour,p_minute,p_second); // 24 hour clock
+  return retval;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// CATALOG
+// o GetCATALOG<Object[s]><Function>
+//   Objects
+//   - Table
+//   - Column
+//   - Index
+//   - PrimaryKey
+//   - ForeignKey
+//   - Trigger
+//   - TemporaryTable 
+//   - View
+//   - Sequence
+//  Functions per object type
+//   - Exists
+//   - List
+//   - Attributes
+//   - Create
+//   - Alter (where possible)
+//   - Drop
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Get SQL to check if a table already exists in the database
+CString
+SQLInfoFirebird::GetCATALOGTableExists(CString /*p_schema*/,CString p_tablename) const
+{
+  p_tablename.MakeUpper();
+  CString query = "SELECT COUNT(*)\n"
+                  "  FROM rdb$relations\n"
+                  " WHERE rdb$relation_name = '" + p_tablename + "'";
+  return query;
+}
+
+CString
+SQLInfoFirebird::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
+{
+  p_pattern.MakeUpper();
+  CString query = "SELECT rdb$relation_name\n"
+                  "  FROM rdb$relations\n"
+                  " WHERE rdb$relation_name like '" + p_pattern + "'";
+  return query;
+}
+
+// Attributes can fill in 'm_temporary' 
+bool
+SQLInfoFirebird::GetCATALOGTableAttributes(CString /*p_schema*/,CString p_tablename,MetaTable& p_table) const
+{
+  p_tablename.MakeUpper();
+  CString query = "SELECT rdb$relation_type\n"
+                  "  FROM rdb$relations\n"
+                  " WHERE rdb$relation_name = ?";
+  SQLQuery qry(m_database);
+  SQLVariant* var = qry.DoSQLStatementScalar(query,p_tablename);
+  if(var)
+  {
+    p_table.m_temporary = var->GetAsBoolean();
+    return true;
+  }
+  return false;
+}
+
+CString
+SQLInfoFirebird::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+{
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetCATALOGTableRename(CString /*p_schema*/,CString /*p_oldName*/,CString /*p_newName*/) const
+{
+  // Not supported by Firebird
+  // Changing database table names is not supported by this database type
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename) const
+{
+  return "DROP TABLE " + p_tablename;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// ALL TEMPORARY TABLE FUNCTIONS
+
 CString 
-SQLInfoFirebird::GetSQLCreateTemporaryTable(CString& p_tablename,CString p_select) const
+SQLInfoFirebird::GetCATALOGTemptableCreate(CString /*p_schema*/,CString p_tablename,CString p_select) const
 {
   return "CREATE GLOBAL TEMPORARY TABLE " + p_tablename + "\nAS " + p_select +
          "ON COMMIT PRESERVE ROWS";
 }
 
-// Get the SQL query to remove a temporary table
+CString 
+SQLInfoFirebird::GetCATALOGTemptableIntoTemp(CString /*p_schema*/,CString p_tablename,CString p_select) const
+{
+  return "INSERT INTO " + p_tablename + "\n" + p_select;
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGTemptableDrop(CString /*p_schema*/,CString p_tablename) const
+{
+  return "DROP TABLE " + p_tablename;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// ALL COLUMN FUNCTIONS
+
+CString 
+SQLInfoFirebird::GetCATALOGColumnExists(CString p_schema,CString p_tablename,CString p_columnname) const
+{
+  p_tablename.MakeUpper();
+  p_columnname.MakeUpper();
+  
+  CString query = "SELECT COUNT(*)\n"
+                  "  FROM rdb$relation_fields\n"
+                  " WHERE rdb$relation_name = '" + p_tablename  + "'\n"
+                  "   AND rdb$field_name    = '" + p_columnname + "'";
+  return query;
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGColumnList(CString p_schema,CString p_tablename) const
+{
+  CString sql(GetCATALOGColumnAttributes(p_schema,p_tablename,""));
+  int pos = sql.ReverseFind('\n');
+  // Remove field filter and add ordering
+  sql = sql.Mid(pos + 1) + " ORDER BY col.rdb$field_position";
+
+  return sql;
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_tablename,CString p_columnname) const
+{
+  p_tablename.MakeUpper();
+  p_columnname.MakeUpper();
+  CString sql = "SELECT col.rdb$field_name\n"        // 0 -> Name
+                "      ,col.rdb$field_position\n"    // 1 -> Position
+                "      ,typ.rdb$field_type\n"        // 2 -> type
+                "      ,typ.rdb$field_length\n"      // 3 -> length
+                "      ,typ.rdb$null_flag\n"         // 4 -> nn 1 = not null / 0 is null
+                "      ,typ.rdb$field_precision\n"   // 5 -> precision
+                "      ,typ.rdb$field_scale\n"       // 6 -> scale (neg)
+                "      ,col.rdb$default_source\n"    // 7 -> default value
+                "  FROM rdb$relation_fields col\n"
+                "      ,rdb$fields typ\n"
+                " WHERE col.rdb$field_source  = typ.rdb$field_name\n"
+                "   AND col.rdb$relation_name = '" + p_tablename  + "'\n"
+                "   AND col.rdb$field_name    = '" + p_columnname + "'";
+                // Beware: last filter line must be column name for previous method!
+  return sql;
+}
+
+CString SQLInfoFirebird::GetCATALOGColumnCreate(MetaColumn& p_column) const
+{
+  CString sql  = "ALTER TABLE "  + p_column.m_table  + "\n";
+                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
+  p_column.GetPrecisionAndScale(sql);
+  p_column.GetNullable(sql);
+  return sql;
+}
+
+CString SQLInfoFirebird::GetCATALOGColumnAlter(MetaColumn& p_column) const
+{
+  // The extra 'TYPE' keyword  is a-typical
+  // The SET/DROP for the NULL is a-typical
+  CString sql  = "ALTER TABLE "  + p_column.m_table  + "\n";
+                 "      MODIFY COLUMN " + p_column.m_column + " TYPE " + p_column.m_typename;
+  p_column.GetPrecisionAndScale(sql);
+  if(p_column.m_nullable)
+  {
+    sql += " DROP NOT NULL";
+  }
+  else
+  {
+    sql += " SET NOT NULL";
+  }
+  return sql;
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGColumnRename(CString /*p_schema*/,CString p_tablename,CString p_columnname,CString p_newname,CString /*p_datatype*/) const
+{
+  CString sql("ALTER  TABLE  " + p_tablename + "\n"
+              "RENAME " + p_columnname + " TO " + p_newname + "\n");
+  return sql;
+}
+
+
+CString 
+SQLInfoFirebird::GetCATALOGColumnDrop(CString p_schema,CString p_tablename,CString p_columnname) const
+{
+  CString sql("ALTER TABLE " + p_tablename + "\n"
+              " DROP COLUMN " + p_columnname);
+  return sql;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// ALL INDICES FUNCTIONS
+
+// All index functions
 CString
-SQLInfoFirebird::GetSQLRemoveTemporaryTable(CString& p_tablename,int& p_number) const
+SQLInfoFirebird::GetCATALOGIndexExists(CString /*p_schema*/,CString /*p_tablename*/,CString p_indexname) const
 {
-  // 'Simply' a drop from a table
-  p_number += 1;
-  return "DROP TABLE "     + p_tablename + ";\n";
+  p_indexname.MakeUpper();
+  CString sql = "SELECT COUNT(*)\n"
+                "  FROM rdb$indices\n"
+                " WHERE rdb$index_name = '" + p_indexname + "'";
+  return sql;
 }
 
-// Getting the SQL query to select into a temporary table
-CString 
-SQLInfoFirebird::GetSQLSelectIntoTemp(CString& p_tablename,CString& p_select) const
+CString
+SQLInfoFirebird::GetCATALOGIndexList(CString /*p_schema*/,CString p_tablename)   const
 {
-  return "INSERT INTO " + p_tablename + "\n" + p_select + ";\n";
-}
+  p_tablename.MakeUpper();
 
-// Replace primary key column OID by a sequence.nextval / GENID()
-CString 
-SQLInfoFirebird::GetReplaceColumnOIDbySequence(CString p_columns,CString p_tablename,CString p_postfix /*="_seq"*/) const
-{
-  int pos;
-  int len = p_columns.GetLength();
-  pos = p_columns.Find("OID,");
-  if(pos == 0)
-  {
-    CString newkolom = ( p_tablename + p_postfix + ".genid()");
-    newkolom += p_columns.Right(len - 3);
-    return newkolom;
-  }
-  if(pos > 0)
-  {
-    pos = p_columns.Find(",OID,");
-    CString newkolom = p_columns.Left(pos) + "," + p_tablename + p_postfix + ".genid()";
-    newkolom += p_columns.Right(len - pos - 5);
-    return newkolom;
-  }
-  return p_columns;
-}
-
-// Remove catalog dependencies
-CString 
-SQLInfoFirebird::GetSQLRemoveProcedureDependencies(CString p_procname) const
-{
-  CString upperName = p_procname;
-  upperName.MakeUpper();
-  CString query = "DELETE FROM rdb$dependencies\n"
-                  " WHERE rdb$depended_on_name = '" + upperName + "'\n"
-                  "   AND rdb$depended_on_type = 5\n"
-                  "   AND rdb$dependent_type   = 5";
+  CString query = "SELECT idx.rdb$index_name\n"
+                  "      ,col.rdb$field_name\n"
+                  "      ,col.rdb$field_position\n"
+                  "      ,idx.rdb$unique_flag\n" // 1 if unique, null if not
+                  "      ,idx.rdb$index_type\n"  // 1 if descending, null,0 on ascending
+                  "      ,idx.rdb$expression_source\n"
+                  "  FROM rdb$indices idx\n"
+                  "      ,rdb$index_segments col\n"
+                  " WHERE idx.rdb$index_name    = col.rdb$index_name\n"
+                  "   AND idx.rdb$system_flag   = 0\n"
+                  "   AND idx.rdb$relation_name = '" + p_tablename + "'\n"
+                  " ORDER BY 1";
   return query;
 }
 
 CString
-SQLInfoFirebird::GetSQLRemoveFieldDependencies(CString p_tablename) const
+SQLInfoFirebird::GetCATALOGIndexAttributes(CString p_schema,CString p_tablename,CString p_indexname)  const
 {
-  CString upperName = p_tablename;
-  upperName.MakeUpper();
-  CString query = "DELETE FROM rdb$dependencies\n"
-                  " WHERE rdb$depended_on_name = '" + upperName + "'\n"
-                  "   AND rdb$dependent_type   = 3";
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
+{
+  CString query;
+  for(auto& index : p_indices)
+  {
+    if(index.m_position == 1)
+    {
+      // New index
+      query = "CREATE ";
+      if(index.m_unique)
+      {
+        query += "UNIQUE ";
+      }
+      if(index.m_ascending != "A")
+      {
+        query += "DESC ";
+      }
+      query += "INDEX ";
+      if(!index.m_schemaName.IsEmpty())
+      {
+        query += index.m_schemaName + ".";
+      }
+      query += index.m_indexName;
+      query += " ON ";
+      if(!index.m_schemaName.IsEmpty())
+      {
+        query += index.m_schemaName + ".";
+      }
+      query += index.m_tableName;
+      query += "(";
+    }
+    else
+    {
+      query += ",";
+    }
+    if(index.m_columnName.Left(1) == "(")
+    {
+      query.TrimRight("(");
+      query += " COMPUTED BY ";
+      query += index.m_columnName;
+      query.TrimRight(")");
+    }
+    else if(!index.m_filter.IsEmpty())
+    {
+      query += index.m_filter;
+    }
+    else
+    {
+      query += index.m_columnName;
+    }
+  }
+  query += ")";
   return query;
 }
 
-// Getting the create table form for a primary key
-CString 
-SQLInfoFirebird::GetPrimaryKeyDefinition(CString p_schema,CString p_tableName,bool p_temporary) const
+CString
+SQLInfoFirebird::GetCATALOGIndexDrop(CString /*p_schema*/,CString /*p_tablename*/,CString p_indexname) const
 {
-  CString keyDefinitie = GetPrimaryKeyType() + " NOT NULL\n";
-  keyDefinitie += p_temporary ? CString("\n") : " CONSTRAINT pk_" + p_tableName + " PRIMARY KEY\n";
-  return keyDefinitie;
+  CString sql = "DROP INDEX " + p_indexname;
+  return sql;
 }
 
-// Getting the constraint form for adding a primary key to a table
+// Get extra filter expression for an index column
 CString
-SQLInfoFirebird::GetPrimaryKeyConstraint(CString /*p_schema*/,CString p_tablename,CString p_primary) const
+SQLInfoFirebird::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 {
-  return "ALTER TABLE " + p_tablename + "\n"
-         "  ADD CONSTRAINT pk_" + p_tablename + "\n"
-         "      PRIMARY KEY (" + p_primary + ")";
+  return "";
+}
+
+//////////////////////////////////////////////////////////////////////////
+// ALL PRIMARY KEY FUNCTIONS
+
+CString
+SQLInfoFirebird::GetCATALOGPrimaryExists(CString /*p_schema*/,CString p_tablename) const
+{
+  p_tablename.MakeUpper();
+  CString query = "SELECT COUNT(*)\n"
+                  "  FROM rdb$relation_constraints\n"
+                  " WHERE rdb$relation_name   = '" + p_tablename + "'\n"
+                  "   AND rdb$constraint_type = 'PRIMARY KEY'";
+  return query;
 }
 
 CString
-SQLInfoFirebird::GetPrimaryKeyConstraint(MPrimaryMap& p_primaries) const
+SQLInfoFirebird::GetCATALOGPrimaryAttributes(CString /*p_schema*/,CString p_tablename) const
+{
+  p_tablename.MakeUpper();
+  CString sql = "SELECT rdb$constraint_name\n"      // 1 -> Constraint name
+                "      ,rdb$index_name\n"           // 2 -> Index name
+                "      ,rdb$deferrable\n"           // 3 ->
+                "      ,rdb$initially_deferred\n"
+                "  FROM rdb$relation_constraints\n"
+                " WHERE rdb$relation_name   = '" + p_tablename + "'\n"
+                "   AND rdb$constraint_type = 'PRIMARY KEY'";
+  return sql;
+}
+
+CString
+SQLInfoFirebird::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
 {
   CString query("ALTER TABLE ");
 
@@ -404,48 +738,109 @@ SQLInfoFirebird::GetPrimaryKeyConstraint(MPrimaryMap& p_primaries) const
   return query;
 }
 
-// Get the sql to add a foreign key to a table
-CString 
-SQLInfoFirebird::GetSQLForeignKeyConstraint(DBForeign& p_foreign) const
+CString
+SQLInfoFirebird::GetCATALOGPrimaryDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
 {
-  // Construct the correct tablename
-  CString table  (p_foreign.m_tablename);
-  CString primary(p_foreign.m_primaryTable);
-  if(!p_foreign.m_schema.IsEmpty())
+  CString sql("ALTER TABLE " + p_tablename + "\n"
+              " DROP CONSTRAINT " + p_constraintname);
+  return sql;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// ALL FOREIGN KEY FUNCTIONS
+
+CString
+SQLInfoFirebird::GetCATALOGForeignExists(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
+{
+  p_tablename.MakeUpper();
+  p_constraintname.MakeUpper();
+
+  CString sql;
+  sql.Format("SELECT COUNT(*)\n"
+             "  FROM rdb$relation_constraints con\n"
+             " WHERE con.rdb$constraint_name = '%s'\n"
+             "   AND con.rdb$relation_name   = '%s'\n"
+             "   AND con.rdb$constraint_type = 'FOREIGN KEY'"
+            ,p_constraintname.GetString()
+            ,p_tablename.GetString());
+  return sql;
+}
+
+CString
+SQLInfoFirebird::GetCATALOGForeignList(CString p_schema,CString p_tablename,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
+{
+  return GetCATALOGForeignAttributes(p_schema,p_tablename,"",p_maxColumns);
+}
+
+CString
+SQLInfoFirebird::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraint,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+{
+  p_schema.MakeUpper();
+  p_tablename.MakeUpper();
+  p_constraint.MakeUpper();
+  CString query;
+  query.Format( "SELECT mon.mon$database_name           AS primary_key_catalog\n"
+                "      ,'%s'                            AS primary_key_schema\n"
+                "      ,idx.rdb$relation_name           AS primary_key_table\n"
+                "      ,mon.mon$database_name           AS foreign_key_catalog\n"
+                "      ,'%s'                            AS foreign_key_schema\n"
+                "      ,con.rdb$relation_name           AS foreign_key_table\n"
+                "      ,ref.rdb$const_name_uq           AS primary_key_constraint\n"
+                "      ,con.rdb$constraint_name         AS foreign_key_constraint\n"
+                "      ,%d                              AS key_sequence\n"
+                "      ,seg.rdb$field_name              AS foreign_key_column_name\n"
+                "      ,psg.rdb$field_name              AS primary_key_column_name\n"
+                "      ,case ref.rdb$update_rule        WHEN 'RESTRICT'     THEN 1\n"
+                "                                       WHEN 'CASCADE'      THEN 0\n"
+                "                                       WHEN 'SET NULL'     THEN 2\n"
+                "                                       WHEN 'SET DEFAULT'  THEN 4\n"
+                "                                       WHEN 'NO ACTION'    THEN 3\n"
+                "                                       ELSE 0\n"
+                "                                       END AS update_rule\n"
+                "      ,case ref.rdb$delete_Rule        WHEN 'RESTRICT'     THEN 1\n"
+                "                                       WHEN 'CASCADE'      THEN 0\n"
+                "                                       WHEN 'SET NULL'     THEN 2\n"
+                "                                       WHEN 'SET DEFAULT'  THEN 4\n"
+                "                                       WHEN 'NO ACTION'    THEN 3\n"
+                "                                       ELSE 0\n"
+                "                                       END AS delete_rule\n"
+                "      ,case con.rdb$deferrable         WHEN 'YES'  THEN 1 ELSE 0 END as deferrable\n"
+                "      ,case ref.rdb$match_option       WHEN 'FULL' THEN 1 ELSE 0 END as match_option\n"
+                "      ,case con.rdb$initially_deferred WHEN 'YES'  THEN 1 ELSE 0 END as initially_deferred\n"
+                "      ,1                               AS enabled\n"
+                "  FROM rdb$relation_constraints con\n"
+                "      ,rdb$ref_constraints ref\n"
+                "      ,rdb$indices         idx\n"
+                "      ,rdb$indices         cix\n"
+                "      ,rdb$index_segments  seg\n"
+                "      ,rdb$index_segments  psg\n"
+                "      ,mon$database        mon\n"
+                " WHERE con.rdb$constraint_name = ref.rdb$constraint_name\n"
+                "   AND ref.rdb$const_name_uq   = idx.rdb$index_name\n"
+                "   AND con.rdb$index_name      = cix.rdb$index_name\n"
+                "   AND seg.rdb$index_name      = cix.rdb$index_name\n"
+                "   AND psg.rdb$index_name      = idx.rdb$index_name\n"
+                "   AND seg.rdb$field_position  = psg.rdb$field_position\n"
+                "   AND con.rdb$constraint_type = 'FOREIGN KEY'\n"
+                ,p_schema.GetString()
+                ,p_schema.GetString());
+  if(!p_tablename.IsEmpty())
   {
-    table   = p_foreign.m_schema + "." + table;
-    primary = p_foreign.m_schema + "." + primary;
+    query += "   AND con.rdb$relation_name   = '" + p_tablename + "'\n";
+  }
+  if(!p_constraint.IsEmpty())
+  {
+    query += "   AND con.rdb$constraint_name = '" + p_constraint + "'\n";
   }
 
-  // The base foreign key command
-  CString query = "ALTER TABLE " + table + "\n"
-                  "  ADD CONSTRAINT " + p_foreign.m_constraintname + "\n"
-                  "      FOREIGN KEY (" + p_foreign.m_column + ")\n"
-                  "      REFERENCES " + primary + "(" + p_foreign.m_primaryColumn + ")";
-  // Add all relevant options
-  switch(p_foreign.m_updateRule)
-  {
-    case 0: query += "\n      ON UPDATE CASCADE";     break;
-    case 2: query += "\n      ON UPDATE SET NULL";    break;
-    case 4: query += "\n      ON UPDATE SET DEFAULT"; break;
-    case 3: query += "\n      ON UPDATE NO ACTION";   break;
-    default:// In essence: ON UPDATE RESTRICT, but that's already the default
-    case 1: break;
-  }
-  switch(p_foreign.m_deleteRule)
-  {
-    case 0: query += "\n      ON DELETE CASCADE";     break;
-    case 2: query += "\n      ON DELETE SET NULL";    break;
-    case 4: query += "\n      ON DELETE SET DEFAULT"; break;
-    case 3: query += "\n      ON DELETE NO ACTION";   break;
-    default:// In essence: ON DELETE RESTRICT, but that's already the default
-    case 1: break;
-  }
+  // Add ordering upto column number
+  query += " ORDER BY 1,2,3,4,5,6,7,8,9";
+
   return query;
 }
 
-CString 
-SQLInfoFirebird::GetSQLForeignKeyConstraint(MForeignMap& p_foreigns) const
+CString
+SQLInfoFirebird::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
 {
   // Get first record
   MetaForeign& foreign = p_foreigns.front();
@@ -511,656 +906,56 @@ SQLInfoFirebird::GetSQLForeignKeyConstraint(MForeignMap& p_foreigns) const
   return query;
 }
 
-// Get the sql (if possible) to change the foreign key constraint
-CString 
-SQLInfoFirebird::GetSQLAlterForeignKey(DBForeign& /*p_origin*/,DBForeign& /*p_requested*/) const
+CString
+SQLInfoFirebird::GetCATALOGForeignAlter(MForeignMap& /*p_original*/, MForeignMap& /*p_requested*/) const
 {
   // Firebird cannot alter a foreign-key constraint.
   // You must drop and then re-create your foreign key constraint
   // So return an empty string to signal this!
   return "";
-} 
+}
 
-// Setting SQL performance parameters in the database
 CString
-SQLInfoFirebird::GetSQLPerformanceSettings() const
+SQLInfoFirebird::GetCATALOGForeignDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
 {
-  return "";
-}
-
-// SQL To set the caching mode of SQL results
-CString 
-SQLInfoFirebird::GetSQLCacheModeSetting(const CString& /*p_mode*/) const
-{
-  return "";
-}
-
-// Settings for NUMERIC/DECIMAL numbers in stored procedures
-CString
-SQLInfoFirebird::GetSQLNlsNumericCharacters() const
-{
-  return "";
-}
-
-// Getting the RENAME column (can contain more than 1 SQL)
-CString
-SQLInfoFirebird::GetSQLModifyColumnName(CString p_tablename,CString p_oldName,CString p_newName,CString /*p_datatype*/)
-{
-  CString rename = "rename column " + p_tablename + "." + p_oldName + " to " + p_newName;
-  return rename;
-}
-
-// Max length of an SQL statement
-unsigned long 
-SQLInfoFirebird::GetMaxStatementLength() const
-{
-  return 0;		// NO limit
-}
-
-// Getting the prefix for altering the datatyp in MODIFY/ALTER
-CString 
-SQLInfoFirebird::GetModifyDatatypePrefix() const
-{
-  return "TYPE ";
-}
-
-// Code to create a temporary table
-CString 
-SQLInfoFirebird::GetCodeTemporaryTable() const
-{
-  return "";
-}
-
-// Getting the correct locking mode
-CString 
-SQLInfoFirebird::GetCodeLockModeRow() const
-{
-  return "";
-}
-
-// Extra create table clause for creating a table with no logging
-CString 
-SQLInfoFirebird::GetCodeTempTableWithNoLog() const
-{
-  return "";
-}
-
-// Giving rights to configured users in a NON-ANSI database
-CString 
-SQLInfoFirebird::GetSQLGrantAllOnTable(CString /*p_schema*/,CString p_tableName,bool p_grantOption /*= false*/)
-{
-  CString sql = "GRANT ALL ON "+ p_tableName + " TO" + GetGrantedUsers();
-  if(p_grantOption)
-  {
-    sql += " WITH GRANT OPTION;\n";
-  }
+  CString sql("ALTER TABLE " + p_tablename + "\n"
+              " DROP CONSTRAINT " + p_constraintname);
   return sql;
 }
 
-// Code BEFORE a 'select into temp' clause
-CString
-SQLInfoFirebird::GetSelectIntoTempClausePrefix(CString p_tableName) const
-{
-  return "";
-}
-
-// Code AFTER a 'select into temp' clause
-CString
-SQLInfoFirebird::GetSelectIntoTempClauseSuffix(CString p_tableName) const
-{
-  return "";
-}
-
-bool
-SQLInfoFirebird::GetCodeIfStatementBeginEnd() const
-{
-  // IF THEN ELSE END IF; always needs a BEGIN/END
-  return true;
-}
-
-// End of the IF statement
-CString 
-SQLInfoFirebird::GetCodeEndIfStatement() const
-{
-  return "\n";
-}
-
-CString 
-SQLInfoFirebird::GetAssignmentStatement(const CString& p_destiny,const CString& p_source) const
-{
-  return p_destiny + " = " + p_source + ";";
-}
-
-
-// SQL keyword to alter a column in a table
-CString 
-SQLInfoFirebird::GetCodeAlterColumn() const
-{
-  return "ALTER COLUMN ";
-}
-
-// Code to start a while loop
-CString
-SQLInfoFirebird::GetStartWhileLoop(CString p_condition) const
-{
-  return "WHILE " + p_condition + " LOOP\n";
-}
-
-// Code to end a WHILE loop
-CString
-SQLInfoFirebird::GetEndWhileLoop() const
-{
-  return "END LOOP;\n";
-}
-
-// The fact that a SELECT **must** be between parenthesis for an assignment
-bool 
-SQLInfoFirebird::GetAssignmentSelectParenthesis() const
-{
-  // waarde = (SELECT max kenmerk FROM tabel);
-  return true;
-}
-
-// Gets the UPPER function
-CString 
-SQLInfoFirebird::GetUpperFunction(CString& p_expression) const
-{
-  return "UPPER(" + p_expression + ")";
-}
-
-// Gets the construction for 1 minute ago
-CString 
-SQLInfoFirebird::GetInterval1MinuteAgo() const
-{
-  return "ERROR";
-}
-
-// Gets the construction / select for generating a new serial identity
-CString 
-SQLInfoFirebird::GetSQLGenerateSerial(CString p_table) const
-{
-  return "SELECT " + p_table + "_seq.nextval FROM DUAL";
-}
-
-// Gets the construction / select for the resulting effective generated serial
-CString 
-SQLInfoFirebird::GetSQLEffectiveSerial(CString p_identity) const
-{
-  // Just return it, it's the correct value
-  return p_identity;
-}
-
-// Gets the Not-NULL-Value statement of the database
-CString 
-SQLInfoFirebird::GetNVLStatement(CString& p_test,CString& p_isnull) const
-{
-  return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
-}
-
-// Gets the sub-transaction commands
-CString 
-SQLInfoFirebird::GetStartSubTransaction(CString p_savepointName) const
-{
-  return CString("SAVEPOINT ") + p_savepointName;
-}
-
-CString 
-SQLInfoFirebird::GetCommitSubTransaction(CString p_savepointName) const
-{
-  return CString("COMMIT TRANSACTION ") + p_savepointName;
-}
-
-CString 
-SQLInfoFirebird::GetRollbackSubTransaction(CString p_savepointName) const
-{
-  return CString("ROLLBACK TO ") + p_savepointName;
-}
-
-// SQL CATALOG QUERIES
-// ====================================================================
-
-// SQL to find out whether a stored procedure does exist in the database
-CString 
-SQLInfoFirebird::GetSQLStoredProcedureExists(CString& p_name) const
-{
-  CString nameUpper(p_name);
-  nameUpper.MakeUpper();
-  CString query = ( "SELECT COUNT(*) "
-                    "  FROM RDB$PROCEDURES "
-                    " WHERE RDB$PROCEDURE_NAME ='" + nameUpper + "';");
-  return query;
-}
-
-// To select one (1) record in a query
-CString 
-SQLInfoFirebird::GetDualTableName() const
-{
-  return "rdb$database";
-}
-
-// FROM-Part for a query to select only 1 (one) record
-CString 
-SQLInfoFirebird::GetDualClause() const
-{
-  return " FROM rdb$database";
-}
-
-// CONSTRAINTS DEFERRABLE clause
-CString
-SQLInfoFirebird::GetConstraintDeferrable() const
-{
-  return "";
-}
-
-// Defer constraints until the next commit
-CString 
-SQLInfoFirebird::GetSQLDeferConstraints() const
-{
-  return "";
-}
-
-// Constraints back to immediate checking
-CString 
-SQLInfoFirebird::GetSQLConstraintsImmediate() const
-{
-  return "";
-}
-
-// Get the SQL to see if a table exists in the database
-CString 
-SQLInfoFirebird::GetSQLTableExists(CString /*p_schema*/,CString p_tablename) const
-{
-  CString upperName(p_tablename);
-  upperName.MakeUpper();
-  CString query = "SELECT COUNT(*)\n"
-                  "  FROM rdb$relations\n"
-                  " WHERE rdb$relation_name = '" + upperName + "'";
-  return query;
-}
-
-// Get the SQL query to get the columns of a table from the catalog
-CString 
-SQLInfoFirebird::GetSQLGetColumns(CString& /*p_user*/,CString& p_tableName) const
-{
-  CString upperName(p_tableName);
-  upperName.MakeUpper();
-
-  CString table = "SELECT col.rdb$field_name\n"        // 0 -> Naam
-                  "      ,col.rdb$field_position\n"    // 1 -> Positie
-                  "      ,typ.rdb$field_type\n"        // 2 -> type
-                  "      ,typ.rdb$field_length\n"      // 3 -> lengte
-                  "      ,typ.rdb$null_flag\n"         // 4 -> nn 1 = not null / 0 is null
-                  "      ,typ.rdb$field_precision\n"   // 5 -> precision
-                  "      ,typ.rdb$field_scale\n"       // 6 -> scale (neg)
-                  "  FROM rdb$relation_fields col\n"
-                  "      ,rdb$fields typ\n"
-                  " WHERE col.rdb$relation_name = '" + upperName + "'\n"
-                  "   AND col.rdb$field_source  = typ.rdb$field_name\n"
-                  " ORDER BY col.rdb$field_position";
-  return table;
-}
-
-// Get the SQL query to get the CHECK and UNIQUE constraints for a table
-CString 
-SQLInfoFirebird::GetSQLGetConstraintsForTable(CString& p_tableName) const
-{
-  CString upperName = p_tableName;
-  upperName.MakeUpper();
-  CString contabel = "SELECT con.rdb$constraint_name\n"
-                     "      ,con.rdb$relation_name\n"
-                     "  FROM rdb$relation_constraints con\n"
-                     " WHERE rdb$relation_name = '" + upperName + "'"
-                     "   AND con.rdb$constraint_type IN ('CHECK','UNIQUE')";
-  return contabel;
-}
-
-// Read all existing indices of a table
-CString 
-SQLInfoFirebird::GetSQLTableIndices(CString /*p_user*/,CString p_tableName) const
-{
-  p_tableName.MakeUpper();
-  CString query = "SELECT idx.rdb$index_name\n"
-                  "      ,col.rdb$field_name\n"
-                  "      ,col.rdb$field_position\n"
-                  "      ,idx.rdb$unique_flag\n" // 1 if unique, null if not
-                  "      ,idx.rdb$index_type\n"  // 1 if descending, null,0 on ascending
-                  "      ,idx.rdb$expression_source\n"
-                  "  FROM rdb$indices idx\n"
-                  "      ,rdb$index_segments col\n"
-                  " WHERE idx.rdb$index_name    = col.rdb$index_name\n"
-                  "   AND idx.rdb$relation_name = '" + p_tableName + "'\n"
-                  "   AND idx.rdb$system_flag   = 0\n"
-                  " ORDER BY 1,5";
-  return query;
-}
-
-// Get SQL to create an index for a table
-CString 
-SQLInfoFirebird::GetSQLCreateIndex(CString p_user,CString p_tableName,DBIndex* p_index) const
-{
-  CString sql("CREATE ");
-  if(p_index->m_unique)
-  {
-    sql += "UNIQUE ";
-  }
-  sql += (p_index->m_descending) ? "DESC" : "ASC";
-  sql += " INDEX ON ";
-  sql += p_user + ".";
-  sql += p_tableName + "(";
-
-  int column = 0;
-  while(!p_index->m_indexName.IsEmpty())
-  {
-    if(column)
-    {
-      sql += ",";
-    }
-    sql += p_index->m_column;
-    // Next column
-    ++column;
-    ++p_index;
-  }
-  sql += ")";
-
-  return sql;
-}
+//////////////////////////////////////////////////////////////////////////
+// ALL TRIGGER FUNCTIONS
 
 CString
-SQLInfoFirebird::GetSQLCreateIndex(MStatisticsMap& p_indices) const
-{
-  CString query;
-  for(auto& index : p_indices)
-  {
-    if(index.m_position == 1)
-    {
-      // New index
-      query = "CREATE ";
-      if(index.m_unique)
-      {
-        query += "UNIQUE ";
-      }
-      if(index.m_ascending != "A")
-      {
-        query += "DESC ";
-      }
-      query += "INDEX ";
-      if(!index.m_schemaName.IsEmpty())
-      {
-        query += index.m_schemaName + ".";
-      }
-      query += index.m_indexName;
-      query += " ON ";
-      if(!index.m_schemaName.IsEmpty())
-      {
-        query += index.m_schemaName + ".";
-      }
-      query += index.m_tableName;
-      query += "(";
-    }
-    else
-    {
-      query += ",";
-    }
-    if(index.m_columnName.Left(1) == "(")
-    {
-      query.TrimRight("(");
-      query += " COMPUTED BY ";
-      query += index.m_columnName;
-      query.TrimRight(")");
-    }
-    else if(!index.m_filter.IsEmpty())
-    {
-      query += index.m_filter;
-    }
-    else
-    {
-      query += index.m_columnName;
-    }
-  }
-  query += ")";
-  return query;
-}
-
-// Get extra filter expression for an index column
-CString
-SQLInfoFirebird::GetIndexFilter(MetaStatistics& /*p_index*/) const
-{
-  return "";
-}
-
-// Get SQL to drop an index
-CString 
-SQLInfoFirebird::GetSQLDropIndex(CString p_user,CString p_indexName) const
-{
-  CString sql = "DROP INDEX " + p_indexName;
-  return sql;
-}
-
-// Get the SQL Query to read the referential constraints for a table
-CString 
-SQLInfoFirebird::GetSQLTableReferences(CString /*p_schema*/
-                                      ,CString p_tablename
-                                      ,CString p_constraint /*=""*/
-                                      ,int     /* p_maxColumns /*= SQLINFO_MAX_COLUMNS*/) const
+SQLInfoFirebird::GetCATALOGTriggerExists(CString /*p_schema*/, CString p_tablename, CString p_triggername) const
 {
   p_tablename.MakeUpper();
-  p_constraint.MakeUpper();
-  CString query = "SELECT con.rdb$constraint_name         AS foreign_key_constraint\n"
-                  "      ,''                              AS schema_name\n"
-                  "      ,con.rdb$relation_name           AS table_name\n"
-                  "      ,seg.rdb$field_name              AS column_name\n"
-                  "      ,idx.rdb$relation_name           AS primary_table_name\n"
-                  "      ,psg.rdb$field_name              AS primary_key_column\n"
-                  "      ,case con.rdb$deferrable         WHEN 'YES'  THEN 1 ELSE 0 END as deferrable\n"
-                  "      ,case con.rdb$initially_deferred WHEN 'YES'  THEN 1 ELSE 0 END as initially_deferred\n"
-                  "      ,1                               as enabled\n"
-                  "      ,case ref.rdb$match_option       WHEN 'FULL' THEN 1 ELSE 0 END as match_option\n"
-                  "      ,case ref.rdb$update_rule        WHEN 'RESTRICT'     THEN 1\n"
-                  "                                       WHEN 'CASCADE'      THEN 0\n"
-                  "                                       WHEN 'SET NULL'     THEN 2\n"
-                  "                                       WHEN 'SET DEFAULT'  THEN 4\n"
-                  "                                       WHEN 'NO ACTION'    THEN 3\n"
-                  "                                       ELSE 0\n"
-                  "                                       END as update_rule\n"
-                  "      ,case ref.rdb$delete_Rule        WHEN 'RESTRICT'     THEN 1\n"
-                  "                                       WHEN 'CASCADE'      THEN 0\n"
-                  "                                       WHEN 'SET NULL'     THEN 2\n"
-                  "                                       WHEN 'SET DEFAULT'  THEN 4\n"
-                  "                                       WHEN 'NO ACTION'    THEN 3\n"
-                  "                                       ELSE 0\n"
-                  "                                       END as delete_rule\n"
-                  "  FROM rdb$relation_constraints con\n"
-                  "      ,rdb$ref_constraints ref\n"
-                  "      ,rdb$indices         idx\n"
-                  "      ,rdb$indices         cix\n"
-                  "      ,rdb$index_segments  seg\n"
-                  "      ,rdb$index_segments  psg\n"
-                  " WHERE con.rdb$constraint_name = ref.rdb$constraint_name\n"
-                  "   AND ref.rdb$const_name_uq   = idx.rdb$index_name\n"
-                  "   AND con.rdb$index_name      = cix.rdb$index_name\n"
-                  "   AND seg.rdb$index_name      = cix.rdb$index_name\n"
-                  "   AND psg.rdb$index_name      = idx.rdb$index_name\n"
-                  "   AND seg.rdb$field_position  = psg.rdb$field_position\n"
-                  "   AND con.rdb$constraint_type = 'FOREIGN KEY'";
-  if(!p_tablename.IsEmpty())
-  {
-    query += "\n   AND con.rdb$relation_name   = '" + p_tablename + "'";
-  }
-  if(!p_constraint.IsEmpty())
-  {
-    query += "\n   AND con.rdb$constraint_name = '" + p_constraint + "'";
-  }
-  return query;
-}
+  p_triggername.MakeUpper();
 
-// Get the SQL to determine the sequence state in the database
-CString 
-SQLInfoFirebird::GetSQLSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
-{
-  CString sequence = p_tablename + p_postfix;
-  sequence.MakeUpper();
-
-  CString sql = "SELECT rdb$generator_name as sequence_name\n" 
-                "      ,rdb$initial_value as current_value\n"
-                "      ,decode(rdb$generator_increment,1,1,0) as is_correct\n"
-                "  FROM rdb$generators\n"
-                " WHERE rdb$system_flag    = 0\n"
-                "   AND rdb$generator_name = '" + sequence + "'";
-  return sql;
-}
-
-// Create a sequence in the database
-CString 
-SQLInfoFirebird::GetSQLCreateSequence(CString /*p_schema*/,CString p_tablename,CString p_postfix /*= "_seq"*/,int p_startpos /*=1*/) const
-{
-  CString sequence = p_tablename + p_postfix;
   CString sql;
-  sql.Format("CREATE SEQUENCE %s START WITH %d",sequence,p_startpos);
+  sql.Format("SELECT COUNT(*)\n"
+             "  FROM rdb$triggers\n"
+             " WHERE rdb$relation_name = '%s'\n"
+             "   AND rdb$trigger_name  = '%s'\n"
+             "   AND rdb$system_flag   = 0"
+            ,p_tablename.GetString()
+            ,p_triggername.GetString());
   return sql;
 }
 
-// Remove a sequence from the database
-CString 
-SQLInfoFirebird::GetSQLDropSequence(CString p_schema,CString p_tablename,CString p_postfix /*= "_seq"*/) const
-{
-  CString sequence = p_tablename + p_postfix;
-  CString sql = "DROP SEQUENCE " + sequence;
-  return sql;
-}
-
-// Grant rights on the sequence
 CString
-SQLInfoFirebird::GetSQLSequenceRights(CString /*p_schema*/,CString p_tableName,CString p_postfix /*="_seq"*/) const
+SQLInfoFirebird::GetCATALOGTriggerList(CString p_schema, CString p_tablename) const
 {
-  CString sql;
-  CString sequence = p_tableName + p_postfix;
-  sql.Format("GRANT USAGE ON %s TO %s",sequence,GetGrantedUsers());
-  return sql;
-}
-
-// Query to remove a stored procedure
-void
-SQLInfoFirebird::DoRemoveProcedure(CString& p_procedureName) const
-{
-  SQLQuery query(m_database);
-  query.TryDoSQLStatement("DROP PROCEDURE " + p_procedureName);
+  return GetCATALOGTriggerAttributes(p_schema,p_tablename,"");
 }
 
 CString
-SQLInfoFirebird::GetSQLSessionAndTerminal() const
+SQLInfoFirebird::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename, CString p_triggername) const
 {
-  CString query = "SELECT mon.mon$attachment_id\n"
-                  "      ,mon.mon$timestamp\n"
-                  "      ,mon.mon$remote_address\n"
-                  "      ,mon.mon$remote_host\n"
-                  "      ,mon.mon$remote_process\n"
-                  "      ,mon.mon$remote_pid\n"
-                  "      ,mon.mon$remote_os_user\n"
-                  "  FROM mon$attachments mon\n"
-                  " WHERE mon$attachment_id = current_connection";
-  return query;
-}
+  p_schema.MakeUpper();
+  p_triggername.MakeUpper();
+  p_triggername.MakeUpper();
 
-// Get SQL to check if session number exists
-CString 
-SQLInfoFirebird::GetSQLSessionExists(CString p_sessionID) const
-{
-  CString query;
-  query.Format("SELECT COUNT(*)\n"
-               "  FROM mon$attachments\n"
-               " WHERE mon$system_flag = 0\n"
-               "   AND mon$attachment_id = %d",p_sessionID);
-  return query;
-}
-
-// Get a query for an unique session id
-CString
-SQLInfoFirebird::GetSQLUniqueSessionId(const CString& /*p_databaseName*/,const CString& /*p_sessionTable*/) const
-{
-  CString query = "SELECT distinct(mon$attachment_id)\n"
-                  "  FROM mon$attachments\n"
-                  " WHERE mon$system_flag = 0";
-  return query;
-}
-
-// Get query to find the extra logged in sessions
-CString
-SQLInfoFirebird::GetSQLSearchSession(const CString& /*p_databaseName*/,const CString& /*p_sessionTable*/) const
-{
-  // No way in Firebird to find that
-  return "";
-}
-
-// See if a column exists in a table
-bool   
-SQLInfoFirebird::DoesColumnExistsInTable(CString& /*p_owner*/,CString& p_tableName,CString& p_column) const
-{
-  CString table(p_tableName);
-  CString column(p_column);
-  table.MakeUpper();
-  column.MakeUpper();
-  
-  CString query = "SELECT COUNT(*)\n"
-                  "  FROM rdb$relation_fields\n"
-                  " WHERE rdb$relation_name = '" + p_tableName + "'\n"
-                  "   AND rdb$field_name    = '" + p_column + "'";
-  SQLQuery qry(m_database);
-  return qry.DoSQLStatementScalar(query)->GetAsBoolean();
-}
-
-// See if a table already has a primary key
-CString
-SQLInfoFirebird::GetSQLPrimaryKeyConstraintInformation(CString /*p_schema*/,CString p_tableName) const
-{
-  CString table(p_tableName);
-  table.MakeUpper();
-  CString query = "select count(*)\n"
-                  "  from rdb$indices\n"
-                  " where rdb$relation_name = '" + table + "'\n"
-                  "   and rdb$index_name = 'PK_" + table + "'";
-  return query;
-}
-
-// Does the named constraint exist in the database
-bool    
-SQLInfoFirebird::DoesConstraintExist(CString p_constraintName) const
-{
-  return false;
-}
-
-// returns a lock table statement
-CString 
-SQLInfoFirebird::GetSQLLockTable(CString& /*p_tableName*/,bool /*p_exclusive*/) const
-{
-  // Firebird does NOT have a LOCK-TABLE statement
-  return "";
-}
-
-// Query to optimize a table
-CString 
-SQLInfoFirebird::GetSQLOptimizeTable(CString& /*p_owner*/,CString& /*p_tableName*/,int& /*p_number*/)
-{
-  // Firebird has no SQL for this, it uses the "gfix -sweep <database>" tool
-  return "";
-}
-
-// Getting the fact that there is only **one** (1) user session in the database
-bool
-SQLInfoFirebird::GetOnlyOneUserSession()
-{
-  CString sql("SELECT COUNT(*)\n"
-              "  FROM MON$ATTACHMENTS\n"
-              " WHERE MON$SYSTEM_FLAG = 0");
-
-  SQLQuery query(m_database);
-  SQLVariant* sessions = query.DoSQLStatementScalar(sql);
-  return sessions->GetAsSLong() <= 1;
-}
-
-// Gets the triggers for a table
-CString
-SQLInfoFirebird::GetSQLTriggers(CString p_schema,CString p_table) const
-{
   CString sql;
   sql.Format("SELECT '' AS catalog_name\n"
              "      ,'%s' AS schema_name\n"
@@ -1233,93 +1028,25 @@ SQLInfoFirebird::GetSQLTriggers(CString p_schema,CString p_table) const
              "  FROM rdb$triggers\n"
              " WHERE rdb$relation_name = '%s'\n"
              "   AND rdb$system_flag   = 0\n"
-             " ORDER BY rdb$trigger_sequence"
-            ,p_schema
-            ,p_table);
-  return sql;
-}
+            ,p_schema.GetString()
+            ,p_tablename.GetString());
 
-// SQL DDL STATEMENTS
-// ==================
-
-CString
-SQLInfoFirebird::GetCreateColumn(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition,bool p_notNull)
-{
-  CString sql  = "ALTER TABLE "  + p_tablename  + "\n";
-                 "  ADD COLUMN " + p_columnName + " " + p_typeDefinition;
-  if(p_notNull)
+  if(!p_triggername.IsEmpty())
   {
-    sql += " NOT NULL";
+    sql.AppendFormat("   AND rdb$trigger_name = '%s'\n",p_triggername.GetString());
   }
-  return sql;
-}
 
-// Drop a column from a table
-CString 
-SQLInfoFirebird::GetSQLDropColumn(CString p_schema,CString p_tablename,CString p_columnName) const
-{
-  return "ALTER TABLE " + p_tablename + "\n"
-         " DROP COLUMN " + p_columnName;
+  sql += " ORDER BY rdb$trigger_sequence";
+  return sql;
 }
 
 CString
-SQLInfoFirebird::GetCreateForeignKey(CString p_tablename,CString p_constraintname,CString p_column,CString p_refTable,CString p_primary)
-{
-  CString sql = "ALTER TABLE " + p_tablename + "\n"
-                "  ADD CONSTRAINT " + p_constraintname + "\n"
-                "      FOREIGN KEY (" + p_column + ")\n"
-                "      REFERENCES " + p_refTable + "(" + p_primary + ")";
-  return sql;
-}
-
-CString 
-SQLInfoFirebird::GetModifyColumnType(CString /*p_schema*/,CString p_tablename,CString p_columnName,CString p_typeDefinition)
-{
-  CString sql = "ALTER TABLE "    + p_tablename + "\n"
-                " MODIFY COLUMN " + p_columnName + "\n"
-                " TYPE   " + p_typeDefinition;
-  return sql;
-}
-
-CString 
-SQLInfoFirebird::GetModifyColumnNull(CString /*p_schema*/,CString p_tablename,CString p_columnName,bool p_notNull)
-{
-  CString sql = "ALTER TABLE "    + p_tablename + "\n"
-                " MODIFY COLUMN " + p_columnName + (p_notNull ? " SET " : " DROP ") + "NOT NULL";
-  return sql;
-}
-
-// Get the SQL to drop a view. If precursor is filled: run that SQL first!
-CString 
-SQLInfoFirebird::GetSQLDropView(CString /*p_schema*/,CString p_view,CString& p_precursor)
-{
-  p_view.MakeUpper();
-
-  // Firebird cannot drop a view if dependencies from stored procedures or functions
-  // still exist in the dependencies table. After Firebird 3.0 we need modification
-  // rights on this system catalog table!!
-  // Changes being that we re-create the view right away after the drop.
-  p_precursor = "DELETE FROM rdb$dependencies\n"
-                " WHERE rdb$depended_on_name = '" + p_view + "'\n"
-                "   AND rdb$depended_on_type = 0";
-  return "DROP VIEW " + p_view;
-}
-
-// Create or replace a database view
-CString 
-SQLInfoFirebird::GetSQLCreateOrReplaceView(CString /*p_schema*/,CString p_view,CString p_asSelect) const
-{
-  return "RECREATE VIEW " + p_view + "\n" + p_asSelect;
-}
-
-// Create or replace a trigger
-CString
-SQLInfoFirebird::CreateOrReplaceTrigger(MetaTrigger& p_trigger) const
+SQLInfoFirebird::GetCATALOGTriggerCreate(MetaTrigger& p_trigger) const
 {
   CString sql;
   sql.Format("CREATE OR ALTER TRIGGER %s FOR %s\n"
-            ,p_trigger.m_triggerName
-            ,p_trigger.m_tableName);
+            ,p_trigger.m_triggerName.GetString()
+            ,p_trigger.m_tableName.GetString());
 
   // Do the table level trigger
   if(p_trigger.m_insert || p_trigger.m_update || p_trigger.m_delete)
@@ -1370,335 +1097,497 @@ SQLInfoFirebird::CreateOrReplaceTrigger(MetaTrigger& p_trigger) const
   return sql;
 }
 
-// SQL DDL ACTIONS
-// ====================================================================
-
-// Process DDL commandos in the catalog
-void 
-SQLInfoFirebird::DoCommitDDLcommands() const
+CString
+SQLInfoFirebird::GetCATALOGTriggerDrop(CString /*p_schema*/, CString /*p_tablename*/, CString p_triggername) const
 {
-  SQLQuery sql(m_database);
-  try
-  {
-    sql.DoSQLStatement("COMMIT");
-  }
-  catch(...)
-  {
-    sql.TryDoSQLStatement("ROLLBACK");
-    throw CString("Rollback transaction");
-  }
-}
-
-// Explicit DML commando committing
-void
-SQLInfoFirebird::DoCommitDMLcommands() const
-{
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement("COMMIT");
-}
-
-// Remove a column from a table
-void
-SQLInfoFirebird::DoDropColumn(CString p_tableName,CString p_columName)
-{
-  CString sql = "ALTER TABLE  " + p_tableName + "\n"
-                " DROP COLUMN " + p_columName;
-  SQLQuery query(m_database);
-  query.TryDoSQLStatement(sql);
-  DoCommitDDLcommands();
-}
-
-// Does the named view exists in the database
-bool
-SQLInfoFirebird::DoesViewExists(CString& p_viewName)
-{
-  CString view(p_viewName);
-  view.MakeUpper();
-
-  CString sql = "SELECT count(*)\n"
-                "  FROM rdb$relations\n"
-                " WHERE rdb$relation_name = '" + view + "'\n"
-                "   AND rdb$relation_type = 1";
-  SQLQuery query(m_database);
-  return query.DoSQLStatementScalar(sql)->GetAsBoolean();
-}
-
-// Can create temporary tables at runtime
-bool 
-SQLInfoFirebird::GetMustMakeTemptablesAtRuntime() const
-{
-  return true;
-}
-
-// Creates a temporary table 
-void
-SQLInfoFirebird::DoMakeTemporaryTable(CString& p_tableName,CString& p_content,CString& /*p_indexColumn*/) const
-{
-  SQLQuery sql(m_database);
-  CString create = "CREATE GLOBAL TEMPORARY TABLE " + p_tableName + p_content;
-  try
-  {
-    sql.DoSQLStatement(create);
-  }
-  catch(CString& error)
-  {
-    // throw error if not succeeded
-    throw CString("Cannot create temporary table: " + p_tableName + " : " + error);
-  }
-}
-
-// Removal of the temporary table
-void
-SQLInfoFirebird::DoRemoveTemporaryTable(CString& p_tableName) const
-{
-  SQLQuery query(m_database);
-  // If table is not there, no error...
-  query.TryDoSQLStatement("DROP TABLE " + p_tableName);
-}
-
-// Making a stored procedure in the database
-void 
-SQLInfoFirebird::DoMakeProcedure(CString& p_procName,CString p_table,bool /*p_noParameters*/,CString& p_codeBlock)
-{
-  SQLQuery sql(m_database);
-  sql.DoSQLStatement(p_codeBlock);
-  sql.DoSQLStatement("GRANT EXECUTE ON PROCEDURE " + p_procName + " TO " + GetGrantedUsers());
-  DoCommitDDLcommands();
-}
-
-// Not supported by Firebird
-void
-SQLInfoFirebird::DoRenameTable(CString& /*p_oldName*/,CString& /*p_newName*/) const
-{
-  throw CString("Changing database tablenames is not supported by this database type.");
-}
-
-// PERSISTENT-STORED MODULES (SPL / PL/SQL)
-// ===================================================================
-
-// Getting the user errors from the database
-CString 
-SQLInfoFirebird::GetUserErrorText(CString& p_procName) const
-{
-  (void)p_procName;   // Not supported in Firebird.
-  return "";
-}
-
-// Getting assignment to a variable in SPL
-CString 
-SQLInfoFirebird::GetSPLAssignment(CString p_variable) const
-{
-  return p_variable + "=";
-}
-
-// Getting the start of a SPL while loop
-CString 
-SQLInfoFirebird::GetSPLStartWhileLoop(CString p_condition) const
-{
-  CString sql = "WHILE " + p_condition + " DO ";
+  CString sql("DROP TRIGGER " + p_triggername);
   return sql;
 }
 
-// The end of a while loop
-CString 
-SQLInfoFirebird::GetSPLEndWhileLoop() const
+//////////////////////////////////////////////////////////////////////////
+// ALL SEQUENCE FUNCTIONS
+
+CString
+SQLInfoFirebird::GetCATALOGSequenceExists(CString /*p_schema*/, CString p_sequence) const
 {
-  // uses the BEGIN END after the DO
+  p_sequence.MakeUpper();
+
+  CString sql = "SELECT COUNT(*)\n"
+                "  FROM rdb$generators\n"
+                " WHERE rdb$system_flag    = 0\n"
+                "   AND rdb$generator_name = '" + p_sequence + "'";
+  return sql;
+}
+
+CString
+SQLInfoFirebird::GetCATALOGSequenceAttributes(CString /*p_schema*/, CString p_sequence) const
+{
+  p_sequence.MakeUpper();
+
+  CString sql = "SELECT '' as catalog_name\n"
+                "       '' as schema_name\n"
+                "      ,rdb$generator_name      as sequence_name\n" 
+                "      ,rdb$initial_value       as current_value\n"
+                "      ,0                       as minimal_value\n"
+                "      ,rdb$generator_increment as increment\n"
+                "      ,0  as cache\n"
+                "      ,0  as cycle\n"
+                "      ,0  as ordering\n"
+                "  FROM rdb$generators\n"
+                " WHERE rdb$system_flag    = 0\n"
+                "   AND rdb$generator_name = '" + p_sequence + "'";
+  return sql;
+}
+
+CString
+SQLInfoFirebird::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
+{
+  CString sql;
+  sql.Format("CREATE SEQUENCE %s START WITH %d"
+            ,p_sequence.m_sequenceName.GetString()
+            ,p_sequence.m_currentValue);
+  return sql;
+}
+
+CString
+SQLInfoFirebird::GetCATALOGSequenceDrop(CString /*p_schema*/, CString p_sequence) const
+{
+  CString sql("DROP SEQUENCE " + p_sequence);
+  return sql;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// ALL VIEW FUNCTIONS
+
+CString 
+SQLInfoFirebird::GetCATALOGViewExists(CString /*p_schema*/,CString p_viewname) const
+{
+  p_viewname.MakeUpper();
+
+  CString sql = "SELECT count(*)\n"
+                "  FROM rdb$relations\n"
+                " WHERE rdb$relation_name = '" + p_viewname + "'\n"
+                "   AND rdb$relation_type = 1";
+  return sql;
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGViewList(CString p_schema,CString p_pattern) const
+{
   return "";
 }
 
-// Getting a stored procedure call from within SPL
 CString 
-SQLInfoFirebird::GetSQLSPLCall(CString p_procName) const
+SQLInfoFirebird::GetCATALOGViewAttributes(CString p_schema,CString p_viewname) const
 {
-  return "SELECT vv_result,vv_sqlerror,vv_isamerror,vv_errordata FROM " + p_procName;
+  return "";
 }
 
-// Building a parameter list for calling a stored procedure
 CString 
-SQLInfoFirebird::GetBuildedParameterList(size_t p_numOfParameters) const
+SQLInfoFirebird::GetCATALOGViewCreate(CString /*p_schema*/,CString p_viewname,CString p_contents) const
 {
-  // Always doing an ellipsis, even if no parameters are used
-  CString strParamLijst = "(";
-  for (size_t i = 0; i < p_numOfParameters; i++)
+  return "RECREATE VIEW " + p_viewname + "\n" + p_contents;
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGViewRename(CString p_schema,CString p_viewname,CString p_newname)    const
+{
+  return "";
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGViewDrop(CString /*p_schema*/,CString p_viewname,CString& p_precursor) const
+{
+  p_viewname.MakeUpper();
+
+  // Firebird cannot drop a view if dependencies from stored procedures or functions
+  // still exist in the dependencies table. After Firebird 3.0 we need modification
+  // rights on this system catalog table!!
+  // Chances being that we re-create the view right away after the drop.
+  p_precursor = "DELETE FROM rdb$dependencies\n"
+                " WHERE rdb$depended_on_name = '" + p_viewname + "'\n"
+                "   AND rdb$depended_on_type = 0";
+  return "DROP VIEW " + p_viewname;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// SQL/PSM PERSISTENT STORED MODULES 
+//         Also called SPL or PL/SQL
+// o GetPSM<Object[s]><Function>
+//   -Procedures / Functions
+//   - Exists					GetPSMProcedureExists
+//   - List					  GetPSMProcedureList
+//   - Attributes
+//   - Create
+//   - Drop
+//
+// o PSM<Element>[End]
+//   - PSM Declaration(first,variable,datatype[,precision[,scale]])
+//   - PSM Assignment (variable,statement)
+//   - PSM IF         (condition)
+//   - PSM IFElse 
+//   - PSM IFEnd
+//   - PSM WHILE      (condition)
+//   - PSM WHILEEnd
+//   - PSM LOOP
+//   - PSM LOOPEnd
+//   - PSM BREAK
+//   - PSM RETURN     ([statement])
+//
+// o CALL the FUNCTION/PROCEDURE
+//
+//////////////////////////////////////////////////////////////////////////
+
+CString
+SQLInfoFirebird::GetPSMProcedureExists(CString /*p_schema*/, CString p_procedure) const
+{
+  p_procedure.MakeUpper();
+  CString query = ( "SELECT COUNT(*) "
+                    "  FROM RDB$PROCEDURES "
+                    " WHERE RDB$PROCEDURE_NAME ='" + p_procedure + "';");
+  return query;
+}
+
+CString
+SQLInfoFirebird::GetPSMProcedureList(CString p_schema) const
+{
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetPSMProcedureAttributes(CString p_schema, CString p_procedure) const
+{
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
+{
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetPSMProcedureDrop(CString p_schema, CString p_procedure) const
+{
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
+{
+  // Firebird does not support procedure errors
+  return "";
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// ALL PSM LANGUAGE ELEMENTS
+//
+//////////////////////////////////////////////////////////////////////////
+
+CString
+SQLInfoFirebird::GetPSMDeclaration(bool    /*p_first*/
+                                  ,CString p_variable
+                                  ,int     p_datatype
+                                  ,int     p_precision /*= 0 */
+                                  ,int     p_scale     /*= 0 */
+                                  ,CString p_default   /*= ""*/
+                                  ,CString p_domain    /*= ""*/
+                                  ,CString p_asColumn  /*= ""*/) const
+{
+  CString line;
+  line.Format("DECLARE %s ",p_variable.GetString());
+
+  if(p_datatype)
   {
-    if(i) 
+    // Getting type info and name
+    TypeInfo* info = GetTypeInfo(p_datatype);
+    line += info->m_type_name;
+
+    if(p_precision > 0)
     {
-      strParamLijst += ",";
+      line.AppendFormat("(%d",p_precision);
+      if(p_scale > 0)
+      {
+        line.AppendFormat("%d",p_scale);
+      }
+      line += ")";
     }
-    strParamLijst += "?";
+
+    if(!p_default.IsEmpty())
+    {
+      line += " DEFAULT " + p_default;
+    }
   }
-  strParamLijst += ")";
-
-  return strParamLijst;
+  else if(!p_domain.IsEmpty())
+  {
+    line += " TYPE OF " + p_domain;
+  }
+  else if(!p_asColumn)
+  {
+    line += " TYPE OF COLUMN " + p_asColumn;
+  }
+  line += ";\n";
+  return line;
 }
 
 CString
-SQLInfoFirebird::GetParameterType(CString& p_type) const
+SQLInfoFirebird::GetPSMAssignment(CString p_variable,CString p_statement /*= ""*/) const
 {
-  return p_type;
+  CString line(p_variable);
+  line += " = ";
+  if(!p_statement.IsEmpty())
+  {
+    line += p_statement;
+    line += ";";
+  }
+  return line;
 }
 
-// GENERAL SQL ACTIONS
-// =================================================================
-
-CString 
-SQLInfoFirebird::GetSQLString(const CString& p_string) const
-{
-  CString s = p_string;
-  s.Replace("'","''");
-  CString kwoot = GetQuoteCharacter();
-  return  kwoot + s + kwoot;
-}
-
-CString 
-SQLInfoFirebird::GetSQLDateString(int p_year,int p_month,int p_day) const
-{
-  CString retval;
-  retval.Format("CAST '%02d/%02d/04d' AS DATE)",p_day,p_month,p_year); // American order!!
-  return retval;
-}
-
-CString 
-SQLInfoFirebird::GetSQLTimeString(int p_hour,int p_minute,int p_second) const
-{
-  CString time;
-  time.Format("%2.2d:%2.2d:%2.2d",p_hour,p_minute,p_second);
-  return time;
-}
-
-CString 
-SQLInfoFirebird::GetSQLDateTimeString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
-{
-  CString retval;
-  retval.Format("CAST('%02d/%02d/%04d %02d:%02d:%02d' AS TIMESTAMP)"
-               ,p_day,p_month,p_year       // American order !!
-               ,p_hour,p_minute,p_second); // 24 hour clock
-  return retval;
-}
-
-// Get date-time bound parameter string in database format
-CString 
-SQLInfoFirebird::GetSQLDateTimeBoundString() const
-{
-  return "CAST(? AS TIMESTAMP)";
-}
-
-// Stripped data for the parameter binding
 CString
-SQLInfoFirebird::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
+SQLInfoFirebird::GetPSMIF(CString p_condition) const
 {
-  CString retval;
-  retval.Format("%02d/%02d/%04d %02d:%02d:%02d"
-                ,p_day,p_month,p_year       // American order !!
-                ,p_hour,p_minute,p_second); // 24 hour clock
-  return retval;
+  CString line("IF (");
+  line += p_condition;
+  line += ")\n  BEGIN\n";
+  return line;
 }
 
-CString 
-SQLInfoFirebird::GetSPLSourcecodeFromDatabase(const CString& /*p_owner*/,const CString& /*p_procName*/) const
+CString
+SQLInfoFirebird::GetPSMIFElse() const
 {
-  // @EH To be implemented
-  return "";
+  CString line("  END\n"
+               "ELSE\n"
+               "  BEGIN\n");
+  return line;
 }
 
-// Get the SPL datatype for integer
-CString 
-SQLInfoFirebird::GetSPLIntegerType() const
+CString
+SQLInfoFirebird::GetPSMIFEnd() const
 {
-  return "integer";
+  CString line("  END;\n");
+  return line;
 }
 
-// Get the SPL datatype for a decimal
-CString 
-SQLInfoFirebird::GetSPLDecimalType() const
+CString
+SQLInfoFirebird::GetPSMWhile(CString p_condition) const
 {
-  return "decimal";
+  return "WHILE (" + p_condition + ") LOOP\n";
 }
 
-// Get the SPL declaration for a cursor
-CString 
-SQLInfoFirebird::GetSPLCursorDeclaratie(CString& p_variableName,CString& p_query) const
+CString
+SQLInfoFirebird::GetPSMWhileEnd() const
 {
-  return "CURSOR " + p_variableName + " IS " + p_query + ";";
+  return "END LOOP;\n";
 }
 
-// Get the SPL cursor found row parameter
-CString 
-SQLInfoFirebird::GetSPLCursorFound(CString& p_cursorName) const
+CString
+SQLInfoFirebird::GetPSMLOOP() const
 {
-  return p_cursorName + "_found";
+  return "WHILE (true) DO BEGIN\n";
 }
 
-// Get the SPL cursor row-count variable
-CString 
-SQLInfoFirebird::GetSPLCursorRowCount(CString& /*p_variable*/) const
+CString
+SQLInfoFirebird::GetPSMLOOPEnd() const
 {
-  // Not supported
-  return "";
+  return "END;\n";
 }
 
-// Get the SPL datatype for a declaration of a row-variable
-CString 
-SQLInfoFirebird::GetSPLCursorRowDeclaration(CString& /*p_cursorName*/,CString& /*p_variableName*/) const
+CString
+SQLInfoFirebird::GetPSMBREAK() const
 {
-  // TODO: Check
-  return "";
+  return "BREAK;\n";
 }
 
-CString 
-SQLInfoFirebird::GetSPLFetchCursorIntoVariables(CString               p_cursorName
-                                               ,CString             /*p_variableName*/
-                                               ,std::vector<CString>& p_columnNames
-                                               ,std::vector<CString>& p_variableNames) const
+CString
+SQLInfoFirebird::GetPSMRETURN(CString p_statement /*= ""*/) const
 {
-  // TODO: Check
-  CString query = "FETCH " + p_cursorName + " INTO ";  
+  return "SUSPEND;\n";
+}
 
-  std::vector<CString>::iterator cNames;
-  std::vector<CString>::iterator vNames;
+CString
+SQLInfoFirebird::GetPSMExecute(CString p_procedure,MParameterMap& p_parameters) const
+{
+  // EXECUTE PROCEDURE name[(:param[,:param …])] [RETURNING_VALUES:param[,:param …]];
+  CString line;
+  line.Format("EXECUTE PROCEDURE %s (",p_procedure.GetString());
+  bool doReturning = false;
+  bool doMore = false;
+
+  for(auto& param : p_parameters)
+  {
+    // Extra ,
+    if(doMore) line += ",";
+    doMore = true;
+
+    // Append input and in/out parameters
+    if(param.m_type == 0 || param.m_type == 2)
+    {
+      line.AppendFormat(":%s",param.m_parameter.GetString());
+    }
+    // See if we must do 'returning' clause
+    if(param.m_type == 1 || param.m_type == 2)
+    {
+      doReturning = true;
+    }
+  }
+  line += ")";
+
+  // Do the returning clause
+  if(doReturning)
+  {
+    line += " RETURNING VALUES ";
+    doMore = false;
+    for(auto& param : p_parameters)
+    {
+      if(doMore) line += ",";
+      doMore = true;
+
+      if(param.m_type == 1 || param.m_type == 2)
+      {
+        line.AppendFormat(":%s",param.m_parameter.GetString());
+      }
+    }
+  }
+  line += ";\n";
+  return line;
+}
+
+// The CURSOR
+CString
+SQLInfoFirebird::GetPSMCursorDeclaration(CString p_cursorname,CString p_select) const
+{
+  return "DECLARE " + p_cursorname +" SCROLL CURSOR FOR (" + p_select + ");";
+}
+
+CString
+SQLInfoFirebird::GetPSMCursorFetch(CString p_cursorname,std::vector<CString>& /*p_columnnames*/,std::vector<CString>& p_variablenames) const
+{
+  CString query = "FETCH " + p_cursorname + " INTO ";
   bool moreThenOne = false;
 
-  for(cNames  = p_columnNames.begin(), vNames  = p_variableNames.begin();
-    cNames != p_columnNames.end() && vNames != p_variableNames.end();
-    ++cNames, ++vNames)
+  for(auto& var : p_variablenames)
   {
-    query += (moreThenOne ? "," : "") + *vNames;
+    if(moreThenOne) query += ",";
+    moreThenOne = true;
+
+    query += ":" + var;
   }
   query += ";";
   return query;
 }
 
-// Fetch the current SPL cursor row into the row variable
-CString 
-SQLInfoFirebird::GetSPLFetchCursorIntoRowVariable(CString& p_cursorName,CString p_variableName) const
-{ 
-  // TODO: CHeck
-  return "FETCH " + p_cursorName + " INTO " + p_variableName+ ";";
+//////////////////////////////////////////////////////////////////////////
+// PSM Exceptions
+
+CString
+SQLInfoFirebird::GetPSMExceptionCatchNoData() const
+{
+  // SQLSTATE 02000 equals the error 100 Data not found
+//return "WHEN SQLCODE 100 DO\n";
+  return "WHEN SQLSTATE 02000 DO\n";
 }
 
-// Get the SPL no-data exception clause
-CString 
-SQLInfoFirebird::GetSPLNoDataFoundExceptionClause() const
+CString
+SQLInfoFirebird::GetPSMExceptionCatch(CString p_sqlState) const
 {
-  // TODO: Check
-  return "WHEN NO_DATA THEN";
+  return "WHEN SQLSTATE " + p_sqlState + " DO\n";
 }
 
-// Get the SPL form of raising an exception
-CString 
-SQLInfoFirebird::GetSPLRaiseException(CString p_exceptionName) const
+CString
+SQLInfoFirebird::GetPSMExceptionRaise(CString p_sqlState) const
 {
-  // TODO Check
-  return "RAISE " + p_exceptionName + ";";
+  return "EXCEPTION " + p_sqlState;
 }
 
-// Get the fact that the SPL has server functions that return more than 1 value
-bool    
-SQLInfoFirebird::GetSPLServerFunctionsWithReturnValues() const
+//////////////////////////////////////////////////////////////////////////
+//
+// SESSIONS
+// - Sessions (No create and drop)
+//   - GetSessionMyself
+//   - GetSessionExists
+//   - GetSessionList
+//   - GetSessionAttributes
+// - Transactions
+//   - GetSessionDeferredConstraints
+//   - GetSessionImmediateConstraints
+//
+//////////////////////////////////////////////////////////////////////////
+
+CString
+SQLInfoFirebird::GetSESSIONMyself() const
 {
-  return true;
+  CString query = "SELECT mon.mon$attachment_id\n"
+                  "      ,mon.mon$remote_os_user\n"
+                  "      ,mon.mon$remote_host\n"
+                  "      ,mon.mon$timestamp\n"
+                  "      ,mon.mon$remote_address\n"
+                  "      ,mon.mon$remote_process\n"
+                  "      ,mon.mon$remote_pid\n"
+                  "  FROM mon$attachments mon\n"
+                  " WHERE mon$attachment_id = current_connection";
+  return query;
 }
+
+CString
+SQLInfoFirebird::GetSESSIONExists(CString p_sessionID) const
+{
+  CString query;
+  query.Format("SELECT COUNT(*)\n"
+               "  FROM mon$attachments\n"
+               " WHERE mon$system_flag = 0\n"
+               "   AND mon$attachment_id = %s",p_sessionID.GetString());
+  return query;
+}
+
+CString
+SQLInfoFirebird::GetSESSIONList() const
+{
+  return GetSESSIONAttributes("");
+}
+
+CString
+SQLInfoFirebird::GetSESSIONAttributes(CString p_sessionID) const
+{
+  CString sql = "SELECT mon.mon$attachment_id\n"
+                "      ,mon.mon$remote_os_user\n"
+                "      ,mon.mon$remote_host\n"
+                "      ,mon.mon$timestamp\n"
+                "      ,mon.mon$remote_address\n"
+                "      ,mon.mon$remote_process\n"
+                "      ,mon.mon$remote_pid\n"
+                "  FROM mon$attachments mon";
+  if(!p_sessionID.IsEmpty())
+  {
+    sql += "\n WHERE mon$attachment_id = " + p_sessionID;
+  }
+  return sql;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Transactions
+
+CString
+SQLInfoFirebird::GetSESSIONConstraintsDeferred() const
+{
+  // Firebird cannot defer constraints
+  return "";
+}
+
+CString
+SQLInfoFirebird::GetSESSIONConstraintsImmediate() const
+{
+  // Firebird constraints are always active
+  return "";
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// Call FUNCTION/PROCEDURE from within program
+// As a RDBMS dependent extension of "DoSQLCall" of the SQLQuery object
+//
+//////////////////////////////////////////////////////////////////////////
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant* 
@@ -1719,26 +1608,6 @@ SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,CString& /*p_schema*/,CString& p_pr
   // If result, return 0th parameter as the result
   return result ? p_query->GetParameter(0) : nullptr;
 }
-
-
-// SPECIALS
-// ==========================================================================
-
-// Translate database-errors to a human readable form
-CString 
-SQLInfoFirebird::TranslateErrortext(int p_error,CString p_errorText) const
-{
-  // Check if we have work to do
-  if(p_error == 0)
-  {
-    return p_errorText;
-  }
-
-  CString errorText;
-  errorText.Format("ODBC error [%d:%s]",p_error,p_errorText);
-  return errorText;
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -1914,3 +1783,30 @@ SQLInfoFirebird::ConstructSQLForProcedureCall(SQLQuery* p_query
 
 // End of namespace
 }
+
+// Remove catalog dependencies
+// CString 
+// SQLInfoFirebird::GetSQLRemoveProcedureDependencies(CString p_procname) const
+// {
+//   CString upperName = p_procname;
+//   upperName.MakeUpper();
+//   CString query = "DELETE FROM rdb$dependencies\n"
+//                   " WHERE rdb$depended_on_name = '" + upperName + "'\n"
+//                   "   AND rdb$depended_on_type = 5\n"
+//                   "   AND rdb$dependent_type   = 5";
+//   return query;
+// }
+// 
+// CString
+// SQLInfoFirebird::GetSQLRemoveFieldDependencies(CString p_tablename) const
+// {
+//   CString upperName = p_tablename;
+//   upperName.MakeUpper();
+//   CString query = "DELETE FROM rdb$dependencies\n"
+//                   " WHERE rdb$depended_on_name = '" + upperName + "'\n"
+//                   "   AND rdb$dependent_type   = 3";
+//   return query;
+// }
+// 
+
+

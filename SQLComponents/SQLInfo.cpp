@@ -735,15 +735,13 @@ SQLInfo::ReadingDataTypes()
 
 // Getting datatype info
 TypeInfo* 
-SQLInfo::GetTypeInfo(int p_sqlDatatype)
+SQLInfo::GetTypeInfo(int p_sqlDatatype) const
 {
-  DataTypeMap::iterator it;
-  
-  for(it = m_dataTypes.begin();it != m_dataTypes.end();++it)
+  for(auto& type : m_dataTypes)
   {
-    if(it->second->m_data_type == p_sqlDatatype)
+    if(type.second->m_data_type == p_sqlDatatype)
     {
-      return it->second;
+      return type.second;
     }
   }
   return nullptr;
@@ -842,13 +840,13 @@ SQLInfo::GetAttributeString(CString description,SQLINTEGER attrib)
   if(!m_database->Check(nRetCode))
   {
     CString error;
-    error.Format("Cannot get connection attribute \"%s\": ",description);
+    error.Format("Cannot get connection attribute \"%s\": ",description.GetString());
     error += m_database->GetErrorString(NULL);
     InfoMessageBox(error);
     return "";
   }
   value[cbMax] = 0;
-  ATLTRACE("Database connection attribute \"%s\" was: %s\n",description,value);
+  ATLTRACE("Database connection attribute \"%s\" was: %s\n",description.GetString(),value);
   return CString(value);
 }
 
@@ -866,12 +864,12 @@ SQLInfo::SetAttributeInteger(CString     description
   if(!m_database->Check(nRetCode))
   {
     CString error;
-    error.Format("Cannot set connection attribute \"%s\": ",description);
+    error.Format("Cannot set connection attribute \"%s\": ",description.GetString());
     error += m_database->GetErrorString(NULL);
     InfoMessageBox(error);
     return false;
   }
-  ATLTRACE("Database connection attribute \"%s\" set to: %d\n",description,value);
+  ATLTRACE("Database connection attribute \"%s\" set to: %d\n",description.GetString(),value);
   return true;
 }
 
@@ -889,12 +887,12 @@ SQLInfo::SetAttributeString(CString    description
   if(!m_database->Check(nRetCode))
   {
     CString error;
-    error.Format("Cannot set connection attribute \"%s\": ",description);
+    error.Format("Cannot set connection attribute \"%s\": ",description.GetString());
     error += m_database->GetErrorString(NULL);
     InfoMessageBox(error);
     return false;
   }
-  ATLTRACE("Database connection attribute \"%s\" set to: %s\n",description,value);
+  ATLTRACE("Database connection attribute \"%s\" set to: %s\n",description.GetString(),value);
   return true;
 }
 
@@ -1173,7 +1171,7 @@ SQLInfo::GetPrimaryKeyInfo(CString&    p_tablename
   if(!p_primaries.size())
   {
     // If no primary key found, search for the first unique key
-    MStatisticsMap statistics;
+    MIndicesMap statistics;
     MakeInfoTableStatistics(statistics,&p_primaries,errors,false);
   }
   else
@@ -1196,8 +1194,6 @@ SQLInfo::GetStatement(bool p_metadataID /*= true*/)
     errorText += m_database->GetErrorString(m_hstmt);
     throw errorText;
   }
-  ATLTRACE("DBInfo::GetStatement\n");
-
   SQLUINTEGER meta = p_metadataID ? SQL_TRUE : SQL_FALSE;
   // On Various ODBC databases metadata is or is not case-sensitive. To work around
   // these differences, the statement should be aware that it is about metadata!
@@ -1522,7 +1518,7 @@ SQLInfo::MakeInfoTableTablepart(CString p_findTable,MTableMap& p_tables,CString&
   // Split name in a maximum of three parts
   GetObjectName(p_findTable,search_catalog,search_schema,search_table,search_type);
 
-  // Reset tablesearch
+  // Reset table search
   m_searchCatalogName = "";
   m_searchSchemaName  = "";
   m_searchTableName   = "";
@@ -1572,6 +1568,7 @@ SQLInfo::MakeInfoTableTablepart(CString p_findTable,MTableMap& p_tables,CString&
        if(m_retCode == SQL_SUCCESS || m_retCode == SQL_SUCCESS_WITH_INFO)
        {
          MetaTable theTable;
+         theTable.m_temporary = false;
 
          // Put primary info in the MetaTable object
          if(cbCatalogName > 0) theTable.m_catalog = szCatalogName;
@@ -1637,7 +1634,7 @@ SQLInfo::MakeInfoTableColumns(MColumnMap& p_columns,CString& p_errors)
   SQLLEN       cbColumnName  = 0;
   SQLCHAR      szTypeName    [SQL_MAX_BUFFER+1];
   SQLLEN       cbTypeName    = 0;
-  SQLCHAR      szRemarks     [2 *SQL_MAX_BUFFER+1];
+  SQLCHAR      szRemarks     [2 * SQL_MAX_BUFFER + 1];
   SQLLEN       cbRemarks     = 0;
   SQLCHAR      szDefault     [2 * SQL_MAX_BUFFER + 1];
   SQLLEN       cbDefault     = 0;
@@ -2048,7 +2045,7 @@ SQLInfo::MakeInfoTableForeign(MForeignMap& p_foreigns
 }
 
 bool 
-SQLInfo::MakeInfoTableStatistics(MStatisticsMap& p_statistics
+SQLInfo::MakeInfoTableStatistics(MIndicesMap& p_statistics
                                 ,MPrimaryMap*    p_keymap
                                 ,CString&        p_errors
                                 ,bool            p_all /*=true*/)
@@ -2139,7 +2136,7 @@ SQLInfo::MakeInfoTableStatistics(MStatisticsMap& p_statistics
       }
       if(m_retCode == SQL_SUCCESS || m_retCode == SQL_SUCCESS_WITH_INFO)
       {
-        MetaStatistics stat;
+        MetaIndex stat;
         // Names
         if(cbCatalogName > 0) stat.m_catalogName = szCatalogName;
         if(cbSchemaName  > 0) stat.m_schemaName  = szSchemaName;
@@ -2464,6 +2461,7 @@ SQLInfo::MakeInfoProcedureProcedurepart(CString p_procedure,MProcedureMap& p_pro
   {
     findAll = true;
   }
+
   CloseStatement();
   bool meta = GetStatement(false);
 

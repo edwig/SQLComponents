@@ -187,7 +187,7 @@ namespace DatabaseUnitTest
 
     void IndicesDiscovery(SQLInfoDB* p_info)
     {
-      MStatisticsMap statistics;
+      MIndicesMap statistics;
       CString        errors;
 
       if(p_info->MakeInfoTableStatistics(statistics,nullptr,errors))

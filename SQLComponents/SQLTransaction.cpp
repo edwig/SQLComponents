@@ -78,7 +78,7 @@ SQLTransaction::~SQLTransaction()
   catch(CString& error)
   {
     CString message;
-    message.Format("Error in rollback of transaction [%s] : %s\n",m_name,error);
+    message.Format("Error in rollback of transaction [%s] : %s\n",m_name.GetString(),error.GetString());
     if(m_database)
     {
       m_database->LogPrint(LOGLEVEL_ERROR,message);
@@ -100,7 +100,7 @@ SQLTransaction::Start(CString p_name, bool p_startSubtransaction)
   if(m_active)
   {
     CString message;
-    message.Format("Error in start-transaction [%s] : Already started a transaction",m_name);
+    message.Format("Error in start-transaction [%s] : Already started a transaction",m_name.GetString());
     throw message;
   }
 
@@ -129,7 +129,7 @@ SQLTransaction::Commit()
   if(!m_active)
   {
     CString message;
-    message.Format("Error in commit of [%s] : transaction object is not opened",m_name);
+    message.Format("Error in commit of [%s] : transaction object is not opened",m_name.GetString());
     throw message;
   }
 
@@ -159,7 +159,7 @@ SQLTransaction::Commit()
       // Not an error in all RDBMS'es. In MS-Access this is default behaviour
       // So we log the error instead of throwing it. 
       // But as we do not have the database object to log it, we TRACE it :-(
-      ATLTRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name);
+      ATLTRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name.GetString());
     }
   }
   // Cleanup after use
@@ -197,7 +197,7 @@ SQLTransaction::Rollback()
       // Not an error in all RDBMS'es. In MS-Access this is default behaviour
       // So we log the error instead of throwing it. 
       // But as we do not have the database object to log it, we TRACE it :-(
-      ATLTRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name);
+      ATLTRACE("Error setting autocommit mode to 'on', after committed transaction [%s]\n",m_name.GetString());
     }
   }
 }
@@ -220,7 +220,7 @@ SQLTransaction::SetTransactionDeferred()
   {
     return false;
   }
-  CString sql = m_database->GetSQLInfoDB()->GetSQLDeferConstraints();
+  CString sql = m_database->GetSQLInfoDB()->GetSESSIONConstraintsDeferred();
   if(!sql.IsEmpty())
   {
     SQLQuery query(m_database);
@@ -231,7 +231,7 @@ SQLTransaction::SetTransactionDeferred()
 }
 
 // Setting a transaction in an immediate state
-// So that the constraints (uptil now) get checked immediatly
+// So that the constraints (uptil now) get checked immediately
 bool 
 SQLTransaction::SetTransactionImmediate()
 {
@@ -239,7 +239,7 @@ SQLTransaction::SetTransactionImmediate()
   {
     return false;
   }
-  CString sql = m_database->GetSQLInfoDB()->GetSQLConstraintsImmediate();
+  CString sql = m_database->GetSQLInfoDB()->GetSESSIONConstraintsImmediate();
   if(!sql.IsEmpty())
   {
     SQLQuery query(m_database);

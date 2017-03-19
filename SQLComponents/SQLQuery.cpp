@@ -849,7 +849,7 @@ SQLQuery::LogParameter(int p_column,SQLVariant* p_parameter)
     }
     CString text,value;
     p_parameter->GetAsString(value);
-    text.Format("Parameter %d: %s\n",p_column,value);
+    text.Format("Parameter %d: %s\n",p_column,value.GetString());
     m_database->LogPrint(LOGLEVEL_MAX,text);
   }
 }
@@ -1680,7 +1680,7 @@ SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,bool p_hasReturn /*=fal
   }
 
   // Is we support standard ODBC, do that call
-  if(m_database->GetSQLInfoDB()->SupportsODBCCallEscapes())
+  if(m_database->GetSQLInfoDB()->GetRDBMSSupportsODBCCallEscapes())
   {
     return DoSQLCallODBCEscape(p_schema,p_procedure,p_hasReturn);
   }

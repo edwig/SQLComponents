@@ -30,6 +30,7 @@
 #include "SQLQuery.h"
 #include "SQLWrappers.h"
 #include "SQLInfoDB.h"
+#include "SQLInfoMySQL.h"
 #include "SQLInfoAccess.h"
 #include "SQLInfoOracle.h"
 #include "SQLInfoFirebird.h"
@@ -206,14 +207,14 @@ SQLDatabase::Open(CString const& p_datasource
 {
   // get the connect string
   CString connect;
-  connect.Format("DSN=%s;UID=%s;PWD=%s;", p_datasource, p_username, p_password);
+  connect.Format("DSN=%s;UID=%s;PWD=%s;", p_datasource.GetString(), p_username.GetString(), p_password.GetString());
 
   // Add any options passed to 'AddConnectOption'  
   ODBCOptions::iterator it;
   for(it = m_options.begin();it != m_options.end();++it)
   {
     CString text;
-    text.Format("%s=%s;",it->first,it->second);
+    text.Format("%s=%s;",it->first.GetString(),it->second.GetString());
     connect += text;
   }
 
@@ -422,23 +423,23 @@ SQLDatabase::CollectInfo()
   // Consists of 6 chars name and 2 chars of main-version of the database
   // For instance "INFORM09" or "ORACLE09"
   m_DBVersion.Trim();
-  m_dbIdent.Format("%-6s%02d",m_DBName,atoi(m_DBVersion));
+  m_dbIdent.Format("%-6s%02d",m_DBName.GetString(),atoi(m_DBVersion));
 
 
   // Get the type of the database
   CString baseName = m_dbIdent.Left(6);
+  baseName.Trim();
        if(baseName.CompareNoCase("INFORM") == 0)  m_rdbmsType = RDBMS_INFORMIX;
   else if(baseName.CompareNoCase("ORACLE") == 0)  m_rdbmsType = RDBMS_ORACLE;
   else if(baseName.CompareNoCase("ACCESS") == 0)  m_rdbmsType = RDBMS_ACCESS;
   else if(baseName.CompareNoCase("MICROS") == 0)  m_rdbmsType = RDBMS_SQLSERVER;
   else if(baseName.CompareNoCase("FIREBI") == 0)  m_rdbmsType = RDBMS_FIREBIRD;
   else if(baseName.CompareNoCase("POSTGR") == 0)  m_rdbmsType = RDBMS_POSTGRESQL;
+  else if(baseName.CompareNoCase("MYSQL")  == 0)  m_rdbmsType = RDBMS_MYSQL;
   else
   {
+    // Generic default type, now supported by SQLInfoGenericODBC class
     m_rdbmsType = RDBMS_ODBC_STANDARD;
-    CString foutType("Generic ODBC database type: ");
-    foutType += m_dbIdent;
-    throw foutType;
   }
 
   // After findint the databasea type, set the rebinds
@@ -529,6 +530,7 @@ SQLDatabase::GetSQLInfoDB()
       case RDBMS_SQLSERVER: m_info = new SQLInfoSQLServer  (this); break;
       case RDBMS_POSTGRESQL:m_info = new SQLInfoPostgreSQL (this); break;
       case RDBMS_FIREBIRD:  m_info = new SQLInfoFirebird   (this); break;
+      case RDBMS_MYSQL:     m_info = new SQLInfoMySQL      (this); break;
       default:              m_info = new SQLInfoGenericODBC(this); break;
     }
   }
@@ -565,7 +567,7 @@ SQLDatabase::RealDatabaseName()
     if(GetSQLInfoDB())
     {
       // Get the SQLInfo<Database> implementation's name
-      databaseName   = m_info->GetPhysicalDatabaseName();
+      databaseName   = m_info->GetRDBMSPhysicalDatabaseName();
       m_namingMethod = "Physical database name";
     }
   }
@@ -622,7 +624,7 @@ SQLDatabase::RealDatabaseName()
   m_databaseName = databaseName;
   // Log the connection
   CString log;
-  log.Format("Database connection at login => DATABASE: %s\n",databaseName);
+  log.Format("Database connection at login => DATABASE: %s\n",databaseName.GetString());
   LogPrint(LOGLEVEL_ACTION,log);
   return result;
 }
@@ -686,6 +688,7 @@ SQLDatabase::GetDatabaseTypeName()
     case RDBMS_SQLSERVER:     return "SQL-Server";
     case RDBMS_POSTGRESQL:    return "PostgreSQL";
     case RDBMS_FIREBIRD:      return "Firebird";
+    case RDBMS_MYSQL:         return "MySQL";
     case RDBMS_ODBC_STANDARD: return "Generic ODBC";
   }
   return "";
@@ -1038,7 +1041,7 @@ SQLDatabase::Check(INT nRetCode)
                                   if((*m_logLevel)(m_logContext) >= LOGLEVEL_MAX)
                                   {
                                     CString error;
-                                    error.Format("=> ODBC Success with info: %s\n",GetErrorString());
+                                    error.Format("=> ODBC Success with info: %s\n",GetErrorString().GetString());
                                     LogPrint(LOGLEVEL_MAX,error);
                                   }
                                 }
@@ -1074,7 +1077,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
       catch(CString& error)
       {
         CString message;
-        message.Format("Error at starting transaction [%s] : %s",p_transaction->GetName(),error);
+        message.Format("Error at starting transaction [%s] : %s",p_transaction->GetName().GetString(),error.GetString());
         throw message;
       }
     }
@@ -1087,7 +1090,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
       transName.Format("AutoSavePoint%d", m_transactions.size());
 
       // Set savepoint
-      CString startSubtrans = m_info->GetStartSubTransaction(transName);
+      CString startSubtrans = m_info->GetSQLStartSubTransaction(transName);
       if(!startSubtrans.IsEmpty())
       {
         try
@@ -1099,7 +1102,10 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
         catch(CString& err)
         {
           CString message;
-          message.Format("Error starting sub-transaction [%s:%s] : %s",p_transaction->GetName(),transName,err);
+          message.Format("Error starting sub-transaction [%s:%s] : %s"
+                        ,p_transaction->GetName().GetString()
+                        ,transName.GetString()
+                        ,err.GetString());
           throw message;
         }
       }
@@ -1125,7 +1131,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
       // This is clearly not what we want, and points to an error
       // in our application's logic in the calling code.
       CString message;
-      message.Format("Error at commit: transaction [%s] is not the current transaction",p_transaction->GetName());
+      message.Format("Error at commit: transaction [%s] is not the current transaction",p_transaction->GetName().GetString());
       throw message;
     }
 
@@ -1160,7 +1166,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
 
         // Throw an exception with the error info of the failed commit
         CString message;
-        message.Format("Error in commit of transaction [%s] : %s",p_transaction->GetName(),error);
+        message.Format("Error in commit of transaction [%s] : %s",p_transaction->GetName().GetString(),error.GetString());
         throw message;
       }
     }
@@ -1169,7 +1175,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
       // It's a sub transaction
       // If the database is capable: Do the commit of the sub transaction
       // Otherwise: do nothing and wait for the outer transaction to commit the whole in-one-go
-      CString startSubtrans = m_info->GetCommitSubTransaction(p_transaction->GetSavePoint());
+      CString startSubtrans = m_info->GetSQLCommitSubTransaction(p_transaction->GetSavePoint());
       if(!startSubtrans.IsEmpty())
       {
         try
@@ -1181,9 +1187,9 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
         {
           CString message;
           message.Format("Error in commit of sub-transaction [%s:%s] : %s"
-                        ,p_transaction->GetName()
-                        ,p_transaction->GetSavePoint()
-                        ,error);
+                        ,p_transaction->GetName().GetString()
+                        ,p_transaction->GetSavePoint().GetString()
+                        ,error.GetString());
           throw message;
         }
       }
@@ -1200,7 +1206,7 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
   if(GetTransaction() != p_transaction)
   {
     CString message;
-    message.Format("Error in rollback: transaction [%s] is not the current transaction",p_transaction->GetName());
+    message.Format("Error in rollback: transaction [%s] is not the current transaction",p_transaction->GetName().GetString());
     throw message;
   }
 
@@ -1251,14 +1257,14 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
         // Throw an exception with error info at a failed rollback1
         CString message;
         CString error = GetErrorString();
-        message.Format("Error at rollback of transaction [%s] : %s",p_transaction->GetName(),error);
+        message.Format("Error at rollback of transaction [%s] : %s",p_transaction->GetName().GetString(),error.GetString());
         throw message;
       }
     }
     else
     {
       // It is a subtransaction
-      CString startSubtrans = m_info->GetRollbackSubTransaction(p_transaction->GetSavePoint());
+      CString startSubtrans = m_info->GetSQLRollbackSubTransaction(p_transaction->GetSavePoint());
       if(!startSubtrans.IsEmpty())
       {
         try
@@ -1270,9 +1276,9 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
         {
           CString message;
           message.Format("Error in rolling back sub-transaction [%s:%s] : %s"
-                        ,p_transaction->GetName()
-                        ,p_transaction->GetSavePoint()
-                        ,error);
+                        ,p_transaction->GetName().GetString()
+                        ,p_transaction->GetSavePoint().GetString()
+                        ,error.GetString());
           throw message;
         }
       }
@@ -1368,7 +1374,7 @@ SQLDatabase::GetCurrentTimestampQualifier()
 {
   if(GetSQLInfoDB())
   {
-    return m_info->GetSystemDateTimeKeyword();
+    return m_info->GetKEYWORDCurrentTimestamp();
   }
   return "";
 }
@@ -1465,7 +1471,7 @@ SQLDatabase::GetInterval1MinuteAgo()
 {
   if(GetSQLInfoDB())
   {
-    return m_info->GetInterval1MinuteAgo();
+    return m_info->GetKEYWORDInterval1MinuteAgo();
   }
   return "";
 }
@@ -1475,7 +1481,7 @@ SQLDatabase::GetUpper(CString p_veld)
 {
   if(GetSQLInfoDB())
   {
-    return m_info->GetUpperFunction(p_veld);
+    return m_info->GetKEYWORDUpper(p_veld);
   }
   return "";
 }
@@ -1485,7 +1491,7 @@ SQLDatabase::GetNVLStatement(CString p_test,CString p_isnull)
 {
   if(GetSQLInfoDB())
   {
-    return m_info->GetNVLStatement(p_test,p_isnull);
+    return m_info->GetKEYWORDStatementNVL(p_test,p_isnull);
   }
   return "";
 }
@@ -1495,12 +1501,20 @@ void
 SQLDatabase::SetOracleResultCacheMode(const CString& p_mode)
 {
   // Check to see if we are logged in, and 
-  if(!GetSQLInfoDB())
+  if(!GetSQLInfoDB() || (m_rdbmsType != RDBMS_ORACLE))
   {
     return;
   }
+
   // See if we've got a setting
-  CString query = m_info->GetSQLCacheModeSetting(p_mode);
+  // Check mode parameter for correct values
+  CString query;
+  if(p_mode.CompareNoCase("manual") == 0 ||
+     p_mode.CompareNoCase("force") == 0 ||
+     p_mode.CompareNoCase("auto") == 0)
+  {
+    query = "ALTER SESSION SET RESULT_CACHE_MODE = " + p_mode;
+  }
   if(query.IsEmpty())
   {
     return;
