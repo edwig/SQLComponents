@@ -507,7 +507,7 @@ SQLDataSetXLS::Open()
       BasicExcelWorksheet* sheet = m_workbook->GetWorksheet(m_sheetName);
       if(sheet == NULL)
       {
-        m_lastError.Format("Cannot find worksheet [%s] in XLS file: %s",m_sheetName,m_file);
+        m_lastError.Format("Cannot find worksheet [%s] in XLS file: %s",m_sheetName.GetString(),m_file.GetString());
         return false;
       }
       int cols = sheet->GetTotalCols();
@@ -515,7 +515,7 @@ SQLDataSetXLS::Open()
 
       if(cols == 0 || rows <= 1)
       {
-        m_lastError.Format("Empty worksheet [%s]",m_sheetName);
+        m_lastError.Format("Empty worksheet [%s]",m_sheetName.GetString());
         return false;
       }
 
@@ -567,7 +567,7 @@ SQLDataSetXLS::Open()
     BasicXmlWorksheet* sheet = m_xmlWorkbook->GetWorksheet(m_sheetName);
     if(sheet == NULL)
     {
-      m_lastError.Format("Cannot find worksheet [%s] in XLS file: %s",m_sheetName,m_file);
+      m_lastError.Format("Cannot find worksheet [%s] in XLS file: %s",m_sheetName.GetString(),m_file.GetString());
       return false;
     }
     int cols = sheet->GetMaxCols();
@@ -604,39 +604,39 @@ SQLDataSetXLS::Open()
       if(file)
       {
         CString tempString;
-          Close();
-          int rows = 0;
-          bool result = true;
-          // Read and store all rows in memory
-          m_transaction = true;
-          // Read and store all rows in memory
+        Close();
+        int rows = 0;
+        bool result = true;
+        // Read and store all rows in memory
+        m_transaction = true;
+        // Read and store all rows in memory
         while(ReadString(file,tempString))
+        {
+          ATLTRACE("INPUT: %s\n",tempString.GetString());
+          WordList values;
+          if(SplitRow(tempString,values) == false)
           {
-          ATLTRACE("INPUT: %s\n",tempString);
-            WordList values;
-            if(SplitRow(tempString,values) == false)
-            {
-              result = false;
-              break;
-            }
-            if(rows++ == 0)
-            {
-              // Add header fields
-              AddHeaders(values,true);
-              continue;
-            }
-            AddRow(values);
-            values.clear();
+            result = false;
+            break;
           }
+          if(rows++ == 0)
+          {
+            // Add header fields
+            AddHeaders(values,true);
+            continue;
+          }
+          AddRow(values);
+          values.clear();
+        }
         fclose(file);
 
-          if(GetNumberOfFields() != 0)
-          {
-            m_append = true;
-          }
-          m_transaction = false;
-          return result;
+        if(GetNumberOfFields() != 0)
+        {
+          m_append = true;
         }
+        m_transaction = false;
+        return result;
+      }
     }
     catch(...)
     {
