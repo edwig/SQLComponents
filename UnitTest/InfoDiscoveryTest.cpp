@@ -82,7 +82,7 @@ namespace DatabaseUnitTest
       MMetaMap objects;
       CString  errors;
 
-      if(info->MakeInfoMetaTypes(objects,p_type,errors))
+      if(info->MakeInfoMetaTypes(objects,errors,p_type))
       {
         for(auto& obj : objects)
         {
@@ -104,18 +104,22 @@ namespace DatabaseUnitTest
       MTableMap tables;
       CString   errors;
 
-      if(info->MakeInfoTableTablepart(p_table,tables,errors))
+      if(info->MakeInfoTableTable(tables,errors,"",p_table))
       {
         for(auto& table : tables)
         {
-          Logger::WriteMessage("Table found: " + table.m_fullObjectName);
-          ColumnsDiscovery(info);
-          PrimaryDiscovery(info);
-          ForeignDiscovery(info);
-          IndicesDiscovery(info);
-          SpecialDiscovery(info);
-          TriggerDiscovery(info);
-          TabPrivDiscovery(info);
+          CString schema  = table.m_schema;
+          CString tabname = table.m_table;
+
+          Logger::WriteMessage("Table found: " + table.m_fullName);
+
+          ColumnsDiscovery(info,schema,tabname);
+          PrimaryDiscovery(info,schema,tabname);
+          ForeignDiscovery(info,schema,tabname);
+          IndicesDiscovery(info,schema,tabname);
+          SpecialDiscovery(info,schema,tabname);
+          TriggerDiscovery(info,schema,tabname);
+          TabPrivDiscovery(info,schema,tabname);
         }
       }
       else if(!errors.IsEmpty())
@@ -124,12 +128,12 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ColumnsDiscovery(SQLInfoDB* p_info)
+    void ColumnsDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
     {
       CString    errors;
       MColumnMap columns;
 
-      if(p_info->MakeInfoTableColumns(columns,errors))
+      if(p_info->MakeInfoTableColumns(columns,errors,p_schema,p_table))
       {
         for(auto& column : columns)
         {
@@ -142,12 +146,12 @@ namespace DatabaseUnitTest
       }
     }
 
-    void PrimaryDiscovery(SQLInfoDB* p_info)
+    void PrimaryDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
     {
       MPrimaryMap primaries;
       CString     errors;
 
-      if(p_info->MakeInfoTablePrimary(primaries,errors))
+      if(p_info->MakeInfoTablePrimary(primaries,errors,p_schema,p_table))
       {
 
         for(auto& primary : primaries)
@@ -167,12 +171,12 @@ namespace DatabaseUnitTest
       }
     }
     
-    void ForeignDiscovery(SQLInfoDB* p_info)
+    void ForeignDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
     {
       MForeignMap references;
       CString     errors;
 
-      if(p_info->MakeInfoTableForeign(references,errors))
+      if(p_info->MakeInfoTableForeign(references,errors,p_schema,p_table))
       {
         for(auto& ref : references)
         {
@@ -185,12 +189,12 @@ namespace DatabaseUnitTest
       }
     }
 
-    void IndicesDiscovery(SQLInfoDB* p_info)
+    void IndicesDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
     {
       MIndicesMap statistics;
       CString        errors;
 
-      if(p_info->MakeInfoTableStatistics(statistics,nullptr,errors))
+      if(p_info->MakeInfoTableStatistics(statistics,errors,p_schema,p_table,nullptr))
       {
         for(auto& ind : statistics)
         {
@@ -203,11 +207,11 @@ namespace DatabaseUnitTest
       }
     }
 
-    void SpecialDiscovery(SQLInfoDB* p_info)
+    void SpecialDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
     {
-      MSpecialColumnMap specials;
+      MSpecialsMap specials;
       CString errors;
-      if(p_info->MakeInfoTableSpecials(specials,errors))
+      if(p_info->MakeInfoTableSpecials(specials,errors,p_schema,p_table))
       {
         for(auto& spec : specials)
         {
@@ -220,12 +224,12 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TriggerDiscovery(SQLInfoDB* p_info)
+    void TriggerDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
     {
       MTriggerMap triggers;
       CString errors;
 
-      if(p_info->MakeInfoTableTriggers(triggers,errors))
+      if(p_info->MakeInfoTableTriggers(triggers,errors,p_schema,p_table))
       {
         CString line;
         for(auto& trigger : triggers)
@@ -256,12 +260,12 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TabPrivDiscovery(SQLInfoDB* p_info)
+    void TabPrivDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
     {
       MPrivilegeMap privileges;
       CString errors;
 
-      if(p_info->MakeInfoTablePrivileges(privileges,errors))
+      if(p_info->MakeInfoTablePrivileges(privileges,errors,p_schema,p_table))
       {
         for(auto& priv : privileges)
         {
@@ -275,7 +279,7 @@ namespace DatabaseUnitTest
       }
       else if(!errors.IsEmpty())
       {
-        Assert::Fail(L"Cannot get table priviliges for table");
+        Assert::Fail(L"Cannot get table privileges for table");
       }
     }
 
@@ -287,13 +291,13 @@ namespace DatabaseUnitTest
 
       MProcedureMap procedures;
       CString errors;
-      if(info->MakeInfoProcedureProcedurepart(p_procedure,procedures,errors))
+      if(info->MakeInfoPSMProcedures(procedures,errors,"",p_procedure))
       {
         for(auto& proc : procedures)
         {
           Logger::WriteMessage("Procedure : " + proc.m_procedureName);
+          ParametersDiscovery(info,proc.m_schemaName,proc.m_procedureName);
         }
-        ParametersDiscovery(info);
       }
       else if(!errors.IsEmpty())
       {
@@ -301,16 +305,16 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ParametersDiscovery(SQLInfoDB* p_info)
+    void ParametersDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_procedure)
     {
-      MProcColumnMap params;
+      MParameterMap params;
       CString errors;
 
-      if(p_info->MakeInfoProcedureParameters(params,errors))
+      if(p_info->MakeInfoPSMParameters(params,errors,p_schema,p_procedure))
       {
         for(auto& parm : params)
         {
-          Logger::WriteMessage("Parameter : " + parm.m_columnName);
+          Logger::WriteMessage("Parameter : " + parm.m_parameter);
         }
       }
       else if(!errors.IsEmpty())

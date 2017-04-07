@@ -425,22 +425,89 @@ SQLInfoPostgreSQL::GetCATALOGTableExists(CString p_schema,CString p_tablename) c
 CString
 SQLInfoPostgreSQL::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
 {
+  return GetCATALOGTableAttributes(p_schema,p_pattern);
+}
+
+CString
+SQLInfoPostgreSQL::GetCATALOGTableAttributes(CString p_schema,CString p_tablename) const
+{
   p_schema.MakeLower();
-  p_pattern.MakeLower();
-  CString query = "SELECT count(*)\n"
-                  "  FROM pg_class cl\n"
-                  "      ,pg_namespace ns\n"
-                  " WHERE cl.relnamespace = ns.oid\n"
-                  "   AND ns.nspname = '" + p_schema    + "'\n"
-                  "   AND cl.relname like '" + p_pattern + "'";
+  p_tablename.MakeLower();
+  CString query = "SELECT current_catalog as table_catalog\n"
+                  "      ,sch.nspname     as table_schema\n"
+                  "      ,tab.relname     as table_name\n"
+                  "      ,'TABLE'         as object_type\n"
+                  "      ,''              as remarks\n"
+                  "      ,sch.nspname || '.' || tab.relname as fullname\n"
+                  "      ,tsp.spcname     as tablespace\n"
+                  "      ,CASE tab.relpersistence\n"
+                  "            WHEN 'p' THEN 0\n"
+                  "                     ELSE 1\n"
+                  "       END as temporary\n"
+                  "  FROM pg_catalog.pg_class tab\n"
+                  "       left       join pg_catalog.pg_namespace  sch on tab.relnamespace  = sch.oid\n"
+                  "       left outer join pg_catalog.pg_tablespace tsp ON tab.reltablespace = tsp.oid\n"
+                  " WHERE tab.relkind = 'r'\n"
+                  "   AND substring(sch.nspname,1,3) <> 'pg_'\n"
+                  "   AND sch.nspname <> 'information_schema'\n";
+  if(!p_schema.IsEmpty())
+  {
+    query += "    AND sch.name = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    query += "   AND tab.relname ";
+    query += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
+    query += p_tablename + "'\n";
+  }
+  query += " ORDER BY 1,2,3";
+                  
   return query;
 }
 
-bool
-SQLInfoPostgreSQL::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/,MetaTable& /*p_table*/) const
+CString
+SQLInfoPostgreSQL::GetCATALOGTableSynonyms(CString /*p_schema*/,CString /*p_tablename*/) const
 {
-  // Getting the temp table status
+  // MS-Access cannot do this
   return false;
+}
+
+CString
+SQLInfoPostgreSQL::GetCATALOGTableCatalog(CString p_schema,CString p_tablename) const
+{
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  CString query = "SELECT current_catalog as table_catalog\n"
+                  "      ,sch.nspname     as table_schema\n"
+                  "      ,tab.relname     as table_name\n"
+                  "      ,'TABLE'         as object_type\n"
+                  "      ,''              as remarks\n"
+                  "      ,sch.nspname || '.' || tab.relname as fullname\n"
+                  "      ,tsp.spcname     as tablespace\n"
+                  "      ,CASE tab.relpersistence\n"
+                  "            WHEN 'p' THEN 0\n"
+                  "                     ELSE 1\n"
+                  "       END as temporary\n"
+                  "  FROM pg_catalog.pg_class tab\n"
+                  "       left       join pg_catalog.pg_namespace  sch on tab.relnamespace  = sch.oid\n"
+                  "       left outer join pg_catalog.pg_tablespace tsp ON tab.reltablespace = tsp.oid\n"
+                  " WHERE tab.relkind IN ('t','v')\n"
+                  "   AND (substring(sch.nspname,1,3) = 'pg_'\n"
+                  "    OR sch.nspname = 'information_schema')\n"
+                  "   AND sch.nspname <> 'pg_toast'\n";
+  if(!p_schema.IsEmpty())
+  {
+    query += "    AND sch.name = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    query += "   AND tab.relname ";
+    query += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
+    query += p_tablename + "'\n";
+  }
+  query += " ORDER BY 1,2,3";
+                  
+  return query;
 }
 
 CString
@@ -519,82 +586,83 @@ SQLInfoPostgreSQL::GetCATALOGColumnExists(CString p_schema,CString p_tablename,C
 CString 
 SQLInfoPostgreSQL::GetCATALOGColumnList(CString p_schema,CString p_tablename) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-
-  CString query =  "SELECT att.attname\n"
-                   "      ,att.attnum\n"
-                   "      ,typname\n"
-                   "      ,typlen\n"
-                   "      ,attnotnull\n"
-                   "      ,(atttypmod - 4) / 65536\n"
-                   "      ,(atttypmod - 4) % 65536\n"
-                   "  FROM pg_class      tab\n"
-                   "      ,pg_namespaces sch\n"
-                   "      ,pg_attribute  att\n"
-                   "      ,pg_type       typ\n"
-                   "      ,pg_attrdef    def\n"
-                   " WHERE tab.relname  = '" + p_tablename + "'\n"
-                   "   AND sch.name     = '" + p_schema + "'\n"
-                   "   AND sch.oid      = tab.relnamespace\n"
-                   "   AND tab.relkind  = 'r'\n"
-                   "   AND tab.oid      = att.attrelid\n"
-                   "   AND att.atttypid = pg_type.oid\n"
-                   "   AND def.adrelid  = att.attrelid\n"
-                   "   AND def.adnum    = att.attnum\n"
-                   "   AND attnum > 0\n"
-                   "   AND typlen < 0\n"
-                   "   AND typname = 'numeric'\n"
-                   "UNION\n"
-                   "SELECT attname\n"
-                   "      ,attnum\n"
-                   "      ,typname\n"
-                   "      ,(atttypmod - 4) AS typlen\n"
-                   "      ,attnotnull\n"
-                   "      ,0\n"
-                   "      ,0\n"
-                   "  FROM pg_class      tab\n"
-                   "      ,pg_namespaces sch\n"
-                   "      ,pg_attribute  att\n"
-                   "      ,pg_type       typ\n"
-                   "      ,pg_attrdef    def\n"
-                   " WHERE tab.relname  = '" + p_tablename + "'\n"
-                   "   AND sch.name     = '" + p_schema + "'\n"
-                   "   AND sch.oid      = tab.relnamespace\n"
-                   "   AND tab.relkind  = 'r'\n"
-                   "   AND tab.oid      = att.attrelid\n"
-                   "   AND att.atttypid = typ.oid\n"
-                   "   AND def.adrelid  = att.attrelid\n"
-                   "   AND def.adnum    = att.attnum\n"
-                   "   AND attnum > 0\n"
-                   "   AND typlen < 0\n"
-                   "   AND typname = 'varchar'\n"
-                   "UNION\n"
-                   "SELECT attname\n"
-                   "      ,attnum\n"
-                   "      ,typname\n"
-                   "      ,typlen\n"
-                   "      ,attnotnull\n"
-                   "      ,0\n"
-                   "      ,0\n"
-                   "  FROM pg_class      tab\n"
-                   "      ,pg_namespaces sch\n"
-                   "      ,pg_attribute  att\n"
-                   "      ,pg_type       typ\n"
-                   "      ,pg_attrdef    def\n"
-                   " WHERE tab.relname  = '" + p_tablename + "'\n"
-                   "   AND sch.name     = '" + p_schema + "'\n"
-                   "   AND sch.oid      = tab.relnamespace\n"
-                   "   AND tab.relkind  = 'r'\n"
-                   "   AND tab.oid      = att.attrelid\n"
-                   "   AND att.atttypid = typ.oid\n"
-                   "   AND def.adrelid  = att.attrelid\n"
-                   "   AND def.adnum    = att.attnum\n"
-                   "   AND attnum > 0\n"
-                   "   AND typlen > 0\n"
-                   "   AND typname not in ('numeric', 'varchar')\n"
-                   " ORDER BY attnum";
-  return query;
+  return "";
+//   p_schema.MakeLower();
+//   p_tablename.MakeLower();
+// 
+//   CString query =  "SELECT att.attname\n"
+//                    "      ,att.attnum\n"
+//                    "      ,typname\n"
+//                    "      ,typlen\n"
+//                    "      ,attnotnull\n"
+//                    "      ,(atttypmod - 4) / 65536\n"
+//                    "      ,(atttypmod - 4) % 65536\n"
+//                    "  FROM pg_class      tab\n"
+//                    "      ,pg_namespaces sch\n"
+//                    "      ,pg_attribute  att\n"
+//                    "      ,pg_type       typ\n"
+//                    "      ,pg_attrdef    def\n"
+//                    " WHERE tab.relname  = '" + p_tablename + "'\n"
+//                    "   AND sch.name     = '" + p_schema + "'\n"
+//                    "   AND sch.oid      = tab.relnamespace\n"
+//                    "   AND tab.relkind  = 'r'\n"
+//                    "   AND tab.oid      = att.attrelid\n"
+//                    "   AND att.atttypid = pg_type.oid\n"
+//                    "   AND def.adrelid  = att.attrelid\n"
+//                    "   AND def.adnum    = att.attnum\n"
+//                    "   AND attnum > 0\n"
+//                    "   AND typlen < 0\n"
+//                    "   AND typname = 'numeric'\n"
+//                    "UNION\n"
+//                    "SELECT attname\n"
+//                    "      ,attnum\n"
+//                    "      ,typname\n"
+//                    "      ,(atttypmod - 4) AS typlen\n"
+//                    "      ,attnotnull\n"
+//                    "      ,0\n"
+//                    "      ,0\n"
+//                    "  FROM pg_class      tab\n"
+//                    "      ,pg_namespaces sch\n"
+//                    "      ,pg_attribute  att\n"
+//                    "      ,pg_type       typ\n"
+//                    "      ,pg_attrdef    def\n"
+//                    " WHERE tab.relname  = '" + p_tablename + "'\n"
+//                    "   AND sch.name     = '" + p_schema + "'\n"
+//                    "   AND sch.oid      = tab.relnamespace\n"
+//                    "   AND tab.relkind  = 'r'\n"
+//                    "   AND tab.oid      = att.attrelid\n"
+//                    "   AND att.atttypid = typ.oid\n"
+//                    "   AND def.adrelid  = att.attrelid\n"
+//                    "   AND def.adnum    = att.attnum\n"
+//                    "   AND attnum > 0\n"
+//                    "   AND typlen < 0\n"
+//                    "   AND typname = 'varchar'\n"
+//                    "UNION\n"
+//                    "SELECT attname\n"
+//                    "      ,attnum\n"
+//                    "      ,typname\n"
+//                    "      ,typlen\n"
+//                    "      ,attnotnull\n"
+//                    "      ,0\n"
+//                    "      ,0\n"
+//                    "  FROM pg_class      tab\n"
+//                    "      ,pg_namespaces sch\n"
+//                    "      ,pg_attribute  att\n"
+//                    "      ,pg_type       typ\n"
+//                    "      ,pg_attrdef    def\n"
+//                    " WHERE tab.relname  = '" + p_tablename + "'\n"
+//                    "   AND sch.name     = '" + p_schema + "'\n"
+//                    "   AND sch.oid      = tab.relnamespace\n"
+//                    "   AND tab.relkind  = 'r'\n"
+//                    "   AND tab.oid      = att.attrelid\n"
+//                    "   AND att.atttypid = typ.oid\n"
+//                    "   AND def.adrelid  = att.attrelid\n"
+//                    "   AND def.adnum    = att.attnum\n"
+//                    "   AND attnum > 0\n"
+//                    "   AND typlen > 0\n"
+//                    "   AND typname not in ('numeric', 'varchar')\n"
+//                    " ORDER BY attnum";
+//   return query;
 }
 
 CString 
@@ -608,12 +676,12 @@ SQLInfoPostgreSQL::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
   CString sql = "ALTER TABLE "  + p_column.m_schema + "." + p_column.m_table  + "\n";
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
-  if(p_column.m_precision)
+  if(p_column.m_columnSize)
   {
-    sql.AppendFormat("(%d",p_column.m_precision);
-    if(p_column.m_scale)
+    sql.AppendFormat("(%d",p_column.m_columnSize);
+    if(p_column.m_decimalDigits)
     {
-      sql.AppendFormat(",%d",p_column.m_scale);
+      sql.AppendFormat(",%d",p_column.m_decimalDigits);
     }
     sql += ")";
   }
@@ -791,22 +859,23 @@ SQLInfoPostgreSQL::GetCATALOGPrimaryExists(CString p_schema,CString p_tablename)
 CString
 SQLInfoPostgreSQL::GetCATALOGPrimaryAttributes(CString p_schema,CString p_tablename) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-
-  CString query = "SELECT con.conname       as constraint_name\n"
-                  "      ,con.conname       as index_name\n"
-                  "      ,con.condeferrable as deferrable\n"
-                  "      ,con.deferred      as initially_deferred\n"
-                  "  FROM pg_class      tab\n"
-                  "      ,pg_constraint con\n"
-                  "      ,pg_namespaces sch\n"
-                  " WHERE tab.relnamespace = sch.oid\n"
-                  "   AND tab.oid          = con.conrelid\n"
-                  "   AND con.contype      = 'p'\n"
-                  "   AND sch.name         = '" + p_schema    + "'\n"
-                  "   AND tab.relname      = '" + p_tablename + "'";
-  return query;
+//   p_schema.MakeLower();
+//   p_tablename.MakeLower();
+// 
+//   CString query = "SELECT con.conname       as constraint_name\n"
+//                   "      ,con.conname       as index_name\n"
+//                   "      ,con.condeferrable as deferrable\n"
+//                   "      ,con.deferred      as initially_deferred\n"
+//                   "  FROM pg_class      tab\n"
+//                   "      ,pg_constraint con\n"
+//                   "      ,pg_namespaces sch\n"
+//                   " WHERE tab.relnamespace = sch.oid\n"
+//                   "   AND tab.oid          = con.conrelid\n"
+//                   "   AND con.contype      = 'p'\n"
+//                   "   AND sch.name         = '" + p_schema    + "'\n"
+//                   "   AND tab.relname      = '" + p_tablename + "'";
+//   return query;
+  return "";
 }
 
 CString
@@ -879,7 +948,7 @@ SQLInfoPostgreSQL::GetCATALOGForeignList(CString p_schema,CString p_tablename,in
 }
 
 CString
-SQLInfoPostgreSQL::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraint,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoPostgreSQL::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraint,bool p_referenced /*=false*/,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -891,15 +960,15 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(CString p_schema,CString p_tablen
   {
     CString part;
     part.Format("SELECT current_database() as primary_catalog_name\n"
-                "      ,sch.nspname        as primary_schema_name\n"
+                "      ,psc.nspname        as primary_schema_name\n"
                 "      ,pri.relname        as primary_table_name\n"
                 "      ,current_database() as foreign_catalog_name\n"
                 "      ,sch.nspname        as foreign_schema_name\n"
                 "      ,cla.relname        as foreign_table_name\n"
-                "      ,''                 as primary_constraint_name\n"
-                "      ,con.conname        as constraint_name\n"
+                "      ,prc.conname        as primary_constraint_name\n"
+                "      ,con.conname        as foreign_constraint_name\n"
                 "      ,%d                 as key_sequence"
-                "      ,fky.attname        as primary_key_column\n"
+                "      ,pky.attname        as primary_key_column\n"
                 "      ,att.attname        as foreign_key_column\n"
                 "      ,case con.confupdtype   WHEN 'r' THEN 1\n"
                 "                              WHEN 'c' THEN 0\n"
@@ -927,30 +996,55 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(CString p_schema,CString p_tablen
                 "      ,pg_attribute  att\n"
                 "      ,pg_namespace  sch\n"
                 "      ,pg_class      pri\n"
-                "      ,pg_attribute  fky\n"
+                "      ,pg_attribute  pky\n"
+                "      ,pg_namespace  psc\n"
+                "      ,pg_constraint prc\n"
                 " WHERE con.contype      = 'f'\n"
                 "   AND con.conrelid     = cla.oid\n"
                 "   and cla.relnamespace = sch.oid\n"
                 "   and con.confrelid    = pri.oid\n"
+                "   and pri.relnamespace = psc.oid\n"
+                "   and prc.conrelid     = pri.oid\n"
+                "   and prc.contype      = 'p'\n"
                 "   and att.attrelid     = cla.oid\n"
                 "   and att.attnum       = con.conkey[%d]\n"
-                "   and fky.attrelid     = pri.oid\n"
-                "   and fky.attnum       = con.confkey[%d]\n"
-                "   AND cla.relname      = 'part'"
+                "   and pky.attrelid     = pri.oid\n"
+                "   and pky.attnum       = con.confkey[%d]\n"
                ,ind
                ,ind
                ,ind);
     if(!p_schema.IsEmpty())
     {
+      if(p_referenced)
+      {
+        part += "\n   AND psc.nspname = '" + p_schema + "'";
+      }
+      else
+      {
       part += "\n   AND sch.nspname = '" + p_schema + "'";
+    }
     }
     if(!p_tablename.IsEmpty())
     {
+      if(p_referenced)
+      {
+        part += "\n   AND pri.relname = '" + p_tablename + "'";
+      }
+      else
+      {
       part += "\n   AND cla.relname = '" + p_tablename + "'";
+    }
     }
     if(!p_constraint.IsEmpty())
     {
+      if(p_referenced)
+      {
+        part += "\n   AND prc.conname = '" + p_constraint + "'";
+      }
+      else
+      {
       part += "\n   AND con.conname = '" + p_constraint + "'";
+    }
     }
 
     // Append to query, multiple for multiple columns
@@ -1103,19 +1197,74 @@ SQLInfoPostgreSQL::GetCATALOGForeignDrop(CString p_schema,CString p_tablename,CS
 CString
 SQLInfoPostgreSQL::GetCATALOGTriggerExists(CString p_schema, CString p_tablename, CString p_triggername) const
 {
-  return "";
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  p_triggername.MakeLower();
+  CString sql = "SELECT COUNT(*)\n"
+                "  FROM information_schema.triggers\n"
+                " WHERE event_object_schema = '" + p_schema + "'\n"
+                "   AND event_object_table  = '" + p_tablename + "'\n"
+                "   AND trigger_name        = '" + p_triggername + "'";
+  return sql;
 }
 
 CString
 SQLInfoPostgreSQL::GetCATALOGTriggerList(CString p_schema, CString p_tablename) const
 {
-  return "";
+  return GetCATALOGTriggerAttributes(p_schema,p_tablename,"");
 }
 
 CString
 SQLInfoPostgreSQL::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename, CString p_triggername) const
 {
-  return "";
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  p_triggername.MakeLower();
+  CString sql;
+  sql = "SELECT event_object_catalog\n"
+        "      ,event_object_schema\n"
+        "      ,event_object_table\n"
+        "      ,trigger_name\n"
+        "      ,'' AS trigger_remarks\n"
+        "      ,0  AS trigger_position\n"
+        "      ,CASE action_timing\n"
+        "            WHEN 'AFTER' THEN FALSE ELSE TRUE\n"
+        "       END AS trigger_before\n"
+        "      ,CASE event_manipulation\n"
+        "            WHEN 'INSERT' THEN TRUE ELSE FALSE\n"
+        "       END AS trigger_insert\n"
+        "      ,CASE event_manipulation\n"
+        "            WHEN 'UPDATE' THEN TRUE ELSE FALSE\n"
+        "       END AS trigger_update\n"
+        "      ,CASE event_manipulation\n"
+        "            WHEN 'DELETE' THEN TRUE ELSE FALSE\n"
+        "       END AS trigger_delete\n"
+        "      ,CASE event_manipulation\n"
+        "            WHEN 'SELECT' THEN TRUE ELSE FALSE\n"
+        "       END AS trigger_select\n"
+        "      ,FALSE AS trigger_session\n"
+        "      ,FALSE AS trigger_transaction\n"
+        "      ,FALSE AS trigger_rollback\n"
+        "      ,''    AS trigger_referencing\n"
+        "      ,TRUE  AS trigger_enabled\n"
+        "      ,action_statement AS trigger_source\n"
+        "  FROM information_schema.triggers\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += " WHERE event_object_schema = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "event_object_table = '" + p_tablename + "'\n";
+  }
+  if(!p_triggername.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() && p_tablename.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "trigger_name = '" + p_triggername + "'\n";
+  }
+  sql += " ORDER BY 1,2,3,4";
+  return sql;
 }
 
 CString
@@ -1147,6 +1296,38 @@ SQLInfoPostgreSQL::GetCATALOGSequenceExists(CString p_schema, CString p_sequence
 }
 
 CString
+SQLInfoPostgreSQL::GetCATALOGSequenceList(CString p_schema,CString p_pattern) const
+{
+  p_schema.MakeLower();
+  p_pattern.MakeLower();
+  p_pattern = "%" + p_pattern + "%";
+
+  CString sql = "SELECT ''              AS catalog_name\n"
+                "      ,sequence_schema AS schema_name\n"
+                "      ,sequence_name\n"
+                "      ,start_value     AS current_value\n"
+                "      ,0               AS minimal_value\n"
+                "      ,increment\n"
+                "      ,0               AS cache\n"
+                "      ,case cycle_option\n"
+                "            when 'NO' then 1\n"
+                "                      else 0\n"
+                "       end             AS cycle\n"
+                "      ,0               AS ordering\n"
+                "  FROM information_schema.sequences\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += " WHERE sequence_schema  = '" + p_schema + "'\n";
+  }
+  if(!p_pattern.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "sequence_name LIKE '" + p_pattern + "'";
+  }
+  return sql;
+}
+
+CString
 SQLInfoPostgreSQL::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequence) const
 {
   p_schema.MakeLower();
@@ -1159,7 +1340,10 @@ SQLInfoPostgreSQL::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequ
                 "      ,0               AS minimal_value\n"
                 "      ,increment\n"
                 "      ,0               AS cache\n"
-                "      ,decode(cycle_option,'NO',1,0) AS cycle\n"
+                "      ,case cycle_option\n"
+                "            when 'NO' then 1\n"
+                "                      else 0\n"
+                "       end             AS cycle\n"
                 "      ,0               AS ordering\n"
                 "  FROM information_schema.sequences\n"
                 " WHERE sequence_schema = '" + p_schema   + "'\n"
@@ -1210,14 +1394,43 @@ SQLInfoPostgreSQL::GetCATALOGViewExists(CString p_schema,CString p_viewname) con
 CString 
 SQLInfoPostgreSQL::GetCATALOGViewList(CString p_schema,CString p_pattern) const
 {
-  return "";
+  return GetCATALOGViewAttributes(p_schema,p_pattern);
 }
 
 CString 
 SQLInfoPostgreSQL::GetCATALOGViewAttributes(CString p_schema,CString p_viewname) const
 {
-  return "";
+  p_schema.MakeLower();
+  p_viewname.MakeLower();
+  CString query = "SELECT current_catalog as table_catalog\n"
+                  "      ,sch.nspname     as table_schema\n"
+                  "      ,tab.relname     as table_name\n"
+                  "      ,'TABLE'         as object_type\n"
+                  "      ,''              as remarks\n"
+                  "      ,sch.nspname || '.' || tab.relname as fullname\n"
+                  "      ,''              as tablespace\n"
+                  "      ,CASE tab.relpersistence\n"
+                  "            WHEN 'p' THEN 0\n"
+                  "                     ELSE 1\n"
+                  "       END as temporary\n"
+                  "  FROM pg_catalog.pg_class tab\n"
+                  "       left join pg_catalog.pg_namespace sch on tab.relnamespace = sch.oid\n"
+                  " WHERE tab.relkind = 'v'\n"
+                  "   AND substring(sch.nspname,1,3) <> 'pg_'\n"
+                  "   AND sch.nspname <> 'information_schema'\n";
+  if(!p_schema.IsEmpty())
+  {
+    query += "    AND sch.name = '" + p_schema + "'\n";
+  }
+  if(!p_viewname.IsEmpty())
+  {
+    query += "   AND tab.relname ";
+    query += p_viewname.Find('%') >= 0 ? "LIKE '" : "= '";
+    query += p_viewname + "'\n";
 }
+  query += " ORDER BY 1,2,3";
+                  
+  return query;}
 
 CString 
 SQLInfoPostgreSQL::GetCATALOGViewCreate(CString p_schema,CString p_viewname,CString p_contents) const
@@ -1286,14 +1499,21 @@ SQLInfoPostgreSQL::GetPSMProcedureList(CString p_schema) const
 CString
 SQLInfoPostgreSQL::GetPSMProcedureAttributes(CString p_schema, CString p_procedure) const
 {
-  p_schema.MakeLower();
-  p_procedure.MakeLower();
+//   p_schema.MakeLower();
+//   p_procedure.MakeLower();
+// 
+//   CString sql = "SELECT TEXT from ALL_SOURCE "
+//                 "WHERE type = 'FUNCTION' "
+//                 "AND name  = '" + p_procedure + "'\n"
+//                 "AND owner = '" + p_schema    + "'";
+//   return sql;
+  return "";
+}
 
-  CString sql = "SELECT TEXT from ALL_SOURCE "
-                "WHERE type = 'FUNCTION' "
-                "AND name  = '" + p_procedure + "'\n"
-                "AND owner = '" + p_schema    + "'";
-  return sql;
+CString
+SQLInfoPostgreSQL::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
+{
+  return "";
 }
 
 CString
@@ -1312,6 +1532,55 @@ CString
 SQLInfoPostgreSQL::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
 {
   return "";
+}
+
+// And it's parameters
+CString
+SQLInfoPostgreSQL::GetPSMProcedureParameters(CString p_schema,CString p_procedure) const
+{
+  p_schema.MakeLower();
+  p_procedure.MakeLower();
+  CString sql;
+
+  sql = "SELECT par.specific_catalog\n"
+        "      ,par.specific_schema\n"
+        "      ,fun.routine_name\n"
+        "      ,par.parameter_name\n"
+        "      ,case par.parameter_mode\n"
+        "            when 'IN'    then 1\n"
+        "            when 'OUT'   then 4\n"
+        "            when 'INOUT' then 2\n"
+        "       end as columntype\n"
+        "      ,1 as datatype\n"
+        "      ,par.data_type as typename\n"
+        "      ,par.character_maximum_length\n"
+        "      ,par.numeric_precision\n"
+        "      ,par.numeric_scale\n"
+        "      ,par.numeric_precision_radix\n"
+        "      ,1 as is_nullable\n"
+        "      ,'' as remarks\n"
+        "      ,par.parameter_default\n"
+        "      ,1 as datatype3\n"
+        "      ,par.interval_precision as subtype\n"
+        "      ,par.character_octet_length\n"
+        "      ,par.ordinal_position\n"
+        "      ,'YES' as isNullable\n"
+        "  FROM information_schema.parameters par\n"
+        "      ,information_schema.routines fun\n"
+        " WHERE par.specific_catalog = fun.specific_catalog\n"
+        "   AND par.specific_schema  = fun.specific_schema\n"
+        "   AND par.specific_name    = fun.specific_name\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND fun.specific_schema = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += "   AND fun.routine_name    = '" + p_procedure + "'\n";
+  }
+  sql += " ORDER BY 1,2,3,18";
+
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -446,21 +446,129 @@ SQLInfoOracle::GetCATALOGTableExists(CString p_schema,CString p_tablename) const
 CString
 SQLInfoOracle::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
 {
-  p_schema.MakeUpper();
-  p_pattern.MakeUpper();
-  CString query = "SELECT table_name\n"
-                  "  FROM ALL_TABLES\n"
-                  " WHERE owner      = '" + p_schema + "'\n"
-                  "   AND table_name like '" + p_pattern + "'";
-  return query;
+  return GetCATALOGTableAttributes(p_schema,p_pattern);
 }
 
-bool
-SQLInfoOracle::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/,MetaTable& /*p_table*/) const
+CString
+SQLInfoOracle::GetCATALOGTableAttributes(CString p_schema,CString p_tablename) const
 {
-  // Getting the temp table status
-  return false;
+  CString sql;
+
+  // TABLES
+  sql  = "SELECT ora_database_name AS table_catalog\n"
+         "      ,tab.owner         AS table_schema\n"
+         "      ,tab.table_name    AS table_name\n"
+         "      ,CASE tab.TEMPORARY\n"
+         "            WHEN 'Y' THEN 'GLOBAL TEMPORARY'\n"
+         "            WHEN 'N' THEN 'TABLE'\n"
+         "                     ELSE 'UNKNOWN'\n"
+         "       END               AS object_type\n"
+         "      ,com.comments      AS remarks\n"
+         "      ,tab.tablespace_name\n"
+         "      ,CASE tab.TEMPORARY\n"
+         "            WHEN 'Y' THEN 1\n"
+         "            WHEN 'N' THEN 0\n"
+         "                     ELSE -1\n"
+         "       END AS temporary\n"
+         "  FROM all_tables tab LEFT OUTER JOIN all_tab_comments com\n"
+         "                      ON (com.owner      = tab.owner\n"
+         "                     AND  com.table_name = tab.table_name)\n"
+         " WHERE com.table_type = 'TABLE'\n";
+
+
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND tab.owner ";
+    sql += p_schema.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_schema + "'\n";
+  }
+
+  if(!p_tablename.IsEmpty())
+  {
+    sql += "   AND tab.table_name ";
+    sql += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_tablename + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
+
+  return sql;
 }
+
+CString 
+SQLInfoOracle::GetCATALOGTableSynonyms(CString p_schema,CString p_tablename) const
+{
+  CString sql = "SELECT ora_database_name AS table_catalog\n"
+                "      ,table_owner  AS table_schema\n"
+                "      ,synonym_name AS table_name\n"
+                "      ,'SYNONYM'    AS object_type\n"
+                "      ,''           AS remarks\n"
+                "      ,''           AS tablespace_name\n"
+                "      ,0            AS temporary\n"
+                "  FROM all_synonyms syn\n";
+
+  if(!p_schema.IsEmpty())
+  {
+    sql += " WHERE table_owner ";
+    sql += p_schema.Find('%') >= 0 ? "LIKE '" : " = '";
+    sql += p_schema + "'\n";
+}
+
+  if(!p_tablename.IsEmpty())
+{
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "synonym_name ";
+    sql += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_tablename + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
+  return sql;
+}
+
+CString
+SQLInfoOracle::GetCATALOGTableCatalog(CString p_schema,CString p_tablename) const
+{
+  CString sql = "SELECT ora_database_name AS table_catalog\n"
+                "      ,obj.owner         AS table_schema\n"
+                "      ,obj.object_name   AS table_name\n"
+                "      ,'SYSTEM TABLE'    AS object_type\n"
+                "      ,com.comments      AS remarks\n"
+                "      ,''                AS tablespace_name\n"
+                "      ,0                 AS temporary\n"
+                "  FROM all_objects obj LEFT OUTER JOIN all_tab_comments com\n"
+                "                       ON (com.owner      = obj.owner\n"
+                "                      AND  com.table_name = obj.object_name)\n"
+                " WHERE obj.owner IN ('SYS','SYSTEM')\n"
+                "   AND obj.object_type IN ('TABLE','VIEW')\n"
+                "   AND obj.object_name NOT LIKE ('%$%')\n";
+
+  if(!p_schema.IsEmpty())
+  {
+    if(p_schema.Find('%') >= 0)
+    {
+      sql += "  AND obj.owner   LIKE '" + p_schema + "'\n";
+    }
+    else
+    {
+      sql += "  AND obj.owner   = '" + p_schema + "'\n";
+    }
+  }
+
+  if(!p_tablename.IsEmpty())
+  {
+    if(p_tablename.Find('%') >= 0)
+    {
+      sql += "   AND obj.object_name LIKE '" + p_tablename + "'\n";
+    }
+    else
+    {
+      sql += "   AND obj.object_name = '" + p_tablename + "'\n";
+    }
+  }
+
+  sql += " ORDER BY 1,2,3";
+  return sql;
+}
+
 
 CString
 SQLInfoOracle::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
@@ -535,36 +643,38 @@ SQLInfoOracle::GetCATALOGColumnExists(CString p_schema,CString p_tablename,CStri
 CString 
 SQLInfoOracle::GetCATALOGColumnList(CString p_schema,CString p_tablename) const
 {
-  CString sql = GetCATALOGColumnAttributes(p_schema,p_tablename,"");
-
-  int pos = sql.ReverseFind('\n');
-  sql = sql.Mid(pos + 1) + " ORDER BY column_id";
-
-  return sql;
+  return "";
+//   CString sql = GetCATALOGColumnAttributes(p_schema,p_tablename,"");
+// 
+//   int pos = sql.ReverseFind('\n');
+//   sql = sql.Mid(pos + 1) + " ORDER BY column_id";
+// 
+//   return sql;
 }
 
 CString 
 SQLInfoOracle::GetCATALOGColumnAttributes(CString p_schema,CString p_tablename,CString p_columnname) const
 {
-  p_schema.MakeUpper();
-  p_tablename.MakeUpper();
-  p_columnname.MakeUpper();
-
-  // name, number, type, length, nullable, precision, scale
-  CString sql = "SELECT column_name\n"          // 1 -> Columnname
-                "      ,column_id\n"            // 2 -> Position
-                "      ,data_type\n"            // 3 -> Datatype
-                "      ,data_length\n"          // 4 -> Length
-                "      ,CASE WHEN nullable = 'Y' THEN 1 ELSE 0 END\n" // 5-> Nullable
-                "      ,data_precision\n"       // 5 -> Precision
-                "      ,data_scale\n"           // 6 -> Scale
-                "      ,data_default\n"         // 7 -> Default
-                "  FROM all_tab_columns\n"
-                " WHERE owner       = '" + p_schema     + "'\n"
-                "   AND table_name  = '" + p_tablename  + "'\n"
-                "   AND column_name = '" + p_columnname + "'";
-                // BEWARE: Columnname filter must be last for previous method!
-  return sql;
+  return "";
+//   p_schema.MakeUpper();
+//   p_tablename.MakeUpper();
+//   p_columnname.MakeUpper();
+// 
+//   // name, number, type, length, nullable, precision, scale
+//   CString sql = "SELECT column_name\n"          // 1 -> Columnname
+//                 "      ,column_id\n"            // 2 -> Position
+//                 "      ,data_type\n"            // 3 -> Datatype
+//                 "      ,data_length\n"          // 4 -> Length
+//                 "      ,CASE WHEN nullable = 'Y' THEN 1 ELSE 0 END\n" // 5-> Nullable
+//                 "      ,data_precision\n"       // 5 -> Precision
+//                 "      ,data_scale\n"           // 6 -> Scale
+//                 "      ,data_default\n"         // 7 -> Default
+//                 "  FROM all_tab_columns\n"
+//                 " WHERE owner       = '" + p_schema     + "'\n"
+//                 "   AND table_name  = '" + p_tablename  + "'\n"
+//                 "   AND column_name = '" + p_columnname + "'";
+//                 // BEWARE: Columnname filter must be last for previous method!
+//   return sql;
 }
 
 CString 
@@ -836,7 +946,11 @@ SQLInfoOracle::GetCATALOGForeignList(CString p_schema,CString p_tablename,int p_
 }
 
 CString
-SQLInfoOracle::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraint,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoOracle::GetCATALOGForeignAttributes(CString  p_schema
+                                          ,CString  p_tablename
+                                          ,CString  p_constraint
+                                          ,bool     p_referenced /*=false*/
+                                          ,int    /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // Oracle catalog is in uppercase
   p_schema.MakeUpper();
@@ -851,7 +965,7 @@ SQLInfoOracle::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,
 
   CString query = "SELECT ora_database_name    AS primary_catalog_name\n"
                   "      ,pri.owner            AS primary_schema_name\n"
-                  "      ,pri_table_name       AS primary_table_name\n"
+                  "      ,pri.table_name       AS primary_table_name\n"
                   "      ,ora_database_name    AS foreign_catalog_name\n"
                   "      ,con.owner            AS foreign_schema_name\n"
                   "      ,con.table_name       AS table_name\n"
@@ -889,13 +1003,41 @@ SQLInfoOracle::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,
                   "   AND pri.table_name      = pky.table_name\n"
                   "   AND col.position        = pky.position\n"
                   "   AND con.constraint_type = 'R'";
-                  "   AND con.owner           = '" + p_schema    + "'\n"
-                  "   AND con.table_name      = '" + p_tablename + "'\n";
 
-  // Optionally a constraint name                
+  // Optionally add our filters
+  if(!p_schema.IsEmpty())
+  {
+    if(p_referenced)
+    {
+      query += "   AND pri.owner           = '" + p_schema + "'\n";
+    }
+    else
+    {
+      query += "   AND con.owner           = '" + p_schema + "'\n";
+    }
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    if(p_referenced)
+    {
+      query += "   AND pri.table_name      = '" + p_tablename + "'\n";
+    }
+    else
+    {
+      query += "   AND con.table_name      = '" + p_tablename + "'\n";
+    }
+
+  }
   if(!p_constraint.IsEmpty())
   {
+    if(p_referenced)
+    {
+      query += "   AND pri.constraint_name = '" + p_constraint + "'\n";
+    }
+    else
+    {
     query += "   AND con.constraint_name = '" + p_constraint + "'\n";
+  }
   }
 
   // Order upto the column number
@@ -1056,8 +1198,7 @@ SQLInfoOracle::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename
   p_tablename.MakeUpper();
   p_triggername.MakeUpper();
 
-  CString sql;
-  sql.Format("SELECT ''    AS catalog_name\n"
+  CString sql = "SELECT ''    AS catalog_name\n"
              "      ,owner AS schema_name\n"
              "      ,table_name\n"
              "      ,trigger_name\n"
@@ -1078,15 +1219,22 @@ SQLInfoOracle::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename
              "                            ELSE 1\n"
              "            END AS trigger_status\n"
              "      ,trigger_body AS source\n"
-             "  FROM all_triggers\n"
-             " WHERE table_owner = '%s'\n"
-             "   AND table_name  = '%s'"
-             ,p_schema.GetString()
-             ,p_tablename.GetString());
+                "  FROM dba_triggers\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += " WHERE table_owner = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "table_name = '" + p_tablename + "'\n";
+  } 
   if(!p_triggername.IsEmpty())
   {
-    sql += "\n   AND trigger_name = '" + p_triggername + "'";
+    sql += p_schema.IsEmpty() && p_tablename.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "trigger_name = '" + p_triggername + "'\n";
   }
+  sql += " ORDER BY 1,2,3,4";
   return sql;
 }
 
@@ -1166,6 +1314,38 @@ SQLInfoOracle::GetCATALOGSequenceExists(CString p_schema, CString p_sequence) co
 }
 
 CString
+SQLInfoOracle::GetCATALOGSequenceList(CString p_schema,CString p_pattern) const
+{
+  p_schema.MakeUpper();
+  p_pattern.MakeUpper();
+  if(!p_pattern.IsEmpty() && p_pattern != "%")
+  {
+    p_pattern = "%" + p_pattern + "%";
+  }
+  CString sql = "SELECT ''              AS catalog_name\n"
+                "      ,sequence_owner  AS schema_name\n"
+                "      ,sequence_name\n"
+                "      ,last_number     AS current_value\n"
+                "      ,min_value       AS minimal_value\n"
+                "      ,increment_by    AS seq_increment\n"
+                "      ,cache_size                 AS cache\n"
+                "      ,decode(cycle_flag,'N',0,1) AS cycle\n"
+                "      ,decode(order_flag,'N',0,1) AS ordering\n"
+                "  FROM dba_sequences\n";
+  if (!p_schema.IsEmpty())
+  {
+    sql += " WHERE sequence_owner = '" + p_schema + "'\n";
+  }
+  if (!p_pattern.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "sequence_name  LIKE '" + p_pattern + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
+  return sql;
+}
+
+CString
 SQLInfoOracle::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequence) const
 {
   p_schema.MakeUpper();
@@ -1176,13 +1356,21 @@ SQLInfoOracle::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequence
                 "      ,sequence_name\n"
                 "      ,last_number     AS current_value\n"
                 "      ,min_value       AS minimaml_value\n"
-                "      ,increment_by    AS increment\n"
-                "      ,decode(cycle_flag,'N',0,1) AS cycle\n"
+                "      ,increment_by    AS seq_increment\n"
                 "      ,cache_size                 AS cache\n"
+                "      ,decode(cycle_flag,'N',0,1) AS cycle\n"
                 "      ,decode(order_flag,'N',0,1) AS ordering\n"
-                "  FROM all_sequences\n"
-                " WHERE sequence_owner = '" + p_schema + "'\n"
-                "   AND sequence_name  = '" + p_sequence + "'";
+                "  FROM dba_sequences\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += " WHERE sequence_owner = '" + p_schema + "'\n";
+  }
+  if(!p_sequence.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "sequence_name  = '" + p_sequence + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
   return sql;
 }
 
@@ -1243,7 +1431,44 @@ SQLInfoOracle::GetCATALOGViewList(CString p_schema,CString p_pattern) const
 CString 
 SQLInfoOracle::GetCATALOGViewAttributes(CString p_schema,CString p_viewname) const
 {
-  return "";
+  // VIEWS
+  CString sql = "SELECT ora_database_name AS table_catalog\n"
+                "      ,viw.owner         AS table_schema\n"
+                "      ,viw.view_name     AS table_name\n"
+                "      ,'VIEW'            AS object_type\n"
+                "      ,com.comments      AS remarks\n"
+                "      ,''                AS tablespace_name\n"
+                "      ,0                 AS TEMPORARY\n"
+                "  FROM all_views viw LEFT OUTER JOIN all_tab_comments com\n"
+                "                     ON (viw.owner     = com.owner\n"
+                "                    AND  viw.view_name = com.table_name)\n"
+                " WHERE com.table_type = 'VIEW'\n";
+  if(!p_schema.IsEmpty())
+  {
+    if(p_schema.Find('%') >= 0)
+    {
+      sql += "  AND viw.owner   LIKE '" + p_schema + "'\n";
+    }
+    else
+    {
+      sql += "  AND viw.owner   = '" + p_schema + "'\n";
+    }
+  }
+
+  if(!p_viewname.IsEmpty())
+  {
+    if(p_viewname.Find('%') >= 0)
+    {
+      sql += "   AND viw.view_name   LIKE '" + p_viewname + "'\n";
+    }
+    else
+    {
+      sql += "   AND viw.view_name   = '" + p_viewname + "'\n";
+    }
+  }
+
+  sql += " ORDER BY 1,2,3";
+  return sql;
 }
 
 CString 
@@ -1316,12 +1541,64 @@ SQLInfoOracle::GetPSMProcedureAttributes(CString p_schema, CString p_procedure) 
 {
   p_schema.MakeUpper();
   p_procedure.MakeUpper();
+  CString sql;
+  sql = "SELECT ora_database_name AS procedure_catalog\n"
+        "      ,owner             AS procedure_schema\n"
+        "      ,object_name       AS procedure_name\n"
+        "      ,(SELECT COUNT(*)\n"
+        "          FROM all_arguments par\n"
+        "         WHERE par.owner       = pro.owner\n"
+        "           AND par.object_name = pro.object_name\n"
+        "           AND par.object_id   = pro.object_id\n"
+        "           AND par.in_out IN ('IN','IN/OUT')) as input_params\n"
+        "      ,(SELECT COUNT(*)\n"
+        "          FROM all_arguments par\n"
+        "         WHERE par.owner       = pro.owner\n"
+        "           AND par.object_name = pro.object_name\n"
+        "           AND par.object_id   = pro.object_id\n"
+        "           AND par.in_out IN ('OUT','IN/OUT')) as output_params\n"
+        "      ,0   AS result_sets\n"
+        "      ,''  AS remarks\n"
+        "      ,CASE object_type \n"
+        "            WHEN 'PROCEDURE' THEN 1\n"
+        "            WHEN 'FUNCTION'  THEN 2\n"
+        "                             ELSE 3\n"
+        "       END AS procedure_type\n"
+        "      ,'<@>' as source\n"
+        "  FROM all_procedures pro\n"
+        " WHERE object_type IN ('PROCEDURE','FUNCTION')\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND owner = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += "   AND object_name ";
+    sql += p_procedure.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_procedure + "'\n";
+  }
+  return sql;
+}
 
-  CString sql("SELECT 'CREATE OR REPLACE ' || text\n"
-              "  FROM all_source\n"
-              " WHERE type  = 'FUNCTION'\n"
-              "   AND name  = '" + p_procedure + "'\n"
-              "   AND owner = '" + p_schema    + "'");
+CString
+SQLInfoOracle::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
+{
+  p_schema.MakeUpper();
+  p_procedure.MakeUpper();
+  CString sql;
+
+  sql = "SELECT text\n"
+        "  FROM all_source\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += " WHERE owner = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += " name  = '" + p_procedure + "'\n";
+  }
+  sql += " ORDER BY owner,name,line";
   return sql;
 }
 
@@ -1379,6 +1656,13 @@ SQLInfoOracle::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
     }
   }
   return errorText;
+}
+
+// And it's parameters
+CString
+SQLInfoOracle::GetPSMProcedureParameters(CString p_schema,CString p_procedure) const
+{
+  return "";
 }
 
 //////////////////////////////////////////////////////////////////////////

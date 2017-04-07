@@ -60,9 +60,26 @@ public:
   void    SetGrantedUsers(CString p_users);
   CString GetGrantedUsers() const;
 
-  // OVERRIDES AND EXTRAS OF THE ODBC SQL<object> functions
+  // OVERRIDES AND EXTRAS OF THE ODBC MakeInfo<object> functions
 
-  bool    MakeInfoTableTriggers(MTriggerMap& p_triggers,CString& p_errors);
+  // Tables
+  bool    MakeInfoTableObject    (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // Not known which type!
+  bool    MakeInfoTableTable     (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // TABLE   only
+  bool    MakeInfoTableView      (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // VIEW    only
+  bool    MakeInfoTableSynonyms  (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // SYNONYM only
+  bool    MakeInfoTableCatalog   (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // CATALOG only
+  // Attributes of a table
+  bool    MakeInfoTableColumns   (MColumnMap&   p_columns,  CString& p_errors,CString p_schema,CString p_tablename,CString p_columname = "") override;
+  bool    MakeInfoTablePrimary   (MPrimaryMap&  p_primary,  CString& p_errors,CString p_schema,CString p_tablename)                          override;
+  bool    MakeInfoTableForeign   (MForeignMap&  p_foreigns, CString& p_errors,CString p_schema,CString p_tablename,bool p_referenced   = false) override;
+  bool    MakeInfoTableStatistics(MIndicesMap&  p_indices,  CString& p_errors,CString p_schema,CString p_tablename,MPrimaryMap* p_keymap,bool p_all = true) override;
+  bool    MakeInfoTableTriggers  (MTriggerMap&  p_triggers, CString& p_errors,CString p_schema,CString p_tablename,CString p_trigger   = "");
+  bool    MakeInfoTableSequences (MSequenceMap& p_sequences,CString& p_errors,CString p_schema,CString p_tablename);
+  // Procedures
+  bool    MakeInfoPSMProcedures(MProcedureMap& p_procedures,CString& p_errors,CString p_schema,CString p_procedure) override;
+  bool    MakeInfoPSMParameters(MParameterMap& p_parameters,CString& p_errors,CString p_schema,CString p_procedure) override;
+  // Read extra source code for database that can only do it by an extra procedure
+  CString MakeInfoPSMSourcecode(CString p_schema, CString p_procedure);
 
   // PURE VIRTUAL INTERFACE
 
@@ -235,7 +252,9 @@ public:
   // All table functions
   virtual CString GetCATALOGTableExists       (CString p_schema,CString p_tablename) const = 0;
   virtual CString GetCATALOGTablesList        (CString p_schema,CString p_pattern)   const = 0;
-  virtual bool    GetCATALOGTableAttributes   (CString p_schema,CString p_tablename,MetaTable& p_table) const = 0;
+  virtual CString GetCATALOGTableAttributes   (CString p_schema,CString p_tablename) const = 0;
+  virtual CString GetCATALOGTableSynonyms     (CString p_schema,CString p_tablename) const = 0;
+  virtual CString GetCATALOGTableCatalog      (CString p_schema,CString p_tablename) const = 0;
   virtual CString GetCATALOGTableCreate       (MetaTable& p_table,MetaColumn& p_column) const = 0;
   virtual CString GetCATALOGTableRename       (CString p_schema,CString p_tablename,CString p_newname) const = 0;
   virtual CString GetCATALOGTableDrop         (CString p_schema,CString p_tablename) const = 0;
@@ -266,7 +285,7 @@ public:
   // All foreign key functions
   virtual CString GetCATALOGForeignExists     (CString p_schema,CString p_tablename,CString p_constraintname) const = 0;
   virtual CString GetCATALOGForeignList       (CString p_schema,CString p_tablename,int p_maxColumns = SQLINFO_MAX_COLUMNS) const = 0;
-  virtual CString GetCATALOGForeignAttributes (CString p_schema,CString p_tablename,CString p_constraintname,int p_maxColumns = SQLINFO_MAX_COLUMNS) const = 0;
+  virtual CString GetCATALOGForeignAttributes (CString p_schema,CString p_tablename,CString p_constraintname,bool p_referenced = false,int p_maxColumns = SQLINFO_MAX_COLUMNS) const = 0;
   virtual CString GetCATALOGForeignCreate     (MForeignMap& p_foreigns) const = 0;
   virtual CString GetCATALOGForeignAlter      (MForeignMap& p_original,MForeignMap& p_requested) const = 0;
   virtual CString GetCATALOGForeignDrop       (CString p_schema,CString p_tablename,CString p_constraintname) const = 0;
@@ -278,6 +297,7 @@ public:
   virtual CString GetCATALOGTriggerDrop       (CString p_schema,CString p_tablename,CString p_triggername) const = 0;
   // All sequence functions
   virtual CString GetCATALOGSequenceExists    (CString p_schema,CString p_sequence) const = 0;
+  virtual CString GetCATALOGSequenceList      (CString p_schema,CString p_pattern)  const = 0;
   virtual CString GetCATALOGSequenceAttributes(CString p_schema,CString p_sequence) const = 0;
   virtual CString GetCATALOGSequenceCreate    (MetaSequence& p_sequence) const = 0;
   virtual CString GetCATALOGSequenceDrop      (CString p_schema,CString p_sequence) const = 0;
@@ -322,9 +342,12 @@ public:
   virtual CString GetPSMProcedureExists    (CString p_schema,CString p_procedure) const = 0;
   virtual CString GetPSMProcedureList      (CString p_schema) const = 0;
   virtual CString GetPSMProcedureAttributes(CString p_schema,CString p_procedure) const = 0;
+  virtual CString GetPSMProcedureSourcecode(CString p_schema,CString p_procedure) const = 0;
   virtual CString GetPSMProcedureCreate    (MetaProcedure& p_procedure) const = 0;
   virtual CString GetPSMProcedureDrop      (CString p_schema,CString p_procedure) const = 0;
   virtual CString GetPSMProcedureErrors    (CString p_schema,CString p_procedure) const = 0;
+  // And it's parameters
+  virtual CString GetPSMProcedureParameters(CString p_schema,CString p_procedure) const = 0;
 
   // All Language elements
   virtual CString GetPSMDeclaration(bool p_first,CString p_variable,int p_datatype,int p_precision = 0,int p_scale = 0,
@@ -383,6 +406,10 @@ public:
   virtual SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_schema,CString& p_procedure) = 0;
   
 private:
+  // Read a tables cursor from the database
+  bool    ReadTablesFromQuery(SQLQuery& p_query,MTableMap& p_tables);
+
+  // All default granted users for GRANT statements
   CString m_grantedUsers;
 };
 

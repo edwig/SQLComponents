@@ -412,8 +412,22 @@ SQLInfoAccess::GetCATALOGTablesList(CString /*p_schema*/,CString /*p_pattern*/) 
   return "";
 }
 
-bool 
-SQLInfoAccess::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/,MetaTable& /*p_table*/) const
+CString 
+SQLInfoAccess::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/) const
+{
+  // MS-Access cannot do this
+  return false;
+}
+
+CString 
+SQLInfoAccess::GetCATALOGTableSynonyms(CString /*p_schema*/,CString /*p_tablename*/) const
+{
+  // MS-Access cannot do this
+  return false;
+}
+
+CString 
+SQLInfoAccess::GetCATALOGTableCatalog(CString /*p_schema*/,CString /*p_tablename*/) const
 {
   // MS-Access cannot do this
   return false;
@@ -491,12 +505,12 @@ SQLInfoAccess::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
   CString sql = "ALTER TABLE "  + p_column.m_table  + "\n";
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
-  if(p_column.m_precision)
+  if(p_column.m_columnSize)
   {
-    sql.AppendFormat("(%d",p_column.m_precision);
-    if(p_column.m_scale)
+    sql.AppendFormat("(%d",p_column.m_columnSize);
+    if(p_column.m_decimalDigits)
     {
-      sql.AppendFormat(",%d",p_column.m_scale);
+      sql.AppendFormat(",%d",p_column.m_decimalDigits);
     }
     sql += ")";
   }
@@ -695,7 +709,7 @@ SQLInfoAccess::GetCATALOGForeignList(CString /*p_schema*/,CString /*p_tablename*
 }
 
 CString 
-SQLInfoAccess::GetCATALOGForeignAttributes(CString /*p_schema*/,CString /*p_tablename*/,CString /*p_constraintname*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoAccess::GetCATALOGForeignAttributes(CString /*p_schema*/,CString /*p_tablename*/,CString /*p_constraintname*/,bool/* p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // MS-Access cannot get this information, Use ODBC functions
   return "";
@@ -822,14 +836,21 @@ SQLInfoAccess::GetCATALOGTriggerDrop(CString p_schema, CString p_tablename, CStr
 // ALL SEQUENCE FUNCTIONS
 
 CString 
-SQLInfoAccess::GetCATALOGSequenceExists(CString p_schema, CString p_sequence) const
+SQLInfoAccess::GetCATALOGSequenceExists(CString /*p_schema*/,CString /*p_sequence*/) const
 {
   // MS-Access does not have sequences
   return "";
 }
 
 CString 
-SQLInfoAccess::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequence) const
+SQLInfoAccess::GetCATALOGSequenceList(CString /*p_schema*/,CString /*p_pattern*/) const
+{
+  // MS-Access does not have sequences
+  return "";
+}
+
+CString 
+SQLInfoAccess::GetCATALOGSequenceAttributes(CString /*p_schema*/, CString /*p_sequence*/) const
 {
   // MS-Access does not have sequences
   return "";
@@ -843,7 +864,7 @@ SQLInfoAccess::GetCATALOGSequenceCreate(MetaSequence& /*p_sequence*/) const
 }
 
 CString 
-SQLInfoAccess::GetCATALOGSequenceDrop(CString p_schema, CString p_sequence) const
+SQLInfoAccess::GetCATALOGSequenceDrop(CString /*p_schema*/, CString /*p_sequence*/) const
 {
   // MS-Access does not have sequences
   return "";
@@ -943,6 +964,13 @@ SQLInfoAccess::GetPSMProcedureAttributes(CString p_schema, CString p_procedure) 
 }
   
 CString 
+SQLInfoAccess::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
+{
+  // MS-Access does not support PSM
+  return "";
+}
+  
+CString 
 SQLInfoAccess::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
 {
   // MS-Access does not support PSM
@@ -958,6 +986,14 @@ SQLInfoAccess::GetPSMProcedureDrop(CString p_schema,CString p_procedure) const
 
 CString 
 SQLInfoAccess::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
+{
+  // MS-Access does not support PSM
+  return "";
+}
+
+// And it's parameters
+CString 
+SQLInfoAccess::GetPSMProcedureParameters(CString p_schema,CString p_procedure) const
 {
   // MS-Access does not support PSM
   return "";

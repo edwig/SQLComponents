@@ -49,6 +49,7 @@ private:
   void    GetPrimaryKeyInfo();
   void    GetForeignKeyInfo();
   void    GetTriggerInfo();
+  void    GetSequenceInfo();
   void    GetAccessInfo();
 
   // Service routines
@@ -61,6 +62,7 @@ private:
 
   // Private data for the DDL creation
   SQLInfoDB* m_info;
+  CString    m_schema;
   CString    m_tableName;
   CString    m_ddl;
 
@@ -71,6 +73,7 @@ private:
   MPrimaryMap     m_primaries;
   MForeignMap     m_foreigns;
   MTriggerMap     m_triggers;
+  MSequenceMap    m_sequences;
   MPrivilegeMap   m_access;
 };
 

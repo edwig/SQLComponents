@@ -40,7 +40,6 @@ namespace SQLComponents
 #define OBJECT_TYPE_LOCALTEMP     "LOCAL TEMPORARY"   // Local temporary table only visible to current session
 #define OBJECT_TYPE_ALIAS         "ALIAS"             // MSSQL server like alias to another database/table
 #define OBJECT_TYPE_SYNONYM       "SYNONYM"           // Oracle/Informix like alias to another database/table
-#define OBJECT_TYPE_SYSVIEW       "SYSTEM VIEW"       // Added for ORACLE: View over one or more system tables
 
 // Foreign key options, not in sqlext.h
 
@@ -60,7 +59,7 @@ typedef struct _metaInfoTable
   CString   m_table;                  // Table/view/synonym name
   CString   m_objectType;             // Type of the object
   CString   m_remarks;                // Using COMMENTS command
-  CString   m_fullObjectName;         // Full object name, conforming RDBMS rules
+  CString   m_fullName;         // Full object name, conforming RDBMS rules
                                       // eg: type:catalog.schema.table
                                       // or: type:schema.table@catalog
   CString   m_tablespace;             // Some engines need the storage space
@@ -74,28 +73,33 @@ using MTableMap = std::vector<MetaTable>;
 
 typedef struct _metaInfoColumn
 {
-  CString   m_catalog;                // Catalog name (database name)
-  CString   m_schema;                 // Schema name (owner of the object)
-  CString   m_table;                  // Table/view/synonym name
-  CString   m_column;                 // Column name
-  CString   m_remarks;                // Using COMMENTS command
-  int       m_datatype    { 0 };      // SQL Data type
-  CString   m_typename;               // Data type name (according to RDBMS)
-  int       m_precision   { 0 };      // Precision
-  int       m_length      { 0 };      // Total length in bytes
-  int       m_scale       { 0 };      // Decimal/Numeric scale
-  int       m_nullable    { 0 };      // Nullable SQL_NO_NULLS / SQL_NULLABLE / SQL_NULLABLE_UNKNOWN
-  CString   m_default;                // Default value of the column
-  int       m_position    { 0 };      // Ordinal position in the table
+  CString   m_catalog;                // 01 Catalog name (database name)
+  CString   m_schema;                 // 02 Schema name (owner of the object)
+  CString   m_table;                  // 03 Table/view/synonym name
+  CString   m_column;                 // 04 Column name
+  int       m_datatype      { 0 };    // 05 SQL Data type
+  CString   m_typename;               // 06 Data type name (according to RDBMS)
+  int       m_columnSize    { 0 };    // 07 Display column size or precision
+  int       m_bufferLength  { 0 };    // 08 Internal buffer size
+  int       m_decimalDigits { 0 };    // 09 Also known as scale
+  int       m_numRadix      { 0 };    // 10 Radix of the column size
+  int       m_nullable      { 2 };    // 11 Nullable SQL_NO_NULLS(0) / SQL_NULLABLE (1) / SQL_NULLABLE_UNKNOWN (2)
+  CString   m_remarks;                // 12 Using COMMENTS command
+  CString   m_default;                // 13 Default value of the column
+  int       m_datatype3     { 0 };    // 14 ODBC3 datatype (mostly m_datatype)
+  int       m_sub_datatype  { 0 };    // 15 Datetime sub type 
+  int       m_octet_length  { 0 };    // 16 (VAR)CHAR octet length for Unicode
+  int       m_position      { 0 };    // 17 Ordinal position in the table
+  CString   m_isNullable;             // 18 'YES', 'NO' or 'UNKNOWN'
 
   void GetPrecisionAndScale(CString& p_sql)
   {
-    if(m_precision > 0)
+    if(m_columnSize > 0)
     {
-      p_sql.AppendFormat("(%d",m_precision);
-      if(m_scale > 0)
+      p_sql.AppendFormat("(%d",m_columnSize);
+      if(m_decimalDigits > 0)
       {
-        p_sql.AppendFormat(",%d",m_scale);
+        p_sql.AppendFormat(",%d",m_decimalDigits);
       }
       p_sql += ")";
     }
@@ -111,7 +115,7 @@ typedef struct _metaInfoColumn
   {
     if(!m_default.IsEmpty())
     {
-      p_sql += " DEFAULT ";
+      //p_sql += " DEFAULT ";
       p_sql += m_default;
     }
   }
@@ -130,6 +134,9 @@ typedef struct _metaInfoPrimary
   CString  m_columnName;              // Name of the column of the primary key
   int      m_columnPosition { 0 };    // Position of the column in the table
   CString  m_constraintName;          // Name of the primary key constraint
+  // Extra by SQL
+  int       m_deferrable       { 0 }; // SQL_INITIALLY_DEFERRED(5) / SQL_INITIALLY_IMMEDIATE(6) / SQL_NOT_DEFERRABLE(7)
+  int       m_initiallyDeferred{ 0 }; // 0=Immediate, 1=initially deferred
 }
 MetaPrimary;
 
@@ -172,18 +179,18 @@ using MForeignMap = std::vector<MetaForeign>;
 
 typedef struct _metaInfoIndex
 {
-  CString   m_catalogName;              // Catalog (database name)
-  CString   m_schemaName;               // Schema owner
-  CString   m_tableName;                // Table name
-  bool      m_unique      { false };    // true = UNIQUE
-  CString   m_indexName;                // Index name
-  int       m_indexType   { 0 };        // SQL_TABLE_STAT / SQL_INDEX_CLUSTERED / SQL_INDEX_HASHED / SQL_INDEX_OTHER
-  int       m_position    { 0 };        // Ordinal position (start at 1)
-  CString   m_columnName;               // Column in the index
-  CString   m_ascending;                // 'A', 'D', '' = unknown
-  long      m_cardinality { 0 };        // cardinality of index
-  long      m_pages       { 0 };        // Pages of the index
-  CString   m_filter;                   // filter or expression
+  CString   m_catalogName;              // 01 Catalog (database name)
+  CString   m_schemaName;               // 02 Schema owner
+  CString   m_tableName;                // 03 Table name
+  bool      m_unique      { false };    // 04 true = UNIQUE
+  CString   m_indexName;                // 05 Index name
+  int       m_indexType   { 0 };        // 06 SQL_TABLE_STAT / SQL_INDEX_CLUSTERED / SQL_INDEX_HASHED / SQL_INDEX_OTHER
+  int       m_position    { 0 };        // 07 Ordinal position (start at 1)
+  CString   m_columnName;               // 08 Column in the index
+  CString   m_ascending;                // 09 'A', 'D', '' = unknown
+  long      m_cardinality { 0 };        // 10 cardinality of index
+  long      m_pages       { 0 };        // 11 Pages of the index
+  CString   m_filter;                   // 12 filter or expression
 }
 MetaIndex;
 
@@ -204,7 +211,7 @@ typedef struct _metaSpecialColumns
 }
 MetaSpecialColumn;
 
-using MSpecialColumnMap = std::vector<MetaSpecialColumn>;
+using MSpecialsMap = std::vector<MetaSpecialColumn>;
 
 // Results from "SQLTablePrivileges" 
 
@@ -234,6 +241,8 @@ typedef struct _metaInfoProcedure
   int       m_resultSets        { 0 };  // Number  of result sets
   CString   m_remarks;                  // As in COMMENT command
   int       m_procedureType     { 0 };  // SQL_PT_PROCEDURE(1) / SQL_PT_FUNCTION(2) / SQL_PT_UNKNOWN(3)
+  // EXTRA INFO: NOT IN ODBC
+  CString   m_source;                   // Actual source of the procedure/function
 }
 MetaProcedure;
 
@@ -241,28 +250,33 @@ using MProcedureMap = std::vector<MetaProcedure>;
 
 // Results from "SQLProcedureColumns"
 
-typedef struct _metaInfoProcColumns
-{
-  CString   m_catalogName;              // Catalog of the procedure / function
-  CString   m_schemaName;               // Schema  of the procedure / function
-  CString   m_procedureName;            // Name    of the procedure / function
-  CString   m_columnName;               // Parameter / column name 
-  int       m_ordinalPosition { 0 };    // Positioning of the parameter
-  int       m_columnType      { 0 };    // SQL_PARAM_INPUT / SQL_PARAM_OUTPUT etc. etc.
-  int       m_dataType        { 0 };    // ODBC standard type name
-  CString   m_typeName;                 // RDBMS type name
-  int       m_columnSize      { 0 };    // Display size
-  int       m_bufferSize      { 0 };    // Binary buffer size
-  int       m_decimalDigits   { 0 };    // Number of decimal digits
-  int       m_radix           { 0 };    // Radix display (2, 8, 10, 16)
-  int       m_nullable        { 0 };    // SQL_NO_NULLS / SQL_NULLABLE / SQL_NULLABLE_UNKNOWN
-  CString   m_remarks;                  // From the COMMENT command
-  CString   m_defaultValue;             // Default value
-  CString   m_isNullable;               // "NO" or "YES" (can include nulls)
-}
-MetaProcedureColumn;
+// Parameters for a procedure
 
-using MProcColumnMap = std::vector<MetaProcedureColumn>;
+typedef struct _metaParameter
+{
+  CString  m_catalog;         // 01 Catalog of the procedure of the parameter
+  CString  m_schema;          // 02 Schema  of the procedure of the parameter
+  CString  m_procedure;       // 03 Procedure or function name
+  CString  m_parameter;       // 04 Name of the parameters
+  int      m_columnType;      // 05 SQL_PARAM_INPUT (1) / SQL_PARAM_INPUT_OUTPUT (2) / SQL_PARAM_OUTPUT (4) / SQL_RETURN_VALUE (5) / SQL_RESULT_COL (3)
+  int      m_datatype;        // 06 ODBC datatype 
+  CString  m_typeName;        // 07 Type name
+  int      m_columnSize;      // 08 Column size or display size
+  int      m_bufferLength;    // 09 Database buffer length
+  int      m_decimalDigits;   // 10 Decimal digits after the comma
+  int      m_numRadix;        // 11 Decimal radix
+  int      m_nullable;        // 12 Is Nullable
+  CString  m_remarks;         // 13 From the COMMENT command
+  CString  m_default;         // 14 Default value of the parameter
+  int      m_datatype3;       // 15 ODBC 3 datatype
+  int      m_subType;         // 16 Date time subtype of ODBC 3
+  int      m_octetLength;     // 17 Octet length for Unicode
+  int      m_position;        // 18 Ordinal position of the parameter (0 = return value)
+  CString  m_isNullable;      // 19 'YES' or 'NO'
+}
+MetaParameter;
+
+using MParameterMap = std::vector<MetaParameter>;
 
 // Results for Meta objects in the catalog(s)
 
@@ -337,13 +351,5 @@ MetaSession;
 
 using MSessionMap = std::vector<MetaSession>;
 
-typedef struct _metaParameter
-{
-  CString  m_parameter;       // Name of the parameters
-  int      m_type;            // 0=input, 1=output, 2=in/out
-}
-MetaParameter;
-
-using MParameterMap = std::vector<MetaParameter>;
 
 };

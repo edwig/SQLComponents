@@ -197,7 +197,9 @@ public:
   // All table functions
   CString GetCATALOGTableExists    (CString p_schema,CString p_tablename) const;
   CString GetCATALOGTablesList     (CString p_schema,CString p_pattern) const;
-  bool    GetCATALOGTableAttributes(CString p_schema,CString p_tablename,MetaTable& p_table) const;
+  CString GetCATALOGTableAttributes(CString p_schema,CString p_tablename) const;
+  CString GetCATALOGTableSynonyms  (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGTableCatalog   (CString p_schema,CString p_tablename) const;
   CString GetCATALOGTableCreate    (MetaTable& p_table,MetaColumn& p_column) const;
   CString GetCATALOGTableRename    (CString p_schema,CString p_tablename,CString p_newname) const;
   CString GetCATALOGTableDrop      (CString p_schema,CString p_tablename) const;
@@ -228,7 +230,7 @@ public:
   // All foreign key functions
   CString GetCATALOGForeignExists    (CString p_schema,CString p_tablename,CString p_constraintname) const;
   CString GetCATALOGForeignList      (CString p_schema,CString p_tablename,int p_maxColumns = SQLINFO_MAX_COLUMNS) const;
-  CString GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraintname,int p_maxColumns = SQLINFO_MAX_COLUMNS) const;
+  CString GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraintname,bool p_referenced = false,int p_maxColumns = SQLINFO_MAX_COLUMNS) const;
   CString GetCATALOGForeignCreate    (MForeignMap& p_foreigns) const;
   CString GetCATALOGForeignAlter     (MForeignMap& p_original,MForeignMap& p_requested) const;
   CString GetCATALOGForeignDrop      (CString p_schema,CString p_tablename,CString p_constraintname) const;
@@ -240,6 +242,7 @@ public:
   CString GetCATALOGTriggerDrop      (CString p_schema,CString p_tablename,CString p_triggername) const;
     // All sequence functions
   CString GetCATALOGSequenceExists    (CString p_schema,CString p_sequence) const;
+  CString GetCATALOGSequenceList      (CString p_schema,CString p_pattern)  const;
   CString GetCATALOGSequenceAttributes(CString p_schema,CString p_sequence) const;
   CString GetCATALOGSequenceCreate    (MetaSequence& p_sequence) const;
   CString GetCATALOGSequenceDrop      (CString p_schema,CString p_sequence) const;
@@ -284,9 +287,12 @@ public:
   CString GetPSMProcedureExists    (CString p_schema,CString p_procedure) const;
   CString GetPSMProcedureList      (CString p_schema) const;
   CString GetPSMProcedureAttributes(CString p_schema,CString p_procedure) const;
+  CString GetPSMProcedureSourcecode(CString p_schema,CString p_procedure) const;
   CString GetPSMProcedureCreate    (MetaProcedure& p_procedure) const;
   CString GetPSMProcedureDrop      (CString p_schema,CString p_procedure) const;
   CString GetPSMProcedureErrors    (CString p_schema,CString p_procedure) const;
+  // And it's parameters
+  CString GetPSMProcedureParameters(CString p_schema,CString p_procedure) const;
 
   // All Language elements
   CString GetPSMDeclaration(bool p_first,CString p_variable,int p_datatype,int p_precision = 0,int p_scale = 0,

@@ -49,6 +49,7 @@ DDLCreateTable::GetTableDDL(CString p_tableName)
     GetPrimaryKeyInfo();
     GetForeignKeyInfo();
     GetTriggerInfo();
+    GetSequenceInfo();
     GetAccessInfo();
   }
   catch(CString& error)
@@ -82,7 +83,7 @@ DDLCreateTable::GetTableInfo()
 
   // Find table info
   m_tables.clear();
-  if(!m_info->MakeInfoTableTablepart(m_tableName,m_tables,errors) || m_tables.empty())
+  if(!m_info->MakeInfoTableTable(m_tables,errors,"",m_tableName) || m_tables.empty())
   {
     throw CString("Cannot find table: ") + m_tableName + " : " + errors;
   }
@@ -94,6 +95,7 @@ DDLCreateTable::GetTableInfo()
   // Construct table name
   if(!table.m_schema.IsEmpty())
   {
+    m_schema    = table.m_schema;
     m_tableName = table.m_schema + "." + table.m_table;
   }
   else
@@ -120,7 +122,7 @@ DDLCreateTable::GetColumnInfo()
 
   // Find column info
   m_columns.clear();
-  if(!m_info->MakeInfoTableColumns(m_columns,errors) || m_columns.empty())
+  if(!m_info->MakeInfoTableColumns(m_columns,errors,m_schema,m_tableName) || m_columns.empty())
   {
     throw CString("Cannot find columns for table: ") + m_tableName + " : " + errors;
   }
@@ -143,9 +145,9 @@ DDLCreateTable::GetColumnInfo()
     if(type)
     {
       line += ReplaceLengthPrecScale(type->m_create_params
-                                    ,column.m_length
-                                    ,column.m_precision
-                                    ,column.m_scale);
+                                    ,column.m_columnSize
+                                    ,column.m_columnSize
+                                    ,column.m_decimalDigits);
     }
     // optional default value
     if(!column.m_default.IsEmpty() && column.m_default.CompareNoCase("null"))
@@ -179,7 +181,7 @@ DDLCreateTable::GetIndexInfo()
 
   // Find column info
   m_indices.clear();
-  m_info->MakeInfoTableStatistics(m_indices,nullptr,errors);
+  m_info->MakeInfoTableStatistics(m_indices,errors,m_schema,m_tableName,nullptr);
   if(!errors.IsEmpty())
   {
     throw CString("Cannot find indices for table: ") + m_tableName + " : " + errors;
@@ -224,7 +226,7 @@ DDLCreateTable::GetPrimaryKeyInfo()
 
   // Find column info
   m_primaries.clear();
-  m_info->MakeInfoTablePrimary(m_primaries,errors);
+  m_info->MakeInfoTablePrimary(m_primaries,errors,m_schema,m_tableName);
   if(!errors.IsEmpty())
   {
     throw CString("Cannot find the primary key for table: ") + m_tableName + " : " + errors;
@@ -246,7 +248,7 @@ DDLCreateTable::GetForeignKeyInfo()
 
   // Find column info
   m_foreigns.clear();
-  m_info->MakeInfoTableForeign(m_foreigns,errors);
+  m_info->MakeInfoTableForeign(m_foreigns,errors,m_schema,m_tableName);
   if(!errors.IsEmpty())
   {
     throw CString("Cannot find the foreign keys for table: ") + m_tableName + " : " + errors;
@@ -285,7 +287,7 @@ DDLCreateTable::GetTriggerInfo()
   CString errors;
 
   m_triggers.clear();
-  m_info->MakeInfoTableTriggers(m_triggers,errors);
+  m_info->MakeInfoTableTriggers(m_triggers,errors,m_schema,m_tableName);
   if(!errors.IsEmpty())
   {
     throw CString("Cannot find the triggers for table: ") + m_tableName + " : " + errors;
@@ -300,6 +302,27 @@ DDLCreateTable::GetTriggerInfo()
 }
 
 void
+DDLCreateTable::GetSequenceInfo()
+{
+  CString errors;
+  CString line;
+
+  m_sequences.clear();
+  m_info->MakeInfoTableSequences(m_sequences,errors,m_schema,m_tableName);
+  if(!errors.IsEmpty())
+  {
+    throw CString("Cannot find the sequences for table: ") + m_tableName + " : " + errors;
+  }
+
+  // Print all found sequences
+  for(auto& seq : m_sequences)
+  {
+    line = m_info->GetCATALOGSequenceCreate(seq);
+    StashTheLine(line,";",2);
+  }
+}
+
+void
 DDLCreateTable::GetAccessInfo()
 {
   CString errors;
@@ -307,7 +330,7 @@ DDLCreateTable::GetAccessInfo()
 
   // Find column info
   m_access.clear();
-  m_info->MakeInfoTablePrivileges(m_access,errors);
+  m_info->MakeInfoTablePrivileges(m_access,errors,m_schema,m_tableName);
   if(!errors.IsEmpty())
   {
     throw CString("Cannot find the privileges for table: ") + m_tableName + " : " + errors;

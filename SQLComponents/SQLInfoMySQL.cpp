@@ -423,18 +423,73 @@ SQLInfoMySQL::GetCATALOGTableExists(CString /*p_schema*/,CString p_tablename) co
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTablesList(CString /*p_schema*/,CString p_pattern) const
+SQLInfoMySQL::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
 {
-  // MS-Access cannot do this
-  return "";
+  return GetCATALOGTableAttributes(p_schema,p_pattern);
 }
 
-bool
-SQLInfoMySQL::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/,MetaTable& /*p_table*/) const
+CString
+SQLInfoMySQL::GetCATALOGTableAttributes(CString p_schema,CString p_tablename) const
 {
-  // Getting the temp table status
+  CString sql;
+  sql = "SELECT table_catalog\n"
+        "      ,table_schema\n"
+        "      ,table_name\n"
+        "      ,case table_type\n"
+        "            when 'BASE TABLE' THEN 'TABLE'\n"
+        "            else 'UNKNOWN'\n"
+        "       end as table_type\n"
+        "      ,table_comment\n"
+        "      ,table_catalog || '.' || table_schema || '.' || table_name as fullname\n"
+        "      ,engine\n"
+        "      ,0 as temporary\n" 
+        "  FROM information_schema.tables\n"  
+        " WHERE table_type = 'BASE TABLE'\n"
+        "   AND table_schema NOT IN ('mysql','sys','performance_schema')\n";
+  if(!p_schema)
+  {
+    sql += "   AND table_schema = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    sql += "   AND table_name ";
+    sql += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_tablename + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
+  return sql;
+}
+
+CString
+SQLInfoMySQL::GetCATALOGTableSynonyms(CString /*p_schema*/,CString /*p_tablename*/) const
+{
+  // MS-Access cannot do this
   return false;
 }
+
+CString
+SQLInfoMySQL::GetCATALOGTableCatalog(CString /*p_schema*/,CString p_tablename) const
+{
+  CString sql;
+  sql = "SELECT table_catalog\n"
+        "      ,table_schema\n"
+        "      ,table_name\n"
+        "      ,'SYSTEM TABLE' as table_type\n"
+        "      ,table_comment\n"
+        "      ,table_catalog || '.' || table_schema || '.' || table_name as fullname\n"
+        "      ,engine\n"
+        "      ,0 as temporary\n" 
+        "  FROM information_schema.tables\n"  
+        " WHERE ( table_type = 'SYSTEM VIEW'\n"
+        "      OR table_schema IN ('mysql','sys','performance_schema'))\n";
+  if(!p_tablename.IsEmpty())
+  {
+    sql += "   AND table_name ";
+    sql += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_tablename + "'\n";
+}
+  sql += " ORDER BY 1,2,3";
+  return sql;}
 
 CString
 SQLInfoMySQL::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
@@ -695,7 +750,7 @@ SQLInfoMySQL::GetCATALOGForeignList(CString /*p_schema*/,CString p_tablename,int
 }
 
 CString
-SQLInfoMySQL::GetCATALOGForeignAttributes(CString /*p_schema*/,CString p_tablename,CString p_constraintname,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoMySQL::GetCATALOGForeignAttributes(CString /*p_schema*/,CString p_tablename,CString p_constraintname,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -855,15 +910,57 @@ SQLInfoMySQL::GetCATALOGTriggerExists(CString /*p_schema*/, CString p_tablename,
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTriggerList(CString /*p_schema*/, CString p_tablename) const
+SQLInfoMySQL::GetCATALOGTriggerList(CString p_schema, CString p_tablename) const
 {
-  return "";
+  return GetCATALOGTriggerAttributes(p_schema,p_tablename,"");
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTriggerAttributes(CString /*p_schema*/, CString p_tablename, CString p_triggername) const
+SQLInfoMySQL::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename, CString p_triggername) const
 {
-  return "";
+  CString sql;
+  sql = "SELECT event_object_catalog\n"
+        "      ,event_object_schema\n"
+        "      ,event_object_table\n"
+        "      ,trigger_name\n"
+        "      ,'' AS trigger_remarks\n"
+        "      ,action_order  AS trigger_position\n"
+        "      ,CASE action_timing\n"
+        "            WHEN 'AFTER' THEN FALSE ELSE TRUE\n"
+        "       END AS trigger_before\n"
+        "      ,CASE event_manipulation\n"
+        "            WHEN 'INSERT' THEN TRUE ELSE FALSE\n"
+        "       END AS trigger_insert\n"
+        "      ,CASE event_manipulation\n"
+        "            WHEN 'UPDATE' THEN TRUE ELSE FALSE\n"
+        "       END AS trigger_update\n"
+        "      ,CASE event_manipulation\n"
+        "            WHEN 'DELETE' THEN TRUE ELSE FALSE\n"
+        "       END AS trigger_delete\n"
+        "      ,FALSE AS trigger_select\n"
+        "      ,FALSE AS trigger_session\n"
+        "      ,FALSE AS trigger_transaction\n"
+        "      ,FALSE AS trigger_rollback\n"
+        "      ,''    AS trigger_referencing\n"
+        "      ,TRUE  AS trigger_enabled\n"
+        "      ,action_statement AS trigger_source\n"
+        "  FROM information_schema.triggers\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += " WHERE event_object_schema = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "event_object_table = '" + p_tablename + "'\n";
+  }
+  if(!p_triggername.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() && p_tablename.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "trigger_name = '" + p_triggername + "'\n";
+  }
+  sql += " ORDER BY 1,2,3,4";
+  return sql;
 }
 
 CString
@@ -883,6 +980,12 @@ SQLInfoMySQL::GetCATALOGTriggerDrop(CString /*p_schema*/, CString p_tablename, C
 
 CString
 SQLInfoMySQL::GetCATALOGSequenceExists(CString /*p_schema*/, CString p_sequence) const
+{
+  return "";
+}
+
+CString
+SQLInfoMySQL::GetCATALOGSequenceList(CString p_schema,CString p_pattern) const
 {
   return "";
 }
@@ -917,13 +1020,36 @@ SQLInfoMySQL::GetCATALOGViewExists(CString p_schema,CString p_viewname) const
 CString 
 SQLInfoMySQL::GetCATALOGViewList(CString p_schema,CString p_pattern) const
 {
-  return "";
+  return GetCATALOGViewAttributes(p_schema,p_pattern);
 }
 
 CString 
 SQLInfoMySQL::GetCATALOGViewAttributes(CString p_schema,CString p_viewname) const
 {
-  return "";
+  CString sql;
+  sql = "SELECT table_catalog\n"
+        "      ,table_schema\n"
+        "      ,table_name\n"
+        "      ,'VIEW' as table_type\n"
+        "      ,table_comment\n"
+        "      ,table_catalog || '.' || table_schema || '.' || table_name as fullname\n"
+        "      ,engine\n"
+        "      ,0 as temporary\n" 
+        "  FROM information_schema.tables\n"  
+        " WHERE table_type = 'VIEW'\n"
+        "   AND table_schema NOT IN ('mysql','sys','performance_schema')\n";
+  if(!p_schema)
+  {
+    sql += "   AND table_schema = '" + p_schema + "'\n";
+  }
+  if(!p_viewname.IsEmpty())
+  {
+    sql += "   AND table_name ";
+    sql += p_viewname.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_viewname + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
+  return sql;
 }
 
 CString 
@@ -975,20 +1101,80 @@ SQLInfoMySQL::GetCATALOGViewDrop(CString /*p_schema*/,CString p_viewname,CString
 //////////////////////////////////////////////////////////////////////////
 
 CString
-SQLInfoMySQL::GetPSMProcedureExists(CString /*p_schema*/, CString p_procedure) const
+SQLInfoMySQL::GetPSMProcedureExists(CString p_schema, CString p_procedure) const
 {
-  return "";
+  CString sql;
+  sql = "SELECT SELECT COUNT(*)\n"
+        "  FROM information_schema.routines\n";
+  if(!p_schema.IsEmpty())
+  { 
+    sql += "   AND routine_schema = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += "   AND routine_name = '" + p_procedure + "'";
+  }
+  return sql;
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureList(CString /*p_schema*/) const
+SQLInfoMySQL::GetPSMProcedureList(CString p_schema) const
 {
-  return "";
+  return GetPSMProcedureAttributes(p_schema,"");
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureAttributes(CString /*p_schema*/, CString p_procedure) const
+SQLInfoMySQL::GetPSMProcedureAttributes(CString p_schema, CString p_procedure) const
 {
+  CString sql;
+  sql = "SELECT routine_catalog\n"
+        "      ,routine_schema\n"
+        "      ,routine_name\n"
+        "      ,(SELECT COUNT(*)\n"
+        "          FROM information_schema.parameters par\n"
+        "         WHERE par.specific_name    = fun.specific_name\n"
+        "           AND par.specific_catalog = fun.routine_catalog\n"
+        "           AND par.specific_schema  = fun.routine_schema\n"
+        "           AND par.parameter_mode IN ('IN','INOUT')) as input_parameters\n"
+        "      ,(SELECT COUNT(*)\n"
+        "          FROM information_schema.parameters par\n"
+        "         WHERE par.specific_name    = fun.specific_name\n"
+        "           AND par.specific_catalog = fun.routine_catalog\n"
+        "           AND par.specific_schema  = fun.routine_schema\n"
+        "           AND par.parameter_mode IN ('OUT','INOUT')) as output_parameters\n"
+        "      ,(SELECT COUNT(*)\n"
+        "          FROM information_schema.parameters par\n"
+        "         WHERE par.specific_name    = fun.specific_name\n"
+        "           AND par.specific_catalog = fun.routine_catalog\n"
+        "           AND par.specific_schema  = fun.routine_schema\n"
+        "           AND par.data_type        = 'set') as result_sets\n"
+        "      ,'' as remarks\n"
+        "      ,CASE routine_type\n"
+        "            WHEN 'PROCEDURE' THEN 1\n"
+        "            WHEN 'FUNCTION'  THEN 2\n"
+        "                             ELSE 3\n"
+        "       end as procedure_type\n"
+        "      ,routine_definition\n"
+        "  FROM information_schema.routines fun\n";
+  if(!p_schema.IsEmpty())
+  { 
+    sql += " WHERE routine_schema = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
+    sql += "routine_name ";
+    sql += p_procedure.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_procedure + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
+  return sql;
+}
+
+CString
+SQLInfoMySQL::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
+{
+  // Source-code already gotten with attributes
   return "";
 }
 
@@ -1008,6 +1194,63 @@ CString
 SQLInfoMySQL::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
 {
   return "";
+}
+
+// And it's parameters
+CString
+SQLInfoMySQL::GetPSMProcedureParameters(CString p_schema,CString p_procedure) const
+{
+  CString sql;
+
+  sql = "SELECT par.specific_catalog\n"
+        "      ,par.specific_schema\n"
+        "      ,fun.routine_name\n"
+        "      ,par.parameter_name\n"
+        "      ,case par.parameter_mode\n"
+        "            when 'IN'    then 1\n"
+        "            when 'OUT'   then 4\n"
+        "            when 'INOUT' then 2\n"
+        "       end as columntype\n"
+        "      ,case par.data_type\n"
+        "            when 'varchar'  then 1\n"
+        "            when 'int'      then 4\n"
+        "            when 'decimal'  then 2\n"
+        "            when 'tinyint'  then -6\n"
+        "            when 'bigint'   then -5\n"
+        "            when 'text'     then 1\n"
+        "            when 'longtext' then -1\n"
+        "            when 'datetime' then 11\n"
+        "                            else 1\n"
+        "       end as datatype\n"
+        "      ,par.data_type as typename\n"
+        "      ,par.character_maximum_length\n"
+        "      ,par.numeric_precision\n"
+        "      ,par.numeric_scale\n"
+        "      ,10 as numeric_precision_radix\n"
+        "      ,1 as is_nullable\n"
+        "      ,'' as remarks\n"
+        "      ,'' as parameter_default\n"
+        "      ,1 as datatype3\n"
+        "      ,par.datetime_precision as subtype\n"
+        "      ,par.character_octet_length\n"
+        "      ,par.ordinal_position\n"
+        "      ,'YES' as isNullable\n"
+        "  FROM information_schema.parameters par\n"
+        "      ,information_schema.routines fun\n"
+        " WHERE par.specific_catalog = fun.routine_catalog\n"
+        "   AND par.specific_schema  = fun.routine_schema\n"
+        "   AND par.specific_name    = fun.specific_name\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND fun.routine_schema = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += "   AND fun.routine_name    = '" + p_procedure + "'\n";
+  }
+  sql += " ORDER BY 1,2,3,18";
+
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////

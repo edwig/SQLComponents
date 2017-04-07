@@ -417,40 +417,35 @@ SQLInfoGenericODBC::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_da
 CString
 SQLInfoGenericODBC::GetCATALOGTableExists(CString p_schema,CString p_tablename) const
 {
-  WordList list;
-  SQLInfo* info = (SQLInfo*)this;
-  CString table(p_tablename);
-
-  // Construct compounded name
-  if(!p_schema.IsEmpty())
-  {
-    table = p_schema + "." + p_tablename;
-  }
-  // Get from SQLTables
-  MTableMap tables;
-  CString   errors;
-
-  if(info->MakeInfoTableTablepart(p_tablename,tables,errors))
-  {
-    if(!tables.empty())
-    {
-      return tables.front().m_table;
-    }
-  }
+  // Cannot do this, let ODBC handle this
   return "";
 }
 
 CString
 SQLInfoGenericODBC::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
-{
-  // cannot do this
+  {
+  // Cannot do this, let ODBC handle this
+  return "";
+  }
+
+CString
+SQLInfoGenericODBC::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/) const
+  {
+  // Cannot do this, let ODBC handle this
   return "";
 }
 
-bool
-SQLInfoGenericODBC::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/,MetaTable& /*p_table*/) const
+CString
+SQLInfoGenericODBC::GetCATALOGTableSynonyms(CString /*p_schema*/,CString /*p_tablename*/) const
 {
-  // cannot do this
+  // Cannot do this, let ODBC handle this
+  return false;
+}
+
+CString
+SQLInfoGenericODBC::GetCATALOGTableCatalog(CString /*p_schema*/,CString /*p_tablename*/) const
+{
+  // Cannot do this, let ODBC handle this
   return false;
 }
 
@@ -734,7 +729,7 @@ SQLInfoGenericODBC::GetCATALOGForeignList(CString p_schema,CString p_tablename,i
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraintname,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoGenericODBC::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraintname,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -951,6 +946,12 @@ SQLInfoGenericODBC::GetCATALOGSequenceExists(CString p_schema, CString p_sequenc
 }
 
 CString
+SQLInfoGenericODBC::GetCATALOGSequenceList(CString p_schema,CString p_pattern) const
+{
+  return "";
+}
+
+CString
 SQLInfoGenericODBC::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequence) const
 {
   return "";
@@ -1056,6 +1057,12 @@ SQLInfoGenericODBC::GetPSMProcedureAttributes(CString p_schema, CString p_proced
 }
 
 CString
+SQLInfoGenericODBC::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
+{
+  return "";
+}
+
+CString
 SQLInfoGenericODBC::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
 {
   return "";
@@ -1071,6 +1078,13 @@ CString
 SQLInfoGenericODBC::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
 {
   // ISO SQL does not support procedure errors
+  return "";
+}
+
+// And it's parameters
+CString
+SQLInfoGenericODBC::GetPSMProcedureParameters(CString p_schema,CString p_procedure) const
+{
   return "";
 }
 
