@@ -750,6 +750,10 @@ namespace DatabaseUnitTest
       CString source("\'Test'\"");
       CString indexname("01_master_id");
       CString condition("variable IS NOT NULL");
+      CString foreign("fk_master_one");
+      CString triggername("master_check");
+      CString viewname("myview");
+      CString procedurename("calculate");
       CString tabledef("(ID INTEGER,NAME VARCHAR(200),NUMBER DECIMAL(14,2));");
       CString precursor;
       CString cursorname("selcursor");
@@ -759,20 +763,6 @@ namespace DatabaseUnitTest
       int     statements = 0;
       bool    notnull    = true;
 
-//       MetaForeign foreign;
-//       foreign.m_constraintname    = "FK_detail_master";
-//       foreign.m_schema            = schema;
-//       foreign.m_tablename         = "detail";
-//       foreign.m_column            = "master_id";
-//       foreign.m_primaryTable      = table;
-//       foreign.m_primaryColumn     = column;
-//       foreign.m_enabled           = true;
-//       foreign.m_deferrable        = true;
-//       foreign.m_initiallyDeffered = false;
-//       foreign.m_match             = 0; // 0=Full, 1=partial, 2=simple
-//       foreign.m_updateRule        = 0; // 0=restrict, 1=cascade, 2=set null, 3=set default, 4=No action
-//       foreign.m_deleteRule        = 1; // 0=restrict, 1=cascade, 2=set null, 3=set default, 4=No action
-
       MetaIndex index;
       index.m_indexName  = indexname;
       index.m_columnName = "id";
@@ -780,70 +770,157 @@ namespace DatabaseUnitTest
       index.m_unique     = true;
       index.m_ascending  = "A";
 
+      MetaTable    tables;
+      MetaColumn   metacolumns;
+      MetaIndex    metaIndex;
+      MIndicesMap  indices;
+      MPrimaryMap  primaries;
+      MForeignMap  foreigns;
+      MetaTrigger  trigger;
+      MetaSequence sequence;
+      MetaProcedure metaproc;
+      MParameterMap parameters;
+      std::vector<CString> cursorcolumns;    // Cursor fetch
+      std::vector<CString> cursorparameters; // Fetch into
+
+      // RDBMS
+      ReportLong   ("Database type                      :",p_info->GetRDBMSDatabaseType());
       ReportString ("Database vendor name               :",p_info->GetRDBMSVendorName());
+    //ReportString ("Database physical name             :",p_info->GetRDBMSPhysicalDatabaseName());
       ReportBoolean("Catalog is in upper case           :",p_info->GetRDBMSIsCatalogUpper());
       ReportBoolean("Database understands schemas       :",p_info->GetRDBMSUnderstandsSchemas());
       ReportBoolean("Driver understands comments        :",p_info->GetRDBMSSupportsComments());
       ReportBoolean("Support deferred constraints       :",p_info->GetRDBMSSupportsDeferredConstraints());
       ReportBoolean("Support order-by expressions       :",p_info->GetRDBMSSupportsOrderByExpression());
-      ReportString ("Database DATETIME keyword          :",p_info->GetKEYWORDCurrentTimestamp());
-      ReportString ("Database date keyword              :",p_info->GetKEYWORDCurrentDate());
+      ReportBoolean("Supports {[?=] CALL escapes}       :",p_info->GetRDBMSSupportsComments());
       ReportBoolean("Time stored as decimal             :",p_info->GetRDBMSSupportsDatatypeTime());
       ReportBoolean("Interval type supported            :",p_info->GetRDBMSSupportsDatatypeInterval());
+      ReportLong   ("Maximum SQL length                 :",p_info->GetRDBMSMaxStatementLength());
+      ReportBoolean("Must Commit DDL                    :",p_info->GetRDBMSMustCommitDDL());
+      // KEYWORDS
+      ReportString ("Database DATETIME keyword          :",p_info->GetKEYWORDCurrentTimestamp());
+      ReportString ("Database date keyword              :",p_info->GetKEYWORDCurrentDate());
       ReportString ("Concatenation operator             :",p_info->GetKEYWORDConcatanationOperator());
       ReportString ("Quote character                    :",p_info->GetKEYWORDQuoteCharacter());
+      ReportString ("Default NULL for parameter         :",p_info->GetKEYWORDParameterDefaultNULL());
+      ReportString ("Parameter is for INPUT and OUTPUT  :",p_info->GetKEYWORDParameterINOUT());
+      ReportString ("Parameter is for OUTPUT only       :",p_info->GetKEYWORDParameterOUT());
+      ReportString ("Network dbs primary key type       :",p_info->GetKEYWORDNetworkPrimaryKeyType());
+      ReportString ("Datatype for TIMESTAMP / DATETIME  :",p_info->GetKEYWORDTypeTimestamp());
+      ReportString ("Parameter prefix in PSM module     :",p_info->GetKEYWORDParameterPrefix());
       ReportString ("Identity string                    :",p_info->GetKEYWORDIdentityString(table));
-      ReportLong   ("Maximum SQL length                 :",p_info->GetRDBMSMaxStatementLength());
-      ReportString ("End of the IF statement            :",p_info->GetPSMIFEnd());
-      ReportString ("Assignment to variable             :",p_info->GetPSMAssignment(destiny,source));
-      ReportString ("Start of a WHILE loop              :",p_info->GetPSMWhile(condition));
-      ReportString ("End   of a WHILE loop              :",p_info->GetPSMWhileEnd());
+      ReportString ("Function UPPER()                   :",p_info->GetKEYWORDUpper(source));
       ReportString ("INTERVAL 1 minute ago              :",p_info->GetKEYWORDInterval1MinuteAgo());
+      ReportString("Statement Not Null Value (NVL)     :", p_info->GetKEYWORDStatementNVL(column,source));
+      // SQL's
       ReportSQL    ("Generate new serial                :",p_info->GetSQLGenerateSerial(table));
       ReportString ("Effective serial                   :",p_info->GetSQLEffectiveSerial("oid"));
       ReportSQL    ("Start new subtransaction           :",p_info->GetSQLStartSubTransaction(table));
       ReportSQL    ("Commit subtransaction              :",p_info->GetSQLCommitSubTransaction(table));
       ReportSQL    ("Rollback subtransaction            :",p_info->GetSQLRollbackSubTransaction(table));
       ReportString ("FROM part for single row select    :",p_info->GetSQLFromDualClause());
-      ReportSQL    ("SET ALL CONSTRAINTS DEFERRED       :",p_info->GetSESSIONConstraintsDeferred());
-      ReportSQL    ("SET ALL CONSTRAINTS IMMEDIATE      :",p_info->GetSESSIONConstraintsImmediate());
-      ReportSQL    ("Get all column info of a table     :",p_info->GetCATALOGColumnList(schema,table));
-//       ReportSQL    ("Get all constraints of a table     :",p_info->GetCATALOGForeignList(table));
-      ReportSQL    ("Get all indices of a table         :",p_info->GetCATALOGIndexList(schema,table));
-//      ReportSQL    ("Create an index                    :",p_info->GetCATALOGIndexCreate(schema,table,index));
-      ReportSQL    ("Drop an index                      :",p_info->GetCATALOGIndexDrop(schema,table,indexname));
-      ReportSQL    ("Get table references               :",p_info->GetCATALOGForeignList(schema,table));
-      ReportSQL    ("Getting the state of a sequence    :",p_info->GetCATALOGSequenceExists(schema,table));
-//       ReportSQL    ("Create a new sequence for a table  :",p_info->GetCATALOGSequenceCreate(schema,table));
-      ReportSQL    ("Drop the sequence for a table      :",p_info->GetCATALOGSequenceDrop(schema,table));
-      ReportSQL    ("Getting session and terminal       :",p_info->GetSESSIONMyself());
-      ReportSQL    ("Get session exists                 :",p_info->GetSESSIONExists("123"));
-      ReportSQL    ("Get primary key information        :",p_info->GetCATALOGPrimaryAttributes(schema,table));
-//       ReportSQL    ("SQL to lock a table (exclusive)    :",p_info->GetSQLLockTable(table,true));
-//       ReportSQL    ("SQL to lock a table (share-read)   :",p_info->GetSQLLockTable(table,false));
-//       ReportSQL    ("Optimize performance of a table    :",p_info->GetSQLOptimizeTable(schema,table,statements));
-//    ReportBoolean("Only one user session capability   :",p_info->GetOnlyOneUserSession());
-//       ReportSQL    ("Create a new table column          :",p_info->GetCATALOGColumnCreate(schema,table,column,type,notnull));
-//       ReportSQL    ("Drop a column from a table         :",p_info->GetCATALOGColumnDrop(schema,table,column));
-//       ReportSQL    ("Create one (1) foreign key         :",p_info->GetCATALOGForeignCreate(table,CString("constraintname"),column,"master","OID"));
-//       ReportSQL    ("Modify table column type           :",p_info->GetCATALOGColumnAlter(schema,table,column,type));
-//       ReportSQL    ("Modify table column not null state :",p_info->GetCATALOGColumnAlter(schema,table,column,notnull));
-      ReportSQL    ("Drop view                          :",p_info->GetCATALOGViewDrop(schema,table,precursor));
-      ReportSQL    ("Create or replace view             :",p_info->GetCATALOGViewCreate(schema,table,select));
-//    ReportSQL    ("Create temp table from content     :",p_info->DoMakeTemporaryTable(table,tabledef,column));
-//      ReportSQL    ("Remove a temporary table           :",p_info->GetCATALOGTableDrop(table));
-      ReportString ("SPL assignment                     :",p_info->GetPSMAssignment(destiny,source));
-      ReportString ("SPL Start a while loop             :",p_info->GetPSMWhile(condition));
-      ReportString ("SPL End while loop                 :",p_info->GetPSMWhileEnd());
-//      ReportString ("SPL Get procedure call             :",p_info->GetPSMExecute(procedure));
+      ReportSQL    ("SQL lock table                     :",p_info->GetSQLLockTable(schema,table,true));
+      ReportSQL    ("SQL Optimize table                 :",p_info->GetSQLOptimizeTable(schema,table));
       ReportString ("SQL string quotes                  :",p_info->GetSQLString(quoteString));
       ReportString ("SQL date string                    :",p_info->GetSQLDateString(1959,15,10));
       ReportString ("SQL time string                    :",p_info->GetSQLTimeString(15,50,20));
       ReportString ("SQL datetime string (timestamp)    :",p_info->GetSQLDateTimeString(1959,10,15,15,50,20));
       ReportString ("SQL datetime bound string          :",p_info->GetSQLDateTimeBoundString());
       ReportString ("SQL datetime stripped string       :",p_info->GetSQLDateTimeStrippedString(1959,10,15,15,50,20));
-      ReportString ("SPL cursor declaration             :",p_info->GetPSMCursorDeclaration(destiny,select));
-      ReportString ("SPL raise exception                :",p_info->GetPSMExceptionRaise("NODATA"));
+      // CATALOG FUNCTION SQL
+      // CATALOG TABLE
+      ReportSQL    ("TABLE exists                       :",p_info->GetCATALOGTableExists    (schema,table));
+      ReportSQL    ("TABLE list                         :",p_info->GetCATALOGTablesList     (schema,table));
+      ReportSQL    ("TABLE attributes                   :",p_info->GetCATALOGTableAttributes(schema,table));
+      ReportSQL    ("TABLE Synonyms                     :",p_info->GetCATALOGTableSynonyms  (schema,table));
+      ReportSQL    ("TABLE Catalogs                     :",p_info->GetCATALOGTableCatalog   (schema,table));
+      ReportSQL    ("TABLE exists                       :",p_info->GetCATALOGTableExists    (schema,table));
+      ReportSQL    ("TABLE create                       :",p_info->GetCATALOGTableCreate    (tables,metacolumns));
+      ReportSQL    ("TABLE Rename                       :",p_info->GetCATALOGTableRename    (schema,table,table + "_ext"));
+      ReportSQL    ("TABLE Drop                         :",p_info->GetCATALOGTableDrop      (schema,table));
+      // CATALOG Temp table
+      ReportSQL    ("TEMP TABLE create                  :",p_info->GetCATALOGTemptableCreate  (schema,table,select));
+      ReportSQL    ("TEMP TABLE select into temp        :",p_info->GetCATALOGTemptableIntoTemp(schema,table,select));
+      ReportSQL    ("TEMP TABLE drop                    :",p_info->GetCATALOGTemptableDrop    (schema,table));
+      // CATALOG Columns
+      ReportSQL    ("COLUMN exists                      :",p_info->GetCATALOGColumnExists    (schema,table,column));
+      ReportSQL    ("COLUMN all column info of a table  :",p_info->GetCATALOGColumnList      (schema,table));
+      ReportSQL    ("COLUMN all attributes of the column:",p_info->GetCATALOGColumnAttributes(schema,table,column));
+      ReportSQL    ("COLUMN Create                      :",p_info->GetCATALOGColumnCreate    (metacolumns));
+      ReportSQL    ("COLUMN Alter                       :", p_info->GetCATALOGColumnAlter    (metacolumns));
+      ReportSQL    ("COLUMN Rename                      :",p_info->GetCATALOGColumnRename    (schema,table,column,column + "_ext",type));
+      ReportSQL    ("COLUMN Drop                        :",p_info->GetCATALOGColumnDrop      (schema,table,column));
+      // CATALOG Index
+      ReportSQL    ("INDEX exists                       :",p_info->GetCATALOGIndexExists    (schema,table,indexname));
+      ReportSQL    ("INDEX list all indices of a table  :",p_info->GetCATALOGIndexList      (schema,table));
+      ReportSQL    ("INDEX attributes of an index       :",p_info->GetCATALOGIndexAttributes(schema,table,indexname));
+      ReportSQL    ("INDEX Create                       :",p_info->GetCATALOGIndexCreate    (indices));
+      ReportSQL    ("INDEX Drop                         :",p_info->GetCATALOGIndexDrop      (schema,table,indexname));
+    //ReportSQL    ("INDEX Filter                       :",p_info->GetCATALOGIndexFilter    (metaIndex));
+      // CATALOG Primary key
+      ReportSQL    ("PRIMARY KEY exists                 :",p_info->GetCATALOGPrimaryExists    (schema,table));
+      ReportSQL    ("PRIMARY KEY attributes             :",p_info->GetCATALOGPrimaryAttributes(schema,table));
+      ReportSQL    ("PRIMARY KEY create                 :",p_info->GetCATALOGPrimaryCreate    (primaries));
+      ReportSQL    ("PRIMARY KEY drop                   :",p_info->GetCATALOGPrimaryDrop      (schema,table,"pk_" + table));
+      // CATALOG Foreign key
+      ReportSQL    ("FOREIGN KEY exists                 :",p_info->GetCATALOGForeignExists    (schema,table,foreign));
+      ReportSQL    ("FOREIGN KEY list                   :",p_info->GetCATALOGForeignList      (schema,table));
+      ReportSQL    ("FOREIGN KEY attributes             :",p_info->GetCATALOGForeignAttributes(schema,table,foreign));
+    //ReportSQL    ("FOREIGN KEY create                 :",p_info->GetCATALOGForeignCreate    (foreigns));
+      ReportSQL    ("FOREIGN KEY alter                  :",p_info->GetCATALOGForeignAlter     (foreigns,foreigns));
+      ReportSQL    ("FOREIGN KEY drop                   :",p_info->GetCATALOGForeignDrop      (schema,table,foreign));
+      // CATALOG Triggers
+      ReportSQL    ("TRIGGER exists                     :",p_info->GetCATALOGTriggerExists    (schema,table,triggername));
+      ReportSQL    ("TRIGGER lists                      :",p_info->GetCATALOGTriggerList      (schema,table));
+      ReportSQL    ("TRIGGER attributes                 :",p_info->GetCATALOGTriggerAttributes(schema,table,triggername));
+      ReportSQL    ("TRIGGER create                     :",p_info->GetCATALOGTriggerCreate    (trigger));
+      ReportSQL    ("TRIGGER drop                       :",p_info->GetCATALOGTriggerDrop      (schema,table,triggername));
+      // CATALOG Sequence
+      ReportSQL    ("SEQUENCE exists                    :",p_info->GetCATALOGSequenceExists    (schema,table));
+      ReportSQL    ("SEQUENCE lists                     :",p_info->GetCATALOGSequenceList      (schema,table));
+      ReportSQL    ("SEQUENCE attributes                :",p_info->GetCATALOGSequenceAttributes(schema,table));
+      ReportSQL    ("SEQUENCE create                    :",p_info->GetCATALOGSequenceCreate    (sequence));
+      ReportSQL    ("SEQUENCE drop                      :",p_info->GetCATALOGSequenceDrop      (schema,table + "_seq"));
+      // CATALOG View
+      ReportSQL    ("VIEW exists                        :",p_info->GetCATALOGViewExists    (schema,viewname));
+      ReportSQL    ("VIEW list                          :",p_info->GetCATALOGViewList      (schema,viewname));
+      ReportSQL    ("VIEW attributes                    :",p_info->GetCATALOGViewAttributes(schema,viewname));
+      ReportSQL    ("VIEW Create                        :",p_info->GetCATALOGViewCreate    (schema,table,select));
+      ReportSQL    ("VIEW Drop                          :",p_info->GetCATALOGViewDrop      (schema,table,precursor));
+      // PERSISTENT STORED MODULES
+      ReportSQL    ("PSM PROCEDURE exists               :",p_info->GetPSMProcedureExists    (schema,procedurename));
+      ReportSQL    ("PSM PROCEDURE list                 :",p_info->GetPSMProcedureList      (schema));
+      ReportSQL    ("PSM PROCEDURE attributes           :",p_info->GetPSMProcedureAttributes(schema,procedurename));
+      ReportSQL    ("PSM PROCEDURE sourcecode           :",p_info->GetPSMProcedureSourcecode(schema,procedurename));
+      ReportSQL    ("PSM PROCEDURE create               :",p_info->GetPSMProcedureCreate    (metaproc));
+      ReportSQL    ("PSM PROCEDURE drop                 :",p_info->GetPSMProcedureDrop      (schema,procedurename));
+    //ReportSQL    ("PSM PROCEDURE errors               :",p_info->GetPSMProcedureErrors    (schema,procedurename));
+      ReportSQL    ("PSM PROCEDURE parameters           :",p_info->GetPSMProcedureParameters(schema,procedurename));
+      // PSM elements
+    //ReportString ("PSM Declaration                    :",p_info->GetPSMDeclaration(true,destiny,SQL_INTEGER,10,0,"","",""));
+      ReportString ("Assignment to variable             :",p_info->GetPSMAssignment(destiny,source));
+      ReportString ("PSM IF statement                   :",p_info->GetPSMIF(condition));
+      ReportString ("PSM IF else                        :",p_info->GetPSMIFElse());
+      ReportString ("PSM IF End of the IF               :",p_info->GetPSMIFEnd());
+      ReportString ("PSM WHILE loop                     :",p_info->GetPSMWhile(condition));
+      ReportString ("PSM WHILE end                      :",p_info->GetPSMWhileEnd());
+      ReportString ("PSM LOOP                           :",p_info->GetPSMLOOP());
+      ReportString ("PSM LOOP end                       :",p_info->GetPSMLOOPEnd());
+      ReportString ("PSM BREAK                          :",p_info->GetPSMBREAK());
+      ReportString ("PSM RETURN                         :",p_info->GetPSMRETURN(source));
+      ReportString ("PSM EXECUTE                        :",p_info->GetPSMExecute(procedurename,parameters));
+      ReportString ("PSM CURSOR declaration             :",p_info->GetPSMCursorDeclaration(destiny,select));
+      ReportString ("PSM CURSOR Fetch                   :",p_info->GetPSMCursorFetch(cursorname,cursorcolumns,cursorparameters));
+      ReportString ("PSM exception catch NODATA         :",p_info->GetPSMExceptionCatchNoData());
+      ReportString ("PSM exception catch SQLSTATE       :",p_info->GetPSMExceptionCatch("HY001"));
+      ReportString ("PSM exception raise                :",p_info->GetPSMExceptionRaise("NODATA"));
+      // SESSION CONTROL
+      ReportSQL    ("SESSION Getting session/terminal   :",p_info->GetSESSIONMyself());
+      ReportSQL    ("SESSION exists                     :",p_info->GetSESSIONExists("123"));
+      ReportSQL    ("SESSION list                       :",p_info->GetSESSIONList());
+      ReportSQL    ("SESSION attributes                 :",p_info->GetSESSIONExists("123"));
+      ReportSQL    ("SET ALL CONSTRAINTS DEFERRED       :",p_info->GetSESSIONConstraintsDeferred());
+      ReportSQL    ("SET ALL CONSTRAINTS IMMEDIATE      :",p_info->GetSESSIONConstraintsImmediate());
     }
     
     void ReportOracle()
