@@ -421,7 +421,7 @@ SQLInfoFirebird::GetCATALOGTableAttributes(CString /*p_schema*/,CString p_tablen
 {
   p_tablename.MakeUpper();
   CString sql = "SELECT CAST('' AS VARCHAR(31))             AS table_catalog\n"
-                "      ,CAST(rdb$owner_name AS VARCHAR(31)) AS table_schema\n"
+                "      ,trim(rdb$owner_name)     AS table_schema\n"
                 "      ,trim(rdb$relation_name)             AS table_name\n"
                 "      ,CASE rdb$relation_type\n"
                 "            WHEN 0 THEN 'TABLE'\n"
@@ -430,7 +430,7 @@ SQLInfoFirebird::GetCATALOGTableAttributes(CString /*p_schema*/,CString p_tablen
                 "            WHEN 5 THEN 'LOCAL TEMPORARY'\n"
                 "                   ELSE 'UNKNOWN'\n"
                 "       END               AS table_type\n"
-                "      ,rdb$description   AS remarks\n"
+                "      ,trim(rdb$description) AS remarks\n"
                 "      ,trim(rdb$owner_name) || '.' || trim(rdb$relation_name) AS full_name\n"
                 "      ,cast('' as varchar(31)) as storage_space\n"
                   "  FROM rdb$relations\n"
@@ -561,9 +561,9 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_table
   CString sql;
 
   sql = "SELECT cast('' as varchar(255))                   as table_catalog\n"         // 1  - VARCHAR
-        "      ,cast(tbl.rdb$owner_name    as varchar(31)) as table_schema\n"	         // 2  - VARCHAR
-        "      ,cast(col.rdb$relation_name as varchar(31)) as table_name\n"            // 3  - VARCHAR NOT NULL
-        "      ,cast(col.rdb$field_name    as varchar(31)) as column_name\n"           // 4  - VARCHAR NOT NULL
+        "      ,trim(tbl.rdb$owner_name)    as table_schema\n"	         // 2  - VARCHAR
+        "      ,trim(col.rdb$relation_name) as table_name\n"            // 3  - VARCHAR NOT NULL
+        "      ,trim(col.rdb$field_name)    as column_name\n"           // 4  - VARCHAR NOT NULL
         "      ,CASE fld.rdb$field_type\n"
         "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
         "                              WHEN 1 THEN 2\n"
@@ -656,8 +656,8 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_table
         "      ,cast (fld.rdb$field_scale as smallint)*-1  as decimal_digits\n"		        // 9  - SMALLINT
         "      ,10                                         as num_prec_radix\n"           // 10 - SMALLINT
         "      ,(coalesce(col.rdb$null_flag,0,0)-1)*-1     as nullable\n"        				  // 11 - SMALLINT NOT NULL
-        "      ,cast (col.rdb$description    as varchar(512)) as remarks\n"               // 12 - VARCHAR
-        "      ,cast (col.rdb$default_source as varchar(512)) as column_def\n"            // 13 - VARCHAR
+        "      ,trim(col.rdb$description)                  as remarks\n"                  // 12 - VARCHAR
+        "      ,trim(col.rdb$default_source)               as column_def\n"               // 13 - VARCHAR
         "      ,CASE fld.rdb$field_type\n"
         "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
         "                              WHEN 1 THEN 2\n"
@@ -1411,7 +1411,7 @@ CString
 SQLInfoFirebird::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
 {
   CString sql;
-  sql.Format("CREATE SEQUENCE %s START WITH %d"
+  sql.Format("CREATE SEQUENCE %s START WITH %-12.0f"
             ,p_sequence.m_sequenceName.GetString()
             ,p_sequence.m_currentValue);
   return sql;
@@ -1537,7 +1537,27 @@ SQLInfoFirebird::GetPSMProcedureExists(CString /*p_schema*/, CString p_procedure
 CString
 SQLInfoFirebird::GetPSMProcedureList(CString p_schema) const
 {
-  return GetPSMProcedureAttributes(p_schema,"");
+  p_schema.MakeUpper();
+  CString sql1("SELECT '' as catalog_name\n"
+               "      ,trim(rdb$owner_name) as schema_name\n"
+               "      ,trim(rdb$procedure_name)\n"
+               "  FROM rdb$procedures pro\n");
+  if(!p_schema.IsEmpty())
+  {
+    sql1 += " WHERE pro.rdb$owner = '" + p_schema + "'\n";
+  }
+
+  CString sql2("SELECT '' as catalog_name\n"
+               "      ,trim(rdb$owner_name) as schema_name\n"
+               "      ,trim(rdb$function_name)\n"
+               "  FROM rdb$functions fun\n");
+
+  if(!p_schema.IsEmpty())
+  {
+    sql2 += " WHERE fun.rdb$owner = '" + p_schema + "'\n";
+  }
+
+  return sql1 + " UNION ALL\n" + sql2 + " ORDER BY 1,2,3";
 }
 
 CString

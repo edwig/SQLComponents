@@ -220,6 +220,13 @@ SQLInfoDB::ReadTablesFromQuery(SQLQuery& p_query,MTableMap& p_tables)
     table.m_tablespace = (CString) p_query[6];
     table.m_temporary  = (bool)    p_query[7];
 
+    table.m_catalog.Trim();
+    table.m_schema.Trim();
+    table.m_table.Trim();
+    table.m_objectType.Trim();
+    table.m_remarks.Trim();
+    table.m_tablespace.Trim();
+
     p_tables.push_back(table);
   }
   return !p_tables.empty();
@@ -429,7 +436,7 @@ SQLInfoDB::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
 {
   CString sql;
 
-  if(p_procedure.Compare("%") == 0)
+  if(p_procedure.IsEmpty() || p_procedure.Compare("%") == 0)
   {
     sql = GetPSMProcedureList(p_schema);
   }
@@ -448,6 +455,24 @@ SQLInfoDB::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
   {
     SQLQuery qry(m_database);
     qry.DoSQLStatement(sql);
+    
+    if(qry.GetNumberOfColumns() == 3)
+    {
+      // Name only
+      while(qry.GetRecord())
+      {
+        MetaProcedure proc;
+
+        proc.m_catalogName   = qry.GetColumn(1)->GetAsChar();
+        proc.m_schemaName    = qry.GetColumn(2)->GetAsChar();
+        proc.m_procedureName = qry.GetColumn(3)->GetAsChar();
+
+        p_procedures.push_back(proc);
+      }
+    }
+    else
+    {
+      // List complete procedure
     while(qry.GetRecord())
     {
       MetaProcedure proc;
@@ -462,11 +487,12 @@ SQLInfoDB::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
       proc.m_procedureType    = qry.GetColumn(8)->GetAsSLong();
       proc.m_source           = qry.GetColumn(9)->GetAsChar();
 
-      if(proc.m_source.Compare("<@>") == 0)
+        if(proc.m_source.IsEmpty() || proc.m_source.Compare("<@>") == 0)
       {
         proc.m_source = MakeInfoPSMSourcecode(proc.m_schemaName, proc.m_procedureName);
       }
       p_procedures.push_back(proc);
+    }
     }
     return !p_procedures.empty();
   }
@@ -488,7 +514,7 @@ SQLInfoDB::MakeInfoPSMSourcecode(CString p_schema, CString p_procedure)
     query.DoSQLStatement(sql);
     while (query.GetRecord())
     {
-      sourcecode += (CString)query[1];
+      sourcecode += (CString)query[3];
     }
   }
   return sourcecode;
@@ -603,6 +629,10 @@ SQLInfoDB::MakeInfoTableTriggers(MTriggerMap& p_triggers
       trigger.m_source.Trim();
       trigger.m_source.Replace("\r\n","\n");
 
+      if(trigger.m_source.Compare("<@>") == 0)
+      {
+        trigger.m_source = MakeInfoPSMSourcecode(trigger.m_schemaName,trigger.m_triggerName);
+      }
       p_triggers.push_back(trigger);
     }
     return !p_triggers.empty();
@@ -617,13 +647,6 @@ SQLInfoDB::MakeInfoTableTriggers(MTriggerMap& p_triggers
 bool 
 SQLInfoDB::MakeInfoTableSequences(MSequenceMap& p_sequences,CString& p_errors,CString p_schema,CString p_tablename)
 {
-  // Must have searched on a table first
-  if(p_tablename.IsEmpty())
-  {
-    p_errors = "Make a selection first";
-    return false;
-  }
-
   // Getting the database dependent SQL string
   CString sql = GetCATALOGSequenceList(p_schema,p_tablename);
   if(sql.IsEmpty())
@@ -643,8 +666,8 @@ SQLInfoDB::MakeInfoTableSequences(MSequenceMap& p_sequences,CString& p_errors,CS
       sequence.m_catalogName  = qry.GetColumn(1)->GetAsChar();
       sequence.m_schemaName   = qry.GetColumn(2)->GetAsChar();
       sequence.m_sequenceName = qry.GetColumn(3)->GetAsChar();
-      sequence.m_currentValue = qry.GetColumn(4)->GetAsSLong();
-      sequence.m_minimalValue = qry.GetColumn(5)->GetAsSLong();
+      sequence.m_currentValue = qry.GetColumn(4)->GetAsDouble();
+      sequence.m_minimalValue = qry.GetColumn(5)->GetAsDouble();
       sequence.m_increment    = qry.GetColumn(6)->GetAsSLong();
       sequence.m_cache        = qry.GetColumn(7)->GetAsSLong();
       sequence.m_cycle        = qry.GetColumn(8)->GetAsBoolean();

@@ -452,17 +452,38 @@ SQLInfoInformix::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tabl
 }
 
 CString
-SQLInfoInformix::GetCATALOGTableSynonyms(CString /*p_schema*/,CString /*p_tablename*/) const
+SQLInfoInformix::GetCATALOGTableSynonyms(CString p_schema,CString p_tablename) const
 {
-  // MS-Access cannot do this
-  return false;
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  CString sql = "SELECT Trim(DBINFO('dbname')) AS synonym_catalog\n"
+                "      ,Trim(tab.owner)   AS synonym_schema\n"
+                "      ,Trim(tab.tabname) AS synonym_table\n"
+                "      ,'SYNONYM'         AS object_type\n"
+                "      ,''                AS remarks\n"
+                "      ,Trim(tab.owner) || '.' || Trim(tab.tabname) AS fullname\n"
+                "      ,''                AS storage\n"
+                "      ,0                 AS temporary\n"
+                "  FROM systables tab\n"
+                " WHERE tabtype = 'S'\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND owner = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    sql += "   and tabname ";
+    sql += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_tablename + "'\n";
+  }
+  sql += " ORDER BY 1,2,3";
+  return sql;
 }
 
 CString
 SQLInfoInformix::GetCATALOGTableCatalog(CString /*p_schema*/,CString /*p_tablename*/) const
 {
-  // MS-Access cannot do this
-  return false;
+  return "";
 }
 
 CString
@@ -818,7 +839,11 @@ SQLInfoInformix::GetCATALOGForeignList(CString p_schema,CString p_tablename,int 
 
 // Get all attributes in order of MetaForeign for 1 FK constraint
 CString
-SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraint,bool /*p_referenced = false*/,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema
+                                            ,CString p_tablename
+                                            ,CString p_constraint
+                                            ,bool    p_referenced /*= false*/
+                                            ,int     p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
 {
   CString query;
   p_schema.MakeLower();
@@ -828,17 +853,17 @@ SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema,CString p_tablenam
   for(int ind = 1;ind <= p_maxColumns; ++ind)
   {
     CString part;
-    part.Format("SELECT DBINFO('dbname') AS primary_catalog_name\n"
-                "       pri.owner        AS primary_schema_name\n"
-                "      ,pri.tabname      AS primary_table_name\n"
-                "      ,DBINFO('dbname') AS foreign_catalog_name\n"
-                "      ,tab.owner        AS foreign_schema_name\n"
-                "      ,tab.tabname      AS foreign_table_name\n"
-                "      ,pcn.constrname   AS primary_key_constraint\n"
-                "      ,con.constrname   AS foreign_key_constraint\n"
+    part.Format("SELECT trim(DBINFO('dbname')) AS primary_catalog_name\n"
+                "      ,trim(pri.owner)        AS primary_schema_name\n"
+                "      ,trim(pri.tabname)      AS primary_table_name\n"
+                "      ,trim(DBINFO('dbname')) AS foreign_catalog_name\n"
+                "      ,trim(tab.owner)        AS foreign_schema_name\n"
+                "      ,trim(tab.tabname)      AS foreign_table_name\n"
+                "      ,trim(pcn.constrname)   AS primary_key_constraint\n"
+                "      ,trim(con.constrname)   AS foreign_key_constraint\n"
                 "      ,%d               AS key_sequence\n"
-                "      ,pcl.colname      AS primary_column_name\n"
-                "      ,col.colname      AS foreign_column_name\n"
+                "      ,trim(pcl.colname)      AS primary_column_name\n"
+                "      ,trim(col.colname)      AS foreign_column_name\n"
                 "      ,CASE WHEN ref.updrule = 'R' THEN 1\n"
                 "            WHEN ref.updrule = 'C' THEN 0\n"
                 "            WHEN ref.updrule = 'N' THEN 2\n"
@@ -884,15 +909,36 @@ SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema,CString p_tablenam
                ,ind);
     if(!p_schema.IsEmpty())
     {
+      if(p_referenced)
+      {
+        part += "   AND pri.owner      = '" + p_schema + "'\n";
+      }
+      else
+      {
       part += "    AND tab.owner = '" + p_schema + "'\n";
+    }
     }
     if(!p_tablename.IsEmpty())
     {
+      if(p_referenced)
+      {
+        part += "   AND pri.tabname    = '" + p_tablename + "'\n";
+      }
+      else
+      {
       part += "   AND tab.tabname    = '" + p_tablename + "'\n";
+    }
     }
     if(!p_constraint.IsEmpty())
     {
+      if(p_referenced)
+      {
+        part += "    AND pcn.constrname = '" + p_constraint + "'\n";
+      }
+      else
+      {
       part += "    AND con.constrname = '" + p_constraint + "'\n";
+    }
     }
     // Add to the query
     if(!query.IsEmpty())
@@ -1019,13 +1065,53 @@ SQLInfoInformix::GetCATALOGTriggerExists(CString p_schema, CString p_tablename, 
 CString
 SQLInfoInformix::GetCATALOGTriggerList(CString p_schema, CString p_tablename) const
 {
-  return "";
+  return GetCATALOGTriggerAttributes(p_schema,p_tablename,"");
 }
 
 CString
 SQLInfoInformix::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename, CString p_triggername) const
 {
-  return "";
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  p_triggername.MakeLower();
+  CString sql;
+  sql = "SELECT Trim(DBINFO('dbname')) AS trigger_catalog\n"
+        "      ,Trim(tri.owner)        AS trigger_schema\n"
+        "      ,trim(tab.tabname)      AS trigger_table\n"
+        "      ,Trim(tri.trigname)     AS trigger_name\n"
+        "      ,''    AS remarks\n"
+        "      ,0     AS position\n"
+        "      ,0     AS before\n"
+        "      ,CASE tri.event WHEN 'I' THEN 1 ELSE 0 END AS trigger_insert\n"
+        "      ,CASE tri.event WHEN 'U' THEN 1 ELSE 0 END AS trigger_update\n"
+        "      ,CASE tri.event WHEN 'D' THEN 1 ELSE 0 END AS trigger_delete\n"
+        "      ,0     AS trigger_select\n"
+        "      ,0     AS trigger_session\n"
+        "      ,0     AS trigger_transaction\n"
+        "      ,0     AS trigger_rollback\n"
+        "      ,'old as ' || tri.old || ' new as ' || tri.new  AS trigger_referencing\n"
+        "      ,1     AS enabled\n"
+        "      ,'<@>' AS source\n"
+        "  FROM systriggers tri\n"
+        "      ,systables   tab\n"
+        " WHERE tab.tabid = tri.tabid\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND tri.owner = '" + p_schema + "'\n";
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    sql += "   AND tab.tabname = '";
+    sql += p_tablename + "'\n";
+  }
+  if(!p_triggername.IsEmpty())
+  {
+    sql += "   AND tri.trigname ";
+    sql += p_triggername.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_triggername + "'\n";
+  }
+  sql += " ORDER BY 1,2,3,4";
+  return sql;
 }
 
 CString
@@ -1061,25 +1147,7 @@ SQLInfoInformix::GetCATALOGSequenceExists(CString p_schema, CString p_sequence) 
 CString
 SQLInfoInformix::GetCATALOGSequenceList(CString p_schema,CString p_pattern) const
 {
-  p_schema.MakeLower();
-  p_pattern.MakeLower();
-  p_pattern = "%" + p_pattern + "%";
-  CString sql = "SELECT ''            as catalog_name\n"
-                "      ,dom.owner     as schema_name\n"
-                "      ,dom.name      as sequence_name\n"
-                "      ,seq.start_val as current_value\n"
-                "      ,0             as minimal_value\n"
-                "      ,seq.inc_val   as increment\n"
-                "      ,seq.cache     as cache\n"
-                "      ,seq.cycle     as cycle\n"
-                "      ,seq.order     as ordering\n"
-                "  FROM syssequences seq\n"
-                "      ,sysdomains   dom\n"
-                " WHERE dom.id    = seq.id\n"
-              //"   AND dom.owner = '" + p_schema   + "'\n"
-                "   AND dom.name  LIKE '" + p_pattern + "'\n";
-              //"   AND dom.type  = 3"; ??
-  return sql;
+  return GetCATALOGSequenceAttributes(p_schema,p_pattern);
 }
 
 CString
@@ -1087,9 +1155,9 @@ SQLInfoInformix::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequen
 {
   p_schema.MakeLower();
   p_sequence.MakeLower();
-  CString sql = "SELECT ''            as catalog_name\n"
-                "      ,dom.owner     as schema_name\n"
-                "      ,dom.name      as sequence_name\n"
+  CString sql = "SELECT trim(DBINFO('dbname')) as catalog_name\n"
+                "      ,trim(tab.owner)        as schema_name\n"
+                "      ,trim(tab.tabname)      as sequence_name\n"
                 "      ,seq.start_val as current_value\n"
                 "      ,0             as minimal_value\n"
                 "      ,seq.inc_val   as increment\n"
@@ -1097,11 +1165,19 @@ SQLInfoInformix::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequen
                 "      ,seq.cycle     as cycle\n"
                 "      ,seq.order     as ordering\n"
                 "  FROM syssequences seq\n"
-                "      ,sysdomains   dom\n"
-                " WHERE dom.id    = seq.id\n"
-                "   AND dom.owner = '" + p_schema   + "'\n"
-                "   AND dom.name  = '" + p_sequence + "'\n";
-              //"   AND dom.type  = 3"; ??
+                "      ,systables    tab\n"
+                " WHERE tab.tabid   = seq.tabid\n"
+                "   AND tab.tabtype = 'Q'\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND tab.owner = '" + p_schema + "'\n";
+  }
+  if(!p_sequence.IsEmpty())
+  {
+    sql += "   AND tab.tabname ";
+    sql += p_sequence.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_sequence + "'\n";
+  }
   return sql;
 }
 
@@ -1115,7 +1191,7 @@ SQLInfoInformix::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
     sql += p_sequence.m_schemaName + ".";
   }
   sql += p_sequence.m_sequenceName;
-  sql.AppendFormat("\n START WITH %d", p_sequence.m_currentValue);
+  sql.AppendFormat("\n START WITH %-12.0f", p_sequence.m_currentValue);
   sql.AppendFormat("\n INCREMENT BY %d", p_sequence.m_increment);
 
   sql += p_sequence.m_cycle ? "\n CYCLE" : "\n NOCYCLE";
@@ -1244,7 +1320,48 @@ SQLInfoInformix::GetPSMProcedureAttributes(CString /*p_schema*/, CString p_proce
 CString
 SQLInfoInformix::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
 {
-  return "";
+  p_schema.MakeLower();
+  p_procedure.MakeLower();
+
+  // TRIGGER PART
+  CString sql;
+  sql = "SELECT bod.datakey\n"
+        "      ,bod.seqno\n"
+        "      ,bod.data\n"
+        "  FROM systrigbody bod\n"
+        "      ,systriggers tri\n"
+        " WHERE bod.trigid = tri.trigid\n"
+        "   AND bod.datakey IN ('A','D')\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND tri.owner = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += "   AND tri.trigname = '" + p_procedure + "'\n";
+  }
+  // UNION
+  sql += "UNION ALL\n";
+  // PROCEDURE PART
+  sql += "  SELECT bod.datakey\n"
+         "      ,bod.seqno\n"
+         "      ,bod.data\n"
+         "  FROM sysprocbody   bod\n"
+         "      ,sysprocedures pro\n"
+         " WHERE bod.procid   = pro.procid\n"
+         "   AND bod.datakey  = 'T'\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND pro.owner    = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += "   AND pro.procname = '" + p_procedure + "'\n";
+  }
+  // ORDERING
+  sql += " ORDER BY datakey DESC\n"
+         "         ,seqno";
+  return sql;
 }
 
 CString
@@ -1270,7 +1387,135 @@ SQLInfoInformix::GetPSMProcedureErrors(CString p_schema,CString p_procedure) con
 CString
 SQLInfoInformix::GetPSMProcedureParameters(CString p_schema,CString p_procedure) const
 {
-  return "";
+  p_schema.MakeLower();
+  p_procedure.MakeLower();
+  CString sql;
+  sql = "SELECT Trim(DBINFO('dbname')) AS procedure_catalog\n"
+        "      ,Trim(pro.owner)        AS procedure_schema\n"
+        "      ,Trim(pro.procname)     AS procedure_name\n"
+        "      ,Trim(col.paramname)    AS parameter_name\n"
+        "      ,paramattr              AS column_type\n"
+        "      ,CASE paramtype\n"
+        "            WHEN 0  THEN 1 -- char\n"
+        "            WHEN 1  THEN 5 -- smallint\n"
+        "            WHEN 2  THEN 4 -- integer\n"
+        "            WHEN 3  THEN 8 -- float\n"
+        "            WHEN 4  THEN 7 -- float\n"
+        "            WHEN 5  THEN 2 -- decimal\n"
+        "            WHEN 6  THEN 4 -- serial\n"
+        "            WHEN 7  THEN 9 -- date\n"
+        "            WHEN 8  THEN 2 -- money/decimal\n"
+        "            WHEN 10 THEN 11 -- timestmap\n"
+        "            WHEN 11 THEN -6 -- byte\n"
+        "            WHEN 12 THEN -3 -- text\n"
+        "            WHEN 14 THEN -89 -- interval\n"
+        "            WHEN 15 THEN -9  -- nchar\n"
+        "            WHEN 17 THEN -5  -- bigint\n"
+        "            WHEN 18 THEN -5  -- bigint serial\n"
+        "            WHEN 41 THEN -4  -- blob\n"
+        "            WHEN 43 THEN -1  -- lvarchar\n"
+        "            WHEN 45 THEN -7  -- bit/boolean\n"
+        "            WHEN 52 THEN -5  -- bigint\n"
+        "            WHEN 53 THEN -5  -- bigserial\n"
+        "                    ELSE 0   -- unknown\n"
+        "       END AS dataype\n"
+        "      ,CASE paramtype\n"
+        "            WHEN 0  THEN 'CHAR'\n"
+        "            WHEN 1  THEN 'SMALLINT'\n"
+        "            WHEN 2  THEN 'INTEGER'\n"
+        "            WHEN 3  THEN 'DOUBLE'\n"
+        "            WHEN 4  THEN 'FLOAT'\n"
+        "            WHEN 5  THEN 'DECIMAL'\n"
+        "            WHEN 6  THEN 'INTEGER'\n"
+        "            WHEN 7  THEN 'DATE'\n"
+        "            WHEN 8  THEN 'DECIMAL'\n"
+        "            WHEN 10 THEN 'TIMESTAMP'\n"
+        "            WHEN 11 THEN 'BYTE'\n"
+        "            WHEN 12 THEN 'VARCHAR'\n"
+        "            WHEN 14 THEN 'INTERVAL'\n"
+        "            WHEN 15 THEN 'WCHAR'\n"
+        "            WHEN 17 THEN 'BIGINT'\n"
+        "            WHEN 18 THEN 'SERIAL'\n"
+        "            WHEN 41 THEN 'LONGVARBINARY'\n"
+        "            WHEN 43 THEN 'WVARCHAR'\n"
+        "            WHEN 45 THEN 'BIT'\n"
+        "            WHEN 52 THEN 'BIGINT'\n"
+        "            WHEN 53 THEN 'BIGINT'\n"
+        "                    ELSE 'UNKNOWN'\n"
+        "       END AS type_name\n"
+        "      ,CASE paramtype\n"
+        "            WHEN 0  THEN paramlen  -- char\n"
+        "            WHEN 1  THEN 5 -- smallint\n"
+        "            WHEN 2  THEN 11 -- integer\n"
+        "            WHEN 3  THEN 13 -- float\n"
+        "            WHEN 4  THEN 21 -- float\n"
+        "            WHEN 5  THEN 40 -- decimal\n"
+        "            WHEN 6  THEN 11 -- serial\n"
+        "            WHEN 7  THEN 10 -- date\n"
+        "            WHEN 8  THEN 40 -- money/decimal\n"
+        "            WHEN 10 THEN 22 -- timestmap\n"
+        "            WHEN 11 THEN paramlen -- byte\n"
+        "            WHEN 12 THEN paramlen -- text\n"
+        "            WHEN 14 THEN 20 -- interval\n"
+        "            WHEN 15 THEN paramlen  -- nchar\n"
+        "            WHEN 17 THEN 22  -- bigint\n"
+        "            WHEN 18 THEN 22  -- bigint serial\n"
+        "            WHEN 41 THEN paramlen  -- blob\n"
+        "            WHEN 43 THEN paramlen  -- lvarchar\n"
+        "            WHEN 45 THEN 1  -- bit/boolean\n"
+        "            WHEN 52 THEN 22  -- bigint\n"
+        "            WHEN 53 THEN 22  -- bigserial\n"
+        "                    ELSE 0   -- unknown\n"
+        "       END AS column_size\n"
+        "      ,CASE paramtype\n"
+        "            WHEN 0  THEN paramlen -- char\n"
+        "            WHEN 1  THEN 2 -- smallint\n"
+        "            WHEN 2  THEN 4 -- integer\n"
+        "            WHEN 3  THEN 8 -- double\n"
+        "            WHEN 4  THEN 4 -- float\n"
+        "            WHEN 5  THEN Trunc(paramlen/256) -- decimal\n"
+        "            WHEN 6  THEN 4 -- serial\n"
+        "            WHEN 7  THEN Trunc(paramlen/256) -- date\n"
+        "            WHEN 8  THEN Trunc(paramlen/256) -- money/decimal\n"
+        "            WHEN 10 THEN Trunc(paramlen/256) -- timestmap\n"
+        "            WHEN 11 THEN paramlen     -- byte\n"
+        "            WHEN 12 THEN paramlen     -- text\n"
+        "            WHEN 14 THEN Trunc(paramlen/256) -- interval\n"
+        "            WHEN 15 THEN paramlen  -- nchar\n"
+        "            WHEN 17 THEN 8   -- bigint\n"
+        "            WHEN 18 THEN 8   -- bigint serial\n"
+        "            WHEN 41 THEN paramlen  -- blob\n"
+        "            WHEN 43 THEN paramlen  -- lvarchar\n"
+        "            WHEN 45 THEN 1   -- bit/boolean\n"
+        "            WHEN 52 THEN 8   -- bigint\n"
+        "            WHEN 53 THEN 8   -- bigserial\n"
+        "                    ELSE 0   -- unknown\n"
+        "       END  AS buffer_length\n"
+        "      ,Mod(paramlen,16) AS decimal_digits\n"
+        "      ,10       AS numRadix\n"
+        "      ,1        AS nullable\n"
+        "      ,''       AS remarks\n"
+        "      ,''       AS defaults\n"
+        "      ,Trunc(Mod(paramlen,256)/16)  AS datatype3\n"
+        "      ,Mod(paramlen,16)             AS subtype3\n"
+        "      ,paramlen AS octetlength\n"
+        "      ,paramid  AS position\n"
+        "      ,'YES'    AS isnullable\n"
+        "  FROM sysproccolumns col\n"
+        "      ,sysprocedures  pro\n"
+        " WHERE pro.procid   = col.procid\n";
+  if(!p_schema.IsEmpty())
+  {
+    sql += "   AND pro.owner    = '" + p_schema + "'\n";
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += "   AND pro.procname ";
+    sql += p_procedure.Find('%') >= 0 ? "LIKE '" : "= '";
+    sql += p_procedure + "'\n";
+  }
+  sql += " ORDER BY 1,2,3,18";
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////
