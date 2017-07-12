@@ -138,6 +138,7 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("In unit test subtraction operators");
       FillArrays();
+      int numtests = 0;
 
       for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
@@ -163,6 +164,7 @@ namespace OperatorUnitTest
           }
           else
           {
+            ++numtests;
             SQLVariant result = *left - *right; // TEST
             CString res;
             result.GetAsString(res);
@@ -172,6 +174,10 @@ namespace OperatorUnitTest
         }
       }
       FreeArrays();
+
+      CString msg;
+      msg.Format("Number of subtraction tests: %d",numtests);
+      Logger::WriteMessage(msg);
     }
 
     TEST_METHOD(CalculateMultiplyTest)

@@ -1431,13 +1431,13 @@ SQLQuery::GetLastError(CString p_prefix /*=""*/)
     SQLSMALLINT messageLen = 0;
 
     m_retCode = SqlError(SQL_NULL_HENV
-                       ,SQL_NULL_HDBC
-                       ,m_hstmt
-                       ,SqlState
-                       ,&nativeError
-                       ,ErrorMsg
-                       ,SQL_MAX_MESSAGE_LENGTH
-                       ,&messageLen);
+                        ,SQL_NULL_HDBC
+                        ,m_hstmt
+                        ,SqlState
+                        ,&nativeError
+                        ,ErrorMsg
+                        ,SQL_MAX_MESSAGE_LENGTH
+                        ,&messageLen);
     if(!SQL_SUCCEEDED(m_retCode) || m_retCode == SQL_NO_DATA)
     {
       break;
