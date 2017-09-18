@@ -34,8 +34,8 @@ namespace SQLComponents
 // General version, date and copyright
 // of the SQLComponents library
 
-#define SQL_COMPONENTS_VERSION   "1.4.2"
-#define SQL_COMPONENTS_DATE      "28-01-2017"
+#define SQL_COMPONENTS_VERSION   "1.4.3"
+#define SQL_COMPONENTS_DATE      "18-09-2017"
 #define SQL_COMPONENTS_COPYRIGHT "Copyright (c) 2017 ir. W.E. Huisman"
 
 // SQL/CLI Standard states that 128 is the maximum length

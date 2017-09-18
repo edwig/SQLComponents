@@ -23,14 +23,10 @@
 //    so we also need to include the full set
 // So we include the full MFC set, otherwise: we just need CString
 //
-#ifdef SQL_COMPONENTS_MFC
 #include <afx.h>
 #include <afxwin.h>             // MFC core and standard components
 #include <afxext.h>             // MFC extensions
 #include <afxcmn.h>             // MFC support for Windows Common Controls
-#else
-#include <atlstr.h>             // Just ATLString and CString
-#endif
 
 // Headers for unit testing
 #include "CppUnitTest.h"

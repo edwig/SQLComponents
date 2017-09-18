@@ -383,53 +383,6 @@ namespace DatabaseUnitTest
       Logger::WriteMessage(msg);
     }
 
-#ifdef SQL_COMPONENTS_MFC
-
-    TEST_METHOD(BasicTreeControl)
-    {
-      Logger::WriteMessage("Testing the InfoTree function:");
-      Logger::WriteMessage("==============================");
-      CTreeCtrl ctrl;
-      CRect rect(0,0,0,0);
-      CWnd* wnd = CWnd::FromHandle(GetDesktopWindow());
-
-      if(!ctrl.Create(WS_CHILD | WS_TABSTOP | TVS_LINESATROOT | TVS_HASBUTTONS | TVS_HASLINES | TVS_SHOWSELALWAYS
-                     ,rect,wnd,1004))
-      {
-        Assert::Fail(L"Cannot create tree control");
-      }
-
-      SQLDatabase dbs;
-      dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
-      long beginTime = clock();
-
-      try
-      {
-        // Set options for the database
-        dbs.SetLoginTimeout(0);
-        dbs.SetMARS(false);
-
-        if(dbs.Open(g_dsn,g_user,g_password))
-        {
-          SQLInfoTree tree(&dbs);
-          CString filename("Report.txt");
-          tree.MakeTreeInfo(&ctrl);
-          tree.ReportAllCapabilities(&ctrl,filename);
-        }
-        else
-        {
-          Assert::Fail(L"Database ***NOT*** opened.");
-        }
-        dbs.Close();
-      }
-      catch(...)
-      {
-        Assert::Fail(L"Unknown error in database test");
-      }
-    }
-
-#endif
-
     TEST_METHOD(BasicReadNumeric)
     {
       Logger::WriteMessage("Testing Numeric reading/writing:");

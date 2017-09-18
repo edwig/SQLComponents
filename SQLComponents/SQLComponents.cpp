@@ -58,17 +58,6 @@ namespace SQLComponents
     // Initialize the code page name system
     InitCodePageNames();
 
-#ifdef _DEBUG
-#ifndef SQL_COMPONENTS_MFC
-    // Create a memory checkpoint
-    _CrtMemCheckpoint(&state);
-
-    // Do reporting of memory leaks if we have no MFC loaded
-    // By registering our AtExit function
-    atexit(::AtExitOfSQLComponents);
-#endif // SQL_COMPONENTS_MFC
-#endif // _DEBUG
-
     // We are now officially 'in business' :-)
     g_SQLComponentsInitialized = true;
   }
