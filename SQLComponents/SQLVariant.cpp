@@ -437,6 +437,9 @@ SQLVariant::~SQLVariant()
 void
 SQLVariant::Init()
 {
+  // Set contents of m_data to zero's
+  ZeroMemory(&m_data,sizeof(m_data));
+
   ResetDataType(0);
   m_binaryLength    = 0;
   m_binaryPieceSize = 0;
