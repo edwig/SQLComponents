@@ -30,7 +30,6 @@
 #include "stdafx.h"
 #include "SQLComponents.h"
 #include "BasicXmlExcel.h"
-#include "XMLMessage.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

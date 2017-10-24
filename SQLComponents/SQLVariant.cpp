@@ -1087,6 +1087,8 @@ SQLVariant::GetDataSize()
 //
 //////////////////////////////////////////////////////////////////////////
 
+__declspec(thread) CString g_waarde;
+
 const char*
 SQLVariant::GetAsChar()
 {
@@ -1100,9 +1102,8 @@ SQLVariant::GetAsChar()
   }
   // Should be: ThrowErrorDatatype(SQL_C_CHAR);
   // Sometimes we come her unexpectedly in various programs
-  CString value;
-  GetAsString(value);
-  return value;
+  GetAsString(g_waarde);
+  return g_waarde;
 }
 
 void*

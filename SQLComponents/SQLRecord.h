@@ -26,6 +26,7 @@
 //
 #pragma once
 #include "SQLMutation.h"
+#include "XMLMessage.h"
 #include <vector>
 
 namespace SQLComponents
@@ -44,8 +45,6 @@ typedef unsigned long ulong;
 
 // Foreward declaration
 class SQLDataSet;
-class XMLMessage;
-class XMLElement;
 class SQLVariant;
 
 class SQLRecord

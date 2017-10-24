@@ -31,6 +31,7 @@
 #include "unzip.h"
 #include <vector>
 #include <map>
+#include "XMLMessage.h"
 
 // Macro's for finding the cell's row/col
 #define CELLNUM(row,col)  (((col) << 20) | (row))
@@ -42,8 +43,6 @@ namespace SQLComponents
 
 // Forward definition
 class BasicXmlExcel;
-class XMLMessage;
-class XMLElement;
 
 // Type of cells
 typedef enum _celltype

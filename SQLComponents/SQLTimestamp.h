@@ -43,7 +43,9 @@ class SQLDatabase;
 #define SECONDS_PER_HOUR   (60*60)     // One hour in seconds
 #define SECONDS_PER_MINUTE (60)        // One minute in seconds
 // Number of nanoseconds per second
+#ifndef NANOSECONDS_PER_SEC
 #define NANOSECONDS_PER_SEC 1000000000
+#endif
 // Modified Julian Day Shift from Epoch (Astronomically)
 // Actually it's 2,400,000.5 days (12:00 (noon) januari 1st -4713 BC)
 #define MJD_EPOCH 2400001
