@@ -44,6 +44,18 @@ class SQLTime;
 class SQLTimestamp;
 class SQLInterval;
 
+// Type of parameter for queries and persistent-stored-modules
+typedef enum _param_type
+{
+   P_SQL_PARAM_TYPE_UNKNOWN = 0
+  ,P_SQL_PARAM_INPUT        = 1
+  ,P_SQL_PARAM_INPUT_OUTPUT = 2
+  ,P_SQL_RESULT_COL         = 3
+  ,P_SQL_PARAM_OUTPUT       = 4
+  ,P_SQL_RETURN_VALUE       = 5
+}
+ParamType;
+
 //////////////////////////////////////////////////////////////////////////
 //
 // THE VARIANT CLASS
@@ -125,7 +137,7 @@ public:
    void    SetAtExec(bool p_atExec);
    void    SetBinaryPieceSize(int p_size);
    void    SetColumnNumber(int p_column);
-   void    SetParameterType(int p_type);
+   void    SetParameterType(ParamType p_type);
    void    SetSizeIndicator(bool p_realSize);
    void    SetNumericPrecisionScale(int p_precision,int p_scale);
    void    SetNULL();

@@ -48,8 +48,8 @@ namespace SQLComponents
 // Translation list of SQL datatype constants and names
 typedef struct _types
 {
-  char*  name;
-  int    type;
+  char* name;
+  int   type;
 }
 DataTypes;
 
@@ -115,13 +115,13 @@ static DataTypes allOther[] =
 // Names must appear in this order to work properly!!
 static DataTypes allParams[] = 
 {
-  { "<UNKNOWN>", SQL_PARAM_TYPE_UNKNOWN }    // 0
- ,{ "INPUT",     SQL_PARAM_INPUT        }    // 1
- ,{ "INOUT",     SQL_PARAM_INPUT_OUTPUT }    // 2
- ,{ "COLUMN",    SQL_RESULT_COL         }    // 3
- ,{ "OUTPUT",    SQL_PARAM_OUTPUT       }    // 4
- ,{ "RETURN",    SQL_RETURN_VALUE       }    // 5
- ,{ NULL,        0                      }
+  { "<UNKNOWN>", P_SQL_PARAM_TYPE_UNKNOWN }    // 0
+ ,{ "INPUT",     P_SQL_PARAM_INPUT        }    // 1
+ ,{ "INOUT",     P_SQL_PARAM_INPUT_OUTPUT }    // 2
+ ,{ "COLUMN",    P_SQL_RESULT_COL         }    // 3
+ ,{ "OUTPUT",    P_SQL_PARAM_OUTPUT       }    // 4
+ ,{ "RETURN",    P_SQL_RETURN_VALUE       }    // 5
+ ,{ NULL,        0                        }
 };
 
 // General constructors
@@ -480,7 +480,7 @@ SQLVariant::ShrinkSpace()
   {
     return;
   }
-  if((m_paramType != SQL_PARAM_OUTPUT) && (m_paramType != SQL_PARAM_INPUT_OUTPUT))
+  if((m_paramType != P_SQL_PARAM_OUTPUT) && (m_paramType != P_SQL_PARAM_INPUT_OUTPUT))
   {
     return;
   }
@@ -768,10 +768,10 @@ SQLVariant::FindSQLDatatype(int p_type)
 }
 
 void
-SQLVariant::SetParameterType(int p_type)
+SQLVariant::SetParameterType(ParamType p_type)
 {
-  if(p_type >= SQL_PARAM_TYPE_UNKNOWN &&
-     p_type <= SQL_RETURN_VALUE)
+  if(p_type >= P_SQL_PARAM_TYPE_UNKNOWN &&
+     p_type <= P_SQL_RETURN_VALUE)
   {
     m_paramType = p_type;
   }

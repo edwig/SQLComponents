@@ -90,15 +90,25 @@ public:
   void SetConcurrency(int p_concurrency);
 
   // Set parameters for statement
-  void SetParameter  (int p_num,SQLVariant*   p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,long          p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameterUL(int p_num,unsigned long p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const char*   p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,CString&      p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,SQLDate&      p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,SQLTime&      p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,SQLTimestamp& p_param,int p_type = SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const bcd&    p_param,int p_type = SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLVariant*   p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,long          p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameterUL(int p_num,unsigned long p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const char*   p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,CString&      p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLDate&      p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLTime&      p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLTimestamp& p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const bcd&    p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+
+  void SetParameter  (SQLVariant*   p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (long          p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameterUL(unsigned long p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const char*   p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (CString&      p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (SQLDate&      p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (SQLTime&      p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (SQLTimestamp& p_param,ParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const bcd&    p_param,ParamType p_type = P_SQL_PARAM_INPUT);
 
   // SINGLE STATEMENT
 
@@ -191,7 +201,7 @@ public:
 
 private:
   // Set parameter for statement
-  void  InternalSetParameter(int p_num,SQLVariant* p_param,int p_type = SQL_PARAM_INPUT);
+  void  InternalSetParameter(int p_num,SQLVariant* p_param,ParamType p_type = P_SQL_PARAM_INPUT);
   // Bind application parameters
   void  BindParameters();
   void  BindColumns();

@@ -1656,12 +1656,12 @@ SQLInfoInformix::GetPSMExecute(CString p_procedure,MParameterMap& p_parameters) 
     doMore = true;
 
     // Append input and in/out parameters
-    if(param.m_columnType == SQL_PARAM_INPUT || param.m_columnType == SQL_PARAM_INPUT_OUTPUT)
+    if(param.m_columnType == P_SQL_PARAM_INPUT || param.m_columnType == P_SQL_PARAM_INPUT_OUTPUT)
     {
       line += param.m_parameter;
     }
     // See if we must do 'returning' clause
-    if(param.m_columnType == SQL_PARAM_OUTPUT || param.m_columnType == SQL_PARAM_INPUT_OUTPUT)
+    if(param.m_columnType == P_SQL_PARAM_OUTPUT || param.m_columnType == P_SQL_PARAM_INPUT_OUTPUT)
     {
       doReturning = true;
     }
@@ -1679,7 +1679,7 @@ SQLInfoInformix::GetPSMExecute(CString p_procedure,MParameterMap& p_parameters) 
       if(doMore) line += ",";
       doMore = true;
 
-      if(param.m_columnType == SQL_PARAM_OUTPUT || param.m_columnType == SQL_PARAM_INPUT_OUTPUT)
+      if(param.m_columnType == P_SQL_PARAM_OUTPUT || param.m_columnType == P_SQL_PARAM_INPUT_OUTPUT)
       {
         line += param.m_parameter;
       }

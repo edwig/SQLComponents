@@ -68,7 +68,7 @@ void TestCalling()
       
       // Call to get a decimal
       query.ResetParameters();
-      query.SetParameter(0,bcd(10000.01),SQL_PARAM_OUTPUT);
+      query.SetParameter(0,bcd(10000.01),P_SQL_PARAM_OUTPUT);
       query.SetParameter(1,"234.99");
       result = query.DoSQLCall(g_schema,"getdecimal",true);
       printf("Conversion of number 234.99 is: %s\n",result->GetAsBCD().AsString().GetString());
@@ -88,9 +88,9 @@ void TestCalling()
       for(unsigned ind = 0; ind < 202; ++ind) line += "-";
 
       q2.ResetParameters();
-      q2.SetParameter(0,bcd("11.11"),SQL_PARAM_OUTPUT);
+      q2.SetParameter(0,bcd("11.11"),P_SQL_PARAM_OUTPUT);
       q2.SetParameter(1,"Multi duplicate testing.");
-      q2.SetParameter(2,line,SQL_PARAM_OUTPUT);
+      q2.SetParameter(2,line,P_SQL_PARAM_OUTPUT);
       var* res = q2.DoSQLCall(g_schema,"multinout",true);
 
       endTime = clock();

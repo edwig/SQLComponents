@@ -367,7 +367,7 @@ SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
   CString typName = dataset_names[g_defaultLanguage][DATASET_TYPE];
   CString attName = dataset_names[g_defaultLanguage][DATASET_NAME];
 
-  ::XMLElement* p_elem = p_msg->AddElement(p_base,recName,XDT_String,"");
+  XMLElement* p_elem = p_msg->AddElement(p_base,recName,XDT_String,"");
   if(p_elem)
   {
     for(unsigned int ind = 0; ind < m_fields.size(); ++ind)
@@ -383,7 +383,7 @@ SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
 
       CString value;
       var->GetAsString(value);
-      fld->SetValue(value);
+      fld->m_value = value;
     }
   }
 }
