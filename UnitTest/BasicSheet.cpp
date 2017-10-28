@@ -27,10 +27,9 @@
 #include "stdafx.h"
 #include "BasicXmlExcel.h"
 #include "BasicExcel.h"
+#include "UnitTest.h"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace YExcel;
-using namespace SQLComponents;
 
 namespace DatabaseUnitTest
 {
@@ -43,12 +42,14 @@ namespace DatabaseUnitTest
 
       BasicXmlExcel excel("..\\UnitTest\\BasicExcel.xlsx");
       Assert::IsTrue(excel.Load());
+      number_of_tests++;
 
       Names sheets;
       excel.GetSheetNames(sheets);
       for(auto& name : sheets)
       {
         Logger::WriteMessage("Sheet name: " + name);
+        number_of_tests++;
       }
 
       TestXMLWorksheet(excel,1,"First");
@@ -64,8 +65,10 @@ namespace DatabaseUnitTest
       BasicXmlWorksheet* sheet = p_excel.GetWorksheet(p_sheet - 1);
       Assert::IsNotNull(sheet);
       CString name = sheet->GetSheetName();
+      number_of_tests++;
 
       Assert::IsTrue(p_name == name);
+      number_of_tests++;
 
       for(int row = 1; row < 4; ++row)
       {
@@ -77,6 +80,7 @@ namespace DatabaseUnitTest
 
           Logger::WriteMessage(value);
           Assert::IsTrue(expect == value);
+          number_of_tests++;
         }
       }
     }
@@ -89,6 +93,7 @@ namespace DatabaseUnitTest
       BasicExcel excel("..\\UnitTest\\BasicExcel.xls");
       CString error = excel.GetError();
       Assert::IsTrue(error.IsEmpty());
+      number_of_tests++;
 
       TestWorksheet(excel,1,"First");
       TestWorksheet(excel,2,"Second");
@@ -103,6 +108,7 @@ namespace DatabaseUnitTest
       BasicExcelWorksheet* sheet = p_excel.GetWorksheet(p_sheet - 1);
       Assert::IsNotNull(sheet);
       CString name = sheet->GetAnsiSheetName();
+      number_of_tests++;
 
       Assert::IsTrue(p_name == name);
 
@@ -117,9 +123,9 @@ namespace DatabaseUnitTest
 
           Logger::WriteMessage(value);
           Assert::IsTrue(expect == value);
+          number_of_tests++;
         }
       }
-
     }
   };
 }

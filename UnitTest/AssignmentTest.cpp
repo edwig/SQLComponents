@@ -31,9 +31,9 @@
 #include "SQLTimestamp.h"
 #include "SQLInterval.h"
 #include "bcd.h"
+#include "UnitTest.h"
 
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+int number_of_tests = 0;
 
 BEGIN_TEST_MODULE_ATTRIBUTE()
   TEST_MODULE_ATTRIBUTE(L"SQLComponents",L"ODBC")
@@ -46,6 +46,11 @@ TEST_MODULE_INITIALIZE(ModuleInitialize)
 
 TEST_MODULE_CLEANUP(ModuleCleanup)
 {
+  CString message;
+  message.Format("Number of tests conducted: %d\n",number_of_tests);
+  Logger::WriteMessage("\n\nTOTAL TESTS:\n");
+  Logger::WriteMessage(message);
+
   Logger::WriteMessage("END OF: SQLComponents");
 }
 
@@ -58,6 +63,8 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("In unit test assignment operators");
       InitSQLComponents();
+
+      ++number_of_tests;
     }
 
     TEST_METHOD(TestAssignChar)
@@ -77,6 +84,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_CHAR,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignCString)
@@ -97,6 +106,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("23",twoString);
       Assert::AreEqual(SQL_C_CHAR,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignSLong)
@@ -116,6 +127,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_SLONG,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignULong)
@@ -135,6 +148,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_ULONG,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignSShort)
@@ -154,6 +169,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_SSHORT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignUShort)
@@ -173,6 +190,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_USHORT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignSTinyInt)
@@ -192,6 +211,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_STINYINT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignUTinyInt)
@@ -211,6 +232,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_UTINYINT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignFloat)
@@ -230,6 +253,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_FLOAT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignDouble)
@@ -249,6 +274,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_DOUBLE,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignBool)
@@ -268,6 +295,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("1",twoString);
       Assert::AreEqual(SQL_C_BIT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignSBigInt)
@@ -287,6 +316,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_SBIGINT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignUBigInt)
@@ -306,6 +337,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("34",twoString);
       Assert::AreEqual(SQL_C_UBIGINT,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignDate)
@@ -328,6 +361,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("15-10-1959",twoString);
       Assert::AreEqual(SQL_C_DATE,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignDateStruct)
@@ -351,6 +386,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("15-10-1959",twoString);
       Assert::AreEqual(SQL_C_DATE,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignTime)
@@ -373,6 +410,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("15:55:42",twoString);
       Assert::AreEqual(SQL_C_TIME,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignTimeStruct)
@@ -396,6 +435,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("15:55:42",twoString);
       Assert::AreEqual(SQL_C_TIME,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignTimestamp)
@@ -418,6 +459,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("1959-10-15 15:55:42",twoString);
       Assert::AreEqual(SQL_C_TIMESTAMP,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignTimestampStruct)
@@ -445,6 +488,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("1959-10-15 15:55:42",twoString);
       Assert::AreEqual(SQL_C_TIMESTAMP,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignIntervalYM)
@@ -465,6 +510,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("57-2",twoString);
       Assert::AreEqual(SQL_C_INTERVAL_YEAR_TO_MONTH,two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignIntervalDS_String)
@@ -478,6 +525,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("20578 14:22:8",oneString);
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
+
+      number_of_tests += 2;
     }
 
     TEST_METHOD(TestAssignIntervalDS_Values)
@@ -491,6 +540,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("20578 14:22:8",oneString);
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
+
+      number_of_tests += 2;
     }
 
     TEST_METHOD(TestAssignIntervalDS_Period)
@@ -504,6 +555,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("20578 14:22:8",oneString);
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
+
+      number_of_tests += 2;
     }
 
     TEST_METHOD(TestAssignGUID)
@@ -535,6 +588,8 @@ namespace OperatorUnitTest
 
       Assert::AreEqual("{AABBCCDD-0899-6677-1122-030455667788}",twoString);
       Assert::AreEqual((int)SQL_C_GUID,(int)two.GetDataType());
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(TestAssignGuidstring)
@@ -561,6 +616,8 @@ namespace OperatorUnitTest
       Assert::AreEqual((BYTE)0x66,guid->Data4[5]);
       Assert::AreEqual((BYTE)0x77,guid->Data4[6]);
       Assert::AreEqual((BYTE)0x88,guid->Data4[7]);
+
+      number_of_tests += 12;
     }
 
     TEST_METHOD(TestCastOperators)
@@ -610,6 +667,8 @@ namespace OperatorUnitTest
       low  = (unsigned)(numberUBig & 0xFFFFFFFFui64);
       Assert::AreEqual((unsigned)0xCC11DD22,high);
       Assert::AreEqual((unsigned)0xFF11EE11,low);
+
+      number_of_tests += 13;
     }
   };
 }

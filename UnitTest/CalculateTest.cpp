@@ -32,9 +32,7 @@
 #include "SQLTimestamp.h"
 #include "SQLInterval.h"
 #include "bcd.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace OperatorUnitTest
 {
@@ -129,6 +127,7 @@ namespace OperatorUnitTest
           {
             Assert::AreEqual("47",res);   // Adding values
           }
+          number_of_tests++;
         }
       }
       FreeArrays();
@@ -170,6 +169,7 @@ namespace OperatorUnitTest
             result.GetAsString(res);
 
             Assert::AreEqual("37",res);   // Adding values
+            number_of_tests++;
           }
         }
       }
@@ -197,7 +197,7 @@ namespace OperatorUnitTest
           SQLVariant* left = &variants[x];
           SQLVariant* right = &other[y];
 
-          CString leftType = left->FindDatatype(left->GetDataType());
+          CString leftType  = left->FindDatatype(left->GetDataType());
           CString rightType = right->FindDatatype(right->GetDataType());
           CString message;
           message.Format("Multiplication test %s * %s",leftType,rightType);
@@ -215,6 +215,7 @@ namespace OperatorUnitTest
             result.GetAsString(res);
 
             Assert::AreEqual("210",res);   // Adding values
+            number_of_tests++;
           }
         }
       }
@@ -259,6 +260,7 @@ namespace OperatorUnitTest
             {
               Assert::Fail(L"Division error");
             }
+            number_of_tests++;
           }
         }
       }
@@ -301,6 +303,7 @@ namespace OperatorUnitTest
             res.TrimRight('.');
 
             Assert::AreEqual("2",res);
+            number_of_tests++;
           }
         }
       }

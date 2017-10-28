@@ -26,9 +26,7 @@
 //
 #include "stdafx.h"
 #include "SQLDate.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace DatabaseUnitTest
 {
@@ -56,6 +54,7 @@ namespace DatabaseUnitTest
       Assert::AreEqual("donderdag", in_dutch);
       Assert::AreEqual("Donnerstag",in_german);
       Assert::AreEqual("jeudi",     in_french);
+      number_of_tests += 4;
     }
 
     TEST_METHOD(MonthNames)
@@ -79,6 +78,8 @@ namespace DatabaseUnitTest
       Assert::AreEqual("oktober",in_dutch);
       Assert::AreEqual("Oktober",in_german);
       Assert::AreEqual("octobre",in_french);
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(FullDate)
@@ -103,6 +104,8 @@ namespace DatabaseUnitTest
       Assert::AreEqual("donderdag 15 oktober 1959", in_dutch);
       Assert::AreEqual("Donnerstag 15 Oktober 1959",in_german);
       Assert::AreEqual("jeudi 15 octobre 1959",     in_french);
+
+      number_of_tests += 4;
     }
 
     TEST_METHOD(DateAttributes)
@@ -120,6 +123,8 @@ namespace DatabaseUnitTest
       Assert::AreEqual(10,   (int)birth.Month());
       Assert::AreEqual(15,   (int)birth.Day());
       Assert::AreEqual(31,   (int)birth.DaysInMonth());
+
+      number_of_tests += 6;
     }
 
     TEST_METHOD(DateCalculation)
@@ -159,6 +164,8 @@ namespace DatabaseUnitTest
       Assert::IsTrue(birth  < other);
       Assert::IsTrue(birth <= other);
       Assert::IsTrue(other == plusdate);
+
+      number_of_tests += 10;
     }
 
     TEST_METHOD(DateSpecialStrings)
@@ -208,6 +215,7 @@ namespace DatabaseUnitTest
       Assert::IsTrue(today.Year() == todayLY.Year() && todayLY.Month() == 12 && todayLY.Day() == 31);
       Assert::IsTrue(todayFOM.Day() == 1);
       Assert::AreEqual(7,(int)(nextweek.AsNumber() - today.AsNumber()));
+      number_of_tests += 12;
 
       // Try a wrong date
       try
@@ -222,7 +230,7 @@ namespace DatabaseUnitTest
         int pos = er.Find("wrong");
         Assert::IsTrue(pos > 0);
       }
+      number_of_tests++;
     }
-
   };
 }

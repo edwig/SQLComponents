@@ -3,6 +3,29 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.4
 ====== Released since:08-01-2017 =====
 ======================================
 
+Version 1.4.4 of 28-10-2017
+---------------------------
+1) Added a set of "SetParameter" methods to the SQLQuery class, so that
+   you do not need to set the parameter number explicitly. So e.g.:
+
+   query.SetParameter(30);
+   query.SetParameter("A text");
+   query.SetParameter(45.12);
+
+   becomes equivalent to:
+
+   query.SetParameter(1,30);
+   query.SetParameter(2,"A text");
+   query.SetParameter(3,45.12);
+
+   Given the fact that the "SetParameter" calls will be made in climbing
+   order, beginning at 1.
+   Of course, you can always reverse order or set individual parameters
+   again with the first set of calls by providing the parameter number.
+
+2) Added a test counter to the unit tests. Currently 8729 unit tests
+   in 72 test methods of the DatabaseUnitTest namespace.
+
 Version 1.4.3 of 18-09-2017
 ---------------------------
 1) The need for the SQL_COMPONENTS_MFC macro is removed by finding

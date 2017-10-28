@@ -32,9 +32,7 @@
 #include "SQLTimestamp.h"
 #include "SQLInterval.h"
 #include "bcd.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace OperatorUnitTest
 {
@@ -113,6 +111,7 @@ namespace OperatorUnitTest
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*left == *right);  // TEST
+          number_of_tests++;
         }
       }
       FreeArrays();
@@ -143,6 +142,7 @@ namespace OperatorUnitTest
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*left != *right);  // TEST
+          number_of_tests++;
         }
       }
       FreeArrays();
@@ -173,6 +173,7 @@ namespace OperatorUnitTest
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*left > *right);  // TEST
+          number_of_tests++;
         }
       }
       FreeArrays();
@@ -204,6 +205,7 @@ namespace OperatorUnitTest
 
           Assert::IsTrue(*left >= *right);  // GREATER
           Assert::IsTrue(*left >= *left);   // EQUAL
+          number_of_tests += 2;
         }
       }
       FreeArrays();
@@ -234,6 +236,7 @@ namespace OperatorUnitTest
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*right < *left);  // SMALLER
+          number_of_tests++;
         }
       }
       FreeArrays();
@@ -265,6 +268,7 @@ namespace OperatorUnitTest
 
           Assert::IsTrue(*right < *left);  // SMALLER
           Assert::IsTrue(*left <= *left);  // SMALLER/EQUAL
+          number_of_tests += 2;
         }
       }
       FreeArrays();

@@ -29,9 +29,7 @@
 #include "SQLDatabase.h"
 #include "SQLQuery.h"
 #include "SQLInfoDB.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace DatabaseUnitTest
 {
@@ -84,15 +82,19 @@ namespace DatabaseUnitTest
 
       if(info->MakeInfoMetaTypes(objects,errors,p_type))
       {
+        number_of_tests++;
+
         for(auto& obj : objects)
         {
           Logger::WriteMessage("Metatype " + p_name + " : " + obj.m_objectName);
+          number_of_tests++;
         }
       }
       else
       {
         // Essentially not an error. It's an optional feature of ODBC
         Logger::WriteMessage("Cannot get the meta types for: " + p_name);
+        number_of_tests++;
       }
     }
 
@@ -106,6 +108,8 @@ namespace DatabaseUnitTest
 
       if(info->MakeInfoTableTable(tables,errors,"",p_table))
       {
+        number_of_tests++;
+
         for(auto& table : tables)
         {
           CString schema  = table.m_schema;
@@ -125,6 +129,7 @@ namespace DatabaseUnitTest
       else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get info for table");
+        number_of_tests++;
       }
     }
 
@@ -135,14 +140,18 @@ namespace DatabaseUnitTest
 
       if(p_info->MakeInfoTableColumns(columns,errors,p_schema,p_table))
       {
+        number_of_tests++;
+
         for(auto& column : columns)
         {
           Logger::WriteMessage("Column: " + column.m_column);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get column info for table");
+        number_of_tests++;
       }
     }
 
@@ -153,6 +162,7 @@ namespace DatabaseUnitTest
 
       if(p_info->MakeInfoTablePrimary(primaries,errors,p_schema,p_table))
       {
+        number_of_tests++;
 
         for(auto& primary : primaries)
         {
@@ -163,11 +173,13 @@ namespace DatabaseUnitTest
                       ,primary.m_columnPosition
                       ,primary.m_columnName);
           Logger::WriteMessage(text);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
       {
         Assert::Fail(L"Cannot get primary key info for table");
+        number_of_tests++;
       }
     }
     
@@ -178,9 +190,11 @@ namespace DatabaseUnitTest
 
       if(p_info->MakeInfoTableForeign(references,errors,p_schema,p_table))
       {
+        number_of_tests++;
         for(auto& ref : references)
         {
           Logger::WriteMessage("Foreign: " + ref.m_foreignConstraint);
+          number_of_tests++;
         }
       }
       else if (!errors.IsEmpty())
@@ -196,9 +210,12 @@ namespace DatabaseUnitTest
 
       if(p_info->MakeInfoTableStatistics(statistics,errors,p_schema,p_table,nullptr))
       {
+        number_of_tests++;
+
         for(auto& ind : statistics)
         {
           Logger::WriteMessage("Indices: " + ind.m_indexName);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
@@ -213,9 +230,12 @@ namespace DatabaseUnitTest
       CString errors;
       if(p_info->MakeInfoTableSpecials(specials,errors,p_schema,p_table))
       {
+        number_of_tests++;
+
         for(auto& spec : specials)
         {
           Logger::WriteMessage("Specials: " + spec.m_columnName);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
@@ -232,6 +252,8 @@ namespace DatabaseUnitTest
       if(p_info->MakeInfoTableTriggers(triggers,errors,p_schema,p_table))
       {
         CString line;
+
+        number_of_tests++;
         for(auto& trigger : triggers)
         {
           line.Format("Trigger: [%d] %s",trigger.m_position,trigger.m_triggerName);
@@ -252,6 +274,7 @@ namespace DatabaseUnitTest
 
           line.Format("Trigger source: %s",trigger.m_source);
           Logger::WriteMessage(line);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
@@ -267,6 +290,8 @@ namespace DatabaseUnitTest
 
       if(p_info->MakeInfoTablePrivileges(privileges,errors,p_schema,p_table))
       {
+
+        number_of_tests++;
         for(auto& priv : privileges)
         {
           CString line;
@@ -275,6 +300,7 @@ namespace DatabaseUnitTest
                      ,priv.m_privilege
                      ,priv.m_grantor);
           Logger::WriteMessage(line);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
@@ -293,10 +319,12 @@ namespace DatabaseUnitTest
       CString errors;
       if(info->MakeInfoPSMProcedures(procedures,errors,"",p_procedure))
       {
+        number_of_tests++;
         for(auto& proc : procedures)
         {
           Logger::WriteMessage("Procedure : " + proc.m_procedureName);
           ParametersDiscovery(info,proc.m_schemaName,proc.m_procedureName);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
@@ -312,9 +340,11 @@ namespace DatabaseUnitTest
 
       if(p_info->MakeInfoPSMParameters(params,errors,p_schema,p_procedure))
       {
+        number_of_tests++;
         for(auto& parm : params)
         {
           Logger::WriteMessage("Parameter : " + parm.m_parameter);
+          number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
@@ -330,6 +360,7 @@ namespace DatabaseUnitTest
 
       Logger::WriteMessage("TRANSLATE : " + p_sql);
       Logger::WriteMessage("Translated: " + translated);
+      number_of_tests++;
     }
 
 //////////////////////////////////////////////////////////////////////////
@@ -363,6 +394,7 @@ namespace DatabaseUnitTest
       {
         Assert::Fail(L"Database ***NOT*** opened.");
       }
+      number_of_tests++;
       return true;
     }
 
@@ -375,6 +407,7 @@ namespace DatabaseUnitTest
         delete m_database;
         m_database = nullptr;
       }
+      number_of_tests++;
     }
 
   private:

@@ -27,9 +27,7 @@
 #include "stdafx.h"
 #include "HPFCounter.h"
 #include "bcd.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace DatabaseUnitTest
 {
@@ -200,6 +198,8 @@ namespace DatabaseUnitTest
       msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_ln2.AsString(bcd::Bookkeeping,true));
       Logger::WriteMessage(msg);
       Logger::WriteMessage("");
+
+      number_of_tests += 4;
     }
 
     void TestOperatoren(int p_count)
@@ -254,6 +254,7 @@ namespace DatabaseUnitTest
           case Operator_div:   d_result = d_number1 / d_number2; break;
           case Operator_mod:   d_result = fmod(d_number1,d_number2); break;
         }
+        number_of_tests++;
       }
       counter1.Stop();
       msg.Format("double %10.6f +%.15f",counter1.GetCounter(),d_result);
@@ -274,6 +275,7 @@ namespace DatabaseUnitTest
           case Operator_div:    c_result = c_number1 / c_number2; break;
           case Operator_mod:    c_result = c_number1 % c_number2; break;
         }
+        number_of_tests++;
       }
       counter5.Stop();
       msg.Format("bcd    %10.6f %s",counter5.GetCounter(),c_result.AsString(bcd::Bookkeeping,true));
@@ -410,6 +412,7 @@ namespace DatabaseUnitTest
           default:            printf("Unknown function in DoFunctionTest -> double");
                               break;
         }
+        number_of_tests++;
       }
       counter.Stop();
       msg.Format("double %10.6f +%.15f",counter.GetCounter(),d_result);
@@ -457,6 +460,7 @@ namespace DatabaseUnitTest
           default:            printf("Unknown function in DoFunctionTest -> bcd");
                               break;
         }
+        number_of_tests++;
       }
       counter4.Stop();
       msg.Format("bcd    %10.6f %s",counter4.GetCounter(),c_result.AsString(bcd::Bookkeeping,true));
@@ -497,6 +501,7 @@ namespace DatabaseUnitTest
       for(int x = 0; x < p_count; ++x)
       {
         bcd ten(&num);
+        number_of_tests++;
       }
       counter.Stop();
       bcd ten(&num);
@@ -509,6 +514,7 @@ namespace DatabaseUnitTest
       for(int x = 0; x < p_count; ++x)
       {
         ten.AsNumeric(&res);
+        number_of_tests++;
       }
       cnt2.Stop();
 
@@ -526,6 +532,7 @@ namespace DatabaseUnitTest
       bcd check(&res);
       msg.Format("bcd -> SQL_NUMERIC_STRUCT %10.6f : %s",cnt2.GetCounter(),check.AsString());
       Logger::WriteMessage(msg);
+      number_of_tests++;
 
       Logger::WriteMessage("");
       return 0;
@@ -543,6 +550,8 @@ namespace DatabaseUnitTest
 
       Assert::AreEqual((SQLCHAR) p_precision,numeric.precision);
       Assert::AreEqual((SQLSCHAR)p_scale,    numeric.scale);
+
+      number_of_tests += 2;
     }
 
     TEST_METHOD(BCDPrecisionTesting)
@@ -573,6 +582,5 @@ namespace DatabaseUnitTest
       PrecisionTest("0.000001",7,6);
       PrecisionTest("0.0000001",8,7);
     }
-
   };
 }

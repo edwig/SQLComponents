@@ -29,9 +29,7 @@
 #include "SQLQuery.h"
 #include "SQLTransaction.h"
 #include "bcd.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace DatabaseUnitTest
 {
@@ -84,6 +82,7 @@ namespace DatabaseUnitTest
       {
         Assert::Fail(L"Database ***NOT*** opened.");
       }
+      number_of_tests++;
       return true;
     }
 
@@ -95,6 +94,7 @@ namespace DatabaseUnitTest
         m_database->Close();
         delete m_database;
         m_database = nullptr;
+        number_of_tests++;
       }
     }
 
@@ -105,6 +105,7 @@ namespace DatabaseUnitTest
       CString sql = "DELETE FROM test_record";
       query.DoSQLStatementNonQuery(sql);
       trans.Commit();
+      number_of_tests++;
     }
 
     void CheckResultSet()
@@ -130,6 +131,8 @@ namespace DatabaseUnitTest
       // Both records need to show up ONCE!
       Assert::AreEqual(1,programCount);
       Assert::AreEqual(1,duplicatCount);
+
+      number_of_tests += 2;
     }
 
     void TestCalling()
@@ -146,6 +149,7 @@ namespace DatabaseUnitTest
       text.Format("Result of the function call (1  input parameter): %d",result->GetAsSLong());
       Logger::WriteMessage(text);
       Assert::AreEqual(24,(int)result->GetAsSLong());
+      number_of_tests++;
 
 
       // Call with 1 input parameter with SQL input
@@ -162,6 +166,7 @@ namespace DatabaseUnitTest
       text.Format("Result of GETDECIMAL '345.99' = [%s]",res->GetAsBCD().AsString());
       Logger::WriteMessage(text);
       Assert::AreEqual("345.99",res->GetAsBCD().AsString());
+      number_of_tests++;
 
       // Call with 1 input parameter and return value AND return parameter
       var txt(SQL_C_CHAR,200);
@@ -181,8 +186,10 @@ namespace DatabaseUnitTest
       Assert::AreEqual(77.88,number.AsDouble());
       CString dub = m_duplicate + m_duplicate;
       Assert::AreEqual(dub.GetString(),restext.GetString());
+      number_of_tests++;
 
       trans.Commit();
+      number_of_tests++;
     }
 
   private:

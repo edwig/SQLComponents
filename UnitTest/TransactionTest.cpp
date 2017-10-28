@@ -29,9 +29,7 @@
 #include "SQLTransaction.h"
 #include "SQLQuery.h"
 #include "bcd.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace DatabaseUnitTest
 {
@@ -72,6 +70,7 @@ namespace DatabaseUnitTest
       {
         Assert::Fail(L"Database ***NOT*** opened.");
       }
+      number_of_tests++;
       return true;
     }
 
@@ -83,6 +82,7 @@ namespace DatabaseUnitTest
         m_database->Close();
         delete m_database;
         m_database = nullptr;
+        number_of_tests++;
       }
     }
 
@@ -96,6 +96,7 @@ namespace DatabaseUnitTest
       query.SetParameter(2,p_recno);
       int num = query.DoSQLStatementNonQuery(sql);
       Assert::AreEqual(1,num,L"Record update not counted");
+      number_of_tests++;
     }
 
     void CheckRecord(int p_recno,bcd p_value)
@@ -114,6 +115,7 @@ namespace DatabaseUnitTest
       {
         Assert::Fail(L"Cannot retrieve record from testtable");
       }
+      number_of_tests++;
     }
 
     TEST_METHOD(TransactionCommit)

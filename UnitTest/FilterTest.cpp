@@ -28,9 +28,7 @@
 #include "SQLFilter.h"
 #include "SQLVariant.h"
 #include "SQLDate.h"
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-using namespace SQLComponents;
+#include "UnitTest.h"
 
 namespace OperatorUnitTest
 {
@@ -104,6 +102,7 @@ namespace OperatorUnitTest
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      number_of_tests++;
     }
 
     void TestNegate(CString p_field,SQLOperator p_oper,SQLVariant& p_variant,CString p_expect)
@@ -114,6 +113,7 @@ namespace OperatorUnitTest
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      number_of_tests++;
     }
 
     void TestBetween(CString     p_field
@@ -128,10 +128,12 @@ namespace OperatorUnitTest
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      number_of_tests++;
 
       // Test the getting of the values
       SQLVariant* var = filter.GetValue(1);
       Assert::IsTrue(p_variant2 == *var);
+      number_of_tests++;
     }
 
     void TestIN(CString     p_field
@@ -150,6 +152,7 @@ namespace OperatorUnitTest
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      number_of_tests++;
     }
 
     void TestExpression(CString p_field,SQLOperator p_oper,CString p_expression,CString p_expect)
@@ -160,6 +163,7 @@ namespace OperatorUnitTest
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      number_of_tests++;
     }
   };
 }
