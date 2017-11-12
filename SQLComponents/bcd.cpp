@@ -21,7 +21,7 @@
 #include "Stdafx.h"
 #include "SQLComponents.h"
 #include "bcd.h"
-#include <math.h> // Still needed for conversions of double
+#include <math.h>    // Still needed for conversions of double
 #include <intsafe.h>
 
 #ifdef _DEBUG
@@ -127,7 +127,7 @@ bcd::bcd(const CString& p_string,bool p_fromDB /*= false*/)
 bcd::bcd(const char* p_string,bool p_fromDB /*= false*/)
 {
   CString str(p_string);
-  SetValueString(p_string,p_fromDB);
+  SetValueString(str,p_fromDB);
 }
 
 // bcd::bcd(numeric)
@@ -523,7 +523,7 @@ bcd::operator>(const bcd& p_value) const
   // Shortcut: If the exponent differ, the mantissa's don't matter
   if(m_exponent != p_value.m_exponent)
   {
-    if(m_exponent > p_value.m_exponent)
+    if(m_exponent > p_value.m_exponent || p_value.IsNull())
     {
       return (m_sign == Positive);
     }
@@ -711,6 +711,13 @@ bcd::Truncate(int p_precision /*=0*/)
       m_mantissa[m1] = 0;
     }
   }
+}
+
+// Change the sign
+void
+bcd::Negate()
+{
+  m_sign = (m_sign == Positive) ? Negative : Positive;
 }
   
 //////////////////////////////////////////////////////////////////////////
@@ -1078,7 +1085,7 @@ bcd::TenPower(int n)
 //////////////////////////////////////////////////////////////////////////
 
 // bcd::Sine
-// Description: Sinus of the angle
+// Description: Sine of the angle
 // Technical:   Use the Taylor series: Sin(x) = x - x^3/3! + x^5/5! ...
 //              1) Reduce x to between 0..2*PI 
 //              2) Reduce further until x between 0..PI by means of sin(x+PI) = -Sin(x)
@@ -1161,7 +1168,7 @@ bcd::Sine() const
 }
 
 // bcd::Cosine
-// Description: Cosinus of the angle
+// Description: Cosine of the angle
 // Technical:   Use the Taylor series. Cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! ...
 //              1) However first reduce x to between 0..2*PI
 //              2) Then reduced it further to between 0..PI using cos(x)=Cos(2PI-x) for x >= PI
@@ -1362,7 +1369,7 @@ bcd::ArcCosine() const
 }
 
 // bcd::ArcTangent
-// Description: Arctangent (angle) of the ratio
+// Description: ArcTangent (angle) of the ratio
 // Technical:   Use the Taylor series. ArcTan(x) = x - x^3/3 + x^5/5 ...
 //              However first reduce x to abs(x)< 0.5 to improve taylor series
 //              using the identity. ArcTan(x)=2*ArcTan(x/(1+sqrt(1+x^2)))
@@ -1788,12 +1795,12 @@ bcd::AsString(int p_format /*=Bookkeeping*/,bool p_printPositive /*=false*/) con
     }
   }
   // Stripping trailing zeros.
-  result = result.TrimRight("0");
+  result = result.TrimRight('0');
 
   if(p_format == Engineering)
   {
     CString left = result.Left(1);
-    result = left + "." + result.Mid(1) + "E";
+    result = left + CString(".") + result.Mid(1) + CString("E");
     result += LongToString(exp);
   }
   else // Bookkeeping
@@ -2198,7 +2205,7 @@ bcd::SetValueInt(const int p_value)
     return;
   }
   // Take care of sign
-  m_sign = (uchar) ((p_value < 0) ? Negative : Positive);
+  m_sign = (p_value < 0) ? Negative : Positive;
   // Place in mantissa
   m_mantissa[0] = long_abs(p_value);
   // And normalize
@@ -2225,11 +2232,11 @@ bcd::SetValueLong(const long p_value, const long p_restValue)
   // Get the sign
   if (p_value == 0)
   {
-    m_sign = (uchar)((p_restValue < 0) ? Negative : Positive);
+    m_sign = (p_restValue < 0) ? Negative : Positive;
   }
   else
   {
-    m_sign = (uchar)((p_value < 0) ? Negative : Positive);
+    m_sign = (p_value < 0) ? Negative : Positive;
   }
   // Fill in mantissa. restValue first
   if(p_restValue)
@@ -2272,11 +2279,11 @@ bcd::SetValueInt64(const int64 p_value, const int64 p_restValue)
   // Get the sign
   if(p_value == 0L)
   {
-    m_sign = (uchar)((p_restValue < 0L) ? Negative : Positive);
+    m_sign = (p_restValue < 0L) ? Negative : Positive;
   }
   else
   {
-    m_sign = (uchar)((p_value < 0L) ? Negative : Positive);
+    m_sign = (p_value < 0L) ? Negative : Positive;
   }
   // Fill in mantissa
   if(p_restValue % bcdBase)
@@ -2541,7 +2548,7 @@ bcd::SetValueNumeric(const SQL_NUMERIC_STRUCT* p_numeric)
   m_exponent -= p_numeric->scale;
 
   // Adjust the sign
-  m_sign = (uchar)(p_numeric->sign == 1 ? Positive : Negative);
+  m_sign = (p_numeric->sign == 1) ? Positive : Negative;
 }
 
 // bcd::Normalize
@@ -2844,7 +2851,7 @@ bcd::Add(const bcd& p_number) const
       signResult = Negative;
     }
   }
-  arg1.m_sign = (uchar) signResult;
+  arg1.m_sign = signResult;
 
   return arg1;
 }
@@ -2865,7 +2872,7 @@ bcd::Mul(const bcd& p_number) const
   bcd result = PositiveMultiplication(*this,p_number);
 
   // Take care of the sign
-  result.m_sign = (uchar) (result.IsNull() ? Positive : CalculateSign(*this, p_number));
+  result.m_sign = result.IsNull() ? Positive : CalculateSign(*this, p_number);
 
   return result;
 }
@@ -2890,7 +2897,7 @@ bcd::Div(const bcd& p_number) const
   bcd result = PositiveDivision(arg1,arg2);
 
   // Take care of the sign
-  result.m_sign = (char) (result.IsNull() ? Positive : CalculateSign(*this, p_number));
+  result.m_sign = result.IsNull() ? Positive : CalculateSign(*this, p_number);
 
   return result;
 }
@@ -3497,5 +3504,4 @@ bcd::ReadFromFile(FILE* p_fp)
   return true;
 }
 
-// End of namespace
-}
+} // End of namespace
