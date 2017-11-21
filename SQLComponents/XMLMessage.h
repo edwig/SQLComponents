@@ -122,6 +122,10 @@ public:
   CString         GetValue()        { return m_value;       };
   XMLRestriction* GetRestriction()  { return m_restriction; };
 
+  void  SetName(CString p_name)         { m_name  = p_name;     };
+  void  SetValue(CString p_value)       { m_value = p_value;    };
+  void  SetDataType(XmlDataType p_type) { m_type  = p_type;     };
+
   // (Public!) data
   CString         m_namespace;
   CString         m_name;

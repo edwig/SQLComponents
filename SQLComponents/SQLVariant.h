@@ -54,7 +54,7 @@ typedef enum _param_type
   ,P_SQL_PARAM_OUTPUT       = 4
   ,P_SQL_RETURN_VALUE       = 5
 }
-ParamType;
+SQLParamType;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -137,7 +137,7 @@ public:
    void    SetAtExec(bool p_atExec);
    void    SetBinaryPieceSize(int p_size);
    void    SetColumnNumber(int p_column);
-   void    SetParameterType(ParamType p_type);
+   void    SetParameterType(SQLParamType p_type);
    void    SetSizeIndicator(bool p_realSize);
    void    SetNumericPrecisionScale(int p_precision,int p_scale);
    void    SetNULL();

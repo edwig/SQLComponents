@@ -768,7 +768,7 @@ SQLVariant::FindSQLDatatype(int p_type)
 }
 
 void
-SQLVariant::SetParameterType(ParamType p_type)
+SQLVariant::SetParameterType(SQLParamType p_type)
 {
   if(p_type >= P_SQL_PARAM_TYPE_UNKNOWN &&
      p_type <= P_SQL_RETURN_VALUE)

@@ -383,7 +383,7 @@ SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
 
       CString value;
       var->GetAsString(value);
-      fld->m_value = value;
+      fld->SetValue(value);
     }
   }
 }
