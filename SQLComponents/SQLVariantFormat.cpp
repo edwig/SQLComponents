@@ -511,7 +511,7 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
 {
   ZeroMemory(p_date,sizeof(DATE_STRUCT));
 
-  CString datum = p_variant->GetAsChar();
+  CString datum = p_variant ? p_variant->GetAsChar() : "";
   if(datum.IsEmpty() && !p_format.IsEmpty())
   {
     datum = p_format;
@@ -597,10 +597,6 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     // Is there a date present in the string?
     if (hasDate)
     {
-      if(m_variant == NULL || m_variant->IsEmpty())
-      {
-        return OK;
-      }
       if(!GetDateFromStringVariant(m_variant,m_format,&date))
       {
         return ER_FormatDateTypeValue;
