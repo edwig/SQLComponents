@@ -580,9 +580,7 @@ bcd::Round(int p_precision /*=0*/)
   int precision = p_precision;
   
   // Precision is dependent on the exponent
-  precision -= m_exponent;
-  // Precision is 1 based, because 1 position before decimal point is implied
-  precision += 1;
+  precision += m_exponent;
 
   // Quick optimization
   if(precision <= 0)
@@ -617,7 +615,7 @@ bcd::Round(int p_precision /*=0*/)
 
       if(digitNext >= 5)
       {
-        // The rounding in optimised form
+        // The rounding in optimized form
         m_mantissa[mant] = ++mm;
       }
     }
@@ -627,13 +625,13 @@ bcd::Round(int p_precision /*=0*/)
     // In-between optimalisation
     int base = bcdBase;
     // Calculate base
-    for(int p2 = 0;p2 < pos; ++p2)
+    for(int p2 = 0;p2 <= pos; ++p2)
     {
       base /= 10;
     }
-    // Rouding this digit
+    // Rounding this digit
     int mantBefore = mm / base;
-    // Next rouding digit
+    // Next rounding digit
     int digitNext = mm % base;
     digitNext /= (base / 10);
 
@@ -643,7 +641,7 @@ bcd::Round(int p_precision /*=0*/)
       // Calculate new mantissa
       ++mantBefore;
       int newMant = mantBefore * base;
-      if(pos > 0)
+      if(pos >= 0)
       {
         m_mantissa[mant] = newMant;
       }
@@ -668,9 +666,7 @@ bcd::Truncate(int p_precision /*=0*/)
   int precision = p_precision;
 
   // Precision is dependent on the exponent
-  precision -= m_exponent;
-  // Precision is 1 based, because 1 position before decimal point is implied
-  precision += 1;
+  precision += m_exponent;
 
   // Quick optimization
   if(precision <= 0)
@@ -694,7 +690,7 @@ bcd::Truncate(int p_precision /*=0*/)
   {
     // Calculate base
     int base = bcdBase;
-    for(int p2 = 0;p2 < pos; ++p2)
+    for(int p2 = 0;p2 <= pos; ++p2)
     {
       base /= 10;
     }
@@ -1850,9 +1846,34 @@ bcd::AsString(int p_format /*=Bookkeeping*/,bool p_printPositive /*=false*/) con
 }
 
 CString 
-bcd::AsDisplayString() const
+bcd::AsDisplayString(int p_decimals /*=2*/) const
+{
+  // Not in the bookkeeping range
+  if(m_exponent > 12 || m_exponent < -2)
 {
   return AsString();
+}
+  bcd number(*this);
+  number.Round(p_decimals);
+
+  CString str = number.AsString();
+  str.Replace(".",",");
+
+  int pos = str.Find(",");
+  if(pos > 0)
+  {
+    CString result = str.Mid(pos);
+    str = str.Left(pos);
+
+    while(str.GetLength() > 3)
+    {
+      result = "." + str.Right(3) + result;
+      str = str.Left(str.GetLength() - 3);
+    }
+    result = str + result;
+    return result;
+  }
+  return str;
 }
 
 // Get as an ODBC SQL NUMERIC
@@ -2010,6 +2031,7 @@ bcd::GetLength() const
 
       // See if there is a digit here
       long num = number / base;
+      number  %= base;
       base    /= 10;
       if(num)
       {
@@ -2128,7 +2150,7 @@ bcd::GetHasDecimals() const
   // Compare the length with the exponent.
   // If exponent smaller, the rest is behind the decimal point
   int length = GetLength();
-  if(m_exponent < length)
+  if(m_exponent < (length - 1))
   {
     return true;
   }
@@ -2248,14 +2270,25 @@ bcd::SetValueLong(const long p_value, const long p_restValue)
   }
   if(p_value)
   {
+    int exp = bcdDigits - 1;
     if(p_restValue)
     {
       ShiftRight();
     }
+    long value = abs(p_value);
+    if(value < bcdBase)
+    {
     m_mantissa[0] = long_abs(p_value);
-
+    }
+    else
+    {
+      ShiftRight();
+      exp += bcdDigits;
+      m_mantissa[1] = value % bcdBase;
+      m_mantissa[0] = value / bcdBase;
+    }
     // Normalize with exponent set
-    Normalize(bcdDigits - 1);
+    Normalize(exp);
   }
 }
 
