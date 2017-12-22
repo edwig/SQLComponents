@@ -1397,6 +1397,7 @@ SQLDataSet::GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record)
         sql += " = ?\n";
         p_query->SetParameter(parameter++,value);
       }
+      first = false;
     }
   }
   // Adding the WHERE clause
