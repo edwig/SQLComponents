@@ -558,18 +558,13 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   Close();
   Open();
 
+  // See if it is a 'SELECT' query
   m_isSelectQuery = false;
   if(p_statement.Left(6).CompareNoCase("select") == 0)
   {
     m_isSelectQuery = true;
   }
 
-  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
-  {
-    m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
-    m_database->LogPrint(LOGLEVEL_MAX,p_statement.GetString());
-    m_database->LogPrint(LOGLEVEL_MAX,"\n");
-  }
   // Bind parameters
   BindParameters();
 
@@ -582,6 +577,14 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   if(m_database)
   {
     m_database->ReplaceMacros(statement);
+  }
+
+  // Log the query, just before we run it, replaced macro's and all
+  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
+  {
+    m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
+    m_database->LogPrint(LOGLEVEL_MAX,p_statement.GetString());
+    m_database->LogPrint(LOGLEVEL_MAX,"\n");
   }
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
@@ -781,6 +784,14 @@ SQLQuery::DoSQLPrepare(const CString& p_statement)
   if(m_database)
   {
     m_database->ReplaceMacros(statement);
+  }
+
+  // Log the query, just before we run it, replaced macro's and all
+  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
+  {
+    m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
+    m_database->LogPrint(LOGLEVEL_MAX,p_statement.GetString());
+    m_database->LogPrint(LOGLEVEL_MAX,"\n");
   }
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug

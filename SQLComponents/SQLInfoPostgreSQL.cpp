@@ -1386,7 +1386,7 @@ SQLInfoPostgreSQL::GetCATALOGViewExists(CString p_schema,CString p_viewname) con
   p_schema.MakeLower();
   p_viewname.MakeLower();
   CString sql("SELECT COUNT(*)\n"
-              "  FROM pg_views\n"  // TODO: Check the correct name
+              "  FROM pg_views\n" 
               " WHERE view_name = '" + p_viewname + "'");
   return sql;
 }
