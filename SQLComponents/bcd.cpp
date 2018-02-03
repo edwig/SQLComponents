@@ -1850,9 +1850,9 @@ bcd::AsDisplayString(int p_decimals /*=2*/) const
 {
   // Not in the bookkeeping range
   if(m_exponent > 12 || m_exponent < -2)
-{
-  return AsString();
-}
+  {
+    return AsString();
+  }
   bcd number(*this);
   number.Round(p_decimals);
 
@@ -2278,7 +2278,7 @@ bcd::SetValueLong(const long p_value, const long p_restValue)
     long value = abs(p_value);
     if(value < bcdBase)
     {
-    m_mantissa[0] = long_abs(p_value);
+      m_mantissa[0] = long_abs(p_value);
     }
     else
     {
