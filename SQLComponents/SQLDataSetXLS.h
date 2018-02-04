@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 1998-2017 ir. W.E. Huisman
+// Copyright (c) 1998-2018 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -23,8 +23,8 @@
 // Loosely based on the article by: Yap Chun Wei
 // http://www.codeproject.com/Articles/1636/CSpreadSheet-A-Class-to-Read-and-Write-to-Excel-an
 // 
-// Last Revision:   08-01-2017
-// Version number:  1.4.0
+// Last Revision:   04-02-2018
+// Version number:  1.4.5
 //
 #pragma once
 
