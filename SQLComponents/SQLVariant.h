@@ -68,9 +68,9 @@ public:
    // Generic constructors
    SQLVariant();                              // Generic
    SQLVariant(int p_type,int p_space);        // ODBC driver reserve precision
-   SQLVariant(SQLVariant* p_var);             // From another SQLVariant
+   SQLVariant(SQLVariant* p_var);             // From another SQLVariant pointer
    SQLVariant(const SQLVariant& p_var);       // From another SQLVariant reference
-   // Type constructors
+     // Type constructors
    SQLVariant(const char* p_data);            // SQL_C_CHAR
    SQLVariant(CString& p_data);               // SQL_C_CHAR
    SQLVariant(short p_short);                 // SQL_C_SHORT / SQL_C_SSHORT
@@ -140,14 +140,15 @@ public:
    void    SetParameterType(SQLParamType p_type);
    void    SetSizeIndicator(bool p_realSize);
    void    SetNumericPrecisionScale(int p_precision,int p_scale);
+   void    SetFromBinaryStreamData(int p_type,int p_length,void* p_data,bool p_isnull);
    void    SetNULL();
+   // Variable space functions
    void    ReserveSpace(int p_type,int p_space);
    void    ShrinkSpace();
-   void    SetFromBinaryStreamData(int p_type,int p_length,void* p_data,bool p_isnull);
+   void    TruncateSpace(unsigned p_length);
 
    // General access
    bool                 SetData(int p_type,const char* p_data);
-   bool                 SetBinary(int p_length,void* p_data);
    void*                GetDataPointer();
    // Access per type
    const char*          GetAsChar();

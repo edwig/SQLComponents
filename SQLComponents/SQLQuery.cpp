@@ -126,7 +126,7 @@ SQLQuery::Close()
         GetLastError("Closing the cursor: ");
 
         // Some databases give a SQLSTATE = 24000 if the cursor was at the end
-        // This is documented behaviour of SQLCloseCursor
+        // This is documented behavior of SQLCloseCursor
         if(m_database)
         {
           if(m_database->GetSQLState() != "24000")
@@ -373,23 +373,38 @@ SQLQuery::InternalSetParameter(int p_num,SQLVariant* p_param,SQLParamType p_type
   }
 }
 
+// Setting the maximum size of a SQLCHAR parameter
+void 
+SQLQuery::SetParameterMaxSize(int p_num,unsigned p_maxSize)
+{
+  MaxSizeMap::iterator it = m_paramMaxSizes.find(p_num);
+  if(it == m_paramMaxSizes.end())
+  {
+    m_paramMaxSizes.insert(std::make_pair(p_num,p_maxSize));
+  }
+  else
+  {
+    it->second = p_maxSize;
+  }
+}
+
 // Setting a parameter. Copies the SQLVariant!!
 void
-SQLQuery::SetParameter(int p_num,SQLVariant* p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,const SQLVariant& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter(int p_num,long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,const long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameterUL(int p_num,unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameterUL(int p_num,const unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant *var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
@@ -403,28 +418,28 @@ SQLQuery::SetParameter(int p_num,const char* p_param,SQLParamType p_type /*=SQL_
 }
 
 void 
-SQLQuery::SetParameter(int p_num,CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,const CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter(int p_num,SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,const SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter (int p_num,SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter (int p_num,const SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,const SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type);
@@ -443,7 +458,7 @@ SQLQuery::SetParameter(int p_num,const bcd& p_param,SQLParamType p_type /*=SQL_P
 
 // Setting a parameter. Copies the SQLVariant!!
 void
-SQLQuery::SetParameter(SQLVariant* p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(const SQLVariant& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int) m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(p_param);
@@ -451,7 +466,7 @@ SQLQuery::SetParameter(SQLVariant* p_param,SQLParamType p_type /*=SQL_PARAM_INPU
 }
 
 void
-SQLQuery::SetParameter(long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(const long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(p_param);
@@ -459,7 +474,7 @@ SQLQuery::SetParameter(long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 }
 
 void
-SQLQuery::SetParameterUL(unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameterUL(const unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant *var = new SQLVariant(p_param);
@@ -475,7 +490,7 @@ SQLQuery::SetParameter(const char* p_param,SQLParamType p_type /*=SQL_PARAM_INPU
 }
 
 void
-SQLQuery::SetParameter(CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(const CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(p_param);
@@ -483,7 +498,7 @@ SQLQuery::SetParameter(CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/
 }
 
 void
-SQLQuery::SetParameter(SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(const SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(&p_param);
@@ -491,7 +506,7 @@ SQLQuery::SetParameter(SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/
 }
 
 void
-SQLQuery::SetParameter(SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(const SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(&p_param);
@@ -499,7 +514,7 @@ SQLQuery::SetParameter(SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/
 }
 
 void
-SQLQuery::SetParameter(SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(const SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(&p_param);
@@ -583,7 +598,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
   {
     m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
-    m_database->LogPrint(LOGLEVEL_MAX,p_statement.GetString());
+    m_database->LogPrint(LOGLEVEL_MAX,statement.GetString());
     m_database->LogPrint(LOGLEVEL_MAX,"\n");
   }
 
@@ -591,7 +606,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   // in the processing of the query-strings which crashes it in CharNextW
   // by a missing NULL-Terminator. By changing the length of the statement
   // _including_ the terminating NUL, it won't crash at all
-  // NOTE: This alsoo means we cannot use the SQL_NTS terminator
+  // NOTE: This also means we cannot use the SQL_NTS terminator
   SQLINTEGER lengthStatement = statement.GetLength() + 1;
 
   // GO DO IT RIGHT AWAY
@@ -888,6 +903,12 @@ SQLQuery::BindParameters()
     return;
   }
 
+  // See if we must truncate input CHAR parameters
+  if(!m_paramMaxSizes.empty())
+  {
+    TruncateInputParameters();
+  }
+
   // See if we have an extra function-return parameter
   int extra = (m_parameters.find(0) == m_parameters.end()) ? 0 : 1;
 
@@ -946,6 +967,27 @@ SQLQuery::BindParameters()
     if(dataType == SQL_C_NUMERIC)
     {
       BindColumnNumeric((ushort)icol,var,SQL_PARAM_INPUT);
+    }
+  }
+}
+
+// Truncate CHAR parameters on input to reflect the size of the database column
+// Parameter size can be set with SetParameterMaxSize()!
+void
+SQLQuery::TruncateInputParameters()
+{
+  for(auto& param : m_parameters)
+  {
+    SQLVariant* parm = param.second;
+
+    // If CHAR/VARCHAR column does not support more than this amount of characters
+    if(parm->GetDataType() == SQL_C_CHAR && parm->GetParameterType() == P_SQL_PARAM_INPUT)
+    {
+      MaxSizeMap::iterator ms = m_paramMaxSizes.find(param.first);
+      if (ms != m_paramMaxSizes.end())
+      {
+        parm->TruncateSpace(ms->second);
+      }
     }
   }
 }
@@ -1009,7 +1051,7 @@ SQLQuery::BindColumns()
                               ,colName            // Column name
                               ,SQL_MAX_IDENTIFIER // name buffer length
                               ,&dummy             // actual name length gotten
-                              ,&dataType          // SQL data type (SQL_XX)
+                              ,&dataType          // SQL datatype (SQL_XX)
                               ,&precision         // precision of numbers
                               ,&scale             // decimal scale
                               ,&nullable);        // NULL values OK?

@@ -58,6 +58,7 @@ class SQLDatabase;
 typedef std::map<int,    SQLVariant*> ColNumMap;
 typedef std::map<CString,SQLVariant*> ColNameMap;
 typedef std::map<int,    SQLVariant*> VarMap;
+typedef std::map<int,    unsigned>    MaxSizeMap;
 
 class SQLQuery
 {
@@ -88,27 +89,29 @@ public:
   void SetMaxRows(int p_maxrows);
   // Setting the locking concurrency level
   void SetConcurrency(int p_concurrency);
+  // Setting the maximum size of a SQLCHAR parameter
+  void SetParameterMaxSize(int p_num,unsigned p_maxSize);
 
   // Set parameters for statement
-  void SetParameter  (int p_num,SQLVariant*   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameterUL(int p_num,unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const char*   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const bcd&    p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const SQLVariant&   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameterUL(int p_num,const unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const char*         p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,const bcd&          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
 
-  void SetParameter  (SQLVariant*   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameterUL(unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (const char*   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (const bcd&    p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const SQLVariant&   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameterUL(const unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const char*         p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (const bcd&          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
 
   // SINGLE STATEMENT
 
@@ -174,7 +177,7 @@ public:
   // Get Display size of the column
   int         GetColumnDisplaySize(int p_column);
 
-  // Getting the results of the query
+  // Getting the results of the query as a SQLVariant reference
   SQLVariant& operator[](int p_index);
 
   // VARIOUS STATUS METHODS
@@ -203,6 +206,7 @@ private:
   // Set parameter for statement
   void  InternalSetParameter(int p_num,SQLVariant* p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
   // Bind application parameters
+  void  TruncateInputParameters();
   void  BindParameters();
   void  BindColumns();
   void  BindColumnNumeric(SQLSMALLINT p_column,SQLVariant* p_var,int p_type);
@@ -257,6 +261,7 @@ private:
   bool          m_isSelectQuery;     // Internal SELECT  flag
 
   VarMap        m_parameters;        // Parameter map at execute
+  MaxSizeMap    m_paramMaxSizes;     // Parameter maximum sizes for SQLCHAR parameters
   RebindMap*    m_rebindParameters;  // Rebind map for datatypes of parameter bindings
   RebindMap*    m_rebindColumns;     // Rebind map for datatypes of result columns
   ColNumMap     m_numMap;            // column maps of the derived result set

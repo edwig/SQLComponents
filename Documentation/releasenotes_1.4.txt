@@ -3,6 +3,17 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.4
 ====== Released since:08-01-2017 =====
 ======================================
 
+Version 1.4.5 of 04-02-2018
+---------------------------
+1) Added the SetParameterMaxSize() method to the SQLQuery class to restrict 
+   an input parameter to reflect the max size of a column in the database.
+   This will prevent a database to give a "column to small" error on an 
+   INSERT or an UPDATE. (But it will also truncate your data!)
+2) Changed all the input of the "SetParameter" methods of SQLQuery to be const!
+3) Logging of the SQL statement in the SQLQuery class wil now be done AFTER
+   the macro replacements have taken place, so we can see the actual SQL 
+   that will be sent to the database.
+
 Version 1.4.4 of 28-10-2017
 ---------------------------
 1) Added a set of "SetParameter" methods to the SQLQuery class, so that

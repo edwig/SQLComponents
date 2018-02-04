@@ -138,10 +138,10 @@ SQLVariant::SQLVariant(int p_type,int p_space)
 }
 
 // XTOR from SQLVariant pointer
-SQLVariant::SQLVariant(SQLVariant* that)
+SQLVariant::SQLVariant(SQLVariant* p_that)
 {
   // Use assignment operator
-  *this = *that;
+  *this = *p_that;
 }
 
 // XTOR From another SQLVariant reference
@@ -503,6 +503,17 @@ SQLVariant::ShrinkSpace()
   }
 }
 
+// Truncate the CHAR data, but leave the data pointer
+// otherwise we would lose the data binding
+void    
+SQLVariant::TruncateSpace(unsigned p_length)
+{
+  if(m_datatype == SQL_C_CHAR && ((unsigned)m_binaryLength > p_length))
+  {
+    m_data.m_dataCHAR[m_binaryLength = p_length] = 0;
+    m_indicator = p_length > 0 ? SQL_NTS : SQL_NULL_DATA;
+  }
+}
 
 // Check if the data is 'empty'
 // CHAR -> Empty string, scalar types are 0 or 0.0
