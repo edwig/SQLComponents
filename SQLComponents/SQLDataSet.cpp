@@ -184,7 +184,6 @@ SQLDataSet::Close()
   m_name.Empty();
   m_query.Empty();
   m_selection.Empty();
-  m_searchColumn.Empty();
   m_primaryTableName.Empty();
 
   // Reset the open status
@@ -453,7 +452,6 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
 {
   bool   result = false;
   CString query = m_query;
-  int    number = 0;
 
   if(m_query.IsEmpty() && m_selection.IsEmpty())
   {
@@ -471,7 +469,7 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
   }
   try
   {
-    SQLQuery qr(m_database);
+    SQLQuery qry(m_database);
     SQLTransaction trans(m_database,m_name);
 
     // If parameters, parse them
@@ -488,44 +486,24 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
     }
     else
     {
-      query = ParseSelection(qr);
+      query = ParseSelection(qry);
     }
 
     // Do the SELECT query
-    qr.DoSQLStatement(query);
-    if (p_stopIfNoColumns && qr.GetNumberOfColumns() == 0)
+    qry.DoSQLStatement(query);
+    if (p_stopIfNoColumns && qry.GetNumberOfColumns() == 0)
     {
       return false;
     }
 
     // Read the names of the fields
-    ReadNames(qr);
-    ReadTypes(qr);
-
-    // Searchable sets prepare primary key column
-    int primary = FindSearchColumn();
+    ReadNames(qry);
+    ReadTypes(qry);
 
     // Read all the records
-    while(qr.GetRecord())
+    while(qry.GetRecord())
     {
-      // Make a new record
-      SQLRecord* record = new SQLRecord(this,modifiable);
-      m_records.push_back(record);
-      // Get all the columns of the record
-      SQLVariant* var = NULL;
-      int num = qr.GetNumberOfColumns();
-      for(int ind = 1; ind <= num; ++ind)
-      {
-        var = qr.GetColumn(ind);
-        record->AddField(var);
-
-        // Record position of the primary
-        if(ind == primary)
-        {
-          unsigned long prim = var->GetAsULong();
-          m_objects[prim] = number++;
-        }
-      }
+      ReadRecordFromQuery(qry,modifiable);
     }
     // Reached the end: we are OPEN!
     m_open = true;
@@ -570,11 +548,10 @@ SQLDataSet::Append()
   Last();
   // Remember size before reading
   size_t sizeBefore = m_records.size();
-  int    number     = 1;
 
   try
   {
-    SQLQuery qr(m_database);
+    SQLQuery qry(m_database);
     SQLTransaction trans(m_database,m_name);
     CString query(m_query);
 
@@ -592,51 +569,19 @@ SQLDataSet::Append()
     }
     else
     {
-      query = ParseSelection(qr);
+      query = ParseSelection(qry);
     }
 
     // Do the SELECT query
-    qr.DoSQLStatement(query);
+    qry.DoSQLStatement(query);
 
     // Names and types must be the same as previous queries
-    CheckNames(qr);
-    CheckTypes(qr);
+    CheckNames(qry);
+    CheckTypes(qry);
 
-    // Finding the primary
-    int primary = FindSearchColumn();
-
-    while(qr.GetRecord())
+    while(qry.GetRecord())
     {
-      // Make a new record
-      SQLRecord* record = new SQLRecord(this,modifiable);
-      bool foundNew = true;
-      // Get all the columns of the record
-      SQLVariant* var = NULL;
-      int num = qr.GetNumberOfColumns();
-      for(int ind = 1; ind <= num; ++ind)
-      {
-        var = qr.GetColumn(ind);
-        record->AddField(var);
-
-        // Record primary key in object cache
-        if(ind == primary)
-        {
-          unsigned long prim = var->GetAsULong();
-          if(m_objects.find(prim) == m_objects.end())
-          {
-            m_objects[prim] = m_current + number++;
-          }
-          else
-          {
-            foundNew = false;
-          }
-        }
-      }
-      // If we found a new record: keep it!
-      if(foundNew)
-      {
-        m_records.push_back(record);
-      }
+      ReadRecordFromQuery(qry,modifiable,true);
     }
     // Legal 0 or more records
     result = true;
@@ -654,6 +599,87 @@ SQLDataSet::Append()
     Next();
   }
   return result;
+}
+
+// Read in a record from a SQLQuery
+bool
+SQLDataSet::ReadRecordFromQuery(SQLQuery& p_query,bool p_modifiable,bool p_append /*=false*/)
+{
+  // Make a new record
+  SQLRecord* record = new SQLRecord(this,p_modifiable);
+
+  // Get all the columns of the record
+  int num = p_query.GetNumberOfColumns();
+  for(int ind = 1; ind <= num; ++ind)
+  {
+    SQLVariant* var = p_query.GetColumn(ind);
+    record->AddField(var);
+  }
+
+  // Construct the primarykey (possibly from more than 1 field)
+  CString key = MakePrimaryKey(record);
+
+  if(key.IsEmpty())
+  {
+    // New record, no primary key info, just keep it
+    m_records.push_back(record);
+  }
+  else
+  {
+    bool extra = true;
+    if(p_append)
+    {
+      ObjectMap::iterator it = m_objects.find(key);
+      extra = (it == m_objects.end());
+    }
+    if(extra)
+    {
+      // New record: keep it along with the primary key info
+      m_records.push_back(record);
+      int recnum = (int)m_records.size() - 1;
+      m_objects.insert(std::make_pair(key,recnum));
+    }
+    else
+    {
+      // We already had the record
+      delete record;
+    }
+  }
+  return true;
+}
+
+// Make a primary key record
+CString
+SQLDataSet::MakePrimaryKey(SQLRecord* p_record)
+{
+  CString key;
+  CString value;
+
+  for(auto& field : m_primaryKey)
+  {
+    SQLVariant* var = p_record->GetField(field);
+    var->GetAsString(value);
+
+    key += value;
+    key += "\0x1E";  // ASCII UNIT Seperator
+  }
+  return key;
+}
+
+CString
+SQLDataSet::MakePrimaryKey(VariantSet& p_primary)
+{
+  CString key;
+  CString value;
+
+  for(auto& val : p_primary)
+  {
+    val->GetAsString(value);
+
+    key += value;
+    key += "\0x1E";  // ASCII UNIT Seperator
+  }
+  return key;
 }
 
 // Get all the columns of the record
@@ -713,31 +739,6 @@ SQLDataSet::CheckTypes(SQLQuery& p_query)
   }
 }
 
-// Find primary key in the column names
-int
-SQLDataSet::FindSearchColumn()
-{
-  // Searchable primary requested?
-  if(m_searchColumn.IsEmpty())
-  {
-    return 0;
-  }
-  // Find the column in the selected set
-  for(unsigned ind = 0;ind < m_names.size(); ++ind)
-  {
-    if(m_searchColumn.CompareNoCase(m_names[ind]) == 0)
-    {
-      if(m_types[ind] == SQL_C_SLONG ||
-         m_types[ind] == SQL_C_ULONG ||
-         m_types[ind] == SQL_C_LONG  )
-      {
-        return ind + 1;
-      }
-    }
-  }
-  return 0;
-}
-
 // Check that all datatypes are the same
 SQLRecord*
 SQLDataSet::GetRecord(int p_recnum)
@@ -753,7 +754,9 @@ SQLDataSet::GetRecord(int p_recnum)
 int
 SQLDataSet::FindObjectRecNum(int p_primary)
 {
-  ObjectMap::iterator it = m_objects.find(p_primary);
+  CString key;
+  key.Format("%d\0x1E",p_primary);
+  ObjectMap::iterator it = m_objects.find(key);
   if(it != m_objects.end())
   {
     return it->second;
@@ -765,7 +768,9 @@ SQLDataSet::FindObjectRecNum(int p_primary)
 SQLRecord*
 SQLDataSet::FindObjectRecord(int p_primary)
 {
-  ObjectMap::iterator it = m_objects.find(p_primary);
+  CString key;
+  key.Format("%d\0x1E",p_primary);
+  ObjectMap::iterator it = m_objects.find(key);
   if(it != m_objects.end())
   {
     return m_records[it->second];
@@ -788,30 +793,12 @@ SQLDataSet::FindObjectRecNum(VariantSet& p_primary)
     return -1;
   }
 
-  int searching = 0;
-  for(int ind = 0;ind < (int) m_primaryKey.size(); ++ind)
-  {
-    int fieldnum = GetFieldNumber(m_primaryKey[ind]);
-    SQLVariant* var = p_primary[ind];
+  CString key = MakePrimaryKey(p_primary);
 
-    for(int search = searching; search < (int)m_records.size(); ++search)
-    {
-      SQLVariant* field = m_records[search]->GetField(fieldnum);
-      if(field == var)
-      {
-        if(ind+1 == (int) m_primaryKey.size())
-        {
-          // Last field in the primary key. Stop here
-          return search;
-        }
-        else
-        {
-          // Value found, get on to the next search field
-          break;
-        }
-      }
-      ++searching;
-    }
+  ObjectMap::iterator it = m_objects.find(key);
+  if(it != m_objects.end())
+  {
+    return it->second;
   }
   return -1;
 }
@@ -831,30 +818,12 @@ SQLDataSet::FindObjectRecord(VariantSet& p_primary)
     return nullptr;
   }
 
-  int searching = 0;
-  for(int ind = 0; ind < (int)m_primaryKey.size(); ++ind)
-  {
-    int fieldnum = GetFieldNumber(m_primaryKey[ind]);
-    SQLVariant* var = p_primary[ind];
+  CString key = MakePrimaryKey(p_primary);
 
-    for(int search = searching; search < (int)m_records.size(); ++search)
-    {
-      SQLVariant* field = m_records[search]->GetField(fieldnum);
-      if(field == var)
-      {
-        if(ind + 1 == (int)m_primaryKey.size())
-        {
-          // Last field in the primary key. Stop here
-          return m_records[search];
-        }
-        else
-        {
-          // Value found, get on to the next search field
-          break;
-        }
-      }
-      ++searching;
-    }
+  ObjectMap::iterator it = m_objects.find(key);
+  if(it != m_objects.end())
+  {
+    return m_records[it->second];
   }
   return nullptr;
 }
@@ -966,6 +935,7 @@ SQLDataSet::GetFieldNumber(CString p_name)
   return -1;
 }
 
+// Get a field of the current record
 SQLVariant*
 SQLDataSet::GetCurrentField(int p_num)
 {
@@ -1597,6 +1567,9 @@ SQLDataSet::ForgetRecord(SQLRecord* p_record,bool p_force)
 
       // Remove from m_records
       m_records.erase(it);
+
+      // Reset the current pointer
+      First();
     }
     return true;
   }
@@ -1607,28 +1580,15 @@ SQLDataSet::ForgetRecord(SQLRecord* p_record,bool p_force)
 void
 SQLDataSet::ForgetPrimaryObject(SQLRecord* p_record)
 {
-  // See if we have a unique primary key
-  int primary = FindSearchColumn();
-  if(!primary)
-  {
-    return;
-  }
-  // Find the record
-  long value = p_record->GetField(primary)->GetAsSLong();
-  ObjectMap::iterator it = m_objects.find(value);
-  if(it != m_objects.end())
-  {
-    // Remove the reference to the record
-    it = m_objects.erase(it);
+  CString key = MakePrimaryKey(p_record);
 
-    // All other objects shift one place down!
-    while(it != m_objects.end())
+  if(!key.IsEmpty())
+  {
+    ObjectMap::iterator it = m_objects.find(key);
+    if(it != m_objects.end())
     {
-      it->second--;
-      ++it;
+      m_objects.erase(it);
     }
-    // Reset the current pointer
-    First();
   }
 }
 

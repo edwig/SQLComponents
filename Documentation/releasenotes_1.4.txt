@@ -3,6 +3,14 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.4
 ====== Released since:08-01-2017 =====
 ======================================
 
+Version 1.4.6 of 15-02-2018
+---------------------------
+1) Refactored the SQLDataSet and the way the primary key works and the way
+   that the objects are found by their primary key.
+   The former 'searchable column' optimazation has been removed, as it was
+   no longer needed. All records now can be found if the primary key has been
+   explicitly set.
+
 Version 1.4.5 of 04-02-2018
 ---------------------------
 1) Added the SetParameterMaxSize() method to the SQLQuery class to restrict 

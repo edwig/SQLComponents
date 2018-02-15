@@ -187,7 +187,6 @@ namespace DatabaseUnitTest
       SQLDataSet details("detail",p_dbs);
       details.SetPrimaryTable(g_schema,"detail");
       details.SetPrimaryKeyColumn("id");
-      details.SetSearchableColumn("id");
       details.SetParameter("mast_id",SQLVariant(p_master));
       details.SetSelection("*"); // Select all columns
       number_of_tests += 5;
@@ -577,8 +576,6 @@ namespace DatabaseUnitTest
           detail.SetPrimaryTable(g_schema,"detail");
           master.SetPrimaryKeyColumn("id");
           detail.SetPrimaryKeyColumn("id");
-          master.SetSearchableColumn("id");
-          detail.SetSearchableColumn("id");
           number_of_tests += 8;
 
           // Set up an association

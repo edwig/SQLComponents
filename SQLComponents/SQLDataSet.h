@@ -83,7 +83,7 @@ typedef std::vector<SQLVariant*>  VariantSet;
 typedef std::vector<SQLParameter> ParameterSet;
 typedef std::vector<CString>      NamenMap;
 typedef std::vector<int>          TypenMap;
-typedef std::map<int,int>         ObjectMap;
+typedef std::map<CString,int>     ObjectMap;
 typedef std::list<CString>        WordList;
 
 class SQLDataSet
@@ -153,7 +153,7 @@ public:
   void         SetPrimaryKeyColumn(CString p_name);
   void         SetPrimaryKeyColumn(WordList& p_list);
   // Set searchable column
-  void         SetSearchableColumn(CString p_name);
+  // void         SetSearchableColumn(CString p_name);
   // Set parameter for a query
   void         SetParameter(SQLParameter p_parameter);
   void         SetParameter(CString p_naam,SQLVariant p_waarde);
@@ -218,8 +218,11 @@ private:
   bool         GetPrimaryKeyInfo();
   // Check that all primary key columns are in the dataset
   bool         CheckPrimaryKeyColumns();
-  // Find primary key in the column names
-  int          FindSearchColumn();
+  // Read in a record from a SQLQuery
+  bool         ReadRecordFromQuery(SQLQuery& p_query,bool p_modifiable,bool p_append = false);
+  // Make a primary key record
+  CString      MakePrimaryKey(SQLRecord*  p_record);
+  CString      MakePrimaryKey(VariantSet& p_primary);
   // Forget about a record in the recordset
   bool         ForgetRecord(SQLRecord* p_record,bool p_force);
   void         ForgetPrimaryObject(SQLRecord* p_record);
@@ -248,15 +251,13 @@ private:
   ParameterSet m_parameters;
   SQLFilterSet m_filters;
   NamenMap     m_primaryKey;
-  // Object mapping
-  CString      m_searchColumn; 
-  ObjectMap    m_objects;
 protected:
   int          m_status;
   int          m_current;
   NamenMap     m_names;
   TypenMap     m_types;
   RecordSet    m_records;
+  ObjectMap    m_objects;
 };
 
 inline void 
@@ -332,12 +333,6 @@ inline CString
 SQLDataSet::GetPrimaryTableName()
 {
   return m_primaryTableName;
-}
-
-inline void
-SQLDataSet::SetSearchableColumn(CString p_name)
-{
-  m_searchColumn = p_name;
 }
 
 inline void

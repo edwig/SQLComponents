@@ -42,7 +42,6 @@ TestAppend(SQLDatabase* p_dbs,long p_master)
   SQLDataSet details("detail",p_dbs);
   details.SetPrimaryTable(g_schema,"detail");
   details.SetPrimaryKeyColumn("id");
-  details.SetSearchableColumn("id");
   details.SetParameter("mast_id",SQLVariant(p_master));
   details.SetSelection("*"); // Select all columns
 
