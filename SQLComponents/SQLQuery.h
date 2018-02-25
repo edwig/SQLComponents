@@ -93,24 +93,24 @@ public:
   void SetParameterMaxSize(int p_num,unsigned p_maxSize);
 
   // Set parameters for statement
-  void SetParameter  (int p_num,const SQLVariant&   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameterUL(int p_num,const unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLVariant*   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameterUL(int p_num,unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
   void SetParameter  (int p_num,const char*         p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (int p_num,const SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (int p_num,SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
   void SetParameter  (int p_num,const bcd&          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
 
-  void SetParameter  (const SQLVariant&   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (const long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameterUL(const unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (SQLVariant*   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (long          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameterUL(unsigned long p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
   void SetParameter  (const char*         p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (const CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (const SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (const SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
-  void SetParameter  (const SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (CString&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (SQLDate&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (SQLTime&      p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
+  void SetParameter  (SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
   void SetParameter  (const bcd&          p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
 
   // SINGLE STATEMENT

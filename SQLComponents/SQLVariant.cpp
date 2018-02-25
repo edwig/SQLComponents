@@ -1098,7 +1098,7 @@ SQLVariant::GetDataSize()
 //
 //////////////////////////////////////////////////////////////////////////
 
-__declspec(thread) CString g_waarde;
+__declspec(thread) char g_waarde[2 * sizeof(SQL_NUMERIC_STRUCT)+1];
 
 const char*
 SQLVariant::GetAsChar()
@@ -1113,7 +1113,9 @@ SQLVariant::GetAsChar()
   }
   // Should be: ThrowErrorDatatype(SQL_C_CHAR);
   // Sometimes we come her unexpectedly in various programs
-  GetAsString(g_waarde);
+  CString waarde;
+  GetAsString(waarde);
+  strncpy_s(g_waarde,waarde.GetString(),2 * sizeof(SQL_NUMERIC_STRUCT));
   return g_waarde;
 }
 

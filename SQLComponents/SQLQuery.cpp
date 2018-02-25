@@ -390,21 +390,21 @@ SQLQuery::SetParameterMaxSize(int p_num,unsigned p_maxSize)
 
 // Setting a parameter. Copies the SQLVariant!!
 void
-SQLQuery::SetParameter(int p_num,const SQLVariant& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,SQLVariant* p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter(int p_num,const long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameterUL(int p_num,const unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameterUL(int p_num,unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant *var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
@@ -418,28 +418,28 @@ SQLQuery::SetParameter(int p_num,const char* p_param,SQLParamType p_type /*=SQL_
 }
 
 void 
-SQLQuery::SetParameter(int p_num,const CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter(int p_num,const SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter (int p_num,const SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter (int p_num,SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type);
 }
 
 void 
-SQLQuery::SetParameter(int p_num,const SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   SQLVariant* var = new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type);
@@ -458,7 +458,7 @@ SQLQuery::SetParameter(int p_num,const bcd& p_param,SQLParamType p_type /*=SQL_P
 
 // Setting a parameter. Copies the SQLVariant!!
 void
-SQLQuery::SetParameter(const SQLVariant& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(SQLVariant* p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int) m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(p_param);
@@ -466,7 +466,7 @@ SQLQuery::SetParameter(const SQLVariant& p_param,SQLParamType p_type /*=SQL_PARA
 }
 
 void
-SQLQuery::SetParameter(const long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(p_param);
@@ -474,7 +474,7 @@ SQLQuery::SetParameter(const long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT
 }
 
 void
-SQLQuery::SetParameterUL(const unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameterUL(unsigned long p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant *var = new SQLVariant(p_param);
@@ -490,7 +490,7 @@ SQLQuery::SetParameter(const char* p_param,SQLParamType p_type /*=SQL_PARAM_INPU
 }
 
 void
-SQLQuery::SetParameter(const CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(CString& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(p_param);
@@ -498,7 +498,7 @@ SQLQuery::SetParameter(const CString& p_param,SQLParamType p_type /*=SQL_PARAM_I
 }
 
 void
-SQLQuery::SetParameter(const SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(&p_param);
@@ -506,7 +506,7 @@ SQLQuery::SetParameter(const SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_I
 }
 
 void
-SQLQuery::SetParameter(const SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(&p_param);
@@ -514,7 +514,7 @@ SQLQuery::SetParameter(const SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_I
 }
 
 void
-SQLQuery::SetParameter(const SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
+SQLQuery::SetParameter(SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/)
 {
   int size = (int)m_parameters.size() + 1;
   SQLVariant* var = new SQLVariant(&p_param);
