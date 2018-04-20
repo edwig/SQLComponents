@@ -188,6 +188,8 @@ using namespace std;
 #define SIZEOFWCHAR_T sizeof(wchar_t)
 #endif
 
+#define ERROR_SIZE 256
+
 
   //MF string conversion functions
 
@@ -282,7 +284,7 @@ struct CompoundFile
 private:
   void      SetError(HRESULT hr);
   IStorage*	_pStg;
-  char      _error[256];
+  char      _error[ERROR_SIZE];
 };
 
 } // namespace WinCompFiles
@@ -1069,7 +1071,6 @@ struct SmallString
 struct LargeString
 {
   LargeString();
-  ~LargeString();
   LargeString(const LargeString& s);
 
   LargeString& operator=(const LargeString& s);

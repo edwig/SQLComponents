@@ -3,6 +3,17 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.4
 ====== Released since:08-01-2017 =====
 ======================================
 
+Version 1.4.7 of 20-04-2018
+---------------------------
+1) Refacotred BasicExcel after extensive testing on SonarQube. Removed various
+   security issues with this class under Internet conditions.
+2) Repaired a bug in SQLPrepare/SQLExecute cycles
+   - The prepare was not robust against macro replacings
+   - The execute was not working on SELECT statements because the prepare
+     was missing an special test case.
+3) Repared a bug in bcd::Mod in case of a negative bcd number
+   All thanks to SonarQube analysis!
+
 Version 1.4.6 of 15-02-2018
 ---------------------------
 1) Refactored the SQLDataSet and the way the primary key works and the way

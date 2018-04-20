@@ -801,11 +801,18 @@ SQLQuery::DoSQLPrepare(const CString& p_statement)
     m_database->ReplaceMacros(statement);
   }
 
+  // See if it is a 'SELECT' query
+  m_isSelectQuery = false;
+  if(p_statement.Left(6).CompareNoCase("select") == 0)
+  {
+    m_isSelectQuery = true;
+  }
+
   // Log the query, just before we run it, replaced macro's and all
   if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
   {
     m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
-    m_database->LogPrint(LOGLEVEL_MAX,p_statement.GetString());
+    m_database->LogPrint(LOGLEVEL_MAX,statement.GetString());
     m_database->LogPrint(LOGLEVEL_MAX,"\n");
   }
 
@@ -816,7 +823,7 @@ SQLQuery::DoSQLPrepare(const CString& p_statement)
   SQLINTEGER lengthStatement = statement.GetLength() + 1;
 
   // GO DO THE PREPARE
-  m_retCode = SqlPrepare(m_hstmt,(SQLCHAR*)(LPCSTR)p_statement,lengthStatement);
+  m_retCode = SqlPrepare(m_hstmt,(SQLCHAR*)(LPCSTR)statement,lengthStatement);
   if(SQL_SUCCEEDED(m_retCode))
   {
     m_prepareDone = true;

@@ -2959,7 +2959,7 @@ bcd::Mod(const bcd& p_number) const
   bcd mod((*this) - (count * p_number));
   if (m_sign == Negative)
   {
-    -mod;
+    mod = -mod;
   }
   return mod;
 }
