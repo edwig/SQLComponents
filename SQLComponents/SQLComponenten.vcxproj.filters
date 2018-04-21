@@ -160,6 +160,9 @@
     <ClCompile Include="SQLTime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SQLGuid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicExcel.h">
@@ -310,6 +313,9 @@
       <Filter>Headers Files</Filter>
     </ClInclude>
     <ClInclude Include="SQLInfoMySQL.h">
+      <Filter>Headers Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLGuid.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
   </ItemGroup>

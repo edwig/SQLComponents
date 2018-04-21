@@ -43,6 +43,7 @@ class SQLDate;
 class SQLTime;
 class SQLTimestamp;
 class SQLInterval;
+class SQLGuid;
 
 // Type of parameter for queries and persistent-stored-modules
 typedef enum _param_type
@@ -97,6 +98,7 @@ public:
    SQLVariant(SQLTimestamp* p_stamp);         // SQLTimestamp
    SQLVariant(SQLInterval* p_interval);       // SQLInterval
    SQLVariant(const bcd* p_bcd);              // Binary Coded Decimal
+   SQLVariant(SQLGuid* p_guid);               // SQLGuid
    // Destructor
   ~SQLVariant();
    
@@ -179,8 +181,9 @@ public:
    SQLTime              GetAsSQLTime();
    SQLTimestamp         GetAsSQLTimestamp();
    SQLInterval          GetAsSQLInterval();
+   SQLGuid              GetAsSQLGuid();
    bcd                  GetAsBCD();
-
+   
    // Assignment operator
    SQLVariant& operator  =(const SQLVariant& p_original);
    // Assignment operator from original data
@@ -208,6 +211,7 @@ public:
    SQLVariant& operator  =(SQLTime& p_data);                 // SQLTime
    SQLVariant& operator  =(SQLTimestamp& p_data);            // SQLTimestamp
    SQLVariant& operator  =(SQLInterval& p_data);             // SQLInterval
+   SQLVariant& operator  =(SQLGuid& p_guid);                 // SQLGuid
    SQLVariant& operator  =(bcd& p_bcd);                      // Binary Coded Decimal
 
    // Comparison operators
@@ -244,6 +248,7 @@ public:
    operator SQLTime();
    operator SQLTimestamp();
    operator SQLInterval();
+   operator SQLGuid();
    operator CString();
    operator bcd();
 

@@ -31,6 +31,7 @@
 #include "SQLDate.h"
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
+#include "SQLGuid.h"
 #include "bcd.h"
 #include <math.h>
 #include <float.h>
@@ -424,6 +425,15 @@ SQLVariant::SQLVariant(const bcd* p_bcd)
   m_sqlDatatype = SQL_NUMERIC;
   m_indicator   = 0;
   p_bcd->AsNumeric(&m_data.m_dataNUMERIC);
+}
+
+SQLVariant::SQLVariant(SQLGuid* p_guid)
+{
+  Init();
+  m_datatype    = SQL_C_GUID;
+  m_sqlDatatype = SQL_GUID;
+  m_indicator   = 0;
+  memcpy_s(&m_data.m_dataGUID,sizeof(SQLGUID),p_guid->AsGUID(),sizeof(SQLGUID));
 }
 
 // GENERAL DTOR
@@ -2010,6 +2020,18 @@ SQLVariant::GetAsSQLInterval()
   }
   SQLInterval interval(&m_data.m_dataINTERVAL);
   return interval;
+}
+
+SQLGuid
+SQLVariant::GetAsSQLGuid()
+{
+  if(IsNULL())
+  {
+    SQLGuid guid;
+    return guid;
+  }
+  SQLGuid guid(&m_data.m_dataGUID);
+  return guid;
 }
 
 int

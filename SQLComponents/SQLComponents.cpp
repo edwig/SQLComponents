@@ -58,6 +58,9 @@ namespace SQLComponents
     // Initialize the code page name system
     InitCodePageNames();
 
+    // Initialize the COM subsystem
+    CoInitializeEx(nullptr,COINIT_MULTITHREADED);
+
     // We are now officially 'in business' :-)
     g_SQLComponentsInitialized = true;
   }
