@@ -36,17 +36,20 @@ public:
   SQLGuid();
   SQLGuid(const SQLGuid& p_guid);
   SQLGuid(const SQLGUID* p_guid);
-  SQLGuid(const CString p_string);
+  SQLGuid(const CString  p_string);
 
   bool     New();
-  bool     Set(const CString p_string);
+  // Set from external values
+  bool     Set(const CString  p_string);
   bool     Set(const SQLGUID* p_guid);
 
+  // Get the internals
   bool     IsValid();
   SQLGUID* AsGUID();
   CString  AsString();
 
-  bool     operator ==(SQLGuid& p_other);
+  // Operators
+  bool     operator ==(const SQLGuid& p_other);
   SQLGuid& operator  =(const SQLGuid& p_other);
 private:
   bool     GenerateGUID();

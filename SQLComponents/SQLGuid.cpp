@@ -38,7 +38,7 @@ namespace SQLComponents
 SQLGuid::SQLGuid()
 {
   // Set the guid to zeros
-  memset((void*)&m_guid, 0, sizeof(GUID));
+  memset((void*)&m_guid, 0, sizeof(SQLGUID));
 }
 
 // XTOR from other SQLGuid
@@ -132,7 +132,7 @@ SQLGuid::GenerateGUID()
 
 // See if GUID's are equal
 bool 
-SQLGuid::operator ==(SQLGuid& p_other)
+SQLGuid::operator ==(const SQLGuid& p_other)
 {
   if(this == &p_other)
   {
