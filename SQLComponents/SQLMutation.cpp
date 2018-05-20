@@ -166,12 +166,11 @@ SQLMutation::MixedMutations(int p_mutationID)
   }
 
   MutType type = MUT_NoMutation;
-  MutationStack::iterator it;
-  for(it = m_stack.begin(); it != m_stack.end(); ++it);
+  for(auto& mutate : m_stack)
   {
-    if((*it)->m_mutationID > 0)
+    if(mutate->m_mutationID > 0)
     {
-      if((*it)->m_mutationID == p_mutationID)
+      if(mutate->m_mutationID == p_mutationID)
       {
         if(type == MUT_OnlyOthers)
         {
@@ -196,7 +195,7 @@ SQLMutation::MixedMutations(int p_mutationID)
   return type;
 }
 
-// Reduce all mutations after synchronisation with the database
+// Reduce all mutations after synchronization with the database
 // Leaving only the last mutation (TOS) intact.
 void
 SQLMutation::Reduce()

@@ -53,8 +53,51 @@ SQLFilter::SQLFilter(CString p_field,SQLOperator p_operator,SQLVariant* p_value)
 {
   if(p_value)
   {
-    m_values.push_back(p_value);
+    m_values.push_back(new SQLVariant(p_value));
   }
+}
+
+// XTOR from a single integer
+SQLFilter::SQLFilter(CString p_field,SQLOperator p_operator,int p_value)
+          :m_field(p_field)
+          ,m_operator(p_operator)
+{
+  SQLVariant* val = new SQLVariant(p_value);
+  m_values.push_back(val);
+}
+
+// XTOR from a single CString
+SQLFilter::SQLFilter(CString p_field,SQLOperator p_operator,CString p_value)
+          :m_field(p_field)
+          ,m_operator(p_operator)
+{
+  SQLVariant* val = new SQLVariant(p_value);
+  m_values.push_back(val);
+}
+
+// XTOR from another filter
+SQLFilter::SQLFilter(SQLFilter* p_other)
+{
+  m_field      = p_other->m_field;
+  m_operator   = p_other->m_operator;
+  m_expression = p_other->m_expression;
+  m_negate     = p_other->m_negate;
+
+  for(auto& variant : p_other->m_values)
+  {
+    var* value = new SQLVariant(variant);
+    m_values.push_back(value);
+  }
+}
+
+// DTOR: Remove all variant values
+SQLFilter::~SQLFilter()
+{
+  for(auto& val : m_values)
+  {
+    delete val;
+  }
+  m_values.clear();
 }
 
 // Getting one of the values of the filter

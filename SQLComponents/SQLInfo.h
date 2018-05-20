@@ -68,8 +68,6 @@ typedef struct _TypeInfo
 TypeInfo;
 
 typedef std::map<CString,TypeInfo*> DataTypeMap;
-
-
 typedef std::list<CString>          WordList;
 
 class SQLInfo 
@@ -268,6 +266,7 @@ public:
   SQLSMALLINT   GetIdentifierCase();
   SQLSMALLINT   GetCatalogLocation();
   SQLUINTEGER   GetCatalogNameUsage();
+  SQLUINTEGER   GetSchemaNameUsage();
   SQLSMALLINT   GetNULLCollation();
   SQLSMALLINT   GetNULLConcatBehaviour();
   SQLSMALLINT   GetColumnsCanBeNULL();
@@ -419,6 +418,7 @@ protected:
   CString      m_procedureName;         // Standard is 'procedure'
   SQLUSMALLINT m_catalogLocation;       // Before schema or after tablename
   SQLUINTEGER  m_catalogUsage;          // Where catalog names can be used
+  SQLUINTEGER  m_schemaUsage;           // WHere schema names can be used
   CString      m_catalogNameSeparator;  // Separator for the catalog name
   SQLSMALLINT  m_identifierCase;        // Case-specific of names in the catalog
 
@@ -1056,6 +1056,12 @@ inline SQLUINTEGER
 SQLInfo::GetCatalogNameUsage()
 {
   return m_catalogUsage;
+}
+
+inline SQLUINTEGER
+SQLInfo::GetSchemaNameUsage()
+{
+  return m_schemaUsage;
 }
 
 inline SQLSMALLINT   

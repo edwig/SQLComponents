@@ -44,6 +44,7 @@ SQLRecord::SQLRecord(SQLDataSet* p_set,bool p_modifiable)
           ,m_modifiable(p_modifiable)
           ,m_status(SQL_Record_NULL)
           ,m_reference(0)
+          ,m_generator(-1)
 {
   Acquire();
 }
@@ -73,6 +74,15 @@ SQLRecord::Release()
   }
   return false;
 }
+
+// Set the status of the record to 'Inserted'
+void
+SQLRecord::Inserted()
+{
+  m_status = SQL_Record_Insert;
+  m_dataSet->SetStatus(SQL_Insertions,SQL_Record_Updated);
+}
+
 
 // Set this record's status to a deleted record
 void
@@ -156,50 +166,58 @@ SQLRecord::Rollback()
 
 // Modify a field on the basis of the raw data pointer
 // Expects the same datatype as the value of the field!!!!!
-void
-SQLRecord::ModifyField(int p_num,void* p_data,int p_mutationID /*=0*/)
-{
-  if(m_modifiable == false || (m_status & SQL_Record_Deleted))
-  {
-    return;
-  }
-  if(p_num < 0 || p_num >= (int)m_fields.size())
-  {
-    return;
-  }
-  SQLVariant* field = m_fields[p_num]->MutationValue(p_mutationID);
-  if(memcmp(field->GetDataPointer(),p_data,field->GetDataSize()))
-  {
-    // If really different, set updated
-    m_status |= SQL_Record_Updated;
-    m_dataSet->SetStatus(SQL_Updates);
-  }
-  if(m_fields[p_num]->Original())
-  {
-    // Make the first mutation
-    SQLVariant value;
-    value.SetData(field->GetDataType(),(const char*)p_data);
-    m_fields[p_num]->Add(&value,p_mutationID);
-  }
-  else if(m_fields[p_num]->CurrentMutationID() == p_mutationID)
-  {
-    // Same mutation id: add it directly to the SQLVariant
-    field->SetData(field->GetDataType(),(char*)p_data);
-  }
-  else
-  {
-    // Make a new mutation of the same type
-    SQLVariant value;
-    value.SetData(field->GetDataType(),(const char*)p_data);
-    m_fields[p_num]->Add(&value,p_mutationID);
-  }
-}
+// void
+// SQLRecord::ModifyField(int p_num,void* p_data,int p_mutationID /*=0*/)
+// {
+//   if(m_modifiable == false || (m_status & SQL_Record_Deleted))
+//   {
+//     return;
+//   }
+//   if(p_num < 0 || p_num >= (int)m_fields.size())
+//   {
+//     return;
+//   }
+// 
+//   // Compare values, and see if we really must modify something
+// 
+//   // Get the last value from the mutation stack
+//   SQLVariant* field = m_fields[p_num]->MutationValue(p_mutationID);
+//   // Make the new value
+//   SQLVariant value(field->GetDataType(),0);
+//   value.SetFromRawDataPointer(p_data);
+// 
+//   // If equal, bail out
+//   if(*field == value)
+//   {
+//     return;
+//   }
+// 
+//   // If really different, set updated
+//   m_status |= SQL_Record_Updated;
+//   m_dataSet->SetStatus(SQL_Updates);
+// 
+//   if(m_fields[p_num]->Original())
+//   {
+//     // Make the first mutation
+//     m_fields[p_num]->Add(&value,p_mutationID);
+//   }
+//   else if(m_fields[p_num]->CurrentMutationID() == p_mutationID)
+//   {
+//     // Same mutation id: add it directly to the SQLVariant
+//     field->SetFromRawDataPointer(p_data);
+//   }
+//   else
+//   {
+//     // Make a new mutation of the same type
+//     m_fields[p_num]->Add(&value,p_mutationID);
+//   }
+// }
 
-void
-SQLRecord::ModifyField(CString p_name,void* p_field,int p_mutationID /*=0*/)
-{
-  ModifyField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
-}
+// void
+// SQLRecord::ModifyField(const char* p_name,void* p_field,int p_mutationID /*=0*/)
+// {
+//   ModifyField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
+// }
 
 void        
 SQLRecord::ModifyField(int p_num,SQLVariant* p_data,int p_mutationID /*=0*/)
@@ -217,13 +235,7 @@ SQLRecord::ModifyField(int p_num,SQLVariant* p_data,int p_mutationID /*=0*/)
     // Need a data pointer
     return;
   }
-//   SQLVariant* field = m_fields[p_num]->MutationValue(p_mutationID);
-//   size_t size = max(field->GetDataSize(),p_data->GetDataSize());
-//   if(memcmp(field->GetDataPointer(),p_data->GetDataPointer(),size))
-//   {
-//     m_status |= SQL_Record_Updated;
-//     m_dataSet->SetStatus(SQL_Updates);
-//   }
+  // Save the mutation
   if(m_fields[p_num]->Mutate(p_data,p_mutationID))
   {
     m_status |= SQL_Record_Updated;
@@ -232,9 +244,142 @@ SQLRecord::ModifyField(int p_num,SQLVariant* p_data,int p_mutationID /*=0*/)
 }
 
 void
-SQLRecord::ModifyField(CString p_name,SQLVariant* p_field,int p_mutationID /*= 0*/)
+SQLRecord::ModifyField(const char* p_name,SQLVariant* p_field,int p_mutationID /*= 0*/)
 {
   ModifyField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,bool& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name),&value,p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,char& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name),&value,p_mutationID);
+}
+
+void        
+SQLRecord::ModifyField(const char* p_name,const char* p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name),&value,p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,unsigned char& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,short& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,unsigned short& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,int& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value((long)p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,unsigned int& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value((unsigned int)p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,float& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,double& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,__int64& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,unsigned __int64& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,SQLDate& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(&p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,SQLTime& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(&p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,SQLTimestamp& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(&p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,SQLInterval& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(&p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,SQLGuid& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(&p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,CString& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
+}
+
+void
+SQLRecord::ModifyField(const char* p_name,bcd& p_field,int p_mutationID /*= 0*/)
+{
+  SQLVariant value(&p_field);
+  ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
 }
 
 // Record is changed?
@@ -349,6 +494,31 @@ SQLRecord::AllMixedMutations(MutationIDS& p_list,int p_mutationID)
     total += m_fields[ind]->AllMixedMutations(p_list,p_mutationID);
   }
   return total;
+}
+
+static SQLVariant null;
+
+// Getting contents of the record as a SQLVariant pointer
+SQLVariant&
+SQLRecord::operator[](int p_index)
+{
+  SQLVariant* var = GetField(p_index);
+  if(var)
+  {
+    return *var;
+  }
+  return null;
+}
+
+SQLVariant&
+SQLRecord::operator[](const char* p_name)
+{
+  SQLVariant* var = GetField(p_name);
+  if(var)
+  {
+    return *var;
+  }
+  return null;
 }
 
 //////////////////////////////////////////////////////////////////////////

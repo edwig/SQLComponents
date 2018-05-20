@@ -75,8 +75,8 @@ void TestEqual()
   variants[CT_CHAR]     = SQLVariant("42");
   variants[CT_SSHORT]   = SQLVariant((short)42);
   variants[CT_USHORT]   = SQLVariant((unsigned short)42);
-  variants[CT_SLONG]    = SQLVariant((long)42);
-  variants[CT_ULONG]    = SQLVariant((unsigned long)42);
+  variants[CT_SLONG]    = SQLVariant((int)42);
+  variants[CT_ULONG]    = SQLVariant((unsigned)42);
   variants[CT_FLOAT]    = SQLVariant((float)42.0);
   variants[CT_DOUBLE]   = SQLVariant((double)42.0);
   variants[CT_BIT]      = SQLVariant(true);
@@ -125,8 +125,8 @@ TestAdd()
   others[CT_CHAR]     = SQLVariant("5");
   others[CT_SSHORT]   = SQLVariant((short)5);
   others[CT_USHORT]   = SQLVariant((unsigned short)5);
-  others[CT_SLONG]    = SQLVariant((long)5);
-  others[CT_ULONG]    = SQLVariant((unsigned long)5);
+  others[CT_SLONG]    = SQLVariant((int)5);
+  others[CT_ULONG]    = SQLVariant((unsigned)5);
   others[CT_FLOAT]    = SQLVariant((float)5);
   others[CT_DOUBLE]   = SQLVariant((double)5);
   others[CT_BIT]      = SQLVariant(true);
@@ -198,8 +198,8 @@ void TestCast()
   SQLVariant varUTiny ((unsigned char) 189);
   SQLVariant varSShort((short) -567);
   SQLVariant varUShort((ushort) 567);
-  SQLVariant varInt   ((long) 2 * 42);
-  SQLVariant varUInt  ((ulong) 0x84556677);
+  SQLVariant varInt   ((int) 2 * 42);
+  SQLVariant varUInt  ((unsigned) 0x84556677);
   
   bool     numberBit     = varBit;
   char     numberSTiny   = varSTiny;

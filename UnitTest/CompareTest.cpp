@@ -57,8 +57,8 @@ namespace OperatorUnitTest
       variants[CT_CHAR]     = SQLVariant("42");
       variants[CT_SSHORT]   = SQLVariant((short)42);
       variants[CT_USHORT]   = SQLVariant((unsigned short)42);
-      variants[CT_SLONG]    = SQLVariant((long)42);
-      variants[CT_ULONG]    = SQLVariant((unsigned long)42);
+      variants[CT_SLONG]    = SQLVariant((int)42);
+      variants[CT_ULONG]    = SQLVariant((unsigned)42);
       variants[CT_FLOAT]    = SQLVariant((float)42.0);
       variants[CT_DOUBLE]   = SQLVariant((double)42.0);
       variants[CT_BIT]      = SQLVariant(true);
@@ -71,8 +71,8 @@ namespace OperatorUnitTest
       other[CT_CHAR]     = SQLVariant("24");
       other[CT_SSHORT]   = SQLVariant((short)24);
       other[CT_USHORT]   = SQLVariant((unsigned short)24);
-      other[CT_SLONG]    = SQLVariant((long)24);
-      other[CT_ULONG]    = SQLVariant((unsigned long)24);
+      other[CT_SLONG]    = SQLVariant((int)24);
+      other[CT_ULONG]    = SQLVariant((unsigned)24);
       other[CT_FLOAT]    = SQLVariant((float)24.0);
       other[CT_DOUBLE]   = SQLVariant((double)24.0);
       other[CT_BIT]      = SQLVariant(false);

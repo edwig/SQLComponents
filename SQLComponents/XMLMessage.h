@@ -34,6 +34,8 @@
 #include "XMLDataType.h"
 #include <deque>
 
+#ifndef COMPILED_TOGEHTER_WITH_MARLIN
+
 namespace SQLComponents
 {
 
@@ -356,3 +358,5 @@ XMLMessage::SetSendBOM(bool p_bom)
 
 // End of namespace
 }
+
+#endif   // COMPILED_TOGETHER_WITH_MARLIN

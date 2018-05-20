@@ -35,6 +35,8 @@
 #include "XMLParser.h"
 #include "ConvertWideString.h"
 
+#ifndef COMPILED_TOGETHER_WITH_MARLIN
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -1113,3 +1115,5 @@ XMLMessage::SetSendUnicode(bool p_unicode)
 
 // End of namespace
 }
+
+#endif // COMPILED_TOGETHER_WITH_MARLIN

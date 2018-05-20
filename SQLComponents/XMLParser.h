@@ -32,6 +32,8 @@
 #pragma once
 #include "XMLMessage.h"
 
+#ifndef COMPILED_TOGEHTER_WITH_MARLIN
+
 namespace SQLComponents
 {
 
@@ -121,3 +123,5 @@ XMLParser::SetUTF8()
 
 // End of namespace
 }
+
+#endif // COMPILED_TOGETHER_WITH_MARLIN

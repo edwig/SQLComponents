@@ -35,6 +35,8 @@
 #include "DefuseBOM.h"
 #include "ConvertWideString.h"
 
+#ifndef COMPILED_TOGETHER_WITH_MARLIN
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -789,3 +791,5 @@ XMLParser::MakeElement(CString& p_namespace,CString& p_name)
 
 // End of namespace
 }
+
+#endif // COMPILED_TOGETHER_WITH_MARLIN

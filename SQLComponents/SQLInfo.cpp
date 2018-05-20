@@ -499,6 +499,7 @@ SQLInfo::GetInfo()
   m_predicates          = GetInfoInteger(SQL_SQL92_PREDICATES);
   m_catalogLocation     = GetInfoShortInteger(SQL_CATALOG_LOCATION);
   m_catalogUsage        = GetInfoInteger(SQL_CATALOG_USAGE);
+  m_schemaUsage         = GetInfoInteger(SQL_SCHEMA_USAGE);
   m_datetimeLiterals    = GetInfoInteger(SQL_DATETIME_LITERALS);
   m_funcNumeric         = GetInfoInteger(SQL_NUMERIC_FUNCTIONS);
   m_funcString          = GetInfoInteger(SQL_STRING_FUNCTIONS);

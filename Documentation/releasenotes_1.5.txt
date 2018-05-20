@@ -1,0 +1,20 @@
+RELEASENOTES SQLCOMPONENTS VERSION 1.5
+======================================
+====== Released since:20-05-2017 =====
+======================================
+
+1) The new compile time macro "COMPILED_TOGETHER_WITH_MARLIN" makes it possible to 
+   drop the library in a larger project, together with the Marlin library at once.
+   Just copy the directory, plugin the "SQLComponents.vcxproj" file in your solution,
+   and set this macro on the project definition as an extra C++ macro define.
+
+2) The datatype "long" in SQLVariant has been replaces by the standard "int" type.
+   This works better together with different other projects and libraries.
+
+3) The SQLFilter and SQLFilter set has been rewritten to have local copies off all values
+
+4) The CreateTable file can now be locally configured with model parts and then generate
+   the desired DDL for creating a table, before the table even exists in the database
+
+5) Small rewrites to the SQLDataSet, so that the "Insert" functionallity can use a 
+   sequence generator

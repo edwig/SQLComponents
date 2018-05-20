@@ -93,6 +93,7 @@ SQLDataSet::SQLDataSet()
            ,m_status(SQL_Empty)
            ,m_current(-1)
            ,m_open(false)
+           ,m_filters(nullptr)
 {
 }
 
@@ -102,6 +103,7 @@ SQLDataSet::SQLDataSet(CString p_name,SQLDatabase* p_database /*=NULL*/)
            ,m_status(SQL_Empty)
            ,m_current(-1)
            ,m_open(false)
+           ,m_filters(nullptr)
 {
 }
 
@@ -294,9 +296,9 @@ SQLDataSet::SetParameter(CString p_naam,SQLVariant p_waarde)
 }
 
 // Set filters for a query
-// Releasing the previous set of filters
+// Forgetting the previous set of filters
 void
-SQLDataSet::SetFilters(SQLFilterSet& p_filters)
+SQLDataSet::SetFilters(SQLFilterSet* p_filters)
 {
   m_filters = p_filters;
 }
@@ -322,6 +324,24 @@ SQLDataSet::GetParameter(CString& p_name)
     }
   }
   return NULL;
+}
+
+// Getting the sequence name
+CString
+SQLDataSet::GetSequenceName()
+{
+  // Special sequence name set
+  if(!m_sequenceName.IsEmpty())
+  {
+    return m_sequenceName;
+  }
+  // Mostly enough
+  if(!m_primaryTableName.IsEmpty())
+  {
+    return m_primaryTableName + "_seq";
+  }
+  // Give up :-(
+  return "";
 }
 
 // Replace $name for the value of a parameter
@@ -414,7 +434,7 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
   return sql;
 }
 
-// Parse the fitlers
+// Parse the fitlers (m_filters must be non-null)
 CString
 SQLDataSet::ParseFilters()
 {
@@ -428,7 +448,7 @@ SQLDataSet::ParseFilters()
   query = m_query;
 
   // Add all filters
-  for(auto& filt : m_filters)
+  for(auto& filt : m_filters->GetFilters())
   {
     if(first == true)
     {
@@ -441,7 +461,7 @@ SQLDataSet::ParseFilters()
     {
       query += "\n   AND ";
     }
-    query += filt.GetSQLFilter();
+    query += filt->GetSQLFilter();
   }
   return query;
 }
@@ -479,7 +499,7 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
       {
         query = ParseQuery();
       }
-      else if(m_filters.size())
+      else if(m_filters && !m_filters->Empty())
       {
         query = ParseFilters();
       }
@@ -562,7 +582,7 @@ SQLDataSet::Append()
       {
         query = ParseQuery();
       }
-      else if(m_filters.size())
+      else if(m_filters && !m_filters->Empty())
       {
         query = ParseFilters();
       }
@@ -616,7 +636,7 @@ SQLDataSet::ReadRecordFromQuery(SQLQuery& p_query,bool p_modifiable,bool p_appen
     record->AddField(var);
   }
 
-  // Construct the primarykey (possibly from more than 1 field)
+  // Construct the primary key (possibly from more than 1 field)
   CString key = MakePrimaryKey(record);
 
   if(key.IsEmpty())
@@ -661,7 +681,7 @@ SQLDataSet::MakePrimaryKey(SQLRecord* p_record)
     var->GetAsString(value);
 
     key += value;
-    key += "\0x1E";  // ASCII UNIT Seperator
+    key += "\0x1E";  // ASCII UNIT Separator
   }
   return key;
 }
@@ -677,7 +697,7 @@ SQLDataSet::MakePrimaryKey(VariantSet& p_primary)
     val->GetAsString(value);
 
     key += value;
-    key += "\0x1E";  // ASCII UNIT Seperator
+    key += "\0x1E";  // ASCII UNIT Separator
   }
   return key;
 }
@@ -836,10 +856,11 @@ SQLDataSet::FindObjectFilter(SQLFilterSet& p_filters,bool p_primary /*=false*/)
   SQLRecord* record = nullptr;
 
   // Optimize for network databases
-  if(p_primary && p_filters.size() == 1)
+  if(p_primary && p_filters.Size() == 1)
   {
-    SQLVariant* prim = p_filters[0].GetValue();
-    if(p_filters[0].GetOperator() == OP_Equal && prim->GetDataType() == SQL_C_SLONG )
+    SQLFilter* filter = p_filters.GetFilters().front();
+    SQLVariant* prim  = filter->GetValue();
+    if(filter->GetOperator() == OP_Equal && prim->GetDataType() == SQL_C_SLONG )
     {
       return FindObjectRecord(prim->GetAsSLong());
     }
@@ -850,9 +871,9 @@ SQLDataSet::FindObjectFilter(SQLFilterSet& p_filters,bool p_primary /*=false*/)
   {
     record = rec;
     // Walk the chain of filters
-    for(auto& filt : p_filters)
+    for(auto& filt : p_filters.GetFilters())
     {
-      if(! filt.MatchRecord(record))
+      if(! filt->MatchRecord(record))
       {
         record = nullptr;
         break;
@@ -880,9 +901,9 @@ SQLDataSet::FindRecordSet(SQLFilterSet& p_filters)
   {
     SQLRecord* record = rec;
     // Walk the chain of filters
-    for(auto& filt : p_filters)
+    for(auto& filt : p_filters.GetFilters())
     {
-      if(! filt.MatchRecord(record))
+      if(! filt->MatchRecord(record))
       {
         record = nullptr;
         break;
@@ -950,13 +971,16 @@ SQLDataSet::GetCurrentField(int p_num)
 }
 
 // Insert new record
+// If the set was previously closed, it is now OPEN for transactions
+// because there is at least one record in the dataset
 SQLRecord* 
 SQLDataSet::InsertRecord()
 {
-  SQLRecord* record = new SQLRecord(this);
+  SQLRecord* record = new SQLRecord(this,true);
   m_records.push_back(record);
   m_current = (int)(m_records.size() - 1);
   m_status |= SQL_Insertions;
+  m_open    = true;
   return record;
 }
 
@@ -1066,12 +1090,19 @@ SQLDataSet::Synchronize(int p_mutationID /*=0*/)
     return true;
   }
   // Check preliminary conditions
-  if(m_primaryTableName.IsEmpty() ||    // Needs the primary table name of the dataset
-     !GetPrimaryKeyInfo()         ||    // Needs primary key info for doing updates/deletes
-     !CheckPrimaryKeyColumns()    )     // Needs all of the primary key columns
+  if(m_primaryTableName.IsEmpty())
   {
-    // No primary key, cannot do updates/deletes
+    // Needs the primary table name of the dataset
     return false;
+  }
+  if(m_status & (SQL_Record_Deleted | SQL_Record_Updated))
+  {
+    if(!GetPrimaryKeyInfo()     ||    // Needs primary key info for doing updates/deletes
+       !CheckPrimaryKeyColumns())     // Needs all of the primary key columns
+    {
+      // No primary key, cannot do updates/deletes
+      return false;
+    }
   }
 
   // Save status before a possible throw
@@ -1197,6 +1228,11 @@ SQLDataSet::Deletes(int p_mutationID)
                              ++deletes;
                              break;
       }
+      // Iterator cannot continue after last removed item
+      if(m_records.empty())
+      {
+        break;
+      }
     }
     else
     {
@@ -1268,16 +1304,24 @@ SQLDataSet::Inserts(int p_mutationID)
     {
       ++total;
       CString sql;
+      CString serial;
       MutType type = record->MixedMutations(p_mutationID);
       switch(type)
       {
         case MUT_NoMutation: // Fall through: Do nothing
         case MUT_OnlyOthers: break;
         case MUT_Mixed:      throw CString("Mixed mutations");
-        case MUT_MyMutation: sql = GetSQLInsert(&query,record);
+        case MUT_MyMutation: sql = GetSQLInsert(&query,record,serial);
                              query.DoSQLStatement(sql);
                              ++insert;
                              break;
+      }
+      // For an active generator, fill in the retrieved value
+      if(record->GetGenerator() >= 0 && !serial.IsEmpty())
+      {
+        int value = m_database->GetSQL_EffectiveSerial(serial);
+        SQLVariant val(value);
+        record->SetField(record->GetGenerator(),&val,0);
       }
     }
   }
@@ -1377,7 +1421,7 @@ SQLDataSet::GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record)
 }
 
 CString
-SQLDataSet::GetSQLInsert(SQLQuery* p_query,SQLRecord* p_record)
+SQLDataSet::GetSQLInsert(SQLQuery* p_query,SQLRecord* p_record,CString& p_serial)
 {
   int parameter = 1;
   CString sql("INSERT INTO " + m_primaryTableName);
@@ -1392,11 +1436,21 @@ SQLDataSet::GetSQLInsert(SQLQuery* p_query,SQLRecord* p_record)
   for(unsigned ind = 0;ind < m_names.size(); ++ind)
   {
     SQLVariant* value = p_record->GetField(ind);
-    if(value->IsNULL() == false)
+    if((int)ind == p_record->GetGenerator() && value->IsEmpty())
     {
-      fields += m_names[ind] + ",";
-      params += "?,";
-      p_query->SetParameter(parameter++,value);
+      fields  += m_names[ind] + ",";
+      p_serial = m_database->GetSQL_GenerateSerial(m_primaryTableName);
+      params  += p_serial;
+      params  += ",";
+    }
+    else
+    {
+      if(value->IsNULL() == false)
+      {
+        fields += m_names[ind] + ",";
+        params += "?,";
+        p_query->SetParameter(parameter++,value);
+      }
     }
   }
   // Closing
@@ -1559,12 +1613,12 @@ SQLDataSet::ForgetRecord(SQLRecord* p_record,bool p_force)
   RecordSet::iterator it = find(m_records.begin(),m_records.end(),p_record);
   if(it != m_records.end())
   {
+    // Remove from m_objects. Maybe does nothing!
+    ForgetPrimaryObject(p_record);
+
     // Try to release the record
     if(p_record->Release())
     {
-      // Remove from m_objects. Maybe does nothing!
-      ForgetPrimaryObject(p_record);
-
       // Remove from m_records
       m_records.erase(it);
 

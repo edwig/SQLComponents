@@ -31,6 +31,8 @@
 //
 #pragma once
 
+#ifndef COMPILED_TOGEHTER_WITH_MARLIN
+
 // XML DATA TYPES
 #define XDT_String              0x00000001
 #define XDT_Integer             0x00000002
@@ -102,3 +104,5 @@
 
 // The XML Datatype holds datatypes AND wsdl options
 typedef unsigned XmlDataType;
+
+#endif // COMPILED_TOGETHER_WITH_MARLIN
