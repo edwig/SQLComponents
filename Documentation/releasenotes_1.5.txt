@@ -18,3 +18,5 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.5
 
 5) Small rewrites to the SQLDataSet, so that the "Insert" functionallity can use a 
    sequence generator
+
+6) All throws of CString has been refactored to throws of "StdException"

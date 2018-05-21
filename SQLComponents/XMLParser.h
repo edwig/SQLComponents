@@ -32,7 +32,9 @@
 #pragma once
 #include "XMLMessage.h"
 
-#ifndef COMPILED_TOGEHTER_WITH_MARLIN
+#ifdef COMPILED_TOGETHER_WITH_MARLIN
+#include "..\Marlin\XMLParser.h"
+#else
 
 namespace SQLComponents
 {

@@ -73,14 +73,11 @@ namespace DatabaseUnitTest
           Assert::Fail(L"Database ***NOT*** opened.");
         }
       }
-      catch(CString& s)
+      catch(StdException* er)
       {
-        Logger::WriteMessage(s);
+        Logger::WriteMessage(MessageFromException(er));
         Assert::Fail(L"Database ***NOT*** opened.");
-      }
-      catch(...)
-      {
-        Assert::Fail(L"Database ***NOT*** opened.");
+        er->Delete();
       }
       number_of_tests++;
       return true;

@@ -225,9 +225,11 @@ namespace DatabaseUnitTest
 
         Assert::Fail(L"Should not come here");
       }
-      catch (CString& er)
+      catch (StdException* er)
       {
-        int pos = er.Find("wrong");
+        CString message = er->GetErrorMessage();
+        int pos = message.Find("wrong");
+        er->Delete();
         Assert::IsTrue(pos > 0);
       }
       number_of_tests++;

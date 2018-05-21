@@ -108,13 +108,10 @@ void TestCalling()
       printf("Database ***NOT*** opened.\n");
     }
   }
-  catch(CString& s)
+  catch(StdException* er)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",s.GetString());
-  }
-  catch(...)
-  {
-    printf("Database ***NOT*** opened for unknown reasons\n");
+    printf("Database ***NOT*** opened. Reason:\n%s\n",er->GetErrorMessage().GetString());
+    er->Delete();
   }
   if(dbs.IsOpen())
   {

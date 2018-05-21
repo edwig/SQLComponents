@@ -833,7 +833,7 @@ SQLVariant::SetFromBinaryStreamData(int   p_type
     }
     else
     {
-      throw CString("Cannot set variant from binary stream data.");
+      throw new StdException("Cannot set variant from binary stream data.");
     }
   }
 }
@@ -1902,9 +1902,9 @@ SQLVariant::GetAsDate()
       date.AsDateStruct(&g_date);
       return &g_date;
     }
-    catch(CString& /*er*/)
+    catch(StdException* er)
     {
-      throw;
+      throw er;
     }
   }
   ThrowErrorDatatype(SQL_C_DATE);
@@ -2109,7 +2109,7 @@ SQLVariant::GetNumericPrecision()
   {
     return m_data.m_dataNUMERIC.precision;
   }
-  throw CString("Cannot get the numeric precision of this datatype");
+  throw new StdException("Cannot get the numeric precision of this datatype");
 }
 
 // Only for SQL_NUMERIC: The scale
@@ -2734,7 +2734,7 @@ SQLVariant::ThrowErrorDatatype(int p_getas)
   char* type  = SQLVariant::FindDatatype(m_datatype);
   char* getas = SQLVariant::FindDatatype(p_getas);
   error.Format("Cannot get a %s as a %s datatype.",type,getas);
-  throw error;
+  throw new StdException(error);
 }
 
 // End of namespace

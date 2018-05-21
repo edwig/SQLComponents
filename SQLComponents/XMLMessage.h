@@ -34,7 +34,9 @@
 #include "XMLDataType.h"
 #include <deque>
 
-#ifndef COMPILED_TOGEHTER_WITH_MARLIN
+#ifdef COMPILED_TOGETHER_WITH_MARLIN
+#include "..\Marlin\XMLMessage.h"
+#else
 
 namespace SQLComponents
 {

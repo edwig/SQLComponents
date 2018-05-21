@@ -86,9 +86,10 @@ SQLInfoDB::MakeInfoTableObject(MTableMap& p_tables
     qry.DoSQLStatement(sql);
     return ReadTablesFromQuery(qry,p_tables);
   }
-  catch(CString& er)
+  catch(StdException* er)
   {
-    p_errors.Append(er);
+    p_errors += MessageFromException(er);
+    er->Delete();
   }
   return 0;
 }

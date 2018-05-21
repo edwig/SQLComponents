@@ -88,14 +88,11 @@ namespace DatabaseUnitTest
         }
         number_of_tests++;
       }
-      catch(CString& s)
+      catch(StdException* er)
       {
-        Logger::WriteMessage(s);
+        Logger::WriteMessage(MessageFromException(er));
         Assert::Fail(L"Database ***NOT*** opened. Reason:");
-      }
-      catch(...)
-      {
-        Assert::Fail(L"Database ***NOT*** opened for unknown reasons");
+        er->Delete();
       }
       long endTime = clock();
       CString performance;
@@ -166,14 +163,11 @@ namespace DatabaseUnitTest
         Assert::AreEqual((double)1350.0,grandTotal);
         number_of_tests++;
       }
-      catch(CString& s)
+      catch(StdException* er)
       {
-        Logger::WriteMessage(s);
+        Logger::WriteMessage(MessageFromException(er));
         Assert::Fail(L"Database ***NOT*** opened. Reason:");
-      }
-      catch(...)
-      {
-        Assert::Fail(L"Database ***NOT*** opened for unknown reasons");
+        er->Delete();
       }
     }
 
@@ -384,15 +378,12 @@ namespace DatabaseUnitTest
         }
         dbs.Close();
       }
-      catch(CString& s)
+      catch(StdException* er)
       {
         Logger::WriteMessage("Database error. Reason:");
-        Logger::WriteMessage(s);
+        Logger::WriteMessage(MessageFromException(er));
         Assert::Fail(L"Database error");
-      }
-      catch(...)
-      {
-        Assert::Fail(L"Unknown error in database test");
+        er->Delete();
       }
       long endTime = clock();
       number_of_tests++;
@@ -480,15 +471,12 @@ namespace DatabaseUnitTest
         }
        dbs.Close();
       }
-      catch(CString& s)
+      catch(StdException* er)
       {
         Logger::WriteMessage("Database error. Reason:");
-        Logger::WriteMessage(s);
+        Logger::WriteMessage(MessageFromException(er));
         Assert::Fail(L"Database error");
-      }
-      catch(...)
-      {
-        Assert::Fail(L"Unknown error in database test");
+        er->Delete();
       }
       long endTime = clock();
       number_of_tests++;
@@ -598,15 +586,12 @@ namespace DatabaseUnitTest
         dbs.Close();
         number_of_tests++;
       }
-      catch(CString& s)
+      catch(StdException* er)
       {
         Logger::WriteMessage("Database error. Reason:");
-        Logger::WriteMessage(s);
+        Logger::WriteMessage(MessageFromException(er));
         Assert::Fail(L"Database error");
-      }
-      catch(...)
-      {
-        Assert::Fail(L"Unknown error in database test");
+        er->Delete();
       }
     }
 
@@ -667,15 +652,12 @@ namespace DatabaseUnitTest
 //         }
 //         dbs.Close();
 //       }
-//       catch(CString& s)
+//       catch(StdException* er)
 //       {
 //         Logger::WriteMessage("Database error. Reason:");
-//         Logger::WriteMessage(s);
+//         Logger::WriteMessage(MessageFromException(er));
 //         Assert::Fail(L"Database error");
-//       }
-//       catch(...)
-//       {
-//         Assert::Fail(L"Unknown error in database test");
+//         er->Delete();
 //       }
 //       long endTime = clock();
 //       CString msg;

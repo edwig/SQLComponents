@@ -161,13 +161,9 @@ TestSQLFormatting()
     }
     dbs.Close();
   }
-  catch(CString& s)
+  catch(StdException* er)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",s.GetString());
-  }
-  catch(...)
-  {
-    printf("Database ***NOT*** opened for unknown reasons\n");
+    printf("Database ***NOT*** opened. Reason:\n%s\n",MessageFromException(er).GetString());
   }
 }
 

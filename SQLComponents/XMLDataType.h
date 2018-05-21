@@ -31,7 +31,9 @@
 //
 #pragma once
 
-#ifndef COMPILED_TOGEHTER_WITH_MARLIN
+#ifdef COMPILED_TOGETHER_WITH_MARLIN
+#include "..\Marlin\XMLDataType.h"
+#else
 
 // XML DATA TYPES
 #define XDT_String              0x00000001

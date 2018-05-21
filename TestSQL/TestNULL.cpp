@@ -52,9 +52,10 @@ void InsertWithNULL(SQLDatabase* p_dbs)
     query.DoSQLStatement(sql);
     trans.Commit();
   }
-  catch(CString& error)
+  catch(StdException* er)
   {
-    printf("Insert ging fout: %s\n",error.GetString());
+    printf("Insert went wrong: %s\n",MessageFromException(er).GetString());
+    er->Delete();
   }
 }
 
@@ -79,13 +80,14 @@ SelectNULL(SQLDatabase* p_dbs)
       CString oms = query.GetColumn(3)->GetAsChar();
       SQLVariant* var = query.GetColumn(3);
 
-      printf("Omschrijving: %s\n",oms.GetString());
-      printf("Lengte string: %d\n",oms.GetLength());
+      printf("Description: %s\n",oms.GetString());
+      printf("Length string: %d\n",oms.GetLength());
     }
   }
-  catch(CString& er)
+  catch(StdException* er)
   {
-    printf("Fout: %s\n",er.GetString());
+    printf("Error: %s\n",MessageFromException(er).GetString());
+    er->Delete();
   }
   return 0;
 }
@@ -120,13 +122,10 @@ TestNULL()
     }
     dbs.Close();
   }
-  catch(CString& s)
+  catch(StdException* er)
   {
-    printf("Database error. Reason:\n%s\n",s.GetString());
-  }
-  catch(...)
-  {
-    printf("Unknown error in database test\n");
+    printf("Database error. Reason:\n%s\n",MessageFromException(er).GetString());
+    er->Delete();
   }
   long endTime = clock();
   printf("NULL test performed in: %.4f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
