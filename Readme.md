@@ -144,11 +144,12 @@ also be rolled back. This is how you generally do it:
 			// Transaction ready, commit it
 			trans.Commit();
 		}
-		catch(CString& er)
+		catch(StdException* er)
 		{
 			// Catching our error, means the transaction went out of scope
 			// meaning it is rolled back automatically
-			printf("ERROR: What went wrong: %s\n",er);
+			printf("ERROR: What went wrong: %s\n",er->GetErrorMessage());
+      er->Delete();
 		}
 		// Go close it
 		// Or don't and just go out of scope

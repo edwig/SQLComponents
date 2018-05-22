@@ -1899,13 +1899,14 @@ SQLVariant::GetAsDate()
     try
     {
       SQLDate date(m_data.m_dataCHAR);
+      memset(&g_date,0,sizeof(DATE_STRUCT));
       date.AsDateStruct(&g_date);
-      return &g_date;
     }
     catch(StdException* er)
     {
-      throw er;
+      er->Delete();
     }
+    return &g_date;
   }
   ThrowErrorDatatype(SQL_C_DATE);
   return NULL;
@@ -1929,13 +1930,14 @@ SQLVariant::GetAsTime()
     try
     {
       SQLTime time(m_data.m_dataCHAR);
+      memset(&g_time,0,sizeof(TIME_STRUCT));
       time.AsTimeStruct(&g_time);
-      return &g_time;
     }
-    catch(CString& /*er*/)
+    catch(StdException* er)
     {
-      throw;
+      er->Delete();
     }
+    return &g_time;
   }
   ThrowErrorDatatype(SQL_C_TIME);
   return NULL;
@@ -1963,13 +1965,14 @@ SQLVariant::GetAsTimestamp()
     try
     {
       SQLTimestamp stamp(m_data.m_dataCHAR);
+      memset(&g_timestamp,0,sizeof(TIMESTAMP_STRUCT));
       stamp.AsTimeStampStruct(&g_timestamp);
-      return &g_timestamp;
     }
-    catch(CString& /*er*/)
+    catch(StdException* er)
     {
-      throw;
+      er->Delete();
     }
+    return &g_timestamp;
   }
   ThrowErrorDatatype(SQL_C_TIMESTAMP);
   return NULL;

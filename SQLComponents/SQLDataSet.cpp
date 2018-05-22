@@ -1135,12 +1135,13 @@ SQLDataSet::Synchronize(int p_mutationID /*=0*/)
     // After the commit we throw away our changes
     Reduce(p_mutationID);
   }
-  catch(CString& error)
+  catch(StdException* er)
   {
     // Automatic rollback will be done now
-    m_database->LogPrint(1,"Database synchronization stopped: " + error);
+    m_database->LogPrint(1,"Database synchronization stopped: " + er->GetErrorMessage());
     // Restore original status of the dataset, reduce never done
     m_status = oldStatus;
+    er->Delete();
     return false;
   }
   // Ready
