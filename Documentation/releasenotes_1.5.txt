@@ -1,6 +1,6 @@
 RELEASENOTES SQLCOMPONENTS VERSION 1.5
 ======================================
-====== Released since:20-05-2017 =====
+====== Released since:28-05-2017 =====
 ======================================
 
 1) The new compile time macro "COMPILED_TOGETHER_WITH_MARLIN" makes it possible to 
