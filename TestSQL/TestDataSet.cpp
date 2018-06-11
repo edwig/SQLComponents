@@ -206,10 +206,9 @@ TestDataSet()
     }
     dbs.Close();
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
-    printf("Database error. Reason:\n%s\n",MessageFromException(er).GetString());
-    er->Delete();
+    printf("Database error. Reason:\n%s\n",er.GetErrorMessage().GetString());
   }
   long endTime = clock();
   printf("DATASET test performed in: %.4f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);

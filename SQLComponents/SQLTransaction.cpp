@@ -75,10 +75,10 @@ SQLTransaction::~SQLTransaction()
   {
     Rollback();
   }
-  catch(StdException* error)
+  catch(StdException& error)
   {
     CString message;
-    message.Format("Error in rollback of transaction [%s] : %s\n",m_name.GetString(),MessageFromException(error).GetString());
+    message.Format("Error in rollback of transaction [%s] : %s\n",m_name.GetString(),error.GetErrorMessage().GetString());
     if(m_database)
     {
       m_database->LogPrint(LOGLEVEL_ERROR,message);
@@ -90,7 +90,6 @@ SQLTransaction::~SQLTransaction()
     }
     // Cannot throw in a destructor. Stops here
     // But we where already 'cornered', why would we otherwise need to rollback :-(
-    error->Delete();
   }
 }
 

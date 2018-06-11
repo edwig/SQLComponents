@@ -47,11 +47,13 @@ typedef enum _sqlOperator
   ,OP_LikeMiddle
   ,OP_IN
   ,OP_Between
+  ,OP_OR               // OR chaining to next filter(s)
 }
 SQLOperator;
 
 // Forward declarations
 class SQLRecord;
+class SQLQuery;
 // Mapping typedefs
 typedef std::vector<SQLVariant*> VariantSet;
 
@@ -70,6 +72,7 @@ public:
   SQLFilter(CString p_field,SQLOperator p_operator,int         p_value);
   SQLFilter(CString p_field,SQLOperator p_operator,CString     p_value);
   SQLFilter(SQLFilter* p_other);
+  SQLFilter(SQLFilter& p_other);
   ~SQLFilter();
 
   // Adding extra values for the IN or BETWEEN operators
@@ -82,7 +85,7 @@ public:
   // OPERATIONS
 
   // Getting the SQL Condition filter
-  CString     GetSQLFilter();
+  CString     GetSQLFilter(SQLQuery& p_query);
   // Match a record to the filter internally
   bool        MatchRecord(SQLRecord* p_record);
 
@@ -100,13 +103,13 @@ private:
   void        CheckValue();
   void        CheckTwoValues();
   // Constructing the default operand
-  void        ConstructOperand(CString& p_sql);
+  void        ConstructOperand(CString& p_sql,SQLQuery& p_query);
   // Constructing the LIKE clause
   void        ConstructLike(CString& p_sql);
   // Constructing the IN clause
-  void        ConstructIN(CString& p_sql);
+  void        ConstructIN(CString& p_sql,SQLQuery& p_query);
   // Constructing the BETWEEN clause
-  void        ConstructBetween(CString& p_sql);
+  void        ConstructBetween(CString& p_sql,SQLQuery& p_query);
 
   // Internal matching
   bool        MatchEqual(SQLVariant* p_field);
@@ -179,7 +182,7 @@ SQLFilter::GetNegate()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// And finaly: a filter set is a vector of SQLFilters
+// And finally: a filter set is a vector of SQLFilters
 
 // using SQLFilterSet = std::vector<SQLFilter>;
 class SQLFilterSet
@@ -199,6 +202,12 @@ public:
     m_filters.push_back(filter);
   }
 
+  void AddFilter(SQLFilter& p_filter)
+  {
+    SQLFilter* filter = new SQLFilter(p_filter);
+    m_filters.push_back(filter);
+  }
+
   bool Empty()
   {
     return m_filters.empty();
@@ -213,6 +222,8 @@ public:
   {
     return (int)m_filters.size();
   }
+
+  CString ParseFiltersToCondition(SQLQuery& p_query);
 
 private:
   std::vector<SQLFilter*> m_filters;

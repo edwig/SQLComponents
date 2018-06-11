@@ -1902,9 +1902,9 @@ SQLVariant::GetAsDate()
       memset(&g_date,0,sizeof(DATE_STRUCT));
       date.AsDateStruct(&g_date);
     }
-    catch(StdException* er)
+    catch(StdException& er)
     {
-      er->Delete();
+      UNREFERENCED_PARAMETER(er);
     }
     return &g_date;
   }
@@ -1933,9 +1933,9 @@ SQLVariant::GetAsTime()
       memset(&g_time,0,sizeof(TIME_STRUCT));
       time.AsTimeStruct(&g_time);
     }
-    catch(StdException* er)
+    catch(StdException& er)
     {
-      er->Delete();
+      UNREFERENCED_PARAMETER(er);
     }
     return &g_time;
   }
@@ -1968,9 +1968,9 @@ SQLVariant::GetAsTimestamp()
       memset(&g_timestamp,0,sizeof(TIMESTAMP_STRUCT));
       stamp.AsTimeStampStruct(&g_timestamp);
     }
-    catch(StdException* er)
+    catch(StdException& er)
     {
-      er->Delete();
+      UNREFERENCED_PARAMETER(er);
     }
     return &g_timestamp;
   }

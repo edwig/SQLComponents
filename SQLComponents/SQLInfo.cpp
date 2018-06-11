@@ -51,8 +51,8 @@ namespace SQLComponents
   { \
   m_retCode = SQL_ERROR; \
   m_retCode = (SQLFunc); \
-  } catch(StdException* ex)\
-  { ex->Delete();\
+  } catch(StdException& ex)\
+  { UNREFERENCED_PARAMETER(ex);\
   }
 
 SQLInfo::SQLInfo(SQLDatabase* p_database)

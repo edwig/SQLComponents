@@ -5781,16 +5781,13 @@ size_t BasicExcel::Read(const char* data, size_t dataSize)
         bytesRead += workbook_.Read(data+bytesRead);
         break;
 
-      case VISUAL_BASIC_MODULE:
-        bytesRead += rec.Read(data+bytesRead);
-        break;
-
       case WORKSHEET:
         worksheets_.push_back(Worksheet());
         bytesRead += worksheets_.back().Read(data+bytesRead);
         break;
 
-      case CHART:
+      case CHART:               // Fall through
+      case VISUAL_BASIC_MODULE: // Fall through
       default:
         bytesRead += rec.Read(data+bytesRead);
         break;

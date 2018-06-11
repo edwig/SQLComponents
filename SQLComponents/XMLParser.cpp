@@ -219,11 +219,10 @@ XMLParser::ParseMessage(CString& p_message,WhiteSpace p_whiteSpace /*=PRESERVE_W
     // Error message text already set
     m_message->m_internalError = error;
   }
-  catch(StdException* ex)
+  catch(StdException& ex)
   {
     m_message->m_internalError = XmlError::XE_NotAnXMLMessage;
-    m_message->m_internalErrorString = ex->GetErrorMessage();
-    ex->Delete();
+    m_message->m_internalErrorString = ex.GetErrorMessage();
   }
 
   // Conclusion of condensed level

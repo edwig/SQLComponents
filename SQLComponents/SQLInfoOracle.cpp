@@ -867,10 +867,9 @@ SQLInfoOracle::GetCATALOGIndexFilter(MetaIndex& p_index) const
       var->GetAsString(expression);
     }
   }
-  catch(StdException* error)
+  catch(StdException& error)
   {
-    CString message = ("Cannot find index filter: ") + MessageFromException(error);
-    error->Delete();
+    CString message = ("Cannot find index filter: ") + error.GetErrorMessage();
     throw new StdException(message);
   }
   return expression;

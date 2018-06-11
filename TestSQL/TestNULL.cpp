@@ -52,10 +52,9 @@ void InsertWithNULL(SQLDatabase* p_dbs)
     query.DoSQLStatement(sql);
     trans.Commit();
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
-    printf("Insert went wrong: %s\n",MessageFromException(er).GetString());
-    er->Delete();
+    printf("Insert went wrong: %s\n",er.GetErrorMessage().GetString());
   }
 }
 
@@ -84,10 +83,9 @@ SelectNULL(SQLDatabase* p_dbs)
       printf("Length string: %d\n",oms.GetLength());
     }
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
-    printf("Error: %s\n",MessageFromException(er).GetString());
-    er->Delete();
+    printf("Error: %s\n",er.GetErrorMessage().GetString());
   }
   return 0;
 }
@@ -122,10 +120,9 @@ TestNULL()
     }
     dbs.Close();
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
-    printf("Database error. Reason:\n%s\n",MessageFromException(er).GetString());
-    er->Delete();
+    printf("Database error. Reason:\n%s\n",er.GetErrorMessage().GetString());
   }
   long endTime = clock();
   printf("NULL test performed in: %.4f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);

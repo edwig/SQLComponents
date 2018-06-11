@@ -88,11 +88,10 @@ namespace DatabaseUnitTest
         }
         number_of_tests++;
       }
-      catch(StdException* er)
+      catch(StdException& er)
       {
-        Logger::WriteMessage(MessageFromException(er));
+        Logger::WriteMessage(er.GetErrorMessage());
         Assert::Fail(L"Database ***NOT*** opened. Reason:");
-        er->Delete();
       }
       long endTime = clock();
       CString performance;
@@ -163,11 +162,10 @@ namespace DatabaseUnitTest
         Assert::AreEqual((double)1350.0,grandTotal);
         number_of_tests++;
       }
-      catch(StdException* er)
+      catch(StdException& er)
       {
-        Logger::WriteMessage(MessageFromException(er));
+        Logger::WriteMessage(er.GetErrorMessage());
         Assert::Fail(L"Database ***NOT*** opened. Reason:");
-        er->Delete();
       }
     }
 
@@ -378,12 +376,11 @@ namespace DatabaseUnitTest
         }
         dbs.Close();
       }
-      catch(StdException* er)
+      catch(StdException& er)
       {
         Logger::WriteMessage("Database error. Reason:");
-        Logger::WriteMessage(MessageFromException(er));
+        Logger::WriteMessage(er.GetErrorMessage());
         Assert::Fail(L"Database error");
-        er->Delete();
       }
       long endTime = clock();
       number_of_tests++;
@@ -471,12 +468,11 @@ namespace DatabaseUnitTest
         }
        dbs.Close();
       }
-      catch(StdException* er)
+      catch(StdException& er)
       {
         Logger::WriteMessage("Database error. Reason:");
-        Logger::WriteMessage(MessageFromException(er));
+        Logger::WriteMessage(er.GetErrorMessage());
         Assert::Fail(L"Database error");
-        er->Delete();
       }
       long endTime = clock();
       number_of_tests++;
@@ -586,84 +582,13 @@ namespace DatabaseUnitTest
         dbs.Close();
         number_of_tests++;
       }
-      catch(StdException* er)
+      catch(StdException& er)
       {
         Logger::WriteMessage("Database error. Reason:");
-        Logger::WriteMessage(MessageFromException(er));
+        Logger::WriteMessage(er.GetErrorMessage());
         Assert::Fail(L"Database error");
-        er->Delete();
       }
     }
-
-//     TEST_METHOD(BasicUpdateCursor)
-//     {
-//       Logger::WriteMessage("Testing UPDATE WHERE CURRENT OF:");
-//       Logger::WriteMessage("================================");
-// 
-//       SQLDatabase dbs;
-//       dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
-//       long beginTime = clock();
-// 
-//       try
-//       {
-//         // Set options for the database
-//         dbs.SetLoginTimeout(0);
-//         dbs.SetMARS(false);
-// 
-//         if(dbs.Open(g_dsn,g_user,g_password))
-//         {
-//           Logger::WriteMessage("Database opened.");
-// 
-//           bcd theValue;
-//           CString sql1 = "SELECT field3\n"
-//                          "  FROM test_number\n"
-//                          " WHERE id = 1";
-// 
-//           CString sql2 = "UPDATE test_number\n"
-//                         "   SET field3 = ?\n"
-//                         " WHERE CURRENT OF ";
-//           SQLQuery query(&dbs);
-//           SQLTransaction trans(&dbs,"UpdCursor");
-//           query.SetConcurrency(SQL_CONCUR_LOCK);
-// 
-//           query.DoSQLStatement(sql1);
-//           if(query.GetRecord())
-//           {
-//             bcd value = query[1];
-//             theValue  = value * 2;
-// 
-//             query.SetParameter(1,theValue);
-//             sql2 += query.GetCursorName();
-//             query.DoSQLStatementNonQuery(sql2);
-//           }
-//           trans.Commit();
-// 
-//           // Checking the value
-//           
-//           query.ResetParameters();
-//           SQLVariant* result = query.DoSQLStatementScalar(sql1);
-//           bcd check = result->GetAsBCD();
-// 
-//           Assert::AreEqual(theValue.AsString().GetString(),check.AsString().GetString());
-//         }
-//         else
-//         {
-//           Assert::Fail(L"Database ***NOT*** opened.");
-//         }
-//         dbs.Close();
-//       }
-//       catch(StdException* er)
-//       {
-//         Logger::WriteMessage("Database error. Reason:");
-//         Logger::WriteMessage(MessageFromException(er));
-//         Assert::Fail(L"Database error");
-//         er->Delete();
-//       }
-//       long endTime = clock();
-//       CString msg;
-//       msg.Format("NUMERIC test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
-//       Logger::WriteMessage(msg);
-//     }
 
     //////////////////////////////////////////////////////////////////////////
     //

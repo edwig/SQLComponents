@@ -541,10 +541,9 @@ SQLDataSetXLS::Open()
         }
       }
     }
-    catch(StdException* ex)
+    catch(StdException& ex)
     {
-      m_lastError = "Error reading spreadhseet: " + MessageFromException(ex);
-      ex->Delete();
+      m_lastError = "Error reading spreadhseet: " + ex.GetErrorMessage();
       return false;
     }
     catch(...)
@@ -641,10 +640,9 @@ SQLDataSetXLS::Open()
         return result;
       }
     }
-    catch(StdException* ex)
+    catch(StdException& ex)
     {
-      m_lastError = MessageFromException(ex);
-      ex->Delete();
+      m_lastError = ex.GetErrorMessage();
     }
     m_lastError += "Error in opening file\n";
     return false;

@@ -436,33 +436,22 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
 
 // Parse the fitlers (m_filters must be non-null)
 CString
-SQLDataSet::ParseFilters()
+SQLDataSet::ParseFilters(SQLQuery& p_query)
 {
   CString query(m_query);
   query.MakeUpper();
   query.Replace("\t"," ");
   bool whereFound = m_query.Find("WHERE ") > 0;
-  bool first = true;
 
   // Restart with original query
   query = m_query;
 
+  // Offset in the WHERE clause
+  query += whereFound ? "\n   AND " : "\n WHERE ";
+
   // Add all filters
-  for(auto& filt : m_filters->GetFilters())
-  {
-    if(first == true)
-    {
-      if(!whereFound)
-      {
-        query += "\nWHERE ";
-      }
-    }
-    else
-    {
-      query += "\n   AND ";
-    }
-    query += filt->GetSQLFilter();
-  }
+  query += m_filters->ParseFiltersToCondition(p_query);
+
   return query;
 }
 
@@ -501,7 +490,7 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
       }
       else if(m_filters && !m_filters->Empty())
       {
-        query = ParseFilters();
+        query = ParseFilters(qry);
       }
     }
     else
@@ -531,10 +520,10 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
 
     trans.Commit();
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
     Close();
-    throw er;
+    throw new StdException(er.GetErrorMessage());
   }
   if(m_records.size())
   {
@@ -584,7 +573,7 @@ SQLDataSet::Append()
       }
       else if(m_filters && !m_filters->Empty())
       {
-        query = ParseFilters();
+        query = ParseFilters(qry);
       }
     }
     else
@@ -607,10 +596,10 @@ SQLDataSet::Append()
     result = true;
     trans.Commit();
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
     Close();
-    throw er;
+    throw new StdException(er.GetErrorMessage());
   }
   // Goto the first freshly read record
   if(m_records.size() > sizeBefore)
@@ -1135,13 +1124,12 @@ SQLDataSet::Synchronize(int p_mutationID /*=0*/)
     // After the commit we throw away our changes
     Reduce(p_mutationID);
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
     // Automatic rollback will be done now
-    m_database->LogPrint(1,"Database synchronization stopped: " + er->GetErrorMessage());
+    m_database->LogPrint(1,"Database synchronization stopped: " + er.GetErrorMessage());
     // Restore original status of the dataset, reduce never done
     m_status = oldStatus;
-    er->Delete();
     return false;
   }
   // Ready

@@ -60,10 +60,9 @@ void TestConnection()
       printf("Database ***NOT*** opened.\n");
     }
   }
-  catch(StdException* er)
+  catch(StdException& er)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",MessageFromException(er).GetString());
-    er->Delete();
+    printf("Database ***NOT*** opened. Reason:\n%s\n",er.GetErrorMessage().GetString());
   }
   long endTime = clock();
   printf("Open  test performed in: %.6f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);

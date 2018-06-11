@@ -28,6 +28,7 @@
 #include "SQLFilter.h"
 #include "SQLVariant.h"
 #include "SQLDate.h"
+#include "SQLQuery.h"
 #include "UnitTest.h"
 
 namespace OperatorUnitTest
@@ -56,49 +57,50 @@ namespace OperatorUnitTest
       SQLVariant valEx3(888L);
       SQLVariant valEx4(777L);
 
-      TestFilter("fieldname",OP_Equal,valText,  "fieldname = 'Text'");
-      TestFilter("fieldname",OP_Equal,valNumber,"fieldname = 123");
-      TestFilter("fieldname",OP_Equal,valDate,  "fieldname = {d '1959-10-15'}");
-      TestFilter("fieldname",OP_Equal,valTime,  "fieldname = {t '08:23:49'}");
-      TestFilter("fieldname",OP_Equal,valStamp, "fieldname = {ts '2017-01-22 11:45:16'}");
+      TestFilter("fieldname",OP_Equal,valText,  "fieldname = ? : Text");
+      TestFilter("fieldname",OP_Equal,valNumber,"fieldname = ? : 123");
+      TestFilter("fieldname",OP_Equal,valDate,  "fieldname = ? : 15-10-1959");
+      TestFilter("fieldname",OP_Equal,valTime,  "fieldname = ? : 08:23:49");
+      TestFilter("fieldname",OP_Equal,valStamp, "fieldname = ? : 2017-01-22 11:45:16");
 
-      TestFilter("fieldname",OP_NotEqual,    valNumber,"fieldname <> 123");
-      TestFilter("fieldname",OP_Greater,     valNumber,"fieldname > 123");
-      TestFilter("fieldname",OP_GreaterEqual,valNumber,"fieldname >= 123");
-      TestFilter("fieldname",OP_Smaller,     valNumber,"fieldname < 123");
-      TestFilter("fieldname",OP_SmallerEqual,valNumber,"fieldname <= 123");
+      TestFilter("fieldname",OP_NotEqual,    valNumber,"fieldname <> ? : 123");
+      TestFilter("fieldname",OP_Greater,     valNumber,"fieldname > ? : 123");
+      TestFilter("fieldname",OP_GreaterEqual,valNumber,"fieldname >= ? : 123");
+      TestFilter("fieldname",OP_Smaller,     valNumber,"fieldname < ? : 123");
+      TestFilter("fieldname",OP_SmallerEqual,valNumber,"fieldname <= ? : 123");
 
-      TestFilter("fieldname",OP_IsNULL,    valText,"fieldname IS NULL");
-      TestFilter("fieldname",OP_LikeBegin, valText,"fieldname LIKE 'Text%'");
-      TestFilter("fieldname",OP_LikeMiddle,valText,"fieldname LIKE '%Text%'");
+      TestFilter("fieldname",OP_IsNULL,    valText,"fieldname IS NULL : Text");
+      TestFilter("fieldname",OP_LikeBegin, valText,"fieldname LIKE 'Text%' : Text");
+      TestFilter("fieldname",OP_LikeMiddle,valText,"fieldname LIKE '%Text%' : Text");
 
-      TestBetween("fieldname",OP_Between,valText,  valTextExtra, "fieldname BETWEEN 'Text' AND 'ZZZ'");
-      TestBetween("fieldname",OP_Between,valNumber,valNumberHigh,"fieldname BETWEEN 123 AND 999");
+      TestBetween("fieldname",OP_Between,valText,  valTextExtra, "fieldname BETWEEN ? AND ?  : Text : ZZZ");
+      TestBetween("fieldname",OP_Between,valNumber,valNumberHigh,"fieldname BETWEEN ? AND ?  : 123 : 999");
 
-      TestIN("fieldname",OP_IN,valNumber,valEx4,valEx3,valNumberHigh,"fieldname IN (123,777,888,999)");
+      TestIN("fieldname",OP_IN,valNumber,valEx4,valEx3,valNumberHigh,"fieldname IN (?,?,?,?) : 123 : 777 : 888 : 999");
       TestExpression("fieldname",OP_Equal,"{fn UCASE(TheFunction(other))}","fieldname = {fn UCASE(TheFunction(other))}");
 
-      TestNegate("fieldname",OP_Equal,valText,  "NOT fieldname = 'Text'");
-      TestNegate("fieldname",OP_Equal,valNumber,"NOT fieldname = 123");
-      TestNegate("fieldname",OP_Equal,valDate,  "NOT fieldname = {d '1959-10-15'}");
-      TestNegate("fieldname",OP_Equal,valTime,  "NOT fieldname = {t '08:23:49'}");
-      TestNegate("fieldname",OP_Equal,valStamp, "NOT fieldname = {ts '2017-01-22 11:45:16'}");
+      TestNegate("fieldname",OP_Equal,valText,  "NOT fieldname = ? : Text");
+      TestNegate("fieldname",OP_Equal,valNumber,"NOT fieldname = ? : 123");
+      TestNegate("fieldname",OP_Equal,valDate,  "NOT fieldname = ? : 15-10-1959");
+      TestNegate("fieldname",OP_Equal,valTime,  "NOT fieldname = ? : 08:23:49");
+      TestNegate("fieldname",OP_Equal,valStamp, "NOT fieldname = ? : 2017-01-22 11:45:16");
 
-      TestNegate("fieldname",OP_NotEqual,    valNumber,"NOT fieldname <> 123");
-      TestNegate("fieldname",OP_Greater,     valNumber,"NOT fieldname > 123");
-      TestNegate("fieldname",OP_GreaterEqual,valNumber,"NOT fieldname >= 123");
-      TestNegate("fieldname",OP_Smaller,     valNumber,"NOT fieldname < 123");
-      TestNegate("fieldname",OP_SmallerEqual,valNumber,"NOT fieldname <= 123");
+      TestNegate("fieldname",OP_NotEqual,    valNumber,"NOT fieldname <> ? : 123");
+      TestNegate("fieldname",OP_Greater,     valNumber,"NOT fieldname > ? : 123");
+      TestNegate("fieldname",OP_GreaterEqual,valNumber,"NOT fieldname >= ? : 123");
+      TestNegate("fieldname",OP_Smaller,     valNumber,"NOT fieldname < ? : 123");
+      TestNegate("fieldname",OP_SmallerEqual,valNumber,"NOT fieldname <= ? : 123");
 
-      TestNegate("fieldname",OP_IsNULL,    valText,"NOT fieldname IS NULL");
-      TestNegate("fieldname",OP_LikeBegin, valText,"NOT fieldname LIKE 'Text%'");
-      TestNegate("fieldname",OP_LikeMiddle,valText,"NOT fieldname LIKE '%Text%'");
+      TestNegate("fieldname",OP_IsNULL,    valText,"NOT fieldname IS NULL : Text");
+      TestNegate("fieldname",OP_LikeBegin, valText,"NOT fieldname LIKE 'Text%' : Text");
+      TestNegate("fieldname",OP_LikeMiddle,valText,"NOT fieldname LIKE '%Text%' : Text");
     }
 
     void TestFilter(CString p_field,SQLOperator p_oper,SQLVariant& p_variant,CString p_expect)
     {
+      SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
-      CString condition = filter.GetSQLFilter();
+      CString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -107,9 +109,10 @@ namespace OperatorUnitTest
 
     void TestNegate(CString p_field,SQLOperator p_oper,SQLVariant& p_variant,CString p_expect)
     {
+      SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
       filter.Negate();
-      CString condition = filter.GetSQLFilter();
+      CString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -122,9 +125,11 @@ namespace OperatorUnitTest
                     ,SQLVariant& p_variant2
                     ,CString     p_expect)
     {
+      SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant1);
       filter.AddValue(&p_variant2);
-      CString condition = filter.GetSQLFilter();
+      CString condition = filter.GetSQLFilter(query) + " : " + p_variant1.GetAsChar();
+      condition += CString(" : ") + p_variant2.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -144,11 +149,16 @@ namespace OperatorUnitTest
                ,SQLVariant& p_variant4
                ,CString     p_expect)
     {
+      SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant1);
       filter.AddValue(&p_variant2);
       filter.AddValue(&p_variant3);
       filter.AddValue(&p_variant4);
-      CString condition = filter.GetSQLFilter();
+      CString condition = filter.GetSQLFilter(query);
+      condition += CString(" : ") + p_variant1.GetAsChar();
+      condition += CString(" : ") + p_variant2.GetAsChar();
+      condition += CString(" : ") + p_variant3.GetAsChar();
+      condition += CString(" : ") + p_variant4.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -157,9 +167,10 @@ namespace OperatorUnitTest
 
     void TestExpression(CString p_field,SQLOperator p_oper,CString p_expression,CString p_expect)
     {
+      SQLQuery query;
       SQLFilter filter(p_field,p_oper);
       filter.AddExpression(p_expression);
-      CString condition = filter.GetSQLFilter();
+      CString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());

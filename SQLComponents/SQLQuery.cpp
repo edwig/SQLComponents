@@ -662,10 +662,10 @@ SQLQuery::TryDoSQLStatement(const CString& p_statement)
   {
     DoSQLStatement(p_statement);
   }
-  catch(StdException* error)
+  catch(StdException& error)
   {
     // Do Nothing, ignoring the error
-    error->Delete();
+    UNREFERENCED_PARAMETER(error);
   }
 }
 

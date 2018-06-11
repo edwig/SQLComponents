@@ -27,6 +27,7 @@
 #include "stdafx.h"
 #include "SQLFilter.h"
 #include "SQLRecord.h"
+#include "SQLQuery.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -115,6 +116,21 @@ SQLFilter::SQLFilter(SQLFilter* p_other)
   }
 }
 
+// XTOR from another filter
+SQLFilter::SQLFilter(SQLFilter& p_other)
+{
+  m_field      = p_other.m_field;
+  m_operator   = p_other.m_operator;
+  m_expression = p_other.m_expression;
+  m_negate     = p_other.m_negate;
+
+  for(auto& variant : p_other.m_values)
+  {
+    var* value = new SQLVariant(variant);
+    m_values.push_back(value);
+  }
+}
+
 // DTOR: Remove all variant values
 SQLFilter::~SQLFilter()
 {
@@ -138,7 +154,7 @@ SQLFilter::GetValue(int p_number)
 
 // Getting the SQL Condition
 CString
-SQLFilter::GetSQLFilter()
+SQLFilter::GetSQLFilter(SQLQuery& p_query)
 {
   // Add the field
   CString sql(m_field);
@@ -168,17 +184,17 @@ SQLFilter::GetSQLFilter()
   }
   else if(m_operator == OP_IN)
   {
-    ConstructIN(sql);
+    ConstructIN(sql,p_query);
   }
   else if(m_operator == OP_Between)
   {
-    ConstructBetween(sql);
+    ConstructBetween(sql,p_query);
   }
   else if(m_operator != OP_IsNULL)
   {
     // For all other operators, getting the argument
     // Getting the value as an SQL expression string (with ODBC escapes)
-    ConstructOperand(sql);
+    ConstructOperand(sql,p_query);
   }
 
   // See if we must NEGATE the condition
@@ -257,13 +273,14 @@ SQLFilter::CheckTwoValues()
 
 // Constructing the default operand
 void
-SQLFilter::ConstructOperand(CString& p_sql)
+SQLFilter::ConstructOperand(CString& p_sql,SQLQuery& p_query)
 {
   if(m_expression.IsEmpty())
   {
     // Check that we have a value, and use it
     CheckValue();
-    p_sql += m_values[0]->GetAsSQLString();
+    p_sql += "?";
+    p_query.SetParameter(m_values[0]);
   }
   else
   {
@@ -294,13 +311,13 @@ SQLFilter::ConstructLike(CString& p_sql)
 
 // Constructing the IN clause
 void
-SQLFilter::ConstructIN(CString& p_sql)
+SQLFilter::ConstructIN(CString& p_sql,SQLQuery& p_query)
 {
   // Getting a series of values, comma seperated
   for(auto& var : m_values)
   {
-    p_sql += var->GetAsSQLString();
-    p_sql += ",";
+    p_sql += "?,";
+    p_query.SetParameter(var);
   }
   p_sql.TrimRight(',');
   p_sql += ")";
@@ -308,14 +325,14 @@ SQLFilter::ConstructIN(CString& p_sql)
 
 // Constructiong the BETWEEN clause
 void
-SQLFilter::ConstructBetween(CString& p_sql)
+SQLFilter::ConstructBetween(CString& p_sql,SQLQuery& p_query)
 {
   // CHeck that we have EXACTLY two values
   CheckTwoValues();
 
-  p_sql += m_values[0]->GetAsSQLString();
-  p_sql += " AND ";
-  p_sql += m_values[1]->GetAsSQLString();
+  p_sql += "? AND ? ";
+  p_query.SetParameter(m_values[0]);
+  p_query.SetParameter(m_values[1]);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -462,8 +479,57 @@ SQLOperatorToString(SQLOperator p_oper)
     {
       return filter->m_name;
     }
+    ++filter;
   }
   return "";
 }
 
+//////////////////////////////////////////////////////////////////////////
+//
+// HERE IT COMES ALL TOGETHER
+// We parse a FilterSet to a condition filter for a WHERE part
+//
+//////////////////////////////////////////////////////////////////////////
+
+CString 
+SQLFilterSet::ParseFiltersToCondition(SQLQuery& p_query)
+{
+  CString query;
+  bool first = true;
+  int closing = 0;
+
+  // Add all filters
+  for(auto& filt : m_filters)
+  {
+    if(first == true)
+    {
+      first = false;
+    }
+    else
+    {
+      if(filt->GetOperator() == SQLOperator::OP_OR)
+      {
+        query = "(" + query + ")\n"
+                "    OR (";
+        ++closing;
+			}
+      else
+      {
+        query += "\n   AND ";
+      }
+    }
+    query += filt->GetSQLFilter(p_query);
+  }
+
+  // Do the closing of all 'OR' groups
+  while(closing--)
+  {
+    query += ")";
+  }
+  return query;
 }
+
+
+
+}
+
