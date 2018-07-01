@@ -1377,6 +1377,7 @@ SQLDataSet::GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record)
 {
   int parameter = 1;
   CString sql("UPDATE " + m_primaryTableName + "\n");
+  WordList::iterator it;
 
   // New set of parameters
   p_query->ResetParameters();
@@ -1385,7 +1386,18 @@ SQLDataSet::GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record)
   bool first = true;
   for(unsigned ind = 0;ind < m_names.size(); ++ind)
   {
-    if(p_record->IsModified(ind))
+    // Filter for specific columns that are allowed to be updated
+    bool update = true;
+    if(!m_updateColumns.empty())
+    {
+      it = std::find(m_updateColumns.begin(),m_updateColumns.end(),m_names[ind]);
+      if(it == m_updateColumns.end())
+      {
+        update = false;
+      }
+    }
+
+    if(update && p_record->IsModified(ind))
     {
       SQLVariant* value = p_record->GetField(ind);
 

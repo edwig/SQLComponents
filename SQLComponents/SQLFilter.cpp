@@ -512,7 +512,7 @@ SQLFilterSet::ParseFiltersToCondition(SQLQuery& p_query)
         query = "(" + query + ")\n"
                 "    OR (";
         ++closing;
-			}
+      }
       else
       {
         query += "\n   AND ";

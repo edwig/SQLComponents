@@ -35,7 +35,7 @@ namespace SQLComponents
 // Operator for a condition filter
 typedef enum _sqlOperator
 {
-  OP_NOP = 0
+   OP_NOP = 0
   ,OP_Equal = 1
   ,OP_NotEqual
   ,OP_Greater
@@ -129,7 +129,7 @@ private:
   SQLOperator m_operator;           // Operator of the condition
   VariantSet  m_values;             // Multiple values for IN and BETWEEN
   CString     m_expression;         // Free expression (no values!)
-  bool        m_negate{false};   // Negate the whole condition
+  bool        m_negate { false };   // Negate the whole condition
 };
 
 inline CString
