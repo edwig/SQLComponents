@@ -531,9 +531,9 @@ SQLVariantFormat::GetDateFromStringVariant(SQLVariant* p_variant,CString p_forma
       lang.AsDateStruct(p_date);
       return true;
     }
-    catch(StdException& e)
+    catch(StdException& er)
     {
-      UNREFERENCED_PARAMETER(e);
+      ReThrowSafeException(er);
     }
     return false;
   }
@@ -853,10 +853,10 @@ SQLVariantFormat::DateCalculate(char p_operator,CString p_argument)
       SQLInterval intval = other - date;
       m_format.Format("%d",intval.GetDays());
     }
-    catch(StdException& e)
+    catch(StdException& ex)
     {
+      ReThrowSafeException(ex);
       // Does nothing. Underlying date is unchanged
-      UNREFERENCED_PARAMETER(e);
     }
   }
   return OK;

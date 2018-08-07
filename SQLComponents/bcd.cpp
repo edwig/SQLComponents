@@ -21,7 +21,7 @@
 #include "Stdafx.h"
 #include "SQLComponents.h"
 #include "bcd.h"
-#include <math.h>    // Still needed for conversions of double
+#include <math.h> // Still needed for conversions of double
 #include <intsafe.h>
 
 #ifdef _DEBUG
@@ -708,7 +708,7 @@ bcd::Truncate(int p_precision /*=0*/)
     }
   }
 }
-
+  
 // Change the sign
 void
 bcd::Negate()
@@ -2107,9 +2107,9 @@ bcd::GetFitsInLong() const
   {
     AsLong();
   }
-  catch(StdException& e)
+  catch(StdException& ex)
   {
-    UNREFERENCED_PARAMETER(e);
+    ReThrowSafeException(ex);
     return false;
   }
   return true;
@@ -2125,9 +2125,9 @@ bcd::GetFitsInInt64() const
   {
     AsInt64();
   }
-  catch(StdException& e)
+  catch(StdException& ex)
   {
-    UNREFERENCED_PARAMETER(e);
+    ReThrowSafeException(ex);
     return false;
   }
   return true;

@@ -771,6 +771,7 @@ SQLDatabase::GetSQLHandle(HSTMT *p_statementHandle, BOOL p_exception)
   }
   catch(StdException& ex)
   {
+    ReThrowSafeException(ex);
     *p_statementHandle = NULL;
     if(p_exception)
     {
@@ -1076,6 +1077,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
       }
       catch(StdException& error)
       {
+        ReThrowSafeException(error);
         CString message;
         message.Format("Error at starting transaction [%s] : %s",p_transaction->GetName().GetString(),error.GetErrorMessage().GetString());
         throw StdException(message);
@@ -1101,6 +1103,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
         }
         catch(StdException& err)
         {
+          ReThrowSafeException(err);
           CString message;
           message.Format("Error starting sub-transaction [%s:%s] : %s"
                         ,p_transaction->GetName().GetString()
@@ -1158,6 +1161,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
       }
       catch(StdException& ex) 
       {
+        ReThrowSafeException(ex);
         // Get the error information
         CString error = GetErrorString();
 
@@ -1188,6 +1192,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
         }
         catch(StdException& error)
         {
+          ReThrowSafeException(error);
           CString message;
           message.Format("Error in commit of sub-transaction [%s:%s] : %s"
                         ,p_transaction->GetName().GetString()
@@ -1257,6 +1262,7 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
       }
       catch(StdException& ex)
       {
+        ReThrowSafeException(ex);
         // Throw an exception with error info at a failed rollback1
         CString message;
         CString error = GetErrorString();
@@ -1280,6 +1286,7 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
         }
         catch(StdException& error)
         {
+          ReThrowSafeException(error);
           CString message;
           message.Format("Error in rolling back sub-transaction [%s:%s] : %s"
                         ,p_transaction->GetName().GetString()
@@ -1544,6 +1551,7 @@ SQLDatabase::SetOracleResultCacheMode(const CString& p_mode)
   }
   catch(StdException& ex)
   {
+    ReThrowSafeException(ex);
     CString error = "Database error while setting RESULT_CACHE_MODE: " + ex.GetErrorMessage();
     throw StdException(error);
   }

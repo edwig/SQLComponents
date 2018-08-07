@@ -9,6 +9,8 @@ Version 1.5.1 of 07-08-2018
 2) DDLCreateTable now creates a number of independent scripts so that they can be
    run in succession against a database to (re-)create the objects
 3) A small optimalisation in the SQLDataset in UPDATE'ing individual records
+4) Re-Throw of a safe exception in exception handlers
+5) Code quality checks from SonarQube
 
 Version 1.5.0 of 28-05-2018
 ---------------------------

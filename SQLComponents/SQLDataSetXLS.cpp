@@ -218,13 +218,12 @@ SQLDataSetXLS::Commit()
     }
     catch(StdException& er)
     {
+      ReThrowSafeException(er);
       m_lastError = er.GetErrorMessage();
     }
     catch(CException& er)
     {
-      char buffer[_MAX_PATH];
-      er.GetErrorMessage(buffer,_MAX_PATH);
-      m_lastError = buffer;
+      m_lastError = MessageFromException(er);
     }
     m_lastError += "Error writing file\n";
     return false;
@@ -548,6 +547,7 @@ SQLDataSetXLS::Open()
     }
     catch(StdException& ex)
     {
+      ReThrowSafeException(ex);
       m_lastError = "Error reading spreadhseet: " + ex.GetErrorMessage();
       return false;
     }
@@ -647,6 +647,7 @@ SQLDataSetXLS::Open()
     }
     catch(StdException& ex)
     {
+      ReThrowSafeException(ex);
       m_lastError = ex.GetErrorMessage();
     }
     m_lastError += "Error in opening file\n";

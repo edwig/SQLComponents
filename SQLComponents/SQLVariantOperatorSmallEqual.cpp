@@ -409,7 +409,7 @@ static SQL_OperDoubleSmallEQFloat(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperBitSmallEQFloat(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
-  return p_right.GetAsFloat() != 0.0;
+  return p_right.GetAsFloat() < -FLT_EPSILON || FLT_EPSILON < p_right.GetAsFloat();
 }
 
 bool
@@ -483,7 +483,7 @@ static SQL_OperDoubleSmallEQDouble(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperBitSmallEQDouble(SQLVariant& /*p_left*/,SQLVariant& p_right)
 {
-  return p_right.GetAsDouble() != 0.0;
+  return p_right.GetAsDouble() < -DBL_EPSILON || DBL_EPSILON < p_right.GetAsDouble();
 }
 
 bool

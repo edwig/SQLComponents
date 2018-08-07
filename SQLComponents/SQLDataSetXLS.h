@@ -33,7 +33,8 @@
 #include "BasicXmlExcel.h"
 #include <list>
 
-using namespace ExcelFormat;
+using YExcel::BasicExcel;
+using YExcel::BasicExcelWorksheet;
 
 namespace SQLComponents
 {

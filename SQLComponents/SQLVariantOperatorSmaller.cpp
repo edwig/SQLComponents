@@ -409,7 +409,8 @@ static SQL_OperDoubleSmallerFloat(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperBitSmallerFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsBit() == 0 && p_right.GetAsFloat() != 0.0;
+  float right = p_right.GetAsFloat();
+  return p_left.GetAsBit() == 0 && (right < -FLT_EPSILON || FLT_EPSILON < right);
 }
 
 bool
@@ -483,7 +484,8 @@ static SQL_OperDoubleSmallerDouble(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperBitSmallerDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsBit() == 0 && p_right.GetAsDouble() != 0.0;
+  double right = p_right.GetAsDouble();
+  return p_left.GetAsBit() == 0 && (right < -DBL_EPSILON || DBL_EPSILON < right);
 }
 
 bool
@@ -545,13 +547,15 @@ static SQL_OperULongSmallerBit(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperFloatSmallerBit(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsFloat() == 0.0 && p_right.GetAsBit() != 0;
+  float left = p_left.GetAsFloat();
+  return (-FLT_EPSILON < left && left < FLT_EPSILON) && p_right.GetAsBit() != 0;
 }
 
 bool
 static SQL_OperDoubleSmallerBit(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsDouble() == 0.0 && p_right.GetAsBit() != 0;
+  double left = p_left.GetAsDouble();
+  return (-DBL_EPSILON < left && left < DBL_EPSILON) && p_right.GetAsBit() != 0;
 }
 
 bool

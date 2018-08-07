@@ -520,7 +520,8 @@ SQLTimestamp::AddYears(int p_number) const
     }
     catch(StdException& er)
     {
-      if (Month() == 2 && Day() == 29) // Correction for leap year
+      ReThrowSafeException(er);
+      if(Month() == 2 && Day() == 29) // Correction for leap year
       {
         // 29-2-1968 plus 1 year becomes 28-2-1969
         return SQLTimestamp(Year() + p_number, Month(), Day() - 1, Hour(), Minute(), Second());

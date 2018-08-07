@@ -598,6 +598,7 @@ SQLDataSet::Append()
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     Close();
     throw StdException(er.GetErrorMessage());
   }
@@ -1126,6 +1127,7 @@ SQLDataSet::Synchronize(int p_mutationID /*=0*/)
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     // Automatic rollback will be done now
     m_database->LogPrint(1,"Database synchronization stopped: " + er.GetErrorMessage());
     // Restore original status of the dataset, reduce never done

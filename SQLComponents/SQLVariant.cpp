@@ -1509,8 +1509,8 @@ SQLVariant::GetAsBit()
     case SQL_C_LONG:     // fall through
     case SQL_C_SLONG:    return m_data.m_dataLONG     != 0;
     case SQL_C_ULONG:    return m_data.m_dataULONG    != 0;
-    case SQL_C_FLOAT:    return m_data.m_dataFLOAT    != 0.0;
-    case SQL_C_DOUBLE:   return m_data.m_dataDOUBLE   != 0.0;
+    case SQL_C_FLOAT:    return m_data.m_dataFLOAT  < -FLT_EPSILON || FLT_EPSILON < m_data.m_dataFLOAT;
+    case SQL_C_DOUBLE:   return m_data.m_dataDOUBLE < -DBL_EPSILON || DBL_EPSILON < m_data.m_dataDOUBLE;
     case SQL_C_BIT:      return m_data.m_dataBIT;
     case SQL_C_TINYINT:  // fall through
     case SQL_C_STINYINT: return m_data.m_dataTINYINT  != 0;
@@ -1904,7 +1904,7 @@ SQLVariant::GetAsDate()
     }
     catch(StdException& er)
     {
-      UNREFERENCED_PARAMETER(er);
+      ReThrowSafeException(er);
     }
     return &g_date;
   }
@@ -1935,7 +1935,7 @@ SQLVariant::GetAsTime()
     }
     catch(StdException& er)
     {
-      UNREFERENCED_PARAMETER(er);
+      ReThrowSafeException(er);
     }
     return &g_time;
   }
@@ -1970,7 +1970,7 @@ SQLVariant::GetAsTimestamp()
     }
     catch(StdException& er)
     {
-      UNREFERENCED_PARAMETER(er);
+      ReThrowSafeException(er);
     }
     return &g_timestamp;
   }

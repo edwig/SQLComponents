@@ -1629,7 +1629,7 @@ ULONG CompoundFile::ReadData(SECT startIndex, char* data, bool isBig)
 //	ize_t maxIndex = *max_element(indices.begin(), indices.end())
     size_t smallBlocksPerBigBlock = header_.bigBlockSize_ / header_.smallBlockSize_;
     size_t minBlock = minIndex / smallBlocksPerBigBlock;
-//		size_t maxBlock = maxIndex / smallBlocksPerBigBlock +
+//	size_t maxBlock = maxIndex / smallBlocksPerBigBlock +
 //                   (maxIndex % smallBlocksPerBigBlock ? 1 : 0)
 //  size_t totalBlocks = maxBlock - minBlock
     char* buffer = new char[DataSize(dirEntries_[0]->_sectStart, true)];
@@ -2482,11 +2482,8 @@ void CompoundFile::DecreasePropertyReferences(CompoundFile::PropertyTree* parent
 
 namespace YExcel
 {
-using namespace YCompoundFiles;
 
-#ifdef _WIN32
-using namespace WinCompFiles;
-#endif
+using YCompoundFiles::LittleEndian;
 
 /************************************************************************************************************/
 Record::Record() : dataSize_(0), recordSize_(4), code_(0) {}
@@ -2795,11 +2792,11 @@ LargeString& LargeString::operator=(const LargeString& s)
 {
   if(&s != this)
   {
-  unicode_ = s.unicode_;
-  richtext_ = s.richtext_;
-  phonetic_ = s.phonetic_;
-  name_ = s.name_;
-  wname_ = s.wname_;
+    unicode_  = s.unicode_;
+    richtext_ = s.richtext_;
+    phonetic_ = s.phonetic_;
+    name_     = s.name_;
+    wname_    = s.wname_;
   }
   return *this;
 }
@@ -3053,7 +3050,7 @@ ULONG Workbook::Read(const char* data)
       default:
         // Read by
         bytesRead += rec.Read(data+bytesRead);
-      }
+    }
 
     LittleEndian::Read(data, code, bytesRead, 2);
   }
@@ -3075,11 +3072,11 @@ ULONG Workbook::Write(char* data)
 
   //MF
   size_t maxFormats = formats_.size();
-    for(size_t i=0; i<maxFormats; ++i) 
+  for(size_t i=0; i<maxFormats; ++i) 
+  {
+    if(formats_[i].index_ >= FIRST_USER_FORMAT_IDX)	// only write user defined formats
     {
-      if (formats_[i].index_ >= FIRST_USER_FORMAT_IDX)	// only write user defined formats
-    {
-        bytesWritten += formats_[i].Write(data+bytesWritten);
+      bytesWritten += formats_[i].Write(data + bytesWritten);
     }
   }
 
@@ -3118,7 +3115,7 @@ ULONG Workbook::DataSize()
   size_t maxFormats = formats_.size();
   for(size_t i=0; i<maxFormats; ++i) 
   {
-    if (formats_[i].index_ >= FIRST_USER_FORMAT_IDX)	// only write user defined formats
+    if(formats_[i].index_ >= FIRST_USER_FORMAT_IDX)	// only write user defined formats
     {
       size += formats_[i].RecordSize();
     }
@@ -3450,9 +3447,9 @@ ULONG Workbook::SharedStringTable::Read(const char* data)
           ++c;
         }
 
-        if (stringSize > 0)
+        if(stringSize > 0)
         {
-          bytesRead += strings_[i].ContinueRead(&*(data_.begin())+npos+bytesRead, stringSize);
+          bytesRead += strings_[i].ContinueRead(&*(data_.begin()) + npos + bytesRead,stringSize);
         }
         npos += bytesRead;
       }
@@ -3473,7 +3470,7 @@ ULONG Workbook::SharedStringTable::Write(char* data)
   {
     npos += strings_[i].Write(&*(data_.begin())+npos);
 
-    if (c<maxContinue && npos==continueIndices_[c])
+    if(c < maxContinue && npos == continueIndices_[c])
     {
       ++c;
     }
@@ -3499,7 +3496,7 @@ ULONG Workbook::SharedStringTable::DataSize()
   {
     ULONG stringSize = strings_[i].StringSize();
 
-    if (dataSize_+stringSize+3 <= curMax)
+    if(dataSize_ + stringSize + 3 <= curMax)
     {
       dataSize_ += stringSize + 3;
     }
@@ -3510,7 +3507,7 @@ ULONG Workbook::SharedStringTable::DataSize()
       bool unicode = strings_[i].unicode_ & 1;
       if (curMax - dataSize_ >= 12) 
       {
-        if (unicode && !((curMax-dataSize_)%2))
+        if(unicode && !((curMax - dataSize_) % 2))
         {
           --curMax;	// Make sure space reserved for unicode strings is even.
         }
@@ -3545,7 +3542,7 @@ ULONG Workbook::SharedStringTable::DataSize()
       {
         continueIndices_.push_back(dataSize_);
         curMax = dataSize_ + 8224;
-        if (dataSize_+stringSize+3 < curMax)
+        if(dataSize_ + stringSize + 3 < curMax)
         {
           dataSize_ += stringSize + 3;
         }
@@ -5382,7 +5379,7 @@ bool BasicExcel::Save()
     vector<char> data(minBytes, 0);
     Write(&*(data).begin());
 
-    if (file_.WriteFile("Workbook", data, (ULONG)data.size()) != SUCCESS)
+    if (file_.WriteFile("Workbook", data, (ULONG)data.size()) != WinCompFiles::SUCCESS)
       return false;
     else
       return true;
@@ -5399,7 +5396,7 @@ bool BasicExcel::SaveAs(const char* filename)
   if (!file_.Create(filename))
     return false;
 
-  if (file_.MakeFile("Workbook") != SUCCESS)
+  if (file_.MakeFile("Workbook") != WinCompFiles::SUCCESS)
     return false;
 
   return Save();
@@ -5414,7 +5411,7 @@ bool BasicExcel::SaveAs(const wchar_t* filename)
   if (!file_.Create(filename))
     return false;
 
-  if (file_.MakeFile("Workbook") != SUCCESS)
+  if (file_.MakeFile("Workbook") != WinCompFiles::SUCCESS)
     return false;
 
   return Save();
@@ -5907,7 +5904,7 @@ void BasicExcel::AdjustExtSSTPositions()
   size_t maxFormats = workbook_.formats_.size();
   for(size_t i=0; i<maxFormats; ++i) 
   {
-    if (workbook_.formats_[i].index_ >= FIRST_USER_FORMAT_IDX)	// only write user defined formats
+    if(workbook_.formats_[i].index_ >= FIRST_USER_FORMAT_IDX)	// only write user defined formats
     {
       offset += workbook_.formats_[i].RecordSize();
     }
@@ -5947,13 +5944,13 @@ void BasicExcel::AdjustExtSSTPositions()
 
     for(size_t j=0; (int)j<workbook_.extSST_.stringsTotal_; ++j) 
     {
-      if (i*workbook_.extSST_.stringsTotal_+j >= workbook_.sst_.strings_.size())
+      if(i*workbook_.extSST_.stringsTotal_ + j >= workbook_.sst_.strings_.size())
       {
         break;
       }
       ULONG stringSize = workbook_.sst_.strings_[i*workbook_.extSST_.stringsTotal_+j].StringSize();
 
-      if (relativeOffset+stringSize+3 < 8224)
+      if(relativeOffset + stringSize + 3 < 8224)
       {
         relativeOffset += stringSize + 3;
       }
@@ -5968,7 +5965,7 @@ void BasicExcel::AdjustExtSSTPositions()
           relativeOffset = 0;
 
           size_t additionalContinueRecords = stringSize / 8223; // 8223 because the first byte is for unicode
-          for(size_t k=0; k<additionalContinueRecords; ++k)
+          for(size_t k = 0; k < additionalContinueRecords; ++k)
           {
             stringSize -= 8223;
           }
@@ -5976,7 +5973,7 @@ void BasicExcel::AdjustExtSSTPositions()
         } 
         else 
         {
-          if (relativeOffset+stringSize+3 < 8224)
+          if(relativeOffset + stringSize + 3 < 8224)
           {
             relativeOffset += stringSize + 3;
           }
@@ -5991,7 +5988,7 @@ void BasicExcel::AdjustExtSSTPositions()
               relativeOffset = 0;
 
               size_t additionalContinueRecords = stringSize / 8223; // 8223 because the first byte is for unicode
-              for(size_t k=0; k<additionalContinueRecords; ++k)
+              for(size_t k = 0; k < additionalContinueRecords; ++k)
               {
                 stringSize -= 8223;
               }
@@ -6015,11 +6012,11 @@ void BasicExcel::UpdateYExcelWorksheet()
   {
     yesheets_.push_back(new BasicExcelWorksheet(this, i));
 
-    for(size_t j=0; j<worksheets_[i].colinfos_.colinfo_.size(); ++j)
+    for(size_t j = 0; j < worksheets_[i].colinfos_.colinfo_.size(); ++j)
     {
       yesheets_[i]->colInfos_.colinfo_.push_back(worksheets_[i].colinfos_.colinfo_[j]);
+    }
   }
-}
 }
 
 // Update worksheets_ using information from yesheets_.
@@ -6455,7 +6452,7 @@ void BasicExcelWorksheet::Print(ostream& os, char delimiter, char textQualifier)
           break;
 
         case BasicExcelCell::DOUBLE:
-          os << setprecision(15) << cell->GetDouble();
+          os << std::setprecision(15) << cell->GetDouble();
           break;
 
         case BasicExcelCell::STRING:
@@ -6486,12 +6483,12 @@ void BasicExcelWorksheet::Print(ostream& os, char delimiter, char textQualifier)
           break;
         }
       }
-      if (c < maxCols_-1)
+      if(c < maxCols_ - 1)
       {
         os << delimiter;
+      }
     }
-    }
-    os << endl;
+    os << std::endl;
   }
 }
 

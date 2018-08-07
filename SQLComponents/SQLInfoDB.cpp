@@ -88,6 +88,7 @@ SQLInfoDB::MakeInfoTableObject(MTableMap& p_tables
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -114,6 +115,7 @@ SQLInfoDB::MakeInfoTableTable(MTableMap& p_tables
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -140,6 +142,7 @@ SQLInfoDB::MakeInfoTableView(MTableMap& p_tables
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -172,6 +175,7 @@ SQLInfoDB::MakeInfoTableSynonyms(MTableMap& p_tables
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -200,6 +204,7 @@ SQLInfoDB::MakeInfoTableCatalog(MTableMap&  p_tables
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -286,6 +291,7 @@ SQLInfoDB::MakeInfoTableColumns(MColumnMap& p_columns
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -325,6 +331,7 @@ SQLInfoDB::MakeInfoTablePrimary(MPrimaryMap&  p_primaries
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -378,6 +385,7 @@ SQLInfoDB::MakeInfoTableForeign(MForeignMap&  p_foreigns
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -424,6 +432,7 @@ SQLInfoDB::MakeInfoTableStatistics(MIndicesMap& p_indices
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return false;
@@ -499,6 +508,7 @@ SQLInfoDB::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -569,6 +579,7 @@ SQLInfoDB::MakeInfoPSMParameters(MParameterMap& p_parameters
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -640,6 +651,7 @@ SQLInfoDB::MakeInfoTableTriggers(MTriggerMap& p_triggers
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
   }
   return 0;
@@ -680,6 +692,7 @@ SQLInfoDB::MakeInfoTableSequences(MSequenceMap& p_sequences,CString& p_errors,CS
   }
   catch(StdException& er)
   {
+    ReThrowSafeException(er);
     CString message = er.GetErrorMessage();
     if(message.Find("[42S02]") > 0)
     {

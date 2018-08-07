@@ -664,8 +664,8 @@ SQLQuery::TryDoSQLStatement(const CString& p_statement)
   }
   catch(StdException& error)
   {
+    ReThrowSafeException(error);
     // Do Nothing, ignoring the error
-    UNREFERENCED_PARAMETER(error);
   }
 }
 
@@ -1059,7 +1059,7 @@ SQLQuery::BindColumns()
                               ,colName            // Column name
                               ,SQL_MAX_IDENTIFIER // name buffer length
                               ,&dummy             // actual name length gotten
-                              ,&dataType          // SQL datatype (SQL_XX)
+                              ,&dataType          // SQL data type (SQL_XX)
                               ,&precision         // precision of numbers
                               ,&scale             // decimal scale
                               ,&nullable);        // NULL values OK?

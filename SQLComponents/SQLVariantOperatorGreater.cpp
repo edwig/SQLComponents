@@ -410,7 +410,8 @@ static SQL_OperDoubleGreaterFloat(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperBitGreaterFloat(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsBit() != 0 && p_right.GetAsFloat() == 0.0;
+  float right = p_right.GetAsFloat();
+  return p_left.GetAsBit() != 0 && (-FLT_EPSILON < right && right < FLT_EPSILON);
 }
 
 bool
@@ -484,7 +485,8 @@ static SQL_OperDoubleGreaterDouble(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperBitGreaterDouble(SQLVariant& p_left,SQLVariant& p_right)
 {
-  return p_left.GetAsBit() != 0 && p_right.GetAsDouble() == 0.0;
+  double right = p_right.GetAsDouble();
+  return p_left.GetAsBit() != 0 && (-DBL_EPSILON < right && right < DBL_EPSILON);
 }
 
 bool

@@ -151,7 +151,7 @@ SQLMutation::CurrentMutationID()
 {
   if(m_stack.size())
   {
-    m_stack.back()->m_mutationID;
+    return m_stack.back()->m_mutationID;
   }
   return 0;
 }

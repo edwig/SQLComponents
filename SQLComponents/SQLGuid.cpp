@@ -149,6 +149,12 @@ SQLGuid::operator ==(const SQLGuid& p_other)
 SQLGuid& 
 SQLGuid::operator =(const SQLGuid& p_other)
 {
+  // Check if we are not copying ourselves
+  if(&p_other == this)
+  {
+    return *this;
+  }
+  // Copy the GUID
   m_initialized = p_other.m_initialized;
   memcpy_s(&m_guid,sizeof(SQLGUID),&p_other.m_guid,sizeof(SQLGUID));
   return *this;
