@@ -1390,13 +1390,19 @@ SQLDataSet::GetSQLUpdate(SQLQuery* p_query,SQLRecord* p_record)
     bool update = true;
     if(!m_updateColumns.empty())
     {
-      it = std::find(m_updateColumns.begin(),m_updateColumns.end(),m_names[ind]);
-      if(it == m_updateColumns.end())
+      update = false;
+      for(auto& column : m_updateColumns)
       {
-        update = false;
+        if (m_names[ind].CompareNoCase(column) == 0)
+        {
+          update = true;
+          break;
+        }
       }
     }
 
+    // If we may update, and only if the field in the record IS updated!
+    // This reduces the number of columns to write back to the database!
     if(update && p_record->IsModified(ind))
     {
       SQLVariant* value = p_record->GetField(ind);

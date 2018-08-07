@@ -1,8 +1,17 @@
 RELEASENOTES SQLCOMPONENTS VERSION 1.5
 ======================================
-====== Released since:28-05-2017 =====
+====== Released since:28-05-2018 =====
 ======================================
 
+Version 1.5.1 of 07-08-2018
+---------------------------
+1) New SQLFilter extensions for CXHibernate
+2) DDLCreateTable now creates a number of independent scripts so that they can be
+   run in succession against a database to (re-)create the objects
+3) A small optimalisation in the SQLDataset in UPDATE'ing individual records
+
+Version 1.5.0 of 28-05-2018
+---------------------------
 1) The new compile time macro "COMPILED_TOGETHER_WITH_MARLIN" makes it possible to 
    drop the library in a larger project, together with the Marlin library at once.
    Just copy the directory, plugin the "SQLComponents.vcxproj" file in your solution,

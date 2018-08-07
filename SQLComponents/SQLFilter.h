@@ -43,10 +43,12 @@ typedef enum _sqlOperator
   ,OP_Smaller
   ,OP_SmallerEqual
   ,OP_IsNULL
+  ,OP_IsNotNULL
   ,OP_LikeBegin
   ,OP_LikeMiddle
   ,OP_IN
   ,OP_Between
+  ,OP_Exists
   ,OP_OR               // OR chaining to next filter(s)
 }
 SQLOperator;
@@ -71,9 +73,10 @@ public:
   SQLFilter(CString p_field,SQLOperator p_operator,SQLVariant* p_value);
   SQLFilter(CString p_field,SQLOperator p_operator,int         p_value);
   SQLFilter(CString p_field,SQLOperator p_operator,CString     p_value);
+  SQLFilter(SQLOperator p_operator);
   SQLFilter(SQLFilter* p_other);
   SQLFilter(SQLFilter& p_other);
-  ~SQLFilter();
+ ~SQLFilter();
 
   // Adding extra values for the IN or BETWEEN operators
   void        AddValue(SQLVariant* p_value);
@@ -81,6 +84,9 @@ public:
   void        AddExpression(CString p_expression);
   // Negate the filter
   void        Negate();
+  // Setting a parenthesis level
+  void        SetOpenParenthesis();
+  void        SetCloseParenthesis();
 
   // OPERATIONS
 
@@ -98,6 +104,8 @@ public:
   SQLVariant* GetValue(int p_number);
   CString     GetExpression();
   bool        GetNegate();
+
+  SQLFilter&  operator=(const SQLFilter& p_other);
 private:
   // Check that we have at least one operand value
   void        CheckValue();
@@ -112,17 +120,18 @@ private:
   void        ConstructBetween(CString& p_sql,SQLQuery& p_query);
 
   // Internal matching
-  bool        MatchEqual(SQLVariant* p_field);
-  bool        MatchNotEqual(SQLVariant* p_field);
-  bool        MatchGreater(SQLVariant* p_field);
+  bool        MatchEqual       (SQLVariant* p_field);
+  bool        MatchNotEqual    (SQLVariant* p_field);
+  bool        MatchGreater     (SQLVariant* p_field);
   bool        MatchGreaterEqual(SQLVariant* p_field);
-  bool        MatchSmaller(SQLVariant* p_field);
+  bool        MatchSmaller     (SQLVariant* p_field);
   bool        MatchSmallerEqual(SQLVariant* p_field);
-  bool        MatchLikeBegin(SQLVariant* p_field);
-  bool        MatchLikeMiddle(SQLVariant* p_field);
-  bool        MatchIsNULL(SQLVariant* p_field);
-  bool        MatchIN(SQLVariant* p_field);
-  bool        MatchBetween(SQLVariant* p_field);
+  bool        MatchLikeBegin   (SQLVariant* p_field);
+  bool        MatchLikeMiddle  (SQLVariant* p_field);
+  bool        MatchIsNULL      (SQLVariant* p_field);
+  bool        MatchIsNotNull   (SQLVariant* p_field);
+  bool        MatchIN          (SQLVariant* p_field);
+  bool        MatchBetween     (SQLVariant* p_field);
 
   // Data for the filter
   CString     m_field;              // Name of the field to act upon
@@ -130,6 +139,8 @@ private:
   VariantSet  m_values;             // Multiple values for IN and BETWEEN
   CString     m_expression;         // Free expression (no values!)
   bool        m_negate { false };   // Negate the whole condition
+  bool        m_openParenthesis  { false };
+  bool        m_closeParenthesis { false };
 };
 
 inline CString
@@ -179,6 +190,18 @@ inline bool
 SQLFilter::GetNegate()
 {
   return m_negate;
+}
+
+inline void
+SQLFilter::SetOpenParenthesis()
+{
+  m_openParenthesis = true;
+}
+
+inline void
+SQLFilter::SetCloseParenthesis()
+{
+  m_closeParenthesis = true;
 }
 
 //////////////////////////////////////////////////////////////////////////
