@@ -11,6 +11,7 @@ Version 1.5.1 of 07-08-2018
 3) A small optimalisation in the SQLDataset in UPDATE'ing individual records
 4) Re-Throw of a safe exception in exception handlers
 5) Code quality checks from SonarQube
+6) StringInitCapital and StringStartCapital now deal wiht initial diacritic characters.
 
 Version 1.5.0 of 28-05-2018
 ---------------------------

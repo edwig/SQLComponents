@@ -129,58 +129,62 @@ SQLVariantFormat::ReFormat()
 
 // All words get a initial capital
 // The rest of the words become lower case
+// Diacritic letters within words will be left alone
 void
 SQLVariantFormat::StringInitCapital()
 {
   bool doCapital = true;
-  for(int ind = 0;ind < m_format.GetLength(); ++ind)
+  int  length = m_format.GetLength();
+  unsigned char* buffer = (unsigned char*)m_format.GetBuffer();
+
+  for(int ind = 0; ind < length; ++ind)
   {
-    int ch = m_format.GetAt(ind);
-    if(ch > 0 && ch <= 127)
+    int ch = buffer[ind];
+
+    if(isblank(ch))
+    {
+      doCapital = true;
+    }
+    else
     {
       if(isalpha(ch))
       {
         if(doCapital)
         {
-          m_format.SetAt(ind,(unsigned char)toupper(ch));
+          m_format.SetAt(ind, (unsigned char)toupper(ch));
           doCapital = false;
         }
         else
         {
-          m_format.SetAt(ind,(unsigned char)tolower(ch));
+          m_format.SetAt(ind, (unsigned char)tolower(ch));
         }
       }
-      else
-      {
-        doCapital = true;
-      }
+      doCapital = false;
     }
   }
 }
 
-// First letter of the string becomes a capital
+// First character of the string becomes a capital
 // The rest becomes all lower case
+// But only if the first character is NOT a diacritic character
 void
 SQLVariantFormat::StringStartCapital()
 {
   bool doCapital = true;
-  for(int ind = 0;ind < m_format.GetLength(); ++ind)
+  int  length = m_format.GetLength();
+  unsigned char* buffer = (unsigned char*)m_format.GetBuffer();
+
+  for(int ind = 0;ind < length; ++ind)
   {
-    int ch = m_format.GetAt(ind);
-    if(ch > 0 && ch <= 127)
+    int ch = buffer[ind];
+
+    if(isblank(ch) == false)
     {
       if(isalpha(ch))
       {
-        if(doCapital)
-        {
-          m_format.SetAt(ind,(char)toupper(ch));
-          doCapital = false;
-        }
-        else
-        {
-          m_format.SetAt(ind,(char)tolower(ch));
-        }
+        m_format.SetAt(ind,doCapital ? (unsigned char)toupper(ch) : (unsigned char) tolower(ch));
       }
+      doCapital = false;
     }
   }
 }
