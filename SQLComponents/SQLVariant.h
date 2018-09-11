@@ -76,8 +76,8 @@ public:
    SQLVariant(CString& p_data);               // SQL_C_CHAR
    SQLVariant(short p_short);                 // SQL_C_SHORT / SQL_C_SSHORT
    SQLVariant(unsigned short p_short);        // SQL_C_USHORT
-   SQLVariant(int p_long);                   // SQL_C_LONG / SQL_C_SLONG
-   SQLVariant(unsigned int p_long);          // SQL_C_ULONG
+   SQLVariant(int p_long);                    // SQL_C_LONG / SQL_C_SLONG
+   SQLVariant(unsigned int p_long);           // SQL_C_ULONG
    SQLVariant(float p_float);                 // SQL_C_FLOAT
    SQLVariant(double p_double);               // SQL_C_DOUBLE
    SQLVariant(bool p_bit);                    // SQL_C_BIT
@@ -112,15 +112,6 @@ public:
    bool    IsIntervalType();
    bool    IsDateTimeType();
 
-   // INFO about type names/values
-   static  int     FindDatatype   (char* p_type);
-   static  char*   FindDatatype   (int   p_type);
-   static  int     FindParamtype  (char* p_type);
-   static  char*   FindParamtype  (int   p_type);
-   static  int     FindSQLDatatype(char* p_type);
-   static  char*   FindSQLDatatype(int   p_type);
-           int     FindDataTypeFromSQLType();
-
    // GETTERS
    int     GetDataType();
    int     GetDataSize();
@@ -153,6 +144,9 @@ public:
    bool                 SetData(int p_type,const char* p_data);
    void*                GetDataPointer();
    void                 SetFromRawDataPointer(void* p_pointer,int p_size = 0);
+   // BLOB Functions
+   void                 AttachBinary(void* p_pointer,unsigned long p_size = 0);
+   void                 DetachBinary();
 
    // Access per type
    const char*          GetAsChar();
@@ -186,6 +180,15 @@ public:
    SQLGuid              GetAsSQLGuid();
    bcd                  GetAsBCD();
    
+   // INFO about type names/values
+   static  int          FindDatatype   (char* p_type);
+   static  char*        FindDatatype   (int   p_type);
+   static  int          FindParamtype  (char* p_type);
+   static  char*        FindParamtype  (int   p_type);
+   static  int          FindSQLDatatype(char* p_type);
+   static  char*        FindSQLDatatype(int   p_type);
+           int          FindDataTypeFromSQLType();
+
    // Assignment operator
    SQLVariant& operator  =(const SQLVariant& p_original);
    // Assignment operator from original data
@@ -193,8 +196,8 @@ public:
    SQLVariant& operator  =(CString& p_data);                 // SQL_C_CHAR
    SQLVariant& operator  =(short p_data);                    // SQL_C_SHORT / SQL_C_SSHORT
    SQLVariant& operator  =(unsigned short p_data);           // SQL_C_USHORT
-   SQLVariant& operator  =(int p_data);                     // SQL_C_LONG  / SQL_C_SLONG
-   SQLVariant& operator  =(unsigned int p_data);            // SQL_C_ULONG
+   SQLVariant& operator  =(int p_data);                      // SQL_C_LONG  / SQL_C_SLONG
+   SQLVariant& operator  =(unsigned int p_data);             // SQL_C_ULONG
    SQLVariant& operator  =(float p_data);                    // SQL_C_FLOAT
    SQLVariant& operator  =(double p_data);                   // SQL_C_DOUBLE
    SQLVariant& operator  =(bool p_data);                     // SQL_C_BIT

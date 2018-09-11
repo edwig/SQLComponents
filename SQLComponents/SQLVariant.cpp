@@ -2657,6 +2657,37 @@ SQLVariant::SetFromRawDataPointer(void* p_pointer,int p_size /*= 0*/)
 
 //////////////////////////////////////////////////////////////////////////
 //
+// BLOB Functions
+//
+//////////////////////////////////////////////////////////////////////////
+
+void
+SQLVariant::AttachBinary(void* p_pointer,unsigned long p_size /*= 0*/)
+{
+  // Forget previous allocations
+  ResetDataType(0);
+
+  // Set relevant members
+  m_datatype          = SQL_C_BINARY;
+  m_sqlDatatype       = SQL_LONGVARBINARY;
+  m_useAtExec         = true;
+  m_binaryPieceSize   = 4 * 1000; // Default is 1 TCP/IP block
+  m_indicator         = p_size > 0 ? p_size : SQL_NULL_DATA;
+  // Connect the binary block
+  m_binaryLength      = p_size;
+  m_data.m_dataBINARY = p_pointer;
+}
+
+void
+SQLVariant::DetachBinary()
+{
+  // We forget about the binary block
+  // We must **NEVER** do a free on it!!
+  Init();
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
 // CONVERSION ROUTINES BEGIN HERE
 //
 //////////////////////////////////////////////////////////////////////////
