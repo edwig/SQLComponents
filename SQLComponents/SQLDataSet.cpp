@@ -1581,7 +1581,7 @@ SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset)
   while(field)
   {
     // Remember the name of the field
-    CString name = field->GetName();
+    CString name = field->GetValue();
     m_names.push_back(name);
     // Datatype of the field
     int type = p_msg->GetAttributeInteger(field,dataset_names[g_defaultLanguage][DATASET_TYPE]);
