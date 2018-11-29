@@ -348,7 +348,7 @@ CString
 SQLInfoFirebird::GetSQLDateString(int p_year,int p_month,int p_day) const
 {
   CString retval;
-  retval.Format("CAST '%02d/%02d/04d' AS DATE)",p_day,p_month,p_year); // American order!!
+  retval.Format("CAST '%02d/%02d/%04d' AS DATE)",p_day,p_month,p_year); // American order!!
   return retval;
 }
 
@@ -733,7 +733,7 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_table
 
 CString SQLInfoFirebird::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
-  CString sql  = "ALTER TABLE "  + p_column.m_table  + "\n";
+  CString sql  = "ALTER TABLE "  + p_column.m_table  + "\n"
                  "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);
@@ -744,7 +744,7 @@ CString SQLInfoFirebird::GetCATALOGColumnAlter(MetaColumn& p_column) const
 {
   // The extra 'TYPE' keyword  is a-typical
   // The SET/DROP for the NULL is a-typical
-  CString sql  = "ALTER TABLE "  + p_column.m_table  + "\n";
+  CString sql  = "ALTER TABLE "  + p_column.m_table  + "\n"
                  "      MODIFY COLUMN " + p_column.m_column + " TYPE " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   if(p_column.m_nullable)
@@ -1201,8 +1201,7 @@ SQLInfoFirebird::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablena
   p_triggername.MakeUpper();
   p_triggername.MakeUpper();
 
-  CString sql;
-  sql.Format("SELECT cast('' as varchar(31)) AS catalog_name\n"
+  CString sql("SELECT cast('' as varchar(31)) AS catalog_name\n"
              "      ,(SELECT trim(tab.rdb$owner_name)\n"
              "          FROM rdb$relations tab\n"
              "         WHERE tab.rdb$relation_name = trg.rdb$relation_name) AS schema_name\n"
@@ -1273,8 +1272,7 @@ SQLInfoFirebird::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablena
              "       END AS trigger_enabled\n"
              "      ,rdb$trigger_source\n"
              "  FROM rdb$triggers trg\n"
-             " WHERE rdb$system_flag   = 0\n"
-            ,p_schema.GetString());
+             " WHERE rdb$system_flag   = 0\n");
 
   // Add tablename filter
   if(!p_tablename.IsEmpty())

@@ -702,7 +702,7 @@ SQLInfoOracle::GetCATALOGColumnAttributes(CString p_schema,CString p_tablename,C
 CString 
 SQLInfoOracle::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
-  CString sql = "ALTER TABLE "  + p_column.m_schema + "." + p_column.m_table  + "\n";
+  CString sql = "ALTER TABLE "  + p_column.m_schema + "." + p_column.m_table  + "\n"
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);
@@ -716,7 +716,7 @@ SQLInfoOracle::GetCATALOGColumnCreate(MetaColumn& p_column) const
 CString 
 SQLInfoOracle::GetCATALOGColumnAlter(MetaColumn& p_column) const
 {
-  CString sql = "ALTER  TABLE  " + p_column.m_schema + "." + p_column.m_table  + "\n";
+  CString sql = "ALTER  TABLE  " + p_column.m_schema + "." + p_column.m_table  + "\n"
                 "MODIFY COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);
@@ -1676,7 +1676,9 @@ SQLInfoOracle::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
     CString s = qry1.GetColumn(3)->GetAsChar();
     if(s.Find("Statement ignored") < 0) 
     {
-      s.Format("Error in line %d, column %d: %s\n",qry1.GetColumn(1)->GetAsSLong(),qry1.GetColumn(2)->GetAsSLong());
+      s.Format("Error in line %d, column %d: %s\n",qry1.GetColumn(1)->GetAsSLong()
+	                                                ,qry1.GetColumn(2)->GetAsSLong()
+												                          ,qry1.GetColumn(3)->GetAsChar());
       errorText += s;
       query.Format( "SELECT text\n"
                     "  FROM dba_source\n"

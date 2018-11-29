@@ -258,7 +258,7 @@ SQLDate::AsString() const
   CString buffer;
   if(IsNull() == false)
   {
-    buffer.Format("%02d-%02d-%04d", Day(), Month(), Year());
+    buffer.Format("%02ld-%02ld-%04ld", Day(), Month(), Year());
   }
   return buffer;
 }
@@ -352,7 +352,7 @@ SQLDate::FullDate(Language p_lang /*=LN_DEFAULT*/) const
     }
     if(p_lang >= LN_DUTCH && p_lang <= LN_FRENCH)
     {
-      fullName.Format("%s %d %s %d",WeekDayName(p_lang).GetString(),Day(),MonthName(p_lang).GetString(),Year());
+      fullName.Format("%s %ld %s %ld",WeekDayName(p_lang).GetString(),Day(),MonthName(p_lang).GetString(),Year());
     }
   }
   return fullName;

@@ -511,7 +511,7 @@ SQLInfoAccess::GetCATALOGColumnAttributes(CString /*p_schema*/,CString /*p_table
 CString 
 SQLInfoAccess::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
-  CString sql = "ALTER TABLE "  + p_column.m_table  + "\n";
+  CString sql = "ALTER TABLE "  + p_column.m_table  + "\n"
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
   if(p_column.m_columnSize)
   {
@@ -532,7 +532,7 @@ SQLInfoAccess::GetCATALOGColumnCreate(MetaColumn& p_column) const
 CString 
 SQLInfoAccess::GetCATALOGColumnAlter(MetaColumn& p_column) const
 {
-  CString sql = "ALTER TABLE  " + p_column.m_table + "\n";
+  CString sql = "ALTER TABLE  " + p_column.m_table + "\n"
                 "ALTER COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);

@@ -96,6 +96,7 @@ SQLQuery::Init(SQLDatabase* p_database)
   m_boundDone        = false;
   m_lastError        = "";
   m_maxRows          = 0;
+  m_maxColumnLength  = 0;
   m_isSelectQuery    = false;
   m_speedThreshold   = QUERY_TOO_LONG;
   m_connection       = NULL;

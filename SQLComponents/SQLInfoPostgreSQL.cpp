@@ -590,7 +590,7 @@ SQLInfoPostgreSQL::GetCATALOGColumnExists(CString p_schema,CString p_tablename,C
                  "      ,pg_namespaces sch\n"
                  "      ,pg_attribute  att\n"
                  " WHERE tab.relname = '" + p_tablename  + "'\n"
-                 "   AND sch.name    = '" + p_schema     + "'\n";
+                 "   AND sch.name    = '" + p_schema     + "'\n"
                  "   AND att.attname = '" + p_columnname + "'\n"
                  "   AND tab.oid     = att.attrelid\n"
                  "   AND sch.oid     = tab.relnamespace\n";
@@ -688,7 +688,7 @@ SQLInfoPostgreSQL::GetCATALOGColumnAttributes(CString p_schema,CString p_tablena
 CString 
 SQLInfoPostgreSQL::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
-  CString sql = "ALTER TABLE "  + p_column.m_schema + "." + p_column.m_table  + "\n";
+  CString sql = "ALTER TABLE "  + p_column.m_schema + "." + p_column.m_table  + "\n"
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
   if(p_column.m_columnSize)
   {

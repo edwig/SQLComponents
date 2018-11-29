@@ -565,7 +565,7 @@ SQLInfoMySQL::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_tablenam
 CString 
 SQLInfoMySQL::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
-  CString sql = "ALTER TABLE "  + p_column.m_table  + "\n";
+  CString sql = "ALTER TABLE "  + p_column.m_table  + "\n"
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);
@@ -579,7 +579,7 @@ CString
 SQLInfoMySQL::GetCATALOGColumnAlter(MetaColumn& p_column) const
 {
   // The MODIFY keyword is a-typical
-  CString sql = "ALTER  TABLE  " + p_column.m_table + "\n";
+  CString sql = "ALTER  TABLE  " + p_column.m_table + "\n"
                 "MODIFY COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);

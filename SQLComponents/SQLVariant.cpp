@@ -880,7 +880,7 @@ SQLVariant::GetAsString(CString& result)
     case SQL_C_TINYINT:                   // Fall through
     case SQL_C_STINYINT:                  result.Format("%d",(int)m_data.m_dataTINYINT);
                                           break;
-    case SQL_C_UTINYINT:                  result.Format("%d",(unsigned)m_data.m_dataUTINYINT);
+    case SQL_C_UTINYINT:                  result.Format("%u",(unsigned)m_data.m_dataUTINYINT);
                                           break;
     case SQL_C_SBIGINT:                   result.Format("%I64d",m_data.m_dataSBIGINT);
                                           break;

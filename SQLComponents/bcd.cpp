@@ -2820,8 +2820,8 @@ bcd::DebugPrint(char* p_name)
   // Print the mantissa in special format
   for(int ind = 0;ind < bcdLength; ++ind)
   {
-    // Text "%08d" dependent on bcdDigits
-    printf(" %08d",m_mantissa[ind]);
+    // Text "%08ld" dependent on bcdDigits
+    printf(" %08ld",m_mantissa[ind]);
   }
   printf("\n");
 }
@@ -3427,7 +3427,7 @@ bcd ldexp(bcd p_number,int p_power)
   }
   if(p_power > 0 && p_power <= 31)
   {
-    return p_number * bcd((long) (1 << p_power));
+    return p_number * bcd((long) (((unsigned)1) << p_power));
   }
   return p_number * pow(bcd(2L),bcd((long)p_power));
 }

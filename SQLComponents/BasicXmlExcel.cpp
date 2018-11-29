@@ -445,6 +445,7 @@ BasicXmlExcel::ReadSheetNames()
       {
         m_error.Format("Cannot read the workbook definition of: %s",m_filename.GetString());
         SetError(res);
+        free(buffer);
         break;
       }
       // delimit the buffer
@@ -457,12 +458,14 @@ BasicXmlExcel::ReadSheetNames()
       if(root == NULL)
       {
         m_error.Format("Workbook definition incorrect in: %s",m_filename.GetString());
+        free(buffer);
         break;
       }
       XMLElement* sheets = doc.FindElement(root,"sheets");
       if(sheets == NULL)
       {
         SetError("Workbook is empty. No worksheets in spreadsheet");
+        free(buffer);
         break;
       }
       XMLElement* sheet  = doc.GetElementFirstChild(sheets);
@@ -570,6 +573,7 @@ BasicXmlExcel::LoadStrings()
       {
         m_error.Format("Cannot read the shared-strings of: %s",m_filename.GetString());
         SetError(res);
+        free(buffer);
         return false;
       }
       // delimit the buffer
@@ -582,6 +586,7 @@ BasicXmlExcel::LoadStrings()
       if(root == NULL)
       {
         m_error.Format("Shared-strings definition incorrect in: %s",m_filename.GetString());
+        free(buffer);
         return false;
       }
       // Reading the strings
@@ -639,7 +644,7 @@ BasicXmlExcel::LoadWorksheets()
   for(unsigned sheetnum = 0; sheetnum < m_sheetnames.size(); ++sheetnum)
   {
     CString sheetName;
-    sheetName.Format("xl/worksheets/sheet%d.xml",sheetnum + 1);
+    sheetName.Format("xl/worksheets/sheet%u.xml",sheetnum + 1);
 
     // Loop through all entries
     for(int ind = 0; ind < entries; ++ind)
@@ -661,6 +666,7 @@ BasicXmlExcel::LoadWorksheets()
         {
           m_error.Format("Cannot read the worksheet definition of: %s",m_filename.GetString());
           SetError(res);
+          free(buffer);
           return false;
         }
         // delimit the buffer
@@ -673,6 +679,7 @@ BasicXmlExcel::LoadWorksheets()
         if(root == NULL)
         {
           m_error.Format("Worksheet definition incorrect in: %s",m_filename.GetString());
+          free(buffer);
           return false;
         }
         // Make a new worksheet

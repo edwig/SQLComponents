@@ -412,7 +412,7 @@ SQLTime::ParseXMLTime(const CString& p_string)
   //  Parse the string
   // changed char to unsigned int for 64 bit implementation
   char sep1,sep2,sep3,sep4,sep5;
-  int n = sscanf_s(p_string,"%1d%1d%c%1d%1d%c%1d%1d%c%d%c%1d%1d%c%1d%1d",
+  int n = sscanf_s(p_string,"%1u%1u%c%1u%1u%c%1u%1u%c%u%c%1u%1u%c%1u%1u",
                   &uu[0],&uu[1],
                   &sep1,(unsigned int) sizeof(char),
                   &mi[0],&mi[1],

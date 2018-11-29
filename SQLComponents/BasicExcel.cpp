@@ -4458,14 +4458,19 @@ ULONG Worksheet::CellTable::RowBlock::CellBlock::Formula::String::Read(const cha
   wstr_ = new wchar_t[stringSize+1];
   ULONG bytesRead = 7;
 
-  if (flag_ == 0) { // compressed UTF16LE string?
-    char* str = (char*) alloca(stringSize+1);
+  if (flag_ == 0) 
+  {
+    // compressed UTF16LE string?
+	char* str = new char[stringSize + 1];
     LittleEndian::ReadString(data_, str, 3, stringSize);
     str[stringSize] = 0;
     mbstowcs(wstr_, str, stringSize);
     wstr_[stringSize] = 0;
     bytesRead += stringSize;
-  } else {
+	delete [] str;
+  } 
+  else 
+  {
     LittleEndian::ReadString(data_, wstr_, 3, stringSize);
     wstr_[stringSize] = 0;
     bytesRead += stringSize*2;
@@ -4481,11 +4486,16 @@ ULONG Worksheet::CellTable::RowBlock::CellBlock::Formula::String::Write(char* da
   LittleEndian::Write(data_, stringSize, 0, 2);
   LittleEndian::Write(data_, flag_, 2, 1);
 
-  if (flag_ == 0) { // compressed UTF16LE string?
-    char* str = (char*) alloca(stringSize);
+  if (flag_ == 0) 
+  {
+	  // compressed UTF16LE string?
+	  char* str = new char[stringSize + 1];
     wcstombs(str, wstr_, stringSize);
     LittleEndian::WriteString(data_, str, 3, stringSize);
-  } else {
+	  delete [] str;
+  }
+  else 
+  {
     LittleEndian::WriteString(data_, wstr_, 3, stringSize);
   }
 

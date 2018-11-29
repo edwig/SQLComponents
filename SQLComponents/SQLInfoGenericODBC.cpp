@@ -533,7 +533,7 @@ CString
 SQLInfoGenericODBC::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
   // General ISO 9075E syntax
-  CString sql = "ALTER TABLE  " + p_column.m_schema + "." + p_column.m_table  + "\n";
+  CString sql = "ALTER TABLE  " + p_column.m_schema + "." + p_column.m_table  + "\n"
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);
@@ -548,7 +548,7 @@ CString
 SQLInfoGenericODBC::GetCATALOGColumnAlter(MetaColumn& p_column) const
 {
   // General ISO 9075E syntax
-  CString sql = "ALTER TABLE  " + p_column.m_schema + "." + p_column.m_table  + "\n";
+  CString sql = "ALTER TABLE  " + p_column.m_schema + "." + p_column.m_table  + "\n"
                 "ALTER COLUMN " + p_column.m_column + " " + p_column.m_typename;
   p_column.GetPrecisionAndScale(sql);
   p_column.GetNullable(sql);

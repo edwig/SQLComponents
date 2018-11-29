@@ -197,7 +197,7 @@ SQLTimestamp::RecalculateValue()
   {
     SetNull();
     CString error;
-    error.Format("Day of the month must be between 1 and %d inclusive.",daysInMonth);
+    error.Format("Day of the month must be between 1 and %ld inclusive.",daysInMonth);
     throw StdException(error);
   }
   // Calculate the Astronomical Julian Day Number (JD)

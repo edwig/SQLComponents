@@ -185,7 +185,7 @@ namespace DatabaseUnitTest
       number_of_tests++;
 
       st.FormatDate("");
-      Assert::AreEqual("15-10-1959",st.GetFormat());
+      Assert::AreEqual("15-10-59",st.GetFormat());
       number_of_tests++;
 
       form.Reset();

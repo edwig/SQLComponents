@@ -3,6 +3,11 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.5
 ====== Released since:28-05-2018 =====
 ======================================
 
+Version 1.5.3 of 29-11-2018
+---------------------------
+1) Various small code corrections from CPPCheck 1.85
+2) Upgrade to Firebird 3.0.4 Server
+
 Version 1.5.2 of 17-09-2018
 ---------------------------
 1) Added two new members to SQLVariant
