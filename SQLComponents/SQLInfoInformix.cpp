@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -434,6 +434,15 @@ SQLInfoInformix::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,i
 //   - Drop
 //
 //////////////////////////////////////////////////////////////////////////
+
+// Meta info about meta types
+// Standard ODBC functions are good enough
+CString
+SQLInfoInformix::GetCATALOGMetaTypes(int p_type) const
+{
+  UNREFERENCED_PARAMETER(p_type);
+  return "";
+}
 
 // Get SQL to check if a table already exists in the database
 CString
@@ -869,7 +878,7 @@ SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema
                 "      ,trim(tab.tabname)      AS foreign_table_name\n"
                 "      ,trim(pcn.constrname)   AS primary_key_constraint\n"
                 "      ,trim(con.constrname)   AS foreign_key_constraint\n"
-                "      ,%d               AS key_sequence\n"
+                "      ,%d                     AS key_sequence\n"
                 "      ,trim(pcl.colname)      AS primary_column_name\n"
                 "      ,trim(col.colname)      AS foreign_column_name\n"
                 "      ,CASE WHEN ref.updrule = 'R' THEN 1\n"
@@ -923,8 +932,8 @@ SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema
       }
       else
       {
-      part += "    AND tab.owner = '" + p_schema + "'\n";
-    }
+        part += "   AND tab.owner      = '" + p_schema + "'\n";
+      }
     }
     if(!p_tablename.IsEmpty())
     {
@@ -934,8 +943,8 @@ SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema
       }
       else
       {
-      part += "   AND tab.tabname    = '" + p_tablename + "'\n";
-    }
+        part += "   AND tab.tabname    = '" + p_tablename + "'\n";
+      }
     }
     if(!p_constraint.IsEmpty())
     {
@@ -945,8 +954,8 @@ SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema
       }
       else
       {
-      part += "    AND con.constrname = '" + p_constraint + "'\n";
-    }
+        part += "    AND con.constrname = '" + p_constraint + "'\n";
+      }
     }
     // Add to the query
     if(!query.IsEmpty())
@@ -956,7 +965,7 @@ SQLInfoInformix::GetCATALOGForeignAttributes(CString p_schema
     query += part;
   }
 
-  // Add ordering upto column number
+  // Add ordering up to column number
   query += " ORDER BY 1,2,3,4,5,6,7,8,9";
 
   return query;

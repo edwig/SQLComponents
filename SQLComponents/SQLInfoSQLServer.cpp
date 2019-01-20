@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -418,6 +418,15 @@ SQLInfoSQLServer::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,
 //
 //////////////////////////////////////////////////////////////////////////
 
+// Meta info about meta types
+// Standard ODBC functions are good enough
+CString
+SQLInfoSQLServer::GetCATALOGMetaTypes(int p_type) const
+{
+  UNREFERENCED_PARAMETER(p_type);
+  return "";
+}
+
 // Get SQL to check if a table already exists in the database
 CString
 SQLInfoSQLServer::GetCATALOGTableExists(CString p_schema,CString p_tablename) const
@@ -496,7 +505,7 @@ SQLInfoSQLServer::GetCATALOGTableCatalog(CString p_schema,CString p_tablename) c
                   " WHERE xtype IN ('V','S')\n"
                   "   AND obj.uid = usr.uid\n";
   if(!p_schema.IsEmpty())
-{
+  {
     query += "   AND usr.name      = '" + p_schema + "'\n";
   }
   if(!p_tablename.IsEmpty())
@@ -779,7 +788,7 @@ SQLInfoSQLServer::GetCATALOGPrimaryExists(CString p_schema,CString p_tablename) 
                   " WHERE tab.id    = con.parent_obj\n"
                   "   AND tab.uid   = use.uid\n"
                   "   AND con.xtype = 'PK'\n"
-                  "   AND con.type  = 'K '"
+                  "   AND con.type  = 'K'"
                   "   AND use.name  = '" + p_schema    + "'\n"
                   "   AND tab.name  = '" + p_tablename + "'";
   return query;
@@ -890,11 +899,11 @@ SQLInfoSQLServer::GetCATALOGForeignAttributes(CString p_schema
                   "      ,fok.is_disabled   as disabled\n"
                   "  FROM sys.foreign_keys        fok\n"
                   "      ,sys.foreign_key_columns fkc\n"
-                  "      ,sys.schemas sch\n"
-                  "      ,sys.tables  tab\n"
-                  "      ,sys.columns col\n"
-                  "      ,sys.tables  pri\n"
-                  "      ,sys.columns pky\n"
+                  "      ,sys.schemas    sch\n"
+                  "      ,sys.tables     tab\n"
+                  "      ,sys.columns    col\n"
+                  "      ,sys.tables     pri\n"
+                  "      ,sys.columns    pky\n"
                   "      ,sys.sysobjects prk\n"
                   " WHERE fok.type = 'F'\n"
                   "   AND fok.parent_object_id     = tab.object_id\n"
@@ -920,8 +929,8 @@ SQLInfoSQLServer::GetCATALOGForeignAttributes(CString p_schema
     }
     else
     {
-    query += "   AND tab.name = '" + p_tablename + "'\n";
-  }
+      query += "   AND tab.name = '" + p_tablename + "'\n";
+    }
   }
   if(!p_constraint.IsEmpty())
   {
@@ -931,10 +940,10 @@ SQLInfoSQLServer::GetCATALOGForeignAttributes(CString p_schema
     }
     else
     {
-    query += "   AND fok.name = '" + p_constraint + "'\n";
+      query += "   AND fok.name = '" + p_constraint + "'\n";
+    }
   }
-  }
-  // Order upto column number
+  // Order up to column number
   query += " ORDER BY 1,2,3,4,5,6,7,8,9";
 
   return query;
@@ -1288,7 +1297,7 @@ SQLInfoSQLServer::GetCATALOGViewAttributes(CString p_schema,CString p_viewname) 
     query += "   AND tab.name ";
     query += p_viewname.Find('%') >= 0 ? "LIKE '" : "= '";
     query += p_viewname + "'\n";
-}
+  }
   query += " ORDER BY 1,2,3";
   return query;}
 

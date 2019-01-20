@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #pragma once
 #include "SQLInfoDB.h"
@@ -197,39 +197,41 @@ public:
   //
   //////////////////////////////////////////////////////////////////////////
 
+  // Meta info about meta types
+  CString GetCATALOGMetaTypes(int p_type) const;
   // All table functions
-  CString GetCATALOGTableExists    (CString p_schema,CString p_tablename) const;
-  CString GetCATALOGTablesList     (CString p_schema,CString p_pattern) const;
+  CString GetCATALOGTableExists       (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGTablesList        (CString p_schema,CString p_pattern)   const;
   CString GetCATALOGTableAttributes   (CString p_schema,CString p_tablename) const;
   CString GetCATALOGTableSynonyms     (CString p_schema,CString p_tablename) const;
   CString GetCATALOGTableCatalog      (CString p_schema,CString p_tablename) const;
-  CString GetCATALOGTableCreate    (MetaTable& p_table,MetaColumn& p_column) const;
-  CString GetCATALOGTableRename    (CString p_schema,CString p_tablename,CString p_newname) const;
-  CString GetCATALOGTableDrop      (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGTableCreate       (MetaTable& p_table,MetaColumn& p_column) const;
+  CString GetCATALOGTableRename       (CString p_schema,CString p_tablename,CString p_newname) const;
+  CString GetCATALOGTableDrop         (CString p_schema,CString p_tablename) const;
   // All Temporary table functions
   CString GetCATALOGTemptableCreate   (CString p_schema,CString p_tablename,CString p_select) const;
   CString GetCATALOGTemptableIntoTemp (CString p_schema,CString p_tablename,CString p_select) const;
   CString GetCATALOGTemptableDrop     (CString p_schema,CString p_tablename) const;
   // All column functions
-  CString GetCATALOGColumnExists    (CString p_schema,CString p_tablename,CString p_columname) const;
-  CString GetCATALOGColumnList      (CString p_schema,CString p_tablename) const;
-  CString GetCATALOGColumnAttributes(CString p_schema,CString p_tablename,CString p_columname) const;
-  CString GetCATALOGColumnCreate    (MetaColumn& p_column) const;
-  CString GetCATALOGColumnAlter     (MetaColumn& p_column) const;
-  CString GetCATALOGColumnRename    (CString p_schema,CString p_tablename,CString p_columnname,CString p_newname,CString p_datatype) const;
-  CString GetCATALOGColumnDrop      (CString p_schema,CString p_tablename,CString p_columname) const;
+  CString GetCATALOGColumnExists      (CString p_schema,CString p_tablename,CString p_columname) const;
+  CString GetCATALOGColumnList        (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGColumnAttributes  (CString p_schema,CString p_tablename,CString p_columname) const;
+  CString GetCATALOGColumnCreate      (MetaColumn& p_column) const;
+  CString GetCATALOGColumnAlter       (MetaColumn& p_column) const;
+  CString GetCATALOGColumnRename      (CString p_schema,CString p_tablename,CString p_columnname,CString p_newname,CString p_datatype) const;
+  CString GetCATALOGColumnDrop        (CString p_schema,CString p_tablename,CString p_columname) const;
   // All index functions
-  CString GetCATALOGIndexExists     (CString p_schema,CString p_tablename,CString p_indexname) const;
-  CString GetCATALOGIndexList       (CString p_schema,CString p_tablename) const;
-  CString GetCATALOGIndexAttributes (CString p_schema,CString p_tablename,CString p_indexname) const;
-  CString GetCATALOGIndexCreate     (MIndicesMap& p_index) const;
-  CString GetCATALOGIndexDrop       (CString p_schema,CString p_tablename,CString p_indexname) const;
-  CString GetCATALOGIndexFilter     (MetaIndex& p_index) const;
+  CString GetCATALOGIndexExists       (CString p_schema,CString p_tablename,CString p_indexname) const;
+  CString GetCATALOGIndexList         (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGIndexAttributes   (CString p_schema,CString p_tablename,CString p_indexname) const;
+  CString GetCATALOGIndexCreate       (MIndicesMap& p_index) const;
+  CString GetCATALOGIndexDrop         (CString p_schema,CString p_tablename,CString p_indexname) const;
+  CString GetCATALOGIndexFilter       (MetaIndex& p_index) const;
   // All primary key functions
-  CString GetCATALOGPrimaryExists    (CString p_schema,CString p_tablename) const;
-  CString GetCATALOGPrimaryAttributes(CString p_schema,CString p_tablename) const;
-  CString GetCATALOGPrimaryCreate    (MPrimaryMap& p_primaries) const;
-  CString GetCATALOGPrimaryDrop      (CString p_schema,CString p_tablename,CString p_constraintname) const;
+  CString GetCATALOGPrimaryExists     (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGPrimaryAttributes (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGPrimaryCreate     (MPrimaryMap& p_primaries) const;
+  CString GetCATALOGPrimaryDrop       (CString p_schema,CString p_tablename,CString p_constraintname) const;
   // All foreign key functions
   CString GetCATALOGForeignExists    (CString p_schema,CString p_tablename,CString p_constraintname) const;
   CString GetCATALOGForeignList      (CString p_schema,CString p_tablename,int p_maxColumns = SQLINFO_MAX_COLUMNS) const;

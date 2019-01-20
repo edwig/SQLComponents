@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -420,6 +420,15 @@ SQLInfoPostgreSQL::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day
 //   - Drop
 //
 //////////////////////////////////////////////////////////////////////////
+
+// Meta info about meta types
+// Standard ODBC functions are good enough
+CString
+SQLInfoPostgreSQL::GetCATALOGMetaTypes(int p_type) const
+{
+  UNREFERENCED_PARAMETER(p_type);
+  return "";
+}
 
 // Get SQL to check if a table already exists in the database
 CString
@@ -1035,8 +1044,8 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(CString p_schema,CString p_tablen
       }
       else
       {
-      part += "\n   AND sch.nspname = '" + p_schema + "'";
-    }
+        part += "\n   AND sch.nspname = '" + p_schema + "'";
+      }
     }
     if(!p_tablename.IsEmpty())
     {
@@ -1046,8 +1055,8 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(CString p_schema,CString p_tablen
       }
       else
       {
-      part += "\n   AND cla.relname = '" + p_tablename + "'";
-    }
+        part += "\n   AND cla.relname = '" + p_tablename + "'";
+      }
     }
     if(!p_constraint.IsEmpty())
     {
@@ -1057,8 +1066,8 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(CString p_schema,CString p_tablen
       }
       else
       {
-      part += "\n   AND con.conname = '" + p_constraint + "'";
-    }
+        part += "\n   AND con.conname = '" + p_constraint + "'";
+      }
     }
 
     // Append to query, multiple for multiple columns
@@ -1441,7 +1450,7 @@ SQLInfoPostgreSQL::GetCATALOGViewAttributes(CString p_schema,CString p_viewname)
     query += "   AND tab.relname ";
     query += p_viewname.Find('%') >= 0 ? "LIKE '" : "= '";
     query += p_viewname + "'\n";
-}
+  }
   query += " ORDER BY 1,2,3";
                   
   return query;}

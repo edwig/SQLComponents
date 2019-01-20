@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -90,6 +90,30 @@ SQLInfoDB::MakeInfoTableObject(MTableMap& p_tables
   {
     ReThrowSafeException(er);
     p_errors += er.GetErrorMessage();
+  }
+  return 0;
+}
+
+
+bool
+SQLInfoDB::MakeInfoMetaTypes(MMetaMap& p_objects,CString& p_errors,int p_type)
+{
+  CString sql = GetCATALOGMetaTypes(p_type);
+  if(sql.IsEmpty())
+  {
+    // Ask ODBC driver to find the required meta types
+    return SQLInfo::MakeInfoMetaTypes(p_objects,p_errors,p_type);
+  }
+
+  try
+  {
+    SQLQuery qry(m_database);
+    qry.DoSQLStatement(sql);
+    return ReadMetaTypesFromQuery(qry,p_objects,p_type);
+  }
+  catch(CString& er)
+  {
+    p_errors.Append(er);
   }
   return 0;
 }
@@ -208,34 +232,6 @@ SQLInfoDB::MakeInfoTableCatalog(MTableMap&  p_tables
     p_errors += er.GetErrorMessage();
   }
   return 0;
-}
-
-bool
-SQLInfoDB::ReadTablesFromQuery(SQLQuery& p_query,MTableMap& p_tables)
-{
-  while(p_query.GetRecord())
-  {
-    MetaTable table;
-
-    table.m_catalog    = (CString) p_query[1];
-    table.m_schema     = (CString) p_query[2];
-    table.m_table      = (CString) p_query[3];
-    table.m_objectType = (CString) p_query[4];
-    table.m_remarks    = (CString) p_query[5];
-    table.m_fullName   = (CString) p_query[6];
-    table.m_tablespace = (CString) p_query[7];
-    table.m_temporary  = (bool)    p_query[8];
-
-    table.m_catalog.Trim();
-    table.m_schema.Trim();
-    table.m_table.Trim();
-    table.m_objectType.Trim();
-    table.m_remarks.Trim();
-    table.m_tablespace.Trim();
-
-    p_tables.push_back(table);
-  }
-  return !p_tables.empty();
 }
 
 bool    
@@ -705,6 +701,54 @@ SQLInfoDB::MakeInfoTableSequences(MSequenceMap& p_sequences,CString& p_errors,CS
     }
   }
   return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// PRIVATE
+//
+//////////////////////////////////////////////////////////////////////////
+
+bool
+SQLInfoDB::ReadMetaTypesFromQuery(SQLQuery& p_query,MMetaMap& p_objects,int p_type)
+{
+  while(p_query.GetRecord())
+  {
+    MetaObject object;
+    object.m_objectType = p_type;
+    object.m_objectName = (CString) p_query[1];
+    object.m_remarks    = (CString) p_query[2];
+
+    p_objects.push_back(object);
+  }
+  return true;
+}
+
+bool
+SQLInfoDB::ReadTablesFromQuery(SQLQuery& p_query,MTableMap& p_tables)
+{
+  while(p_query.GetRecord())
+  {
+    MetaTable table;
+
+    table.m_catalog    = (CString) p_query[1];
+    table.m_schema     = (CString) p_query[2];
+    table.m_table      = (CString) p_query[3];
+    table.m_objectType = (CString) p_query[4];
+    table.m_remarks    = (CString) p_query[5];
+    table.m_tablespace = (CString) p_query[6];
+    table.m_temporary  = (bool)    p_query[7];
+
+    table.m_catalog.Trim();
+    table.m_schema.Trim();
+    table.m_table.Trim();
+    table.m_objectType.Trim();
+    table.m_remarks.Trim();
+    table.m_tablespace.Trim();
+
+    p_tables.push_back(table);
+  }
+  return !p_tables.empty();
 }
 
 // End of namespace

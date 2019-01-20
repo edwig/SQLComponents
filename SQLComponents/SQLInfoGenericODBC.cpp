@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -420,6 +420,15 @@ SQLInfoGenericODBC::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_da
 //
 //////////////////////////////////////////////////////////////////////////
 
+// Meta info about meta types
+// Standard ODBC functions are good enough
+CString
+SQLInfoGenericODBC::GetCATALOGMetaTypes(int p_type) const
+{
+  UNREFERENCED_PARAMETER(p_type);
+  return "";
+}
+
 // ALL FUNCTIONS FOR TABLE(s)
 
 CString
@@ -431,14 +440,14 @@ SQLInfoGenericODBC::GetCATALOGTableExists(CString p_schema,CString p_tablename) 
 
 CString
 SQLInfoGenericODBC::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
-  {
+{
   // Cannot do this, let ODBC handle this
   return "";
-  }
+}
 
 CString
 SQLInfoGenericODBC::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/) const
-  {
+{
   // Cannot do this, let ODBC handle this
   return "";
 }

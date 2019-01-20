@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #pragma once
 #include "SQLInfo.h"
@@ -62,6 +62,8 @@ public:
 
   // OVERRIDES AND EXTRAS OF THE ODBC MakeInfo<object> functions
 
+  // Meta info about meta types
+  bool    MakeInfoMetaTypes      (MMetaMap&     p_objects,  CString& p_errors,int p_type);
   // Tables
   bool    MakeInfoTableObject    (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // Not known which type!
   bool    MakeInfoTableTable     (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // TABLE   only
@@ -252,6 +254,8 @@ public:
   //
   //////////////////////////////////////////////////////////////////////////
 
+  // Meta info about meta types
+  virtual CString GetCATALOGMetaTypes(int p_type) const = 0;
   // All table functions
   virtual CString GetCATALOGTableExists       (CString p_schema,CString p_tablename) const = 0;
   virtual CString GetCATALOGTablesList        (CString p_schema,CString p_pattern)   const = 0;
@@ -410,7 +414,8 @@ public:
   
 private:
   // Read a tables cursor from the database
-  bool    ReadTablesFromQuery(SQLQuery& p_query,MTableMap& p_tables);
+  bool    ReadMetaTypesFromQuery(SQLQuery& p_query,MMetaMap&  p_objects,int p_type);
+  bool    ReadTablesFromQuery   (SQLQuery& p_query,MTableMap& p_tables);
 
   // All default granted users for GRANT statements
   CString m_grantedUsers;

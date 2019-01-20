@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -412,6 +412,15 @@ SQLInfoFirebird::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,i
 //
 //////////////////////////////////////////////////////////////////////////
 
+// Meta info about meta types
+// Standard ODBC functions are good enough
+CString 
+SQLInfoFirebird::GetCATALOGMetaTypes(int p_type) const
+{
+  UNREFERENCED_PARAMETER(p_type);
+  return "";
+}
+
 // Get SQL to check if a table already exists in the database
 CString
 SQLInfoFirebird::GetCATALOGTableExists(CString /*p_schema*/,CString p_tablename) const
@@ -496,7 +505,7 @@ SQLInfoFirebird::GetCATALOGTableCatalog(CString /*p_schema*/,CString p_tablename
                 "      ,rdb$description                     AS remarks\n"
                 "      ,trim(rdb$owner_name) || '.' || trim(rdb$relation_name) AS full_name\n"
                 "      ,cast('' as varchar(31)) as storage_space\n"
-                  "  FROM rdb$relations\n"
+                "  FROM rdb$relations\n"
                 " WHERE rdb$relation_type IN (0,3)\n"
                 "   AND rdb$system_flag = 1\n";
   if(!p_tablename.IsEmpty())
@@ -579,7 +588,7 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_table
   p_columnname.MakeUpper();
   CString sql;
 
-  sql = "SELECT cast('' as varchar(255))                   as table_catalog\n"         // 1  - VARCHAR
+  sql = "SELECT cast('' as varchar(255))    as table_catalog\n"         // 1  - VARCHAR
         "      ,trim(tbl.rdb$owner_name)    as table_schema\n"	         // 2  - VARCHAR
         "      ,trim(col.rdb$relation_name) as table_name\n"            // 3  - VARCHAR NOT NULL
         "      ,trim(col.rdb$field_name)    as column_name\n"           // 4  - VARCHAR NOT NULL
@@ -716,7 +725,7 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_table
         "            WHEN 1 THEN 'YES'\n"
         "                   ELSE 'UNKNOWN'\n"
         "       END                                         AS is_nullable\n"             // 18 - VARCHAR
-                "  FROM rdb$relation_fields col\n"
+        "  FROM rdb$relation_fields  col\n"
         "      ,rdb$fields           fld\n"
         "      ,rdb$relations        tbl\n"
         " WHERE col.rdb$field_source  = fld.rdb$field_name\n"
@@ -817,7 +826,7 @@ SQLInfoFirebird::GetCATALOGIndexAttributes(CString /*p_schema*/,CString p_tablen
                   "      ,idx.rdb$statistics          as cardinality\n"
                   "      ,col.rdb$statistics          as index_pages\n"
                   "      ,trim(idx.rdb$expression_source) as index_filter\n"
-                  "  FROM rdb$indices idx\n"
+                  "  FROM rdb$indices        idx\n"
                   "      ,rdb$index_segments col\n"
                   "      ,rdb$relations      tab\n"
                   " WHERE idx.rdb$index_name    = col.rdb$index_name\n"
@@ -1063,8 +1072,8 @@ SQLInfoFirebird::GetCATALOGForeignAttributes(CString p_schema
     }
     else
     {
-    query += "   AND con.rdb$relation_name   = '" + p_tablename + "'\n";
-  }
+      query += "   AND con.rdb$relation_name   = '" + p_tablename + "'\n";
+    }
   }
   if(!p_constraint.IsEmpty())
   {
@@ -1074,11 +1083,11 @@ SQLInfoFirebird::GetCATALOGForeignAttributes(CString p_schema
     }
     else
     {
-    query += "   AND con.rdb$constraint_name = '" + p_constraint + "'\n";
-  }
+      query += "   AND con.rdb$constraint_name = '" + p_constraint + "'\n";
+    }
   }
 
-  // Add ordering upto column number
+  // Add ordering up to column number
   query += " ORDER BY 1,2,3,4,5,6,7,8,9";
 
   return query;
@@ -1296,8 +1305,8 @@ SQLInfoFirebird::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablena
     }
     else
     {
-    sql.AppendFormat("   AND rdb$trigger_name = '%s'\n",p_triggername.GetString());
-  }
+      sql.AppendFormat("   AND rdb$trigger_name = '%s'\n",p_triggername.GetString());
+    }
   }
 
   sql += " ORDER BY rdb$trigger_sequence";
@@ -1412,9 +1421,9 @@ SQLInfoFirebird::GetCATALOGSequenceAttributes(CString /*p_schema*/, CString p_se
   CString sql = "SELECT cast('' as varchar(31))  as catalog_name\n"
                 "      ,trim(rdb$owner_name)     as schema_name\n"
                 "      ,trim(rdb$generator_name) as sequence_name\n" 
-                "      ,rdb$initial_value       as current_value\n"
-                "      ,0                       as minimal_value\n"
-                "      ,rdb$generator_increment as increment\n"
+                "      ,rdb$initial_value        as current_value\n"
+                "      ,0                        as minimal_value\n"
+                "      ,rdb$generator_increment  as increment\n"
                 "      ,0  as cache\n"
                 "      ,0  as cycle\n"
                 "      ,0  as ordering\n"

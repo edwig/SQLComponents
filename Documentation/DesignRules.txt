@@ -1,9 +1,9 @@
 DESIGN RULES FOR SQLCOMPONENTS
 ==============================
 
-1) Alle components are within the "SQLComponents" namespace.
-2) All throws are of type "CString". So calling programs **MUST**
-   rely on a try...catch cycle that catches "CString" objects
+1) All components are within the "SQLComponents" namespace.
+2) All throws are of type "StdException". So calling programs **MUST**
+   rely on a try...catch cycle that catches "StdException" objects
 3) Everything must work in both 32-bits and 64-bits modes
 4) Platform of choice is MSVC 2017, C++17.0 standard
 5) Coding-guidelines are:

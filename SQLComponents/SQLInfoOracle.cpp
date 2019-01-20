@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -444,6 +444,41 @@ SQLInfoOracle::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int
 //
 //////////////////////////////////////////////////////////////////////////
 
+// Meta info about meta types
+// Standard ODBC functions are ***NOT*** good enough (6 seconds per connect)
+// So we provide our own queries for these functions
+CString
+SQLInfoOracle::GetCATALOGMetaTypes(int p_type) const
+{
+  CString sql;
+
+  switch(p_type)
+  {
+    case META_CATALOGS: sql = "SELECT UPPER(Value) AS catalog\n"
+                              "      ,''           AS remarks\n"
+                              "  FROM v$parameter\n"
+                              " WHERE name = 'db_name'\n"
+                              "UNION\n"
+                              "SELECT db_link\n"
+                              "      ,''\n"
+                              "  FROM dba_db_links";
+                        break;
+    case META_SCHEMAS:  sql = "SELECT DISTINCT username\n"
+                              "      ,'' AS remarks\n"
+                              "  FROM all_users";
+                        break;
+    case META_TABLES:   sql = "SELECT 'TABLE' AS table_type\n"
+                              "      ,''      AS remarks\n"
+                              "  FROM dual\n"
+                              "UNION\n"
+                              "SELECT 'VIEW'\n"
+                              "      ,''\n"
+                              "  FROM dual";
+                        break;
+  }
+  return sql;
+}
+
 // Get SQL to check if a table already exists in the database
 CString
 SQLInfoOracle::GetCATALOGTableExists(CString p_schema,CString p_tablename) const
@@ -530,10 +565,10 @@ SQLInfoOracle::GetCATALOGTableSynonyms(CString p_schema,CString p_tablename) con
     sql += " WHERE table_owner ";
     sql += p_schema.Find('%') >= 0 ? "LIKE '" : " = '";
     sql += p_schema + "'\n";
-}
+  }
 
   if(!p_tablename.IsEmpty())
-{
+  {
     sql += p_schema.IsEmpty() ? " WHERE " : "   AND ";
     sql += "synonym_name ";
     sql += p_tablename.Find('%') >= 0 ? "LIKE '" : "= '";
@@ -1060,8 +1095,8 @@ SQLInfoOracle::GetCATALOGForeignAttributes(CString  p_schema
     }
     else
     {
-    query += "   AND con.constraint_name = '" + p_constraint + "'\n";
-  }
+      query += "   AND con.constraint_name = '" + p_constraint + "'\n";
+    }
   }
 
   // Order upto the column number
@@ -1223,26 +1258,26 @@ SQLInfoOracle::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename
   p_triggername.MakeUpper();
 
   CString sql = "SELECT ''    AS catalog_name\n"
-             "      ,owner AS schema_name\n"
-             "      ,table_name\n"
-             "      ,trigger_name\n"
-             "      ,triggering_event || ' ON ' || table_name AS description\n"
-             "      ,0     AS position\n"
-             "      ,CASE WHEN (InStr(trigger_type,    'BEFORE') > 0) THEN 1 ELSE 0 END AS trigger_before\n"
-             "      ,CASE WHEN (InStr(triggering_event,'INSERT') > 0) THEN 1 ELSE 0 END AS trigger_insert\n"
-             "      ,CASE WHEN (InStr(triggering_event,'UPDATE') > 0) THEN 1 ELSE 0 END AS trigger_update\n" 
-             "      ,CASE WHEN (InStr(triggering_event,'DELETE') > 0) THEN 1 ELSE 0 END AS trigger_delete\n" 
-             "      ,CASE WHEN (InStr(triggering_event,'SELECT') > 0) THEN 1 ELSE 0 END AS trigger_select\n"
-             "      ,CASE WHEN (InStr(triggering_event,'LOGON')  > 0 OR\n"
-             "                  InStr(triggering_event,'LOGOFF') > 0 ) THEN 1 ELSE 0 END AS trigger_session\n"
-             "      ,0  AS trigger_transaction\n"
-             "      ,0  AS trigger_rollback\n"
-             "      ,referencing_names\n"
-             "      ,CASE status\n"
-             "            WHEN 'DISABLED' THEN 0\n"
-             "                            ELSE 1\n"
-             "            END AS trigger_status\n"
-             "      ,trigger_body AS source\n"
+                "      ,owner AS schema_name\n"
+                "      ,table_name\n"
+                "      ,trigger_name\n"
+                "      ,triggering_event || ' ON ' || table_name AS description\n"
+                "      ,0     AS position\n"
+                "      ,CASE WHEN (InStr(trigger_type,    'BEFORE') > 0) THEN 1 ELSE 0 END AS trigger_before\n"
+                "      ,CASE WHEN (InStr(triggering_event,'INSERT') > 0) THEN 1 ELSE 0 END AS trigger_insert\n"
+                "      ,CASE WHEN (InStr(triggering_event,'UPDATE') > 0) THEN 1 ELSE 0 END AS trigger_update\n" 
+                "      ,CASE WHEN (InStr(triggering_event,'DELETE') > 0) THEN 1 ELSE 0 END AS trigger_delete\n" 
+                "      ,CASE WHEN (InStr(triggering_event,'SELECT') > 0) THEN 1 ELSE 0 END AS trigger_select\n"
+                "      ,CASE WHEN (InStr(triggering_event,'LOGON')  > 0 OR\n"
+                "                  InStr(triggering_event,'LOGOFF') > 0 ) THEN 1 ELSE 0 END AS trigger_session\n"
+                "      ,0  AS trigger_transaction\n"
+                "      ,0  AS trigger_rollback\n"
+                "      ,referencing_names\n"
+                "      ,CASE status\n"
+                "            WHEN 'DISABLED' THEN 0\n"
+                "                            ELSE 1\n"
+                "            END AS trigger_status\n"
+                "      ,trigger_body AS source\n"
                 "  FROM dba_triggers\n";
   if(!p_schema.IsEmpty())
   {
@@ -1677,8 +1712,8 @@ SQLInfoOracle::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
     if(s.Find("Statement ignored") < 0) 
     {
       s.Format("Error in line %d, column %d: %s\n",qry1.GetColumn(1)->GetAsSLong()
-	                                                ,qry1.GetColumn(2)->GetAsSLong()
-												                          ,qry1.GetColumn(3)->GetAsChar());
+	                                              ,qry1.GetColumn(2)->GetAsSLong()
+						                          ,qry1.GetColumn(3)->GetAsChar());
       errorText += s;
       query.Format( "SELECT text\n"
                     "  FROM dba_source\n"

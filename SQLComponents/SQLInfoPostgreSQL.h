@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #pragma once
 #include "SQLInfoDB.h"
@@ -197,15 +197,17 @@ public:
   //
   //////////////////////////////////////////////////////////////////////////
 
+  // Meta info about meta types
+  CString GetCATALOGMetaTypes(int p_type) const;
   // All table functions
-  CString GetCATALOGTableExists    (CString p_schema,CString p_tablename) const;
-  CString GetCATALOGTablesList     (CString p_schema,CString p_pattern) const;
+  CString GetCATALOGTableExists       (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGTablesList        (CString p_schema,CString p_pattern)   const;
   CString GetCATALOGTableAttributes   (CString p_schema,CString p_tablename) const;
   CString GetCATALOGTableSynonyms     (CString p_schema,CString p_tablename) const;
   CString GetCATALOGTableCatalog      (CString p_schema,CString p_tablename) const;
-  CString GetCATALOGTableCreate    (MetaTable& p_table,MetaColumn& p_column) const;
-  CString GetCATALOGTableRename    (CString p_schema,CString p_tablename,CString p_newname) const;
-  CString GetCATALOGTableDrop      (CString p_schema,CString p_tablename) const;
+  CString GetCATALOGTableCreate       (MetaTable& p_table,MetaColumn& p_column) const;
+  CString GetCATALOGTableRename       (CString p_schema,CString p_tablename,CString p_newname) const;
+  CString GetCATALOGTableDrop         (CString p_schema,CString p_tablename) const;
   // All Temporary table functions
   CString GetCATALOGTemptableCreate   (CString p_schema,CString p_tablename,CString p_select) const;
   CString GetCATALOGTemptableIntoTemp (CString p_schema,CString p_tablename,CString p_select) const;

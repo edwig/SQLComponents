@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -2719,9 +2719,9 @@ SQLInfo::MakeInfoMetaTypes(MMetaMap& p_objects,CString& p_errors,int p_type)
                               break;
           case META_TABLES:   if(cbTableType   > 0) nameFound = (char*)szTableType;
                               break;
-                              }
+        }
         if(cbRemarks > 0)
-                              {
+        {
           object.m_remarks = szRemarks;
         }
         if(nameFound)

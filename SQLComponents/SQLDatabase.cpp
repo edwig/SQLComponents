@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -270,8 +270,9 @@ SQLDatabase::Open(CString const& p_connectString,bool p_readOnly)
   // If connection fails
   if(!Check(res))
   {
+    CString error(GetErrorString());
     Close();
-    throw StdException(CString("Error at opening database: ") + GetErrorString());
+    throw CString("Error at opening database: ") + error;
   }
   // Remember the returned completed connect string of the database
   // This contains all the database option settings from the ODBC Driver

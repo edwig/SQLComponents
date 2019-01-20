@@ -15,8 +15,8 @@
 //  E+01 34125600 00000000 00000000 -> 3.41256
 //  E-05 78976543 12388770 00000000 -> 0.0000789765431238877
 //
-// Last Revision:   28-05-2018
-// Version number:  1.5.0
+// Last Revision:   20-01-2019
+// Version number:  1.5.4
 //
 #include "Stdafx.h"
 #include "SQLComponents.h"
