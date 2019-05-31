@@ -332,6 +332,14 @@ SQLInfoGenericODBC::GetSQLOptimizeTable(CString p_schema, CString p_tablename) c
   return "";
 }
 
+// Transform query to select top <n> rows
+CString
+SQLInfoGenericODBC::GetSQLTopNRows(CString p_sql,int /*p_top*/) const
+{
+  // Does nothing
+  return p_sql;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS

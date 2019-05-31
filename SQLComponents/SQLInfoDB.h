@@ -208,6 +208,9 @@ public:
   // Get query to optimize the table statistics
   virtual CString GetSQLOptimizeTable(CString p_schema, CString p_tablename) const = 0;
 
+  // Transform query to select top <n> rows
+  virtual CString GetSQLTopNRows(CString p_sql,int p_top) const = 0;
+
   //////////////////////////////////////////////////////////////////////////
   // SQL STRINGS
 

@@ -334,6 +334,19 @@ SQLInfoMySQL::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
   return "";
 }
 
+// Transform query to select top <n> rows
+CString
+SQLInfoMySQL::GetSQLTopNRows(CString p_sql,int p_top) const
+{
+  if(p_top > 0)
+  {
+    CString limit;
+    limit.Format("\n LIMIT %d",p_top);
+    p_sql += limit;
+  }
+  return p_sql;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS

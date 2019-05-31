@@ -321,6 +321,14 @@ SQLInfoAccess::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
   return "";
 }
 
+// Transform query to select top <n> rows
+CString 
+SQLInfoAccess::GetSQLTopNRows(CString p_sql,int /*p_top*/) const
+{
+  // Does nothing for now
+  return p_sql;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS

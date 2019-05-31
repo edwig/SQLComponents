@@ -94,6 +94,7 @@ SQLDataSet::SQLDataSet()
            ,m_current(-1)
            ,m_open(false)
            ,m_filters(nullptr)
+           ,m_topRecords(0)
 {
 }
 
@@ -104,6 +105,7 @@ SQLDataSet::SQLDataSet(CString p_name,SQLDatabase* p_database /*=NULL*/)
            ,m_current(-1)
            ,m_open(false)
            ,m_filters(nullptr)
+           ,m_topRecords(0)
 {
 }
 
@@ -303,6 +305,17 @@ SQLDataSet::SetFilters(SQLFilterSet* p_filters)
   m_filters = p_filters;
 }
 
+// Set top <n> records selection
+void
+SQLDataSet::SetTopNRecords(int p_top)
+{
+  if(p_top > 0)
+  {
+    m_topRecords = p_top;
+  }
+}
+
+
 void         
 SQLDataSet::SetPrimaryKeyColumn(WordList& p_list)
 {
@@ -492,11 +505,17 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
       query = ParseSelection(qry);
     }
 
+    // Apply all the filters
     if(m_filters && !m_filters->Empty())
     {
       query = ParseFilters(qry,query);
     }
 
+    // Apply top <N> records selection
+    if(m_topRecords)
+    {
+      query = m_database->GetSQLInfoDB()->GetSQLTopNRows(query,m_topRecords);
+    }
 
     // Do the SELECT query
     qry.DoSQLStatement(query);
@@ -580,6 +599,12 @@ SQLDataSet::Append()
     if(m_filters && !m_filters->Empty())
     {
       query = ParseFilters(qry,query);
+    }
+
+    // Apply top <N> records selection
+    if(m_topRecords)
+    {
+      query = m_database->GetSQLInfoDB()->GetSQLTopNRows(query,m_topRecords);
     }
 
     // Do the SELECT query

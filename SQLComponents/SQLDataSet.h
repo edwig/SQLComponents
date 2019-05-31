@@ -159,6 +159,8 @@ public:
   void         SetParameter(CString p_naam,SQLVariant p_waarde);
   // Set filters for a query
   void         SetFilters(SQLFilterSet* p_filters);
+  // Set top <n> records selection
+  void         SetTopNRecords(int p_top);
   // Set columns that can be updated
   void         SetUpdateColumns(WordList p_list);
   // Set the status to modified/saved
@@ -257,6 +259,7 @@ private:
   NamenMap     m_primaryKey;
   SQLFilterSet* m_filters;
   WordList     m_updateColumns;
+  int          m_topRecords;
 protected:
   int          m_status;
   int          m_current;
