@@ -547,12 +547,15 @@ SQLFilterSet::ParseFiltersToCondition(SQLQuery& p_query)
     {
       first = false;
     }
-    else if(filt->GetOperator() == SQLOperator::OP_OR)
+    else
     {
-      query += "\n    OR ";
-      continue;
+      if(filt->GetOperator() == SQLOperator::OP_OR)
+      {
+        query += "\n    OR ";
+        continue;
+      }
+      query += "\n   AND ";
     }
-    query += "\n   AND ";
     query += filt->GetSQLFilter(p_query);
   }
   return query;

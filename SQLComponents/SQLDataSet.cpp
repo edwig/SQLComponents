@@ -436,15 +436,12 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
 
 // Parse the fitlers (m_filters must be non-null)
 CString
-SQLDataSet::ParseFilters(SQLQuery& p_query)
+SQLDataSet::ParseFilters(SQLQuery& p_query,CString p_sql)
 {
-  CString query(m_query);
+  CString query(p_sql);
   query.MakeUpper();
   query.Replace("\t"," ");
   bool whereFound = m_query.Find("WHERE ") > 0;
-
-  // Restart with original query
-  query = m_query;
 
   // Offset in the WHERE clause
   query += whereFound ? "\n   AND " : "\n WHERE ";
@@ -454,7 +451,6 @@ SQLDataSet::ParseFilters(SQLQuery& p_query)
 
   return query;
 }
-
 
 bool
 SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
@@ -488,15 +484,19 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
       {
         query = ParseQuery();
       }
-      else if(m_filters && !m_filters->Empty())
-      {
-        query = ParseFilters(qry);
-      }
     }
     else
     {
+      // Replace empty query from selection columns
+      // If no selection columns: does a "SELECT *"
       query = ParseSelection(qry);
     }
+
+    if(m_filters && !m_filters->Empty())
+    {
+      query = ParseFilters(qry,query);
+    }
+
 
     // Do the SELECT query
     qry.DoSQLStatement(query);
@@ -571,14 +571,15 @@ SQLDataSet::Append()
       {
         query = ParseQuery();
       }
-      else if(m_filters && !m_filters->Empty())
-      {
-        query = ParseFilters(qry);
-      }
     }
     else
     {
       query = ParseSelection(qry);
+    }
+
+    if(m_filters && !m_filters->Empty())
+    {
+      query = ParseFilters(qry,query);
     }
 
     // Do the SELECT query
