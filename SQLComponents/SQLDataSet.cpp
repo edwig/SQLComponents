@@ -357,6 +357,55 @@ SQLDataSet::GetSequenceName()
   return "";
 }
 
+void
+SQLDataSet::SetQuery(CString& p_query)
+{
+  // Setting the total query supersedes these
+  m_selection.Empty();
+  m_whereCondition.Empty();
+  m_groupby.Empty();
+  m_orderby.Empty();
+  m_having.Empty();
+
+  // Setting the query at once
+  m_query = p_query;
+}
+
+void
+SQLDataSet::SetSelection(CString p_selection)
+{
+  m_query.Empty();
+  m_selection = p_selection;
+}
+
+void
+SQLDataSet::SetWhereCondition(CString p_condition)
+{
+  m_query.Empty();
+  m_whereCondition = p_condition;
+}
+
+void
+SQLDataSet::SetGroupBy(CString p_groupby)
+{
+  m_query.Empty();
+  m_groupby = p_groupby;
+}
+
+void
+SQLDataSet::SetOrderBy(CString p_orderby)
+{
+  m_query.Empty();
+  m_orderby = p_orderby;
+}
+
+void
+SQLDataSet::SetHaving(CString p_having)
+{
+  m_query.Empty();
+  m_having = p_having;
+}
+
 // Replace $name for the value of a parameter
 // $ signs within 'string$chain' or "String$chain" can NOT be replaced
 // This makes it possible to write queries like
@@ -447,7 +496,7 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
   return sql;
 }
 
-// Parse the fitlers (m_filters must be non-null)
+// Parse the filters (m_filters must be non-null)
 CString
 SQLDataSet::ParseFilters(SQLQuery& p_query,CString p_sql)
 {
@@ -465,11 +514,68 @@ SQLDataSet::ParseFilters(SQLQuery& p_query,CString p_sql)
   return query;
 }
 
+// Construct the selection SQL for opening the dataset
+// Getting the total query in effect
+CString
+SQLDataSet::GetSelectionSQL(SQLQuery& p_qry)
+{
+  CString sql(m_query);
+
+  // If parameters, parse them
+  if(!m_query.IsEmpty())
+  {
+    if(m_parameters.size())
+    {
+      sql = ParseQuery();
+    }
+  }
+  else
+  {
+    // Replace empty query from selection columns
+    // If no selection columns: does a "SELECT *"
+    sql = ParseSelection(p_qry);
+  }
+
+  // Apply all the filters
+  if (m_filters && !m_filters->Empty())
+  {
+    sql = ParseFilters(p_qry, sql);
+  }
+  else if(!m_whereCondition.IsEmpty())
+  {
+    if(m_parameters.size())
+    {
+      sql += "\n   AND " + m_whereCondition;
+    }
+    else
+    {
+      sql += "\n WHERE " + m_whereCondition;
+    }
+  }
+
+  if(!m_groupby.IsEmpty())
+  {
+    sql += "\n GROUP BY " + m_groupby;
+  }
+
+  if(!m_orderby.IsEmpty())
+  {
+    sql += "\n ORDER BY " + m_orderby;
+  }
+
+  if(!m_having.IsEmpty())
+  {
+    sql += "\n HAVING " + m_having;
+  }
+
+  return sql;
+}
+
 bool
 SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
 {
   bool   result = false;
-  CString query = m_query;
+  CString query;
 
   if(m_query.IsEmpty() && m_selection.IsEmpty())
   {
@@ -490,26 +596,8 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
     SQLQuery qry(m_database);
     SQLTransaction trans(m_database,m_name);
 
-    // If parameters, parse them
-    if(!m_query.IsEmpty())
-    {
-      if(m_parameters.size())
-      {
-        query = ParseQuery();
-      }
-    }
-    else
-    {
-      // Replace empty query from selection columns
-      // If no selection columns: does a "SELECT *"
-      query = ParseSelection(qry);
-    }
-
-    // Apply all the filters
-    if(m_filters && !m_filters->Empty())
-    {
-      query = ParseFilters(qry,query);
-    }
+    // Get the select query
+    query = GetSelectionSQL(qry);
 
     // Apply top <N> records selection
     if(m_topRecords)
@@ -581,25 +669,9 @@ SQLDataSet::Append()
   {
     SQLQuery qry(m_database);
     SQLTransaction trans(m_database,m_name);
-    CString query(m_query);
 
-    // Fill in the query with parameters / filters
-    if(!m_query.IsEmpty())
-    {
-      if(m_parameters.size())
-      {
-        query = ParseQuery();
-      }
-    }
-    else
-    {
-      query = ParseSelection(qry);
-    }
-
-    if(m_filters && !m_filters->Empty())
-    {
-      query = ParseFilters(qry,query);
-    }
+    // Get the select query
+    CString query = GetSelectionSQL(qry);
 
     // Apply top <N> records selection
     if(m_topRecords)

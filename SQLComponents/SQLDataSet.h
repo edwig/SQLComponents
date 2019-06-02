@@ -145,7 +145,15 @@ public:
   void         SetDatabase(SQLDatabase* p_database);
   // Set one or more columns to select
   void         SetSelection(CString p_selection);
-  // Set a new full query (Superseeds 'SetSelection'!!)
+  // Set the where condition by hand
+  void         SetWhereCondition(CString p_condition);
+  // Set the group-by 
+  void         SetGroupBy(CString p_groupby);
+  // Set the ordering by explicitly
+  void         SetOrderBy(CString p_orderby);
+  // Set the having
+  void         SetHaving(CString p_having);
+  // Set a new full query (Supersedes SetSelection, -Where, -groupby, -orderby and -having)
   void         SetQuery(CString& p_query);
   // Set primary table (for updates)
   void         SetPrimaryTable(CString p_schema,CString p_tableName);
@@ -197,6 +205,12 @@ public:
   CString      GetPrimaryTableName();
   // Getting the sequence name
   CString      GetSequenceName();
+  // Getting the query settings
+  CString      GetSelection();
+  CString      GetWhereCondition();
+  CString      GetGroupBy();
+  CString      GetOrderBy();
+  CString      GetHaving();
 
   // XML Saving and loading
   bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
@@ -206,9 +220,11 @@ public:
 private:
   // Set parameters in the query
   CString      ParseQuery();
+  // Construct the selection SQL for opening the dataset
+  CString      GetSelectionSQL(SQLQuery& p_qry);
   // Parse the selection
   CString      ParseSelection(SQLQuery& p_query);
-  // Parse the fitlers
+  // Parse the filters
   CString      ParseFilters(SQLQuery& p_query,CString p_sql);
   // Get the variant of a parameter
   SQLVariant*  GetParameter(CString& p_name);
@@ -229,7 +245,7 @@ private:
   // Make a primary key record
   CString      MakePrimaryKey(SQLRecord*  p_record);
   CString      MakePrimaryKey(VariantSet& p_primary);
-  // Forget about a record in the recordset
+  // Forget about a record
   bool         ForgetRecord(SQLRecord* p_record,bool p_force);
   void         ForgetPrimaryObject(SQLRecord* p_record);
 
@@ -250,8 +266,14 @@ private:
   CString      m_name;
   SQLDatabase* m_database;
   bool         m_open;
+  // The query to run
   CString      m_query;
   CString      m_selection;
+  CString      m_whereCondition;
+  CString      m_groupby;
+  CString      m_orderby;
+  CString      m_having;
+  // Parts of the query
   CString      m_primarySchema;
   CString      m_primaryTableName;
   CString      m_sequenceName;
@@ -279,20 +301,6 @@ inline bool
 SQLDataSet::IsOpen()
 {
   return m_open;
-}
-
-inline void 
-SQLDataSet::SetQuery(CString& p_query)
-{
-  m_selection.Empty();
-  m_query = p_query;
-}
-
-inline void
-SQLDataSet::SetSelection(CString p_selection)
-{
-  m_query.Empty();
-  m_selection = p_selection;
 }
 
 inline void
@@ -366,6 +374,36 @@ inline void
 SQLDataSet::SetUpdateColumns(WordList p_list)
 {
   m_updateColumns = p_list;
+}
+
+inline CString
+SQLDataSet::GetSelection()
+{
+  return m_selection;
+}
+
+inline CString
+SQLDataSet::GetWhereCondition()
+{
+  return m_whereCondition;
+}
+
+inline CString
+SQLDataSet::GetGroupBy()
+{
+  return m_groupby;
+}
+
+inline CString
+SQLDataSet::GetOrderBy()
+{
+  return m_orderby;
+}
+
+inline CString
+SQLDataSet::GetHaving()
+{
+  return m_having;
 }
 
 inline void
