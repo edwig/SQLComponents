@@ -186,6 +186,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SQLConnections.cpp" />
+    <ClCompile Include="SQLDatabasePool.cpp" />
     <ClCompile Include="SQLGuid.cpp" />
     <ClCompile Include="SQLAssociation.cpp" />
     <ClCompile Include="SQLColumnInfo.cpp" />
@@ -252,6 +254,7 @@
     <ClCompile Include="XMLParser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SQLAutoDBS.h" />
     <ClInclude Include="BasicExcel.h" />
     <ClInclude Include="BasicXmlExcel.h" />
     <ClInclude Include="bcd.h" />
@@ -259,6 +262,8 @@
     <ClInclude Include="DDLCreateTable.h" />
     <ClInclude Include="DefuseBOM.h" />
     <ClInclude Include="ExcelFormat.h" />
+    <ClInclude Include="SQLConnections.h" />
+    <ClInclude Include="SQLDatabasePool.h" />
     <ClInclude Include="SQLGuid.h" />
     <ClInclude Include="Locker.h" />
     <ClInclude Include="SQLAssociation.h" />

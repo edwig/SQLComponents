@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 //
-// File: SQLGuid.h
+// File: SQLConnections.h
 //
 // Copyright (c) 1998-2018 ir. W.E. Huisman
 // All rights reserved
@@ -25,37 +25,46 @@
 // Version number: 1.5.5
 //
 #pragma once
-#include <sqltypes.h>   // Needed for conversions of SQLGUID
+#include <map>
 
 namespace SQLComponents
 {
 
-class SQLGuid
+typedef struct _connection
+{
+  CString m_name;
+  CString m_datasource;
+  CString m_username;
+  CString m_password;
+  CString m_options;
+}
+SQLConnection;
+
+using ConnMap = std::map<CString,SQLConnection>;
+
+class SQLConnections
 {
 public:
-  SQLGuid();
-  SQLGuid(const SQLGuid& p_guid);
-  SQLGuid(const SQLGUID* p_guid);
-  SQLGuid(const CString  p_string);
+  SQLConnections();
 
-  bool     New();
-  // Set from external values
-  bool     Set(const CString  p_string);
-  bool     Set(const SQLGUID* p_guid);
+  // File interface
+  bool        LoadConnectionsFile(CString p_filename = "");
+  bool        SaveConnectionsFile(CString p_filename = "");
 
-  // Get the internals
-  bool     IsValid();
-  SQLGUID* AsGUID();
-  CString  AsString();
+  // GETTERS
+  SQLConnection*  GetConnection(CString p_name);
+  CString         GetConnectionString(CString p_name);
 
-  // Operators
-  bool     operator ==(const SQLGuid& p_other);
-  SQLGuid& operator  =(const SQLGuid& p_other);
+  // SETTERS
+  void        Reset();
+  bool        AddConnection(CString p_name,CString p_datasource,CString p_username,CString p_password,CString p_options);
+
 private:
-  bool     GenerateGUID();
-  // DATA
-  bool     m_initialized { false };
-  SQLGUID  m_guid;
+  CString     PasswordScramble(CString p_password);
+  CString     PasswordDecoding(CString p_scramble);
+
+  // All saved connections from "database.xml"
+  ConnMap     m_connections;
 };
 
 }

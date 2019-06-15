@@ -3,6 +3,16 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.5
 ====== Released since:28-05-2018 =====
 ======================================
 
+Version 1.5.5 of 15-06-2019
+---------------------------
+1) Added the SQLConnections class to safely store information about database
+   connections in a generid 'database.xml' file with password encryption
+2) Added the SQLDatabasePool class. Request a new database connection from
+   the pool, using the connection name from SQLConnections
+3) Added the SQLAutoDBS pointer to get a database connection from a pool, with
+   a connection name
+4) Added auto testing for all new three classes
+
 Version 1.5.4 of 20-01-2019
 ---------------------------
 1) Added a fix for meta discovery in Oracle, so login is 6 seconds faster

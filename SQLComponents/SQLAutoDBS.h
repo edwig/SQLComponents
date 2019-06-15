@@ -1,10 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-// SourceFile: DefuseBOM.h
+// SourceFile: SQLAutoDBS.h
 //
-// From the project: Marlin Server: Internet server/client
-// See: https://github.com/edwig/Marlin
-// 
 // Copyright (c) 2016-2017 ir. W.E. Huisman
 // All rights reserved
 //
@@ -30,36 +27,35 @@
 // Version number: 1.5.5
 //
 #pragma once
+#include "SQLDatabase.h"
+#include "SQLDatabasePool.h"
 
-// Result of the defusion process
-enum class BOMOpenResult
+namespace SQLComponents
 {
-  BOR_NoString
- ,BOR_NoBom
- ,BOR_Bom
- ,BOR_OpenedIncompatible
+
+class SQLAutoDBS
+{
+public:
+  SQLAutoDBS(SQLDatabasePool& p_pool,CString p_connection)
+            :m_pool(p_pool)
+  {
+    m_database = m_pool.GetDatabase(p_connection);
+  }
+
+ ~SQLAutoDBS()
+  {
+    m_pool.GiveUp(m_database);
+  }
+
+  bool Invalid()             { return (m_database == nullptr);  };
+  bool Valid()               { return (m_database != nullptr);  };
+  operator SQLDatabase*()    { return  m_database; };
+  SQLDatabase* get()         { return  m_database; };
+  SQLDatabase* operator->()  { return  m_database; };
+  SQLDatabase& operator*()   { return *m_database; };
+private:
+  SQLDatabasePool& m_pool;
+  SQLDatabase*     m_database;
 };
 
-// Type of BOM found to defuse
-enum class BOMType
-{
-  BT_NO_BOM
- ,BT_BE_UTF1
- ,BT_BE_UTF7
- ,BT_BE_UTF8
- ,BT_BE_UTF16
- ,BT_BE_UTF32
- ,BT_BE_CSCU
- ,BT_LE_UTF8
- ,BT_LE_UTF16
- ,BT_LE_UTF32
- ,BT_UTF_EBCDIC
- ,BT_BOCU_1
- ,BT_GB_18030
-};
-
-// Check for a Byte-Order-Mark (BOM)
-BOMOpenResult CheckForBOM(const unsigned char* p_pointer
-                         ,BOMType&             p_type
-                         ,unsigned int&        p_skip);
-
+}

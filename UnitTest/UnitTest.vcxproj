@@ -190,6 +190,7 @@
     <ClCompile Include="BasicSheet.cpp" />
     <ClCompile Include="CalculateTest.cpp" />
     <ClCompile Include="CompareTest.cpp" />
+    <ClCompile Include="Connections.cpp" />
     <ClCompile Include="FilterTest.cpp" />
     <ClCompile Include="HPFCounter.cpp" />
     <ClCompile Include="InfoDiscoveryTest.cpp" />
