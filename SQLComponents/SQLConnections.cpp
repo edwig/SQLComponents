@@ -59,6 +59,23 @@ SQLConnections::GetConnection(CString p_name)
   return nullptr;
 }
 
+SQLConnection* 
+SQLConnections::GetConnection(unsigned p_number)
+{
+  unsigned index = 0;
+  ConnMap::iterator it = m_connections.begin();
+  while(it != m_connections.end())
+  {
+    if(index == p_number)
+    {
+      return &(it->second);
+    }
+    ++index;
+    ++it;
+  }
+  return nullptr;
+}
+
 CString
 SQLConnections::GetConnectionString(CString p_name)
 {
@@ -105,6 +122,19 @@ SQLConnections::AddConnection(CString p_name
   p_name.MakeLower();
   m_connections.insert(std::make_pair(p_name,connect));
   return true;
+}
+
+bool
+SQLConnections::DelConnection(CString p_name)
+{
+  p_name.MakeLower();
+  ConnMap::iterator it = m_connections.find(p_name);
+  if(it != m_connections.end())
+  {
+    m_connections.erase(it);
+    return true;
+  }
+  return false;
 }
 
 bool

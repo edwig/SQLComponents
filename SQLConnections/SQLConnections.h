@@ -25,48 +25,30 @@
 // Version number: 1.5.5
 //
 #pragma once
-#include <map>
 
-namespace SQLComponents
-{
+#ifndef __AFXWIN_H__
+	#error "include 'pch.h' before including this file for PCH"
+#endif
 
-typedef struct _connection
-{
-  CString m_name;
-  CString m_datasource;
-  CString m_username;
-  CString m_password;
-  CString m_options;
-}
-SQLConnection;
+#include "resource.h"		// main symbols
 
-using ConnMap = std::map<CString,SQLConnection>;
 
-class SQLConnections
+// SQLConnectionsApp:
+// See SQLConnections.cpp for the implementation of this class
+//
+
+class SQLConnectionsApp : public CWinApp
 {
 public:
-  SQLConnections();
+	SQLConnectionsApp();
 
-  // File interface
-  bool        LoadConnectionsFile(CString p_filename = "");
-  bool        SaveConnectionsFile(CString p_filename = "");
+// Overrides
+public:
+	virtual BOOL InitInstance();
 
-  // GETTERS
-  SQLConnection*  GetConnection(CString p_name);
-  SQLConnection*  GetConnection(unsigned p_number);
-  CString         GetConnectionString(CString p_name);
+// Implementation
 
-  // SETTERS
-  void        Reset();
-  bool        AddConnection(CString p_name,CString p_datasource,CString p_username,CString p_password,CString p_options);
-  bool        DelConnection(CString p_name);
-
-private:
-  CString     PasswordScramble(CString p_password);
-  CString     PasswordDecoding(CString p_scramble);
-
-  // All saved connections from "database.xml"
-  ConnMap     m_connections;
+	DECLARE_MESSAGE_MAP()
 };
 
-}
+extern SQLConnectionsApp theApp;
