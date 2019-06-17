@@ -97,7 +97,6 @@ public:
 
   TEST_METHOD(PoolTesting)
   {
-    // Method does no test, just fills the value arrays
     Logger::WriteMessage("Testing the SQLDatabasePool");
 
     SQLComponents::InitSQLComponents(LN_ENGLISH);
@@ -124,12 +123,41 @@ public:
     ++number_of_tests;
   }
 
+  TEST_METHOD(CleanUpPool)
+  {
+    Logger::WriteMessage("Testing the cleanup of the SQLDatabasePool");
+
+    // Open some conenctions to the database server
+    PoolTesting();
+
+    m_pool.Cleanup(true);
+
+    Assert::AreEqual(m_pool.GetConnections(),(unsigned)0);
+    ++number_of_tests;
+  }
+
+  TEST_METHOD(ReuseConnection)
+  {
+    Logger::WriteMessage("Testing the reuse of connections in the SQLDatabasePool");
+
+    // Open some conenctions to the database server
+    PoolTesting();
+    PoolTesting();
+    PoolTesting();
+    PoolTesting();
+
+    // Still just one connection live to the RDBMS
+    Assert::AreEqual(m_pool.GetConnections(),(unsigned)1);
+    ++number_of_tests;
+  }
+
   void FillConnections(SQLConnections& p_conn)
   {
     p_conn.AddConnection("MyConn","testing", "sysdba","altijd",       "DBA=W;");
     p_conn.AddConnection("Other", "testing", "user",  "user_password","DBA=R;");
   }
 
+  // This is the database pool for connections
   SQLDatabasePool m_pool;
 };
 
