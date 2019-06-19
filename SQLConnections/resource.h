@@ -15,9 +15,10 @@
 #define IDC_DELETE                      1006
 #define IDC_PASSWORD2                   1007
 #define IDC_OPTIONS                     1008
-#define IDC_BUTTON2                     1009
 #define IDC_NEW                         1009
 #define IDC_SAVE                        1010
+#define IDC_DELETE2                     1011
+#define IDC_TEST                        1011
 
 // Next default values for new objects
 // 

@@ -48,11 +48,13 @@ public:
           void SaveCurrentConnection();
           bool DropCurrentConnection();
           bool SanityChecks();
+          void TestTheConnection();
 
 // Implementation
 protected:
 	HICON     m_hIcon;
   CListCtrl m_list;
+  CButton   m_test;
   CButton   m_new;
   CButton   m_save;
   CButton   m_delete;
@@ -83,6 +85,7 @@ public:
   afx_msg void OnEnChangePassword1();
   afx_msg void OnEnChangePassword2();
   afx_msg void OnEnChangeOptions();
+  afx_msg void OnBnClickedTest();
   afx_msg void OnBnClickedNew();
   afx_msg void OnBnClickedSave();
   afx_msg void OnBnClickedDelete();

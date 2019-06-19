@@ -28,6 +28,7 @@
 #include "framework.h"
 #include "SQLConnections.h"
 #include "SQLConnectionsDlg.h"
+#include <SQLDatabase.h>
 #include "afxdialogex.h"
 
 #ifdef _DEBUG
@@ -85,6 +86,7 @@ void SQLConnectionsDlg::DoDataExchange(CDataExchange* pDX)
   DDX_Text   (pDX, IDC_PASSWORD1, m_password1);
   DDX_Text   (pDX, IDC_PASSWORD2, m_password2);
   DDX_Text   (pDX, IDC_OPTIONS,   m_options);
+  DDX_Control(pDX, IDC_TEST,      m_test);
   DDX_Control(pDX, IDC_NEW,       m_new);
   DDX_Control(pDX, IDC_SAVE,      m_save);
   DDX_Control(pDX, IDC_DELETE,    m_delete);
@@ -110,6 +112,7 @@ BEGIN_MESSAGE_MAP(SQLConnectionsDlg, CDialog)
   ON_EN_CHANGE(IDC_PASSWORD1,           &SQLConnectionsDlg::OnEnChangePassword1)
   ON_EN_CHANGE(IDC_PASSWORD2,           &SQLConnectionsDlg::OnEnChangePassword2)
   ON_EN_CHANGE(IDC_OPTIONS,             &SQLConnectionsDlg::OnEnChangeOptions)
+  ON_BN_CLICKED(IDC_TEST,               &SQLConnectionsDlg::OnBnClickedTest)
   ON_BN_CLICKED(IDC_NEW,                &SQLConnectionsDlg::OnBnClickedNew)
   ON_BN_CLICKED(IDC_SAVE,               &SQLConnectionsDlg::OnBnClickedSave)
   ON_BN_CLICKED(IDC_DELETE,             &SQLConnectionsDlg::OnBnClickedDelete)
@@ -150,7 +153,7 @@ BOOL SQLConnectionsDlg::OnInitDialog()
 
   // Init the connections list
   m_list.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EDITLABELS);
-  m_list.InsertColumn(0, "Connection", LVCFMT_LEFT, 190);
+  m_list.InsertColumn(0, "Connection",LVCFMT_LEFT,180);
 
   // Read in the complete list
   LoadConnections();
@@ -300,10 +303,44 @@ SQLConnectionsDlg::SanityChecks()
   return true;
 }
 
+void
+SQLConnectionsDlg::TestTheConnection()
+{
+  CString error;
+
+  try
+  {
+    SQLDatabase database;
+    if(database.Open(m_datasource,m_username,m_password1))
+    {
+      AfxMessageBox("Database connection succeeded", MB_OK|MB_ICONINFORMATION);
+      database.Close();
+    }
+    else
+    {
+      AfxMessageBox("We are sorry: **NO** connection made!!",MB_OK|MB_ICONERROR);
+    }
+  }
+  catch(StdException& ex)
+  {
+    error = ex.GetErrorMessage();
+  }
+  catch(CString& err)
+  {
+    error = err;
+  }
+
+  // Error handling needed?
+  if(!error.IsEmpty())
+  {
+    AfxMessageBox("ERROR while opening database: " + error,MB_OK|MB_ICONERROR);
+  }
+}
+
 void 
 SQLConnectionsDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	if((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
@@ -402,6 +439,15 @@ SQLConnectionsDlg::OnEnChangeOptions()
 {
   UpdateData();
   UpdateData(FALSE);
+}
+
+void
+SQLConnectionsDlg::OnBnClickedTest()
+{
+  if(SanityChecks())
+  {
+    TestTheConnection();
+  }
 }
 
 void 

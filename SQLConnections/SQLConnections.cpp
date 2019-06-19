@@ -76,6 +76,9 @@ BOOL SQLConnectionsApp::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("EDO\\SQLConnections"));
 
+  // Init the library
+  SQLComponents::InitSQLComponents(LN_ENGLISH);
+
 	SQLConnectionsDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
