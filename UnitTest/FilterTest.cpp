@@ -176,6 +176,116 @@ namespace OperatorUnitTest
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
+
+    TEST_METHOD(FilterFunction)
+    {
+      Logger::WriteMessage("SQLFilter test with ODBC functions combined");
+      Logger::WriteMessage("===========================================");
+
+      // Needed for date/time/timestamp
+      InitSQLComponents(LN_ENGLISH);
+
+      // Unairy function call
+      TestFunctionString1("fieldname",OP_Equal,FN_ASCII,            "12","{fn ASCII(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_BIT_LENGTH,       "12","{fn BIT_LENGTH(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_CHAR,             "12","{fn CHAR(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_CHAR_LENGTH,      "12","{fn CHAR_LENGTH(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_CHARACTER_LENGTH, "12","{fn CHARACTER_LENGTH(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_LCASE,            "12","{fn LCASE(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_LENGTH,           "12","{fn LENGTH(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_LTRIM,            "12","{fn LTRIM(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_OCTET_LENGTH,     "12","{fn OCTET_LENGTH(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_RTRIM,            "12","{fn RTRIM(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_SOUNDEX,          "12","{fn SOUNDEX(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_SPACE,            "12","{fn SPACE(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_UCASE,            "12","{fn UCASE(fieldname)} = ?");
+
+      TestFunctionString2("fieldname",OP_Equal,FN_CONCAT,           "waarde","veldwaarde","{fn CONCAT(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_DIFFERENCE,       "waarde","veldwaarde","{fn DIFFERENCE(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_LEFT,             "waarde","veldwaarde","{fn LEFT(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_POSITION,         "waarde","veldwaarde","{fn POSITION(fieldname IN ?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_REPEAT,           "waarde","veldwaarde","{fn REPEAT(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_RIGHT,            "waarde","veldwaarde","{fn RIGHT(fieldname,?)} = ?");
+      
+      TestFunctionString3("fieldname",OP_Equal,FN_SUBSTRING,        "waarde","veldwaarde","2","{fn SUBSTRING(fieldname,?,?)} = ?");
+      TestFunctionString3("fieldname",OP_Equal,FN_REPLACE,          "waarde","veldwaarde","2","{fn REPLACE(fieldname,?,?)} = ?");
+      
+      TestFunctionString4("fieldname",OP_Equal,FN_INSERT,           "waarde","veldwaarde","1","2","{fn INSERT(fieldname,?,?,?)} = ?");
+      TestFunctionString4("fieldname",OP_Equal,FN_LOCATE,           "waarde","veldwaarde","1","2","{fn LOCATE(fieldname,?,?,?)} = ?");
+
+    }
+
+    void TestFunctionString1(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_value,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      SQLVariant val(p_value);
+      filter.SetFunction(p_function);
+      filter.AddValue(&val);
+      CString condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("String function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      ++number_of_tests;
+    }
+
+    void TestFunctionString2(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_value1,CString p_value2,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      SQLVariant val1(p_value1);
+      SQLVariant val2(p_value2);
+      filter.SetFunction(p_function);
+      filter.AddValue(&val1);
+      filter.AddValue(&val2);
+      CString condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("String function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      ++number_of_tests;
+    }
+
+    void TestFunctionString3(CString p_field,SQLOperator p_oper,SQLFunction p_function
+                            ,CString p_value1,CString p_value2,CString p_value3
+                            ,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      SQLVariant val1(p_value1);
+      SQLVariant val2(p_value2);
+      SQLVariant val3(p_value3);
+      filter.SetFunction(p_function);
+      filter.AddValue(&val1);
+      filter.AddValue(&val2);
+      filter.AddValue(&val3);
+      CString condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("String function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      ++number_of_tests;
+    }
+
+    void TestFunctionString4(CString p_field,SQLOperator p_oper,SQLFunction p_function
+                            ,CString p_value1,CString p_value2,CString p_value3,CString p_value4
+                            ,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      SQLVariant val1(p_value1);
+      SQLVariant val2(p_value2);
+      SQLVariant val3(p_value3);
+      SQLVariant val4(p_value4);
+      filter.SetFunction(p_function);
+      filter.AddValue(&val1);
+      filter.AddValue(&val2);
+      filter.AddValue(&val3);
+      filter.AddValue(&val4);
+      CString condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("String function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      ++number_of_tests;
+    }
   };
 }
 

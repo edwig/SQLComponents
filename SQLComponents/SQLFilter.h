@@ -53,6 +53,87 @@ typedef enum _sqlOperator
 }
 SQLOperator;
 
+// All ODBC {fn } escaped functions
+typedef enum _sqlFunction
+{
+   FN_NOP = 0
+  ,FN_ASCII
+  ,FN_BIT_LENGTH
+  ,FN_CHAR
+  ,FN_CHAR_LENGTH
+  ,FN_CHARACTER_LENGTH
+  ,FN_CONCAT
+  ,FN_DIFFERENCE
+  ,FN_INSERT
+  ,FN_LCASE
+  ,FN_LEFT
+  ,FN_LENGTH
+  ,FN_LOCATE
+  ,FN_LTRIM
+  ,FN_OCTET_LENGTH
+  ,FN_POSITION
+  ,FN_REPEAT
+  ,FN_REPLACE
+  ,FN_RIGHT
+  ,FN_RTRIM
+  ,FN_SOUNDEX
+  ,FN_SPACE
+  ,FN_SUBSTRING
+  ,FN_UCASE
+  // NUMERIC
+  ,FN_ABS
+  ,FN_ACOS
+  ,FN_ASIN
+  ,FN_ATAN
+  ,FN_ATAN2
+  ,FN_CEILING
+  ,FN_COS
+  ,FN_COT
+  ,FN_DEGREES
+  ,FN_EXP
+  ,FN_FLOOR
+  ,FN_LOG
+  ,FN_LOG10
+  ,FN_MOD
+  ,FN_PI
+  ,FN_POWER
+  ,FN_RADIANS
+  ,FN_RAND
+  ,FN_ROUND
+  ,FN_SIGN
+  ,FN_SIN
+  ,FN_SQRT
+  ,FN_TAN
+  ,FN_TRUNCATE
+  // TIME, DATE
+  ,FN_CURRENT_DATE
+  ,FN_CURRENT_TIME
+  ,FN_CURRENT_TIMESTAMP
+  ,FN_CURDATE
+  ,FN_CURTIME
+  ,FN_DAYNAME
+  ,FN_DAYOFMONTH
+  ,FN_DAYOFWEEK
+  ,FN_DAYOFYEAR
+  ,FN_EXTRACT
+  ,FN_HOUR
+  ,FN_MINUTE
+  ,FN_SECOND
+  ,FN_MONTH
+  ,FN_MONTHNAME
+  ,FN_NOW
+  ,FN_QUARTER
+  ,FN_TIMESTAMPADD
+  ,FN_TIMESTAMPDIFF
+  ,FN_WEEK
+  ,FN_YEAR
+  // SYSTEM
+  ,FN_DATABASE
+  ,FN_IFNULL
+  ,FN_USER
+}
+SQLFunction;
+
 // Forward declarations
 class SQLRecord;
 class SQLQuery;
@@ -87,6 +168,8 @@ public:
   // Setting a parenthesis level
   void        SetOpenParenthesis();
   void        SetCloseParenthesis();
+  // Setting an extra function
+  void        SetFunction(SQLFunction p_function);
 
   // OPERATIONS
 
@@ -103,6 +186,7 @@ public:
   SQLVariant* GetValue();
   SQLVariant* GetValue(int p_number);
   CString     GetExpression();
+  SQLFunction GetFunction();
   bool        GetNegate();
 
   SQLFilter&  operator=(const SQLFilter& p_other);
@@ -118,6 +202,8 @@ private:
   void        ConstructIN(CString& p_sql,SQLQuery& p_query);
   // Constructing the BETWEEN clause
   void        ConstructBetween(CString& p_sql,SQLQuery& p_query);
+  // Constructing a FUNCTION(field)
+  CString     ConstructFunctionSQL(SQLQuery& p_query);
 
   // Internal matching
   bool        MatchEqual       (SQLVariant* p_field);
@@ -134,13 +220,14 @@ private:
   bool        MatchBetween     (SQLVariant* p_field);
 
   // Data for the filter
-  CString     m_field;              // Name of the field to act upon
-  SQLOperator m_operator;           // Operator of the condition
-  VariantSet  m_values;             // Multiple values for IN and BETWEEN
-  CString     m_expression;         // Free expression (no values!)
-  bool        m_negate { false };   // Negate the whole condition
-  bool        m_openParenthesis  { false };
-  bool        m_closeParenthesis { false };
+  CString     m_field;                         // Name of the field to act upon
+  SQLOperator m_operator;                      // Operator of the condition
+  VariantSet  m_values;                        // Multiple values for IN and BETWEEN
+  CString     m_expression;                    // Free expression (no values!)
+  SQLFunction m_function         { FN_NOP };   // Extra function for the field operator
+  bool        m_negate           { false  };   // Negate the whole condition
+  bool        m_openParenthesis  { false  };   // Start with an opening parenthesis
+  bool        m_closeParenthesis { false  };   // End with a closing parenthesis
 };
 
 inline CString
@@ -202,6 +289,18 @@ inline void
 SQLFilter::SetCloseParenthesis()
 {
   m_closeParenthesis = true;
+}
+
+inline void
+SQLFilter::SetFunction(SQLFunction p_function)
+{
+  m_function = p_function;
+}
+
+inline SQLFunction
+SQLFilter::GetFunction()
+{
+  return m_function;
 }
 
 //////////////////////////////////////////////////////////////////////////
