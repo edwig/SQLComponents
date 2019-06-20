@@ -476,6 +476,7 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
   switch(parameters)
   {
     case 0: sql = "{fn " + sql + "()}";
+            m_expression = m_field;
             break;
     case 1: sql = "{fn " + sql + "(" + m_field + ")}";
             break;

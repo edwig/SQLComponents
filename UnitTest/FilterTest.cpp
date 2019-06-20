@@ -30,6 +30,7 @@
 #include "SQLDate.h"
 #include "SQLQuery.h"
 #include "UnitTest.h"
+#include <bcd.h>
 
 namespace OperatorUnitTest
 {
@@ -185,7 +186,9 @@ namespace OperatorUnitTest
       // Needed for date/time/timestamp
       InitSQLComponents(LN_ENGLISH);
 
-      // Unairy function call
+      // STRINGS
+
+      // Unary string function call
       TestFunctionString1("fieldname",OP_Equal,FN_ASCII,            "12","{fn ASCII(fieldname)} = ?");
       TestFunctionString1("fieldname",OP_Equal,FN_BIT_LENGTH,       "12","{fn BIT_LENGTH(fieldname)} = ?");
       TestFunctionString1("fieldname",OP_Equal,FN_CHAR,             "12","{fn CHAR(fieldname)} = ?");
@@ -200,19 +203,76 @@ namespace OperatorUnitTest
       TestFunctionString1("fieldname",OP_Equal,FN_SPACE,            "12","{fn SPACE(fieldname)} = ?");
       TestFunctionString1("fieldname",OP_Equal,FN_UCASE,            "12","{fn UCASE(fieldname)} = ?");
 
-      TestFunctionString2("fieldname",OP_Equal,FN_CONCAT,           "waarde","veldwaarde","{fn CONCAT(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_DIFFERENCE,       "waarde","veldwaarde","{fn DIFFERENCE(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_LEFT,             "waarde","veldwaarde","{fn LEFT(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_POSITION,         "waarde","veldwaarde","{fn POSITION(fieldname IN ?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_REPEAT,           "waarde","veldwaarde","{fn REPEAT(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_RIGHT,            "waarde","veldwaarde","{fn RIGHT(fieldname,?)} = ?");
+      // dual string function call
+      TestFunctionString2("fieldname",OP_Equal,FN_CONCAT,           "value","fieldvalue","{fn CONCAT(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_DIFFERENCE,       "value","fieldvalue","{fn DIFFERENCE(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_LEFT,             "value","fieldvalue","{fn LEFT(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_POSITION,         "value","fieldvalue","{fn POSITION(fieldname IN ?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_REPEAT,           "value","fieldvalue","{fn REPEAT(fieldname,?)} = ?");
+      TestFunctionString2("fieldname",OP_Equal,FN_RIGHT,            "value","fieldvalue","{fn RIGHT(fieldname,?)} = ?");
       
-      TestFunctionString3("fieldname",OP_Equal,FN_SUBSTRING,        "waarde","veldwaarde","2","{fn SUBSTRING(fieldname,?,?)} = ?");
-      TestFunctionString3("fieldname",OP_Equal,FN_REPLACE,          "waarde","veldwaarde","2","{fn REPLACE(fieldname,?,?)} = ?");
+      // Ternary string function call
+      TestFunctionString3("fieldname",OP_Equal,FN_SUBSTRING,        "value","fieldvalue","2","{fn SUBSTRING(fieldname,?,?)} = ?");
+      TestFunctionString3("fieldname",OP_Equal,FN_REPLACE,          "value","fieldvalue","2","{fn REPLACE(fieldname,?,?)} = ?");
       
-      TestFunctionString4("fieldname",OP_Equal,FN_INSERT,           "waarde","veldwaarde","1","2","{fn INSERT(fieldname,?,?,?)} = ?");
-      TestFunctionString4("fieldname",OP_Equal,FN_LOCATE,           "waarde","veldwaarde","1","2","{fn LOCATE(fieldname,?,?,?)} = ?");
+      TestFunctionString4("fieldname",OP_Equal,FN_INSERT,           "value","fieldvalue","1","2","{fn INSERT(fieldname,?,?,?)} = ?");
+      TestFunctionString4("fieldname",OP_Equal,FN_LOCATE,           "value","fieldvalue","1","2","{fn LOCATE(fieldname,?,?,?)} = ?");
 
+      // NUMBERS
+
+      // Constant value
+      TestFunctionConstant("fieldname",OP_Greater,FN_PI,"{fn PI()} > fieldname");
+      // Unary function call
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ABS,              "18", "{fn ABS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ACOS,             "0.5","{fn ACOS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ASIN,             "0.5","{fn ASIN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN,             "0.5","{fn ATAN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN2,            "0.5","{fn ATAN2(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_CEILING,          "5",  "{fn CEILING(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_COS,              "0.5","{fn COS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_COT,              "0.5","{fn COT(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DEGREES,          "180","{fn DEGREES(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_EXP,              "5E6","{fn EXP(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_FLOOR,            "4",  "{fn FLOOR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG,              "4",  "{fn LOG(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG10,            "4",  "{fn LOG10(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_RADIANS,          "0.5","{fn RADIANS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_RAND,             "0.5","{fn RAND(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SIGN,             "-5", "{fn SIGN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SIN,              "0.5","{fn SIN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SQRT,             "2",  "{fn SQRT(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_TAN,              "0.5","{fn TAN(fieldname)} = ?");
+      // Dual number function call
+      TestFunctionNumber2("fieldname",OP_Equal,FN_MOD,              "12","5","{fn MOD(fieldname,?)} = ?");
+      TestFunctionNumber2("fieldname",OP_Equal,FN_POWER,            "2","64","{fn POWER(fieldname,?)} = ?");
+      TestFunctionNumber2("fieldname",OP_Equal,FN_ROUND,            "3.52","1","{fn ROUND(fieldname,?)} = ?");
+      TestFunctionNumber2("fieldname",OP_Equal,FN_TRUNCATE,         "3",   "1","{fn TRUNCATE(fieldname,?)} = ?");
+
+      // DATE/TIME/INTERVAL
+
+      // Constant value
+      TestFunctionConstant("fieldname",OP_Smaller,FN_CURRENT_DATE,  "{fn CURRENT_DATE()} < fieldname");
+      TestFunctionConstant("fieldname",OP_Smaller,FN_CURDATE,       "{fn CURDATE()} < fieldname");
+      TestFunctionConstant("fieldname",OP_Smaller,FN_CURTIME,       "{fn CURTIME()} < fieldname");
+      TestFunctionConstant("fieldname",OP_Smaller,FN_NOW,           "{fn NOW()} < fieldname");
+
+      // SYSTEM FUNCTIONS
+
+      TestFunctionConstant("'testing'",OP_Equal,  FN_DATABASE,      "{fn DATABASE()} = 'testing'");
+      TestFunctionConstant("'sysdba'", OP_Equal,  FN_USER,          "{fn USER()} = 'sysdba'");
+      TestFunctionString2 ("fieldname",OP_Equal,  FN_IFNULL,        "other", "other", "{fn IFNULL(fieldname,?)} = ?");
+    }
+
+    void TestFunctionConstant(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      filter.SetFunction(p_function);
+      CString condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("Filter with constant: " + condition);
+      Assert::AreEqual(p_expect.GetString(), condition.GetString());
+      ++number_of_tests;
     }
 
     void TestFunctionString1(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_value,CString p_expect)
@@ -283,6 +343,36 @@ namespace OperatorUnitTest
       CString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("String function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      ++number_of_tests;
+    }
+
+    void TestFunctionNumber1(CString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      SQLVariant val1(&p_number);
+      filter.SetFunction(p_function);
+      filter.AddValue(&val1);
+      CString  condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("Number function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(),condition.GetString());
+      ++number_of_tests;
+    }
+
+    void TestFunctionNumber2(CString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number1,bcd p_number2,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      SQLVariant val1(&p_number1);
+      SQLVariant val2(&p_number2);
+      filter.SetFunction(p_function);
+      filter.AddValue(&val1);
+      filter.AddValue(&val2);
+      CString  condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("Number function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
