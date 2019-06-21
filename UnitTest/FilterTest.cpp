@@ -221,7 +221,7 @@ namespace OperatorUnitTest
       // NUMBERS
 
       // Constant value
-      TestFunctionConstant("fieldname",OP_Greater,FN_PI,"{fn PI()} > fieldname");
+      TestFunctionConstant("fieldname",OP_Greater,FN_PI,"fieldname > {fn PI()}");
       // Unary function call
       TestFunctionNumber1("fieldname",OP_Equal,FN_ABS,              "18", "{fn ABS(fieldname)} = ?");
       TestFunctionNumber1("fieldname",OP_Equal,FN_ACOS,             "0.5","{fn ACOS(fieldname)} = ?");
@@ -251,15 +251,15 @@ namespace OperatorUnitTest
       // DATE/TIME/INTERVAL
 
       // Constant value
-      TestFunctionConstant("fieldname",OP_Smaller,FN_CURRENT_DATE,  "{fn CURRENT_DATE()} < fieldname");
-      TestFunctionConstant("fieldname",OP_Smaller,FN_CURDATE,       "{fn CURDATE()} < fieldname");
-      TestFunctionConstant("fieldname",OP_Smaller,FN_CURTIME,       "{fn CURTIME()} < fieldname");
-      TestFunctionConstant("fieldname",OP_Smaller,FN_NOW,           "{fn NOW()} < fieldname");
+      TestFunctionConstant("fieldname",OP_Smaller,FN_CURRENT_DATE,  "fieldname < {fn CURRENT_DATE()}");
+      TestFunctionConstant("fieldname",OP_Smaller,FN_CURDATE,       "fieldname < {fn CURDATE()}");
+      TestFunctionConstant("fieldname",OP_Smaller,FN_CURTIME,       "fieldname < {fn CURTIME()}");
+      TestFunctionConstant("fieldname",OP_Smaller,FN_NOW,           "fieldname < {fn NOW()}");
 
       // SYSTEM FUNCTIONS
 
-      TestFunctionConstant("'testing'",OP_Equal,  FN_DATABASE,      "{fn DATABASE()} = 'testing'");
-      TestFunctionConstant("'sysdba'", OP_Equal,  FN_USER,          "{fn USER()} = 'sysdba'");
+      TestFunctionConstant("'testing'",OP_Equal,  FN_DATABASE,      "'testing' = {fn DATABASE()}");
+      TestFunctionConstant("'sysdba'", OP_Equal,  FN_USER,          "'sysdba' = {fn USER()}");
       TestFunctionString2 ("fieldname",OP_Equal,  FN_IFNULL,        "other", "other", "{fn IFNULL(fieldname,?)} = ?");
     }
 

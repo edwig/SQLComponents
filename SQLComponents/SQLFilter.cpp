@@ -475,8 +475,8 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
   // Construct ODBC Function
   switch(parameters)
   {
-    case 0: sql = "{fn " + sql + "()}";
-            m_expression = m_field;
+    case 0: m_expression = sql = "{fn " + sql + "()}";
+            sql = m_field;
             break;
     case 1: sql = "{fn " + sql + "(" + m_field + ")}";
             break;
