@@ -1,0 +1,21 @@
+RELEASENOTES SQLCOMPONENTS VERSION 1.6
+======================================
+====== Released since:22-06-2019 =====
+======================================
+
+Version 1.6.0 of 22-06-2019
+---------------------------
+1) Added the SQLOperator enumerator for the SQLFilters
+2) Added the SQLFunction enumerator for the SQLFilters
+3) Expanded SQLFilters to work with a maximum of 1 SQLFunction
+   Working filters for SQL Select statements in the SQLDataSet are:
+   - fieldname <operator> <value>
+   - FUNCTION(fieldname) <operator> <value>
+   - fieldname <operator> <unary FUNCTION>
+   Functions can have zero, one, two or three arguments.
+   All values need to be added to the filter in that order, the 
+   <value> to operate on as last.
+   See: "Filtertest.cpp" for a number of examples.
+   All ODBC 3.52 functions can be used for a condition filter
+4) Added unit tests for all function-filter combinations
+
