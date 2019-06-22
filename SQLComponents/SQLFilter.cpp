@@ -38,15 +38,7 @@ static char THIS_FILE[] = __FILE__;
 namespace SQLComponents
 {
 
-// Word translation of filters, needed for XMLMessages
-typedef struct _filterName
-{
-  const char* m_name;
-  int         m_filter;
-}
-FilterName;
-
-FilterName sqfilter[] =
+OperatorName operatornames[] =
 {
    { "Equal",         OP_Equal        }
   ,{ "LikeBegin",     OP_LikeBegin    }
@@ -454,7 +446,7 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
     case FN_DAYOFMONTH:       sql = "DAYOFMONTH";       parameters = 1; break;
     case FN_DAYOFWEEK:        sql = "DAYOFWEEK";        parameters = 1; break;
     case FN_DAYOFYEAR:        sql = "DAYOFYEAR";        parameters = 1; break;
-    case FN_EXTRACT:          sql = "EXTRACT";          parameters = 2; comma = " FROM "; break;
+    case FN_EXTRACT:          sql = "EXTRACT";          parameters =-1; break; // BEWARE: Negative parameters
     case FN_HOUR:             sql = "HOUR";             parameters = 1; break;
     case FN_MINUTE:           sql = "MINUTE";           parameters = 1; break;
     case FN_MONTH:            sql = "MONTH";            parameters = 1; break;
@@ -462,8 +454,8 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
     case FN_NOW:              sql = "NOW";              parameters = 0; break;
     case FN_QUARTER:          sql = "QUARTER";          parameters = 1; break;
     case FN_SECOND:           sql = "SECOND";           parameters = 1; break;
-    case FN_TIMESTAMPADD:     sql = "TIMESTAMPADD";     parameters = 3; break;
-    case FN_TIMESTAMPDIFF:    sql = "TIMESTAMPDIFF";    parameters = 3; break;
+    case FN_TIMESTAMPADD:     sql = "TIMESTAMPADD";     parameters =-2; break; // BEWARE: Negative parameters
+    case FN_TIMESTAMPDIFF:    sql = "TIMESTAMPDIFF";    parameters =-2; break; // BEWARE: Negative parameters
     case FN_WEEK:             sql = "WEEK";             parameters = 1; break;
     case FN_YEAR:             sql = "YEAR";             parameters = 1; break;
     // SYSTEM FUNCTIONS
@@ -492,6 +484,12 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
             p_query.SetParameter(m_values[1]);
             p_query.SetParameter(m_values[2]);
             break;
+            // SPECIAL CASES
+    case -1:sql = "{fn " + sql + "(" + ConstructExtractPart() + " FROM " + m_field + ")}";
+            break;
+    case -2:sql = "{fn " + sql + "(" + ConstructTimestampCalcPart() + ",?," + m_field + ")}";
+            p_query.SetParameter(m_values[0]);
+            break;
   }
 
   // Eventually replace the ',' with the operator
@@ -503,6 +501,46 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
   return sql;
 }
 
+// Constructing the extraction part in the EXTRACT function
+CString
+SQLFilter::ConstructExtractPart()
+{
+  CString part;
+  switch(m_extract.m_extract)
+  {
+    case TS_EXT_YEAR:   part = "YEAR";    break;
+    case TS_EXT_MONTH:  part = "MONTH";   break;
+    case TS_EXT_DAY:    part = "DAY";     break;
+    case TS_EXT_HOUR:   part = "HOUR";    break;
+    case TS_EXT_MINUTE: part = "MINUTE";  break;
+    case TS_EXT_SECOND: part = "SECOND";  break;
+    case TS_EXT_NONE:   // Fall through
+    default:            throw CString("Unknown or unset timestamp part for EXTRACT function");
+  }
+  return part;
+}
+
+// Constructing the calculation part in the TIMESTAMPADD/TIMESTAMPDIFF functions
+CString
+SQLFilter::ConstructTimestampCalcPart()
+{
+  CString part;
+  switch(m_extract.m_calcpart)
+  {
+    case SQL_TSI_FRAC_SECOND: part = "SQL_TSI_FRAC_SECOND"; break;
+    case SQL_TSI_SECOND:      part = "SQL_TSI_SECOND";      break;
+    case SQL_TSI_MINUTE:      part = "SQL_TSI_MINUTE";      break;
+    case SQL_TSI_HOUR:        part = "SQL_TSI_HOUR";        break;
+    case SQL_TSI_DAY:         part = "SQL_TSI_DAY";         break;
+    case SQL_TSI_WEEK:        part = "SQL_TSI_WEEK";        break;
+    case SQL_TSI_MONTH:       part = "SQL_TSI_MONTH";       break;
+    case SQL_TSI_QUARTER:     part = "SQL_TSI_QUARTER";     break;
+    case SQL_TSI_YEAR:        part = "SQL_TSI_YEAR";        break;
+    case SQL_TSI_NONE:        // Fall through
+    default:                  throw CString("Unknown or unset calculation part for TIMESTAMPADD/TIMESTAMPDIFF function");
+  }
+  return part;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -629,13 +667,13 @@ SQLFilter::MatchBetween(SQLVariant* p_field)
 SQLOperator 
 StringToSQLOperator(CString p_oper)
 {
-  FilterName* filter = sqfilter;
+  OperatorName* filter = operatornames;
 
-  while(filter->m_filter != OP_NOP)
+  while(filter->m_operator != OP_NOP)
   {
     if(p_oper.Compare(filter->m_name) == 0)
     {
-      return static_cast<SQLOperator>(filter->m_filter);
+      return static_cast<SQLOperator>(filter->m_operator);
     }
     ++filter;
   }
@@ -646,11 +684,11 @@ StringToSQLOperator(CString p_oper)
 CString
 SQLOperatorToString(SQLOperator p_oper)
 {
-  FilterName* filter = sqfilter;
+  OperatorName* filter = operatornames;
 
-  while(filter->m_filter != OP_NOP)
+  while(filter->m_operator != OP_NOP)
   {
-    if(filter->m_filter == p_oper)
+    if(filter->m_operator == p_oper)
     {
       return filter->m_name;
     }

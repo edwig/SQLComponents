@@ -256,11 +256,41 @@ namespace OperatorUnitTest
       TestFunctionConstant("fieldname",OP_Smaller,FN_CURTIME,       "fieldname < {fn CURTIME()}");
       TestFunctionConstant("fieldname",OP_Smaller,FN_NOW,           "fieldname < {fn NOW()}");
 
+      // Unary date/time function
+      TestFunctionString1("fieldname",OP_Equal,FN_DAYNAME,          "Sunday",   "{fn DAYNAME(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_MONTHNAME,        "June",     "{fn MONTHNAME(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFMONTH,       "1",        "{fn DAYOFMONTH(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFWEEK,        "1",        "{fn DAYOFWEEK(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFYEAR,        "172",      "{fn DAYOFYEAR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_QUARTER,          "2",        "{fn QUARTER(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_YEAR,             "2019",     "{fn YEAR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_MONTH,            "6",        "{fn MONTH(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_WEEK,             "23",       "{fn WEEK(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_HOUR,             "17",       "{fn HOUR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_MINUTE,           "53",       "{fn MINUTE(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SECOND,           "12",       "{fn SECOND(fieldname)} = ?");
+
+      // Secondary date/time functions
+      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_YEAR,  "2019","{fn EXTRACT(YEAR FROM fieldname)} = ?");
+      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_MONTH,    "6","{fn EXTRACT(MONTH FROM fieldname)} = ?");
+      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_DAY,     "21","{fn EXTRACT(DAY FROM fieldname)} = ?");
+      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_HOUR,    "19","{fn EXTRACT(HOUR FROM fieldname)} = ?");
+      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_MINUTE,  "55","{fn EXTRACT(MINUTE FROM fieldname)} = ?");
+      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_SECOND,  "12","{fn EXTRACT(SECOND FROM fieldname)} = ?");
+
+      // Ternary date/time functions
+      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_YEAR,   3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_YEAR,?,fieldname)} < ?");
+      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_MONTH,  3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_MONTH,?,fieldname)} < ?");
+      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_DAY,    3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_DAY,?,fieldname)} < ?");
+      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_HOUR,   3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_HOUR,?,fieldname)} < ?");
+      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_MINUTE, 3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_MINUTE,?,fieldname)} < ?");
+      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_SECOND, 3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_SECOND,?,fieldname)} < ?");
+
       // SYSTEM FUNCTIONS
 
-      TestFunctionConstant("'testing'",OP_Equal,  FN_DATABASE,      "'testing' = {fn DATABASE()}");
-      TestFunctionConstant("'sysdba'", OP_Equal,  FN_USER,          "'sysdba' = {fn USER()}");
-      TestFunctionString2 ("fieldname",OP_Equal,  FN_IFNULL,        "other", "other", "{fn IFNULL(fieldname,?)} = ?");
+      TestFunctionConstant("'testing'",OP_Equal,FN_DATABASE,        "'testing' = {fn DATABASE()}");
+      TestFunctionConstant("'sysdba'", OP_Equal,FN_USER,            "'sysdba' = {fn USER()}");
+      TestFunctionString2 ("fieldname",OP_Equal,FN_IFNULL,          "other", "other", "{fn IFNULL(fieldname,?)} = ?");
     }
 
     void TestFunctionConstant(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_expect)
@@ -376,6 +406,39 @@ namespace OperatorUnitTest
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
+
+    void TestFunctionExtract(CString p_field,SQLOperator p_oper,SQLFunction p_function,SQLExtractPart p_part,CString p_value,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field,p_oper);
+      SQLVariant val1(&p_value);
+      filter.SetFunction(p_function);
+      filter.SetExtractPart(p_part);
+      filter.AddValue(&val1);
+      CString condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("EXTRACT function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(), condition.GetString());
+      ++number_of_tests;
+    }
+
+    void TestFunctionTSCalc(CString p_field,SQLOperator p_oper,SQLFunction p_function,SQLTimestampCalcPart p_part,int p_add,CString p_value,CString p_expect)
+    {
+      SQLQuery query;
+      SQLFilter filter(p_field, p_oper);
+      SQLVariant val1(p_add);
+      SQLVariant val2(&p_value);
+      filter.SetFunction(p_function);
+      filter.SetTimestampPart(p_part);
+      filter.AddValue(&val1);
+      filter.AddValue(&val2);
+      CString condition = filter.GetSQLFilter(query);
+
+      Logger::WriteMessage("TIMSTAMP ADD/DIFF function filter: " + condition);
+      Assert::AreEqual(p_expect.GetString(), condition.GetString());
+      ++number_of_tests;
+    }
+
   };
 }
 

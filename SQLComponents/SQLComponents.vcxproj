@@ -264,6 +264,7 @@
     <ClInclude Include="ExcelFormat.h" />
     <ClInclude Include="SQLConnections.h" />
     <ClInclude Include="SQLDatabasePool.h" />
+    <ClInclude Include="SQLFunction.h" />
     <ClInclude Include="SQLGuid.h" />
     <ClInclude Include="Locker.h" />
     <ClInclude Include="SQLAssociation.h" />
@@ -291,11 +292,13 @@
     <ClInclude Include="SQLMemoryDebug.h" />
     <ClInclude Include="SQLMetaInfo.h" />
     <ClInclude Include="SQLMutation.h" />
+    <ClInclude Include="SQLOperator.h" />
     <ClInclude Include="SQLQuery.h" />
     <ClInclude Include="SQLRecord.h" />
     <ClInclude Include="SQLStatement.h" />
     <ClInclude Include="SQLTime.h" />
     <ClInclude Include="SQLTimestamp.h" />
+    <ClInclude Include="SQLTimestampExtract.h" />
     <ClInclude Include="SQLTransaction.h" />
     <ClInclude Include="SQLVariant.h" />
     <ClInclude Include="SQLVariantFormat.h" />
