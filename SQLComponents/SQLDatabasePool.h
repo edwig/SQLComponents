@@ -52,15 +52,17 @@ public:
  ~SQLDatabasePool();
 
   // Get or make a database for this connection
-  SQLDatabase* GetDatabase(const CString& p_connectionName);
+  SQLDatabase*    GetDatabase(const CString& p_connectionName);
+  // Get the connection by name
+  SQLConnection*  GetConnection(const CString& p_connectionName);
   // Return current number of connections
-  unsigned     GetConnections();
+  unsigned        GetConnections();
   // Return current number of maximum databases
-  unsigned     GetMaxDatabases();
+  unsigned        GetMaxDatabases();
   // Get the number of free databases
-  unsigned     GetFreeDatabases();
+  unsigned        GetFreeDatabases();
   // List with current connections (meant for logging purposes only)
-  void         GetListOfConnections(CString& p_list);
+  void            GetListOfConnections(CString& p_list);
 
     // Return a database connection to the pool
   void         GiveUp(SQLDatabase* p_database);

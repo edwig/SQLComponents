@@ -201,6 +201,12 @@ SQLDatabasePool::GetConnections()
   return m_openConnections;
 }
 
+SQLConnection* 
+SQLDatabasePool::GetConnection(const CString& p_connectionName)
+{
+  return m_connections.GetConnection(p_connectionName);
+}
+
 // Return current number of maximum databases
 unsigned
 SQLDatabasePool::GetMaxDatabases()
