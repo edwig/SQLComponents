@@ -56,6 +56,10 @@ OperatorName operatornames[] =
   ,{ "NOP",           OP_NOP          }
 };
 
+// XTOR: Create empty
+SQLFilter::SQLFilter()
+{
+}
 
 // XTOR: Creates a new filter
 //       Used for filters without an operand, or more than one
@@ -123,6 +127,26 @@ SQLFilter::~SQLFilter()
   m_values.clear();
 }
 
+// Adding a comparison field (if not yet set)
+void
+SQLFilter::SetField(CString p_field)
+{
+  if(m_field.IsEmpty())
+  {
+    m_field = p_field;
+  }
+}
+
+// Adding an operator (if not yet set)
+void
+SQLFilter::SetOperator(SQLOperator p_oper)
+{
+  if(m_operator == FN_NOP)
+  {
+    m_operator = p_oper;
+  }
+}
+
 // Copy a SQLFilter
 SQLFilter&
 SQLFilter::operator=(const SQLFilter& p_other)
@@ -139,6 +163,8 @@ SQLFilter::operator=(const SQLFilter& p_other)
   m_negate           = p_other.m_negate;
   m_openParenthesis  = p_other.m_openParenthesis;
   m_closeParenthesis = p_other.m_closeParenthesis;
+  m_extract          = p_other.m_extract;
+  m_field2           = p_other.m_field2;
 
   for(auto& variant : p_other.m_values)
   {
@@ -148,6 +174,24 @@ SQLFilter::operator=(const SQLFilter& p_other)
   return *this;
 }
 
+// Resetting the filter
+void
+SQLFilter::Reset()
+{
+  m_field.Empty();
+  m_field2.Empty();
+  m_expression.Empty();
+  m_negate            = false;
+  m_openParenthesis   = false;
+  m_closeParenthesis  = false;
+  m_extract.m_extract = TS_EXT_NONE;
+
+  for(auto& variant : m_values)
+  {
+    delete variant;
+  }
+  m_values.clear();
+}
 
 // Getting one of the values of the filter
 SQLVariant* 
@@ -311,17 +355,25 @@ SQLFilter::ConstructOperand(CString& p_sql,SQLQuery& p_query)
 {
   if(m_expression.IsEmpty())
   {
-    // Check that we have a value, and use it
-    if(m_values.empty())
+    if(m_field2.IsEmpty())
     {
-      p_sql += "IS NULL";
+      // Check that we have a value, and use it
+      if(m_values.empty())
+      {
+        p_sql += "IS NULL";
+      }
+      else
+      {
+        // Use last value (earlier can be used by functions!!)
+        p_sql += "?";
+        size_t num = m_values.size() - 1;
+        p_query.SetParameter(m_values[num]);
+      }
     }
     else
     {
-      // Use last value (earlier can be used by functions!!)
-      p_sql += "?";
-      size_t num = m_values.size() - 1;
-      p_query.SetParameter(m_values[num]);
+      // "[function]m_field <oper> m_field2"
+      p_sql += m_field2;
     }
   }
   else

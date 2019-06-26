@@ -51,6 +51,7 @@ class SQLFilter
 {
 public:
   // Construct a filter
+  SQLFilter();
   SQLFilter(CString p_field,SQLOperator p_operator);
   SQLFilter(CString p_field,SQLOperator p_operator,SQLVariant* p_value);
   SQLFilter(CString p_field,SQLOperator p_operator,int         p_value);
@@ -60,6 +61,12 @@ public:
   SQLFilter(SQLFilter& p_other);
  ~SQLFilter();
 
+  // BUILDING THE FILTER
+
+  // Adding a comparison field (if not yet set)
+  void        SetField(CString p_field);
+  // Adding an operator (if not yet set)
+  void        SetOperator(SQLOperator p_oper);
   // Adding extra values for the IN or BETWEEN operators
   void        AddValue(SQLVariant* p_value);
   // Adding an expression as replacement for concrete values
@@ -74,6 +81,8 @@ public:
   // Setting an extract part or timestamp add/difference part
   void        SetExtractPart  (SQLExtractPart       p_part);
   void        SetTimestampPart(SQLTimestampCalcPart p_part);
+  // Set extra optional field
+  void        SetField2(CString p_field);
 
   // OPERATIONS
 
@@ -92,11 +101,15 @@ public:
   CString     GetExpression();
   SQLFunction GetFunction();
   bool        GetNegate();
+  CString     GetField2();
   SQLExtractPart        GetExtractPart();
   SQLTimestampCalcPart  GetTimestampPart();
 
   // Filter assignment to another filter
   SQLFilter&  operator=(const SQLFilter& p_other);
+
+  // Resetting the filter
+  void        Reset();
 
 private:
   // Check that we have at least one operand value
@@ -145,6 +158,7 @@ private:
                 SQLTimestampCalcPart  m_calcpart;
               }
               m_extract;
+  CString     m_field2;                        // Optional extra field as in "m_field <oper> m_fileld2"
 
 };
 
@@ -243,6 +257,18 @@ inline SQLTimestampCalcPart
 SQLFilter::GetTimestampPart()
 {
   return m_extract.m_calcpart;
+}
+
+inline void
+SQLFilter::SetField2(CString p_field2)
+{
+  m_field2 = p_field2;
+}
+
+inline CString
+SQLFilter::GetField2()
+{
+  return m_field2;
 }
 
 //////////////////////////////////////////////////////////////////////////
