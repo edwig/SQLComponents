@@ -87,21 +87,34 @@ SQLDatabase::Close()
   // Set lock on the stack
   Locker<SQLDatabase> lock(this,INFINITE);
   
-  // Close database handle
-  if(m_hdbc != SQL_NULL_HANDLE)
+  try
   {
-    // See if there are pending transactions,
-    CloseAllTransactions();
+    // Close database handle
+    if(m_hdbc != SQL_NULL_HANDLE)
+    {
+      // See if there are pending transactions,
+      CloseAllTransactions();
 
-    // Try to disconnect 
-    // (time consuming for some database engines)
-    FreeDbcHandle();
+      // Try to disconnect 
+      // (time consuming for some database engines)
+      FreeDbcHandle();
+    }
+    // Close environment handle
+    if(m_henv != SQL_NULL_HANDLE)
+    {
+      // Disconnect environment
+      FreeEnvHandle();
+    }
   }
-  // Close environment handle
-  if(m_henv != SQL_NULL_HANDLE)
+  catch(StdException& ex)
   {
-    // Disconnect environment
-    FreeEnvHandle();
+    // Can go wrong in many places in the ODBC stack or the RDMBS drivers stack
+    LogPrint(0,ex.GetErrorMessage());
+  }
+  catch(...)
+  {
+    // Can go wrong in many places in the ODBC stack or the RDMBS drivers stack
+    LogPrint(0,"Closing the database\n");
   }
   // Empty parameter and column rebinding
   m_rebindParameters.clear();

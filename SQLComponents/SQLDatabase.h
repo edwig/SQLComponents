@@ -285,10 +285,10 @@ protected:
   bool              m_mars         = { true          };  // Multiple Active Record Sets
   bool              m_readOnly     = { false         };  // ReadOnly connection
   CString           m_connectionName;                    // Can differ from m_datasource !!
-  CString	          m_DBName;
-  CString	          m_DBVersion;
-  CString	          m_DriverName;
-  CString	          m_DriverVersion;
+  CString           m_DBName;
+  CString           m_DBVersion;
+  CString           m_DriverName;
+  CString           m_DriverVersion;
   CString           m_databaseName;
   CString           m_namingMethod;
   CString           m_originalConnect;

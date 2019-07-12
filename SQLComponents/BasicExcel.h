@@ -912,7 +912,6 @@ namespace YExcel
 {
 using WinCompFiles::CompoundFile;
 
-
 struct CODE
 {
   enum 

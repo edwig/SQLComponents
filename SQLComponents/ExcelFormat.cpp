@@ -208,4 +208,5 @@ int XLSFormatManager::get_xf_idx(const CellFormat& fmt)
 
   return xf_idx;
 }
+
 }
