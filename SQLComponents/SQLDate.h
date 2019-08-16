@@ -37,6 +37,8 @@ namespace SQLComponents
 #define SECONDS_PER_DAY   (60 * 60 * 24)
 #define OLEDATE_MJD_SHIFT 15018             // Difference between MJD and OLE_DATE
 
+// BEWARE: The epoch of the SQLDate class is 16 november 1858 12:00 hours (noon)
+//         with a DateValue of zero (0) for that date.
 // Dates are stored as a MJD (Modified Julian Date = 17-11-1858)
 // and works correctly for dates from 1-1-1 up until 31-12-9999 (ODBC Definition)
 typedef long DateValue;
@@ -86,6 +88,9 @@ public:
   // Get in different formats
   CString     AsString() const;
   DateValue   AsNumber() const;
+  DateValue   AsMJD()    const;
+  DateValue   AsJulianDate()     const;
+  DateValue   AsTimeSinchEpoch() const;
   CString     AsSQLString(SQLDatabase* p_database);
   CString     AsStrippedSQLString(SQLDatabase* p_database);
   void        AsDateStruct(DATE_STRUCT* p_date);
@@ -123,12 +128,12 @@ public:
   SQLDate       operator+ (const SQLInterval& p_interval) const;
   SQLDate       operator- (const SQLInterval& p_interval) const;
   // Logical comparison operators on a a date
-  bool     operator <(const SQLDate& p_date) const;
-  bool     operator >(const SQLDate& p_date) const;
-  bool     operator==(const SQLDate& p_date) const;
-  bool     operator!=(const SQLDate& p_date) const;
-  bool     operator<=(const SQLDate& p_date) const;
-  bool     operator>=(const SQLDate& p_date) const;
+  bool          operator <(const SQLDate& p_date) const;
+  bool          operator >(const SQLDate& p_date) const;
+  bool          operator==(const SQLDate& p_date) const;
+  bool          operator!=(const SQLDate& p_date) const;
+  bool          operator<=(const SQLDate& p_date) const;
+  bool          operator>=(const SQLDate& p_date) const;
 
   // Asking for the current date
   static SQLDate Today();
@@ -148,6 +153,9 @@ public:
   static bool IsNumericString(const CString& p_string);
 
 private:
+  // Correction factor is MJD (2,400,000.5) + 0.5 (17 nov 1858 instead of 16 nov 12:00 hours)
+  const long JULIAN_DAY_MODIFIED  = 2400001;
+
   // Calculate m_mjd from a date
   bool SetMJD();
   // Calculate MJD back to a date
@@ -176,11 +184,31 @@ SQLDate::IsNull() const
   return (m_mjd == -1);
 }
 
-// Return the calculated value (MJD)
+// Return the calculated value (MJD) !!
 inline DateValue
 SQLDate::AsNumber() const
 {
-  return m_mjd;  
+  return m_mjd;
+}
+
+// Return the Modified Julian Date
+inline DateValue
+SQLDate::AsMJD() const
+{
+  return m_mjd;
+}
+
+inline DateValue
+SQLDate::AsJulianDate() const
+{
+  return m_mjd + JULIAN_DAY_MODIFIED;
+}
+
+// Return the time-since-epoch
+inline DateValue
+SQLDate::AsTimeSinchEpoch() const
+{
+  return m_mjd;
 }
       
 // Test on validity of a date instance
@@ -194,7 +222,7 @@ SQLDate::Valid() const
 inline long
 SQLDate::WeekDay() const 
 { 
-  return ((m_mjd +3)% 7);
+  return ((m_mjd + 3) % 7);
 }
 
 // Day of the date

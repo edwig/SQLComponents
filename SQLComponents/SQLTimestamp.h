@@ -66,6 +66,8 @@ struct StampStorage
   char  m_second;    // 0 - 59    seconds
 };
 
+// BEWARE: The epoch of the SQLDate class is 16 november 1858 12:00 hours (noon)
+//         with a DateValue of zero (0) for that date.
 // Timestamp is stored internally as a total number of seconds
 // since MJD + 0.5 = 17 nov 1858 instead of 16 nov 12:00 hours
 typedef __int64 StampValue;
@@ -158,6 +160,9 @@ public:
 
   // For usage in integer, date, time and interval 
   StampValue Value() const;
+  StampValue AsNumber() const;
+  StampValue AsTimeSinceEpoch() const;
+
   //////////////////////////////////////////////////////
   // Static use by SQLDate and SQLTimestamp
   static void SplitStrDate(const CString& strDate,
@@ -203,6 +208,18 @@ private:
 
 inline StampValue
 SQLTimestamp::Value() const
+{
+  return m_value;
+}
+
+inline StampValue
+SQLTimestamp::AsNumber() const
+{
+  return m_value;
+}
+
+inline StampValue
+SQLTimestamp::AsTimeSinceEpoch() const
 {
   return m_value;
 }

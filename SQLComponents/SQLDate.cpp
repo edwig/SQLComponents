@@ -33,6 +33,8 @@
 #include <cmath>
 #include <ctime>
 
+#include <chrono>
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -212,7 +214,7 @@ SQLDate::MJDtoDate()
   // See alsoo Robin M. Green: Spherical Astronomy, page 250 and next
 
   // Correction factor is MJD (2,400,000.5) + 0.5 (17 nov 1858 instead of 16 nov 12:00 hours)
-  double JD = m_mjd + 2400001;
+  double JD = m_mjd + JULIAN_DAY_MODIFIED;
   if(JD > 2299160)
   {
     long gregorianA = 0;
@@ -271,6 +273,14 @@ SQLDate::AsSQLString(SQLDatabase* p_database)
     return "NULL";
   }
   return p_database->GetSQLDateString(Day(),Month(),Year()); 
+}
+
+CString
+SQLDate::AsStrippedSQLString(SQLDatabase* /*p_database*/)
+{
+  CString string;
+  string.Format("%04d-%02d-%02d",Year(),Month(),Day());
+  return string;
 }
 
 void
