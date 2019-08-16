@@ -366,6 +366,7 @@ SQLDataSet::SetQuery(CString& p_query)
   m_groupby.Empty();
   m_orderby.Empty();
   m_having.Empty();
+  m_apply.Empty();
 
   // Setting the query at once
   m_query = p_query;
@@ -404,6 +405,13 @@ SQLDataSet::SetHaving(CString p_having)
 {
   m_query.Empty();
   m_having = p_having;
+}
+
+void
+SQLDataSet::SetApply(CString p_apply)
+{
+  m_query.Empty();
+  m_apply = p_apply;
 }
 
 // Replace $name for the value of a parameter
@@ -468,7 +476,81 @@ CString
 SQLDataSet::ParseSelection(SQLQuery& p_query)
 {
   CString sql("SELECT ");
-  sql += m_selection.IsEmpty() ? "*" : m_selection;
+  
+  if(!m_apply.IsEmpty())
+  {
+    m_apply.TrimLeft();
+    m_apply.MakeLower();
+    if(m_apply.GetLength() > 10 && m_apply.Mid(0,9) == "aggregate")
+    {
+      int from = 0;
+      int upto = 0 ;
+      CString action = "";
+      CString column = "";
+
+      // Remove double spaces
+      while (m_apply.Find("  ") >=0)
+      {
+        m_apply.Replace("  "," ");
+      }
+      // Remove space behind parenthesis
+      m_apply.Replace("( ", "(");
+
+      from = m_apply.Find("(",0) + 1;
+      upto = m_apply.Find(" ", from);
+      column =m_apply.Mid(from, (upto - from));
+
+      if(m_apply.Find("with sum") > 0)
+      {
+        action = "SUM(" + column + ")";
+      }
+      else if(m_apply.Find("with min") > 0)
+      { 
+        action = "MIN(" + column + ")";
+      }
+      else if(m_apply.Find("with max") > 0)
+      { 
+        action = "MAX(" + column + ")";
+      }
+      else if(m_apply.Find("with average") > 0)
+      { 
+        action = "AVG(" + column + ")";
+      }
+      else if(m_apply.Find("with countdistinct") > 0)
+      { 
+        action = "COUNT(DISTINCT(" + column + "))";
+      }
+      else if(m_apply.Find("with count") > 0)
+      { 
+        action = "COUNT(" + column + ")";
+      }
+      else
+      {
+        // Error as a MIN with just one record
+        sql += "MIN('Invalid apply aggregate option') AS error";
+      }
+
+      if(action.GetLength() > 1)
+      {
+        sql += action;
+        if(m_apply.Find(" as ") > 0)
+        {
+          from = m_apply.Find(" as ") + 4;
+          upto = m_apply.Find(")", from);
+          sql +=  " AS " + m_apply.Mid(from, upto-from);
+        }
+      }
+    }
+    else
+    {
+      // Error as a MIN with just one record
+      sql += "MIN('missing aggregate') AS error";
+    }
+  }
+  else
+  {
+    sql += m_selection.IsEmpty() ? "*" : m_selection;
+  }
   sql += "\n  FROM ";
 
   if(!m_primarySchema.IsEmpty())

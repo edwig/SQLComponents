@@ -153,6 +153,8 @@ public:
   void         SetOrderBy(CString p_orderby);
   // Set the having
   void         SetHaving(CString p_having);
+  // Set the apply
+  void         SetApply(CString p_having);
   // Set a new full query (Supersedes SetSelection, -Where, -groupby, -orderby and -having)
   void         SetQuery(CString& p_query);
   // Set primary table (for updates)
@@ -182,6 +184,8 @@ public:
 
   // Get the name of the dataset
   CString      GetName();
+  // Getting the database used
+  SQLDatabase* GetDatabase();
   // Get the number of records
   int          GetNumberOfRecords();
   // Get number of fields
@@ -273,6 +277,7 @@ private:
   CString      m_groupby;
   CString      m_orderby;
   CString      m_having;
+  CString      m_apply;
   // Parts of the query
   CString      m_primarySchema;
   CString      m_primaryTableName;
@@ -295,6 +300,12 @@ inline void
 SQLDataSet::SetDatabase(SQLDatabase* p_database)
 {
   m_database = p_database;
+}
+
+inline SQLDatabase*
+SQLDataSet::GetDatabase()
+{
+  return m_database;
 }
 
 inline bool

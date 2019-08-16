@@ -176,6 +176,7 @@ SQLAssociation::FollowToMaster()
   {
     SQLFilter filter(m_assocs[ind]->m_primary,OP_Equal,m_assocs[ind]->m_value);
     filters.AddFilter(&filter);
+    m_master->SetFilters(&filters);
   }
 
   bool result = m_master->IsOpen() ? m_master->Append() : m_master->Open();
@@ -204,6 +205,7 @@ SQLAssociation::FollowToDetails()
   {
     SQLFilter filter(m_assocs[ind]->m_foreign,OP_Equal,m_assocs[ind]->m_value);
     filters.AddFilter(&filter);
+    m_detail->SetFilters(&filters);
   }
 
   bool result = m_detail->IsOpen() ? m_detail->Append() : m_detail->Open();
