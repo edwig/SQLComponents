@@ -168,6 +168,36 @@ namespace DatabaseUnitTest
       number_of_tests += 10;
     }
 
+    TEST_METHOD(DateSubtraction)
+    {
+      Logger::WriteMessage("Date subtraction tests");
+      InitSQLComponents();
+
+      int difference = 0;
+      SQLDate dayInThePast("2003-10-09 12:11:33");
+      SQLDate today = SQLDate::Today();
+      SQLInterval diff = today - dayInThePast;
+      difference = diff.GetDays();
+
+      if(dayInThePast.Valid() == false)
+      {
+        SQLTimestamp inThePast("2003-10-09 12:11:33");
+        if(inThePast.Valid())
+        {
+          SQLTimestamp now = SQLTimestamp::CurrentTimestamp();
+          SQLInterval days = now - inThePast;
+          difference = days.GetDays();
+        }
+      }
+
+      CString result;
+      result.Format("Difference in days : %d",difference);
+      Logger::WriteMessage(result);
+      Assert::AreEqual(5789,difference);
+
+      ++number_of_tests;
+    }
+
     TEST_METHOD(DateSpecialStrings)
     {
       Logger::WriteMessage("Unit testing special strings in dates");

@@ -853,9 +853,23 @@ SQLVariantFormat::DateCalculate(char p_operator,CString p_argument)
   {
     try
     {
+      int days = 0;
       SQLDate other(p_argument);
-      SQLInterval intval = other - date;
-      m_format.Format("%d",intval.GetDays());
+      if(other.Valid())
+      {
+        SQLInterval intval = date - other;
+        days = intval.GetDays();
+      }
+      else
+      {
+        SQLTimestamp other2(p_argument);
+        if(other2.Valid())
+        {
+          SQLInterval intval2 = date - other2.AsSQLDate();
+          days = intval2.GetDays();
+        }
+      }
+      m_format.Format("%d",days);
     }
     catch(StdException& ex)
     {

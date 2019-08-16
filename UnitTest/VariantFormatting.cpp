@@ -358,14 +358,14 @@ namespace DatabaseUnitTest
       var vdat9(&date9);
       SQLVariantFormat fdat9(vdat9);
       fdat9.DateCalculate('~',"03-01-2013");
-      Assert::AreEqual("9",fdat9.GetFormat());
+      Assert::AreEqual("-9",fdat9.GetFormat());
       number_of_tests++;
 
       SQLDate date10("03-01-2013");
       var vdat10(&date10);
       SQLVariantFormat fdat10(vdat10);
       fdat10.DateCalculate('~',"25-12-2012");
-      Assert::AreEqual("-9",fdat10.GetFormat());
+      Assert::AreEqual("9",fdat10.GetFormat());
       number_of_tests++;
 
       // From other than a date
