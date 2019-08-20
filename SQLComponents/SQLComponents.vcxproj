@@ -188,6 +188,7 @@
     </ClCompile>
     <ClCompile Include="SQLConnections.cpp" />
     <ClCompile Include="SQLDatabasePool.cpp" />
+    <ClCompile Include="SQLGetExePath.cpp" />
     <ClCompile Include="SQLGuid.cpp" />
     <ClCompile Include="SQLAssociation.cpp" />
     <ClCompile Include="SQLColumnInfo.cpp" />
@@ -265,6 +266,7 @@
     <ClInclude Include="SQLConnections.h" />
     <ClInclude Include="SQLDatabasePool.h" />
     <ClInclude Include="SQLFunction.h" />
+    <ClInclude Include="SQLGetExePath.h" />
     <ClInclude Include="SQLGuid.h" />
     <ClInclude Include="Locker.h" />
     <ClInclude Include="SQLAssociation.h" />

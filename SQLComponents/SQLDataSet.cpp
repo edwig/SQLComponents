@@ -31,6 +31,8 @@
 #include "SQLVariantFormat.h"
 #include "SQLInfoDB.h"
 #include <algorithm>
+#include <sstream>
+#include <set>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -479,76 +481,11 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
   
   if(!m_apply.IsEmpty())
   {
-    m_apply.TrimLeft();
-    m_apply.MakeLower();
-    if(m_apply.GetLength() > 10 && m_apply.Mid(0,9) == "aggregate")
-    {
-      int from = 0;
-      int upto = 0 ;
-      CString action = "";
-      CString column = "";
-
-      // Remove double spaces
-      while (m_apply.Find("  ") >=0)
-      {
-        m_apply.Replace("  "," ");
-      }
-      // Remove space behind parenthesis
-      m_apply.Replace("( ", "(");
-
-      from = m_apply.Find("(",0) + 1;
-      upto = m_apply.Find(" ", from);
-      column =m_apply.Mid(from, (upto - from));
-
-      if(m_apply.Find("with sum") > 0)
-      {
-        action = "SUM(" + column + ")";
-      }
-      else if(m_apply.Find("with min") > 0)
-      { 
-        action = "MIN(" + column + ")";
-      }
-      else if(m_apply.Find("with max") > 0)
-      { 
-        action = "MAX(" + column + ")";
-      }
-      else if(m_apply.Find("with average") > 0)
-      { 
-        action = "AVG(" + column + ")";
-      }
-      else if(m_apply.Find("with countdistinct") > 0)
-      { 
-        action = "COUNT(DISTINCT(" + column + "))";
-      }
-      else if(m_apply.Find("with count") > 0)
-      { 
-        action = "COUNT(" + column + ")";
-      }
-      else
-      {
-        // Error as a MIN with just one record
-        sql += "MIN('Invalid apply aggregate option') AS error";
-      }
-
-      if(action.GetLength() > 1)
-      {
-        sql += action;
-        if(m_apply.Find(" as ") > 0)
-        {
-          from = m_apply.Find(" as ") + 4;
-          upto = m_apply.Find(")", from);
-          sql +=  " AS " + m_apply.Mid(from, upto-from);
-        }
-      }
-    }
-    else
-    {
-      // Error as a MIN with just one record
-      sql += "MIN('missing aggregate') AS error";
-    }
+    ParseApply(sql);
   }
   else
   {
+    CheckDuplicateColumns();
     sql += m_selection.IsEmpty() ? "*" : m_selection;
   }
   sql += "\n  FROM ";
@@ -576,6 +513,79 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
     }
   }
   return sql;
+}
+
+// Parse the apply part
+void
+SQLDataSet::ParseApply(CString& sql)
+{
+  m_apply.TrimLeft();
+  m_apply.MakeLower();
+  if (m_apply.GetLength() > 10 && m_apply.Mid(0, 9) == "aggregate")
+  {
+    int from = 0;
+    int upto = 0;
+    CString action = "";
+    CString column = "";
+
+    // Remove double spaces
+    while (m_apply.Find("  ") >= 0)
+    {
+      m_apply.Replace("  ", " ");
+    }
+    // Remove space behind parenthesis
+    m_apply.Replace("( ", "(");
+
+    from = m_apply.Find("(", 0) + 1;
+    upto = m_apply.Find(" ", from);
+    column = m_apply.Mid(from, (upto - from));
+
+    if (m_apply.Find("with sum ") > 0)
+    {
+      action = "SUM(" + column + ")";
+    }
+    else if (m_apply.Find("with min ") > 0)
+    {
+      action = "MIN(" + column + ")";
+    }
+    else if (m_apply.Find("with max ") > 0)
+    {
+      action = "MAX(" + column + ")";
+    }
+    else if (m_apply.Find("with average ") > 0)
+    {
+      action = "AVG(" + column + ")";
+    }
+    else if (m_apply.Find("with countdistinct ") > 0)
+    {
+      action = "COUNT(DISTINCT(" + column + "))";
+    }
+    else if (m_apply.Find("with count ") > 0)
+    {
+      action = "COUNT(" + column + ")";
+    }
+    else
+    {
+      // Error as a MIN with just one record
+      throw StdException("Invalid apply aggregate option");
+    }
+
+    if (action.GetLength() > 1)
+    {
+      sql += action;
+      if (m_apply.Find(" as ") > 0)
+      {
+        from = m_apply.Find(" as ") + 4;
+        upto = m_apply.Find(")", from);
+        sql += " AS " + m_apply.Mid(from, upto - from);
+      }
+    }
+  }
+  else
+  {
+    // Error as a MIN with just one record
+    throw StdException("Missing aggregate");
+  }
 }
 
 // Parse the filters (m_filters must be non-null)
@@ -895,6 +905,43 @@ SQLDataSet::ReadTypes(SQLQuery& qr)
   {
     type = qr.GetColumnType(ind);
     m_types.push_back(type);
+  }
+}
+
+void
+SQLDataSet::CheckDuplicateColumns()
+{
+  // Check whether m_selection has duplicate column names. 
+  // Remove double spaces
+  m_selection.TrimLeft();
+  while (m_selection.Find("  ") >= 0)
+  {
+    m_selection.Replace("  ", " ");
+  }
+  while (m_selection.Find(", ") >= 0)
+  {
+    m_selection.Replace(", ", ",");
+  }
+  while (m_selection.Find(" ,") >= 0)
+  {
+    m_selection.Replace(" ,", ",");
+  }
+  std::set<std::string>kolommen;
+  std::stringstream selectie(m_selection.MakeLower().GetString());
+  // Seperate the selection in columns
+  while (selectie.good())
+  {
+    std::string kolom;
+    std::getline(selectie, kolom, ',');
+    // if the column already exists throw error.
+    if (kolommen.find(kolom) != kolommen.end()) // count(kolom))
+    {
+      throw StdException("Duplicate columns in select");
+    }
+    else
+    {
+      kolommen.insert(kolom);
+    }
   }
 }
 

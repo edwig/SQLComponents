@@ -172,6 +172,9 @@
     <ClCompile Include="SQLDatabasePool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SQLGetExePath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicExcel.h">
@@ -346,6 +349,9 @@
       <Filter>Headers Files</Filter>
     </ClInclude>
     <ClInclude Include="SQLTimestampExtract.h">
+      <Filter>Headers Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLGetExePath.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
   </ItemGroup>

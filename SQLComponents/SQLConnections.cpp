@@ -27,6 +27,7 @@
 #include "stdafx.h"
 #include "SQLConnections.h"
 #include "XMLMessage.h"
+#include "SQLGetExePath.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -144,6 +145,8 @@ SQLConnections::LoadConnectionsFile(CString p_filename /*=""*/)
   {
     p_filename = "Database.xml";
   }
+  p_filename = SQLGetExePath() + p_filename;
+
   XMLMessage msg;
   if(msg.LoadFile(p_filename) == false)
   {

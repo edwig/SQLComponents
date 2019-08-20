@@ -228,6 +228,8 @@ private:
   CString      GetSelectionSQL(SQLQuery& p_qry);
   // Parse the selection
   CString      ParseSelection(SQLQuery& p_query);
+  // Parse the apply
+  void         ParseApply(CString& p_sql);
   // Parse the filters
   CString      ParseFilters(SQLQuery& p_query,CString p_sql);
   // Get the variant of a parameter
@@ -236,6 +238,8 @@ private:
   void         ReadNames(SQLQuery& qr);
   // Get all the datatypes of the columns
   void         ReadTypes(SQLQuery& qr);
+  // Check that column names are unique
+  void         CheckDuplicateColumns();
   // Check that all names are the same
   void         CheckNames(SQLQuery& p_query);
     // Check that all the types are the same

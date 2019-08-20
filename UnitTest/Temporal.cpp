@@ -175,7 +175,7 @@ namespace DatabaseUnitTest
 
       int difference = 0;
       SQLDate dayInThePast("2003-10-09 12:11:33");
-      SQLDate today = SQLDate::Today();
+      SQLDate today("20-08-2019");
       SQLInterval diff = today - dayInThePast;
       difference = diff.GetDays();
 
@@ -184,7 +184,7 @@ namespace DatabaseUnitTest
         SQLTimestamp inThePast("2003-10-09 12:11:33");
         if(inThePast.Valid())
         {
-          SQLTimestamp now = SQLTimestamp::CurrentTimestamp();
+          SQLTimestamp now("2019-08-20 12:22:33");
           SQLInterval days = now - inThePast;
           difference = days.GetDays();
         }
@@ -193,7 +193,7 @@ namespace DatabaseUnitTest
       CString result;
       result.Format("Difference in days : %d",difference);
       Logger::WriteMessage(result);
-      Assert::AreEqual(5789,difference);
+      Assert::AreEqual(5794,difference);
 
       ++number_of_tests;
     }
