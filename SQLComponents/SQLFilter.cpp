@@ -185,6 +185,8 @@ SQLFilter::Reset()
   m_openParenthesis   = false;
   m_closeParenthesis  = false;
   m_extract.m_extract = TS_EXT_NONE;
+  m_operator          = OP_NOP;
+  m_function          = FN_NOP;
 
   for(auto& variant : m_values)
   {
@@ -761,6 +763,7 @@ SQLFilterSet::ParseFiltersToCondition(SQLQuery& p_query)
 {
   CString query;
   bool first = true;
+  bool orDone = false;
 
   // Add all filters
   for(auto& filt : m_filters)
@@ -774,9 +777,14 @@ SQLFilterSet::ParseFiltersToCondition(SQLQuery& p_query)
       if(filt->GetOperator() == SQLOperator::OP_OR)
       {
         query += "\n    OR ";
+        orDone = true;
         continue;
       }
-      query += "\n   AND ";
+      if(!orDone)
+      {
+        query += "\n   AND ";
+      }
+      orDone = false;
     }
     query += filt->GetSQLFilter(p_query);
   }
