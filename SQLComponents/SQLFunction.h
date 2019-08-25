@@ -49,6 +49,7 @@ typedef enum _sqlFunction
   ,FN_LTRIM
   ,FN_OCTET_LENGTH
   ,FN_POSITION
+  ,FN_INSTRING
   ,FN_REPEAT
   ,FN_REPLACE
   ,FN_RIGHT

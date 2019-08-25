@@ -64,9 +64,9 @@ public:
   // BUILDING THE FILTER
 
   // Adding a comparison field (if not yet set)
-  void        SetField(CString p_field);
+  bool        SetField(CString p_field);
   // Adding an operator (if not yet set)
-  void        SetOperator(SQLOperator p_oper);
+  bool        SetOperator(SQLOperator p_oper);
   // Adding extra values for the IN or BETWEEN operators
   void        AddValue(SQLVariant* p_value);
   // Adding an expression as replacement for concrete values

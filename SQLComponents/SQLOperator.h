@@ -44,6 +44,7 @@ typedef enum _sqlOperator
   ,OP_IsNotNULL
   ,OP_LikeBegin
   ,OP_LikeMiddle
+  ,OP_LikeEnd
   ,OP_IN
   ,OP_Between
   ,OP_Exists

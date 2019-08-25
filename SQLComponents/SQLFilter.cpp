@@ -43,6 +43,7 @@ OperatorName operatornames[] =
    { "Equal",         OP_Equal        }
   ,{ "LikeBegin",     OP_LikeBegin    }
   ,{ "LikeMiddle",    OP_LikeMiddle   }
+  ,{ "LikeEnd",       OP_LikeEnd      }
   ,{ "IN",            OP_IN           }
   ,{ "IsNULL",        OP_IsNULL       }
   ,{ "IsNotNULL",     OP_IsNotNULL    }
@@ -128,23 +129,27 @@ SQLFilter::~SQLFilter()
 }
 
 // Adding a comparison field (if not yet set)
-void
+bool
 SQLFilter::SetField(CString p_field)
 {
   if(m_field.IsEmpty())
   {
     m_field = p_field;
+    return true;
   }
+  return false;
 }
 
 // Adding an operator (if not yet set)
-void
+bool
 SQLFilter::SetOperator(SQLOperator p_oper)
 {
   if(m_operator == FN_NOP)
   {
     m_operator = p_oper;
+    return true;
   }
+  return false;
 }
 
 // Copy a SQLFilter
@@ -160,6 +165,7 @@ SQLFilter::operator=(const SQLFilter& p_other)
   m_field            = p_other.m_field;
   m_operator         = p_other.m_operator;
   m_expression       = p_other.m_expression;
+  m_function         = p_other.m_function;
   m_negate           = p_other.m_negate;
   m_openParenthesis  = p_other.m_openParenthesis;
   m_closeParenthesis = p_other.m_closeParenthesis;
@@ -240,6 +246,7 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
     case OP_SmallerEqual: sql += " <= ";        break;
     case OP_LikeBegin:    sql += " LIKE '";     break;
     case OP_LikeMiddle:   sql += " LIKE '%";    break;
+    case OP_LikeEnd:      sql += " LIKE '%";    break;
     case OP_IsNULL:       sql += " IS NULL";    break;
     case OP_IsNotNULL:    sql += " IS NOT NULL";break;
     case OP_IN:           sql += " IN (";       break;
@@ -250,7 +257,9 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
   }
 
   // In case of a LIKE search of a character field
-  if(m_operator == OP_LikeBegin || m_operator == OP_LikeMiddle)
+  if(m_operator == OP_LikeBegin  || 
+     m_operator == OP_LikeMiddle ||
+     m_operator == OP_LikeEnd    )
   {
     ConstructLike(sql);
   }
@@ -279,7 +288,7 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
   // End an extra parenthesis level
   if(m_closeParenthesis)
   {
-    sql = ")";
+    sql += ")";
   }
 
   return sql;
@@ -402,7 +411,9 @@ SQLFilter::ConstructLike(CString& p_sql)
   m_values[0]->GetAsString(value);
   // Add as a LIKE string
   p_sql += value;
-  p_sql += "%'";
+
+  // Eventually a closing '%'
+  p_sql += m_operator == OP_LikeEnd ? "'" : "%'";
 }
 
 // Constructing the IN clause
@@ -436,8 +447,9 @@ CString
 SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
 {
   CString sql;
-  int parameters = 0;
   CString comma;
+  int parameters = 0;
+  bool trim = false;
 
   switch(m_function)
   {
@@ -457,6 +469,7 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
     case FN_LTRIM:            sql = "LTRIM";            parameters = 1; break;
     case FN_OCTET_LENGTH:     sql = "OCTET_LENGTH";     parameters = 1; break;
     case FN_POSITION:         sql = "POSITION";         parameters = 2; comma = " IN "; break;
+    case FN_INSTRING:         sql = "INSTR";            parameters = 2; trim = true;    break;
     case FN_REPEAT:           sql = "REPEAT";           parameters = 2; break;
     case FN_REPLACE:          sql = "REPLACE";          parameters = 3; break;
     case FN_RIGHT:            sql = "RIGHT";            parameters = 2; break;
@@ -544,6 +557,13 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
     case -2:sql = "{fn " + sql + "(" + ConstructTimestampCalcPart() + ",?," + m_field + ")}";
             p_query.SetParameter(m_values[0]);
             break;
+  }
+
+  // Eventueel de functie escape er weer afhalen
+  if(trim)
+  {
+    sql = sql.Mid(4);
+    sql = sql.TrimRight('}');
   }
 
   // Eventually replace the ',' with the operator
