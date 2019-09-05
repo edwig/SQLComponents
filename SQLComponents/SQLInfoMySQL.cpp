@@ -336,12 +336,17 @@ SQLInfoMySQL::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
 
 // Transform query to select top <n> rows
 CString
-SQLInfoMySQL::GetSQLTopNRows(CString p_sql,int p_top) const
+SQLInfoMySQL::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
 {
   if(p_top > 0)
   {
+    // MYSQL: " LIMIT <top> [ OFFSET <skip> ]
     CString limit;
     limit.Format("\n LIMIT %d",p_top);
+    if(p_skip > 0)
+    {
+      limit.AppendFormat(" OFFSET %d",p_skip);
+    }
     p_sql += limit;
   }
   return p_sql;

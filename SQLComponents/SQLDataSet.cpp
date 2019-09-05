@@ -92,22 +92,12 @@ const char* dataset_names[LN_NUMLANG][NUM_DATASET_NAMES] =
 
 SQLDataSet::SQLDataSet()
            :m_database(NULL)
-           ,m_status(SQL_Empty)
-           ,m_current(-1)
-           ,m_open(false)
-           ,m_filters(nullptr)
-           ,m_topRecords(0)
 {
 }
 
 SQLDataSet::SQLDataSet(CString p_name,SQLDatabase* p_database /*=NULL*/)
            :m_name(p_name)
            ,m_database(p_database)
-           ,m_status(SQL_Empty)
-           ,m_current(-1)
-           ,m_open(false)
-           ,m_filters(nullptr)
-           ,m_topRecords(0)
 {
 }
 
@@ -309,14 +299,14 @@ SQLDataSet::SetFilters(SQLFilterSet* p_filters)
 
 // Set top <n> records selection
 void
-SQLDataSet::SetTopNRecords(int p_top)
+SQLDataSet::SetTopNRecords(int p_top,int p_skip /*=0*/)
 {
   if(p_top > 0)
   {
-    m_topRecords = p_top;
+    m_topRecords  = p_top;
+    m_skipRecords = p_skip;
   }
 }
-
 
 void         
 SQLDataSet::SetPrimaryKeyColumn(WordList& p_list)
@@ -694,7 +684,7 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
     // Apply top <N> records selection
     if(m_topRecords)
     {
-      query = m_database->GetSQLInfoDB()->GetSQLTopNRows(query,m_topRecords);
+      query = m_database->GetSQLInfoDB()->GetSQLTopNRows(query,m_topRecords,m_skipRecords);
     }
 
     // Do the SELECT query
@@ -768,7 +758,7 @@ SQLDataSet::Append()
     // Apply top <N> records selection
     if(m_topRecords)
     {
-      query = m_database->GetSQLInfoDB()->GetSQLTopNRows(query,m_topRecords);
+      query = m_database->GetSQLInfoDB()->GetSQLTopNRows(query,m_topRecords,m_skipRecords);
     }
 
     // Do the SELECT query

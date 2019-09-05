@@ -152,7 +152,7 @@ public:
   CString GetSQLOptimizeTable(CString p_schema, CString p_tablename) const;
 
   // Transform query to select top <n> rows
-  CString GetSQLTopNRows(CString p_sql,int p_top) const;
+  CString GetSQLTopNRows(CString p_sql,int p_top,int p_skip = 0) const;
 
   //////////////////////////////////////////////////////////////////////////
   // SQL STRINGS

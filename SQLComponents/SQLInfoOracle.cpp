@@ -350,12 +350,22 @@ SQLInfoOracle::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
 // Transform query to select top <n> rows:
 // Works from Oracle 12c and upward!!!
 CString
-SQLInfoOracle::GetSQLTopNRows(CString p_sql,int p_top) const
+SQLInfoOracle::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
 {
   if(p_top > 0)
   {
     CString limit;
-    limit.Format("\n FETCH FIRST %d ROWS WITH TIES",p_top);
+    if(p_skip > 0)
+    {
+      limit.Format("\n OFFSET %d ROWS"
+                   "\n FETCH NEXT %d ROWS ONLY"
+                   ,p_skip
+                   ,p_top);
+    }
+    else
+    {
+      limit.Format("\n FETCH FIRST %d ROWS ONLY",p_top);
+    }
     p_sql += limit;
   }
   return p_sql;

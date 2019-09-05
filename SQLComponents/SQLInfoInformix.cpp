@@ -345,12 +345,17 @@ SQLInfoInformix::GetSQLOptimizeTable(CString /*p_schema*/,CString p_tablename) c
 
 // Transform query to select top <n> rows
 CString
-SQLInfoInformix::GetSQLTopNRows(CString p_sql,int p_top) const
+SQLInfoInformix::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
 {
   if(p_top > 0 && p_sql.Find("SELECT ") == 0)
   {
-    CString selectFirst;
-    selectFirst.Format("SELECT FIRST %d ",p_top);
+    // INFORMIX: "SELECT [SKIP <skip>] FIRST <top> ....
+    CString selectFirst("SELECT ");
+    if(p_skip)
+    {
+      selectFirst.AppendFormat("SKIP %d ",p_skip);
+    }
+    selectFirst.AppendFormat("FIRST %d ",p_top);
 
     p_sql.Replace("SELECT ",selectFirst);
   }
@@ -1855,3 +1860,4 @@ SQLInfoInformix::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& 
 
 // End of namespace
 }
+

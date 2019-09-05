@@ -506,7 +506,7 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
     // DATE/TIME FUNCTIONS
     case FN_CURRENT_DATE:     sql = "CURRENT_DATE";     parameters = 0; break;
     case FN_CURRENT_TIME:     sql = "CURRENT_TIME";     parameters = 0; break;
-    case FN_CURRENT_TIMESTAMP:sql = "CURRENT_TIMESTAMP";parameters = 1; break;
+    case FN_CURRENT_TIMESTAMP:sql = "CURRENT_TIMESTAMP";parameters = 0; break;
     case FN_CURDATE:          sql = "CURDATE";          parameters = 0; break;
     case FN_CURTIME:          sql = "CURTIME";          parameters = 0; break;
     case FN_DAYNAME:          sql = "DAYNAME";          parameters = 1; break;

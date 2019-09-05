@@ -342,14 +342,15 @@ SQLInfoPostgreSQL::GetSQLOptimizeTable(CString p_schema, CString p_tablename) co
 
 // Transform query to select top <n> rows
 CString
-SQLInfoPostgreSQL::GetSQLTopNRows(CString p_sql,int p_top) const
+SQLInfoPostgreSQL::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
 {
-  if(p_top > 0 && p_sql.Find("SELECT ") == 0)
+  if(p_top > 0)
   {
-    CString selectFirst;
-    selectFirst.Format("SELECT LIMIT %d ",p_top);
-
-    p_sql.Replace("SELECT ",selectFirst);
+    p_sql.AppendFormat("\nSELECT LIMIT %d ",p_top);
+    if(p_skip > 0)
+    {
+      p_sql.AppendFormat(" OFFSET %d",p_skip);
+    }
   }
   return p_sql;
 }

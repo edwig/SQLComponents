@@ -170,7 +170,7 @@ public:
   // Set filters for a query
   void         SetFilters(SQLFilterSet* p_filters);
   // Set top <n> records selection
-  void         SetTopNRecords(int p_top);
+  void         SetTopNRecords(int p_top,int p_skip = 0);
   // Set columns that can be updated
   void         SetUpdateColumns(WordList p_list);
   // Set the status to modified/saved
@@ -273,7 +273,7 @@ private:
 
   CString      m_name;
   SQLDatabase* m_database;
-  bool         m_open;
+  bool         m_open { false };
   // The query to run
   CString      m_query;
   CString      m_selection;
@@ -288,12 +288,13 @@ private:
   CString      m_sequenceName;
   ParameterSet m_parameters;
   NamenMap     m_primaryKey;
-  SQLFilterSet* m_filters;
+  SQLFilterSet* m_filters    { nullptr };
   WordList     m_updateColumns;
-  int          m_topRecords;
+  int          m_topRecords  { 0 };
+  int          m_skipRecords { 0 };
 protected:
-  int          m_status;
-  int          m_current;
+  int          m_status      { SQL_Empty };
+  int          m_current     { -1 };
   NamenMap     m_names;
   TypenMap     m_types;
   RecordSet    m_records;

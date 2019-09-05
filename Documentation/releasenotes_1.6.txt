@@ -19,3 +19,7 @@ Version 1.6.0 of 22-06-2019
    All ODBC 3.52 functions can be used for a condition filter
 4) Added unit tests for all function-filter combinations
 
+05-09-2019
+----------
+5) Added "skip" functionality for the SQLDataSet to go with <top>
+   The method "SetTopNRecords" now has an extra parameter "p_skip".

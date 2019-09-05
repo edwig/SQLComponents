@@ -209,7 +209,7 @@ public:
   virtual CString GetSQLOptimizeTable(CString p_schema, CString p_tablename) const = 0;
 
   // Transform query to select top <n> rows
-  virtual CString GetSQLTopNRows(CString p_sql,int p_top) const = 0;
+  virtual CString GetSQLTopNRows(CString p_sql,int p_top,int p_skip = 0) const = 0;
 
   //////////////////////////////////////////////////////////////////////////
   // SQL STRINGS

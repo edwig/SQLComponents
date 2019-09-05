@@ -331,12 +331,18 @@ SQLInfoFirebird::GetSQLOptimizeTable(CString p_schema, CString p_tablename) cons
 
 // Transform query to select top <n> rows
 CString
-SQLInfoFirebird::GetSQLTopNRows(CString p_sql,int p_top) const
+SQLInfoFirebird::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
 {
   if(p_top > 0 && p_sql.Find("SELECT ") == 0)
   {
+    // FIREBIRD: SELECT FIRST <top> [ SKIP <skip> ] ....
     CString selectFirst;
     selectFirst.Format("SELECT FIRST %d ",p_top);
+
+    if(p_skip > 0)
+    {
+      selectFirst.AppendFormat("SKIP %d ",p_skip);
+    }
 
     p_sql.Replace("SELECT ",selectFirst);
   }
