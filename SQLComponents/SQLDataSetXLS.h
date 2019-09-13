@@ -23,8 +23,7 @@
 // Loosely based on the article by: Yap Chun Wei
 // http://www.codeproject.com/Articles/1636/CSpreadSheet-A-Class-to-Read-and-Write-to-Excel-an
 // 
-// Last Revision:  15-06-2019
-// Version number: 1.5.5
+// Version number: See SQLComponents.h
 //
 #pragma once
 

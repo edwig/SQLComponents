@@ -21,8 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:  15-06-2019
-// Version number: 1.5.5
+// Version number: See SQLComponents.h
 //
 #pragma once
 #include "SQLComponents.h"
@@ -109,6 +108,13 @@ typedef enum _sqlFunction
   ,FN_DATABASE
   ,FN_IFNULL
   ,FN_USER
+  // HAVING FUNCTIONS
+  ,FN_SUM
+  ,FN_COUNT
+  ,FN_COUNTDIST
+  ,FN_MIN
+  ,FN_MAX
+  ,FN_AVG
 }
 SQLFunction;
 

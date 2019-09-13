@@ -21,8 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:  15-06-2019
-// Version number: 1.5.5
+// Version number: See SQLComponents.h
 //
 #pragma once
 #include "SQLDatabase.h"
@@ -151,8 +150,6 @@ public:
   void         SetGroupBy(CString p_groupby);
   // Set the ordering by explicitly
   void         SetOrderBy(CString p_orderby);
-  // Set the having
-  void         SetHaving(CString p_having);
   // Set the apply
   void         SetApply(CString p_having);
   // Set a new full query (Supersedes SetSelection, -Where, -groupby, -orderby and -having)
@@ -169,6 +166,8 @@ public:
   void         SetParameter(CString p_naam,SQLVariant p_waarde);
   // Set filters for a query
   void         SetFilters(SQLFilterSet* p_filters);
+  // Set the having filters
+  void         SetHavings(SQLFilterSet* p_havings);
   // Set top <n> records selection
   void         SetTopNRecords(int p_top,int p_skip = 0);
   // Set columns that can be updated
@@ -214,7 +213,7 @@ public:
   CString      GetWhereCondition();
   CString      GetGroupBy();
   CString      GetOrderBy();
-  CString      GetHaving();
+  SQLFilterSet* GetHavings();
 
   // XML Saving and loading
   bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
@@ -277,21 +276,23 @@ private:
   // The query to run
   CString      m_query;
   CString      m_selection;
-  CString      m_whereCondition;
-  CString      m_groupby;
-  CString      m_orderby;
-  CString      m_having;
   CString      m_apply;
+  CString      m_whereCondition;
+  CString      m_orderby;
+  CString      m_groupby;
   // Parts of the query
   CString      m_primarySchema;
   CString      m_primaryTableName;
   CString      m_sequenceName;
   ParameterSet m_parameters;
   NamenMap     m_primaryKey;
-  SQLFilterSet* m_filters    { nullptr };
   WordList     m_updateColumns;
   int          m_topRecords  { 0 };
   int          m_skipRecords { 0 };
+  // Filter sets
+  SQLFilterSet* m_filters { nullptr };
+  SQLFilterSet* m_havings { nullptr };
+
 protected:
   int          m_status      { SQL_Empty };
   int          m_current     { -1 };
@@ -416,10 +417,10 @@ SQLDataSet::GetOrderBy()
   return m_orderby;
 }
 
-inline CString
-SQLDataSet::GetHaving()
+inline SQLFilterSet*
+SQLDataSet::GetHavings()
 {
-  return m_having;
+  return m_havings;
 }
 
 inline void

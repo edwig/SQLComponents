@@ -21,8 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:  15-06-2019
-// Version number: 1.5.5
+// Version number: See SQLComponents.h
 //
 #include "stdafx.h"
 #include "SQLFilter.h"
@@ -449,7 +448,8 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
   CString sql;
   CString comma;
   int parameters = 0;
-  bool trim = false;
+  bool trim  = false;
+  bool extra = false;
 
   switch(m_function)
   {
@@ -529,6 +529,13 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
     case FN_DATABASE:         sql = "DATABASE";         parameters = 0; break;
     case FN_USER:             sql = "USER";             parameters = 0; break;
     case FN_IFNULL:           sql = "IFNULL";           parameters = 2; break;
+    // HAVING FUNCTIONS
+    case FN_SUM:              sql = "SUM";              parameters = 1; trim = true; break;
+    case FN_COUNT:            sql = "COUNT";            parameters = 1; trim = true; break;
+    case FN_COUNTDIST:        sql = "COUNT(DISTINCT(";  parameters = 1; trim = true; extra = true; break;
+    case FN_MIN:              sql = "MIN";              parameters = 1; trim = true; break;
+    case FN_MAX:              sql = "MAX";              parameters = 1; trim = true; break;
+    case FN_AVG:              sql = "AVG";              parameters = 1; trim = true; break;
   }
 
   // Construct ODBC Function
@@ -559,11 +566,17 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
             break;
   }
 
-  // Eventueel de functie escape er weer afhalen
+  // Eventually remove the ODBC function escape!
   if(trim)
   {
     sql = sql.Mid(4);
     sql = sql.TrimRight('}');
+  }
+
+  // Eventuallly an extra parenthesis closing
+  if(extra)
+  {
+    sql += ")";
   }
 
   // Eventually replace the ',' with the operator

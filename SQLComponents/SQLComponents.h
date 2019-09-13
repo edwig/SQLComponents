@@ -21,8 +21,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:  15-06-2019
-// Version number: 1.5.5
+// Last Revision:  13-09-2019
+// Version number: 1.6.1
 //
 #pragma once
 #include "SQLLanguage.h"
@@ -35,8 +35,8 @@ namespace SQLComponents
 // General version, date and copyright
 // of the SQLComponents library
 
-#define SQL_COMPONENTS_VERSION   "1.6.0"
-#define SQL_COMPONENTS_DATE      "22-06-2019"
+#define SQL_COMPONENTS_VERSION   "1.6.1"
+#define SQL_COMPONENTS_DATE      "13-09-2019"
 #define SQL_COMPONENTS_COPYRIGHT "Copyright (c) 2019 ir. W.E. Huisman"
 
 // SQL/CLI Standard states that 128 is the maximum length

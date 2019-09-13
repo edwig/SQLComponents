@@ -204,9 +204,6 @@
     <ClInclude Include="SQLColumnInfo.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
-    <ClInclude Include="SQLComponents.h">
-      <Filter>Headers Files</Filter>
-    </ClInclude>
     <ClInclude Include="SQLDatabase.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
@@ -354,6 +351,7 @@
     <ClInclude Include="SQLGetExePath.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
+    <ClInclude Include="SQLComponents.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers Files">

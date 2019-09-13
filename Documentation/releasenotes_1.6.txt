@@ -1,7 +1,19 @@
 RELEASENOTES SQLCOMPONENTS VERSION 1.6
 ======================================
-====== Released since:22-06-2019 =====
+===== Released since: 22-06-2019 =====
 ======================================
+
+Version 1.6.1 of 13-09-2019
+---------------------------
+1) Added "skip" functionality for the SQLDataSet to go with <top>
+   The method "SetTopNRecords" now has an extra parameter "p_skip".
+2) Added the possibility of a set of SQLFilters to do the work for
+   the HAVING clause in the SQLDataSet.
+3) Fixed a bug in SQLFilters. The order of HAVING and ORDER where
+   incorrect, leading to incorrect SQL
+4) Version numbers and dates are moved from all files to the 
+   SQLComponents.h header file. So changes in the future will
+   not spread among *all* files of the product.
 
 Version 1.6.0 of 22-06-2019
 ---------------------------
@@ -18,8 +30,3 @@ Version 1.6.0 of 22-06-2019
    See: "Filtertest.cpp" for a number of examples.
    All ODBC 3.52 functions can be used for a condition filter
 4) Added unit tests for all function-filter combinations
-
-05-09-2019
-----------
-5) Added "skip" functionality for the SQLDataSet to go with <top>
-   The method "SetTopNRecords" now has an extra parameter "p_skip".

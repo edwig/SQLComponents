@@ -21,8 +21,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-// Last Revision:  15-06-2019
-// Version number: 1.5.5
+// Version number: See SQLComponents.h
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
@@ -357,8 +356,9 @@ SQLDataSet::SetQuery(CString& p_query)
   m_whereCondition.Empty();
   m_groupby.Empty();
   m_orderby.Empty();
-  m_having.Empty();
   m_apply.Empty();
+  m_filters = nullptr;
+  m_havings = nullptr;
 
   // Setting the query at once
   m_query = p_query;
@@ -393,10 +393,10 @@ SQLDataSet::SetOrderBy(CString p_orderby)
 }
 
 void
-SQLDataSet::SetHaving(CString p_having)
+SQLDataSet::SetHavings(SQLFilterSet* p_havings)
 {
   m_query.Empty();
-  m_having = p_having;
+  m_havings = p_havings;
 }
 
 void
@@ -560,8 +560,14 @@ SQLDataSet::ParseApply(CString& sql)
       throw StdException("Invalid apply aggregate option");
     }
 
-    if (action.GetLength() > 1)
+    if(action.GetLength() > 1)
     {
+      if(!m_selection.IsEmpty() && m_selection.Compare("*"))
+      {
+        sql += m_selection;
+        sql += ",";
+      }
+
       sql += action;
       if (m_apply.Find(" as ") > 0)
       {
@@ -640,14 +646,15 @@ SQLDataSet::GetSelectionSQL(SQLQuery& p_qry)
     sql += "\n GROUP BY " + m_groupby;
   }
 
+  if(m_havings && !m_havings->Empty())
+  {
+    sql += "\n HAVING ";
+    sql += m_havings->ParseFiltersToCondition(p_qry);
+  }
+
   if(!m_orderby.IsEmpty())
   {
     sql += "\n ORDER BY " + m_orderby;
-  }
-
-  if(!m_having.IsEmpty())
-  {
-    sql += "\n HAVING " + m_having;
   }
 
   return sql;
