@@ -37,7 +37,7 @@ The 'standard' proces to work with these components is very easy and looks somet
 	}
 
 
-###DATABASE INDEPENDENT
+##DATABASE INDEPENDENT
 
 You can use the following database types through the DBInfoDB class:
 
@@ -61,7 +61,7 @@ a database option should look like. Is the changing of a column in the database
 named 'ALTER' or 'MODIFY' for instance. Or what is the syntax to add a foreign key?
 
 
-###Dataset oriented
+##Dataset oriented
 
 SQLComponents is dataset oriented, as is SQL itself. You can just work with loose SQLQuery 
 objects and do your stuf with it, like in the example above. But you can also use the 
@@ -75,7 +75,7 @@ objects and do your stuf with it, like in the example above. But you can also us
 The SQLDataSet object will in most instances search for the primary key and foreign keys
 for itself and in most cases create the needed INSERT, UPDATE and DELETE statements for itself!
 
-###Powerfull variant class
+##Powerfull variant class
 
 The **SQLVariant** class is central to this library. In fact, the result values of the 
 SQLQuery are all SQLVariants. Just about every standard datatype of the C++ language is 
