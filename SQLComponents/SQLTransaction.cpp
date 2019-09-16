@@ -80,7 +80,7 @@ SQLTransaction::~SQLTransaction()
     message.Format("Error in rollback of transaction [%s] : %s\n",m_name.GetString(),error.GetErrorMessage().GetString());
     if(m_database)
     {
-      m_database->LogPrint(LOGLEVEL_ERROR,message);
+      m_database->LogPrint(message);
     }
     else
     {

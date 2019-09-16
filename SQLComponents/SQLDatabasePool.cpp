@@ -185,7 +185,7 @@ SQLDatabasePool::Cleanup(bool p_aggressive /*=false*/)
     CString text;
     text.Format("Maximum number of databases reached and aggressive cleanup requested.\n"
                 "Max databases is currently: %d", m_maxDatabases);
-    LogPrint(LOGLEVEL_ACTION, text);
+    LogPrint(text);
   }
   CleanupInternally(p_aggressive);
 }
@@ -310,7 +310,7 @@ SQLDatabasePool::GetDatabaseInternally(DbsPool& p_pool,CString& p_connectionName
       {
         CString error;
         error.Format("The maximum number of open databases has been reached [%d]",m_maxDatabases);
-        LogPrint(LOGLEVEL_ERROR,error);
+        LogPrint(error);
         throw StdException(error);
       }
       // Just try again
@@ -350,7 +350,7 @@ SQLDatabasePool::GetDatabaseInternally(DbsPool& p_pool,CString& p_connectionName
   if(dbs == nullptr)
   {
     CString error("INTERN: No database found in the list with free databases");
-    LogPrint(LOGLEVEL_ERROR,error);
+    LogPrint(error);
     throw StdException(error);
   }
 
@@ -410,7 +410,7 @@ SQLDatabasePool::CleanupInternally(bool p_aggressive)
         db->Close();
         CString text;
         text.Format("Closed database connection for [%s/%s]",name.GetString(),db->GetUserName().GetString());
-        LogPrint(LOGLEVEL_ACTION,text);
+        LogPrint(text);
         list->pop_front();
 
         // Reduce counter
@@ -534,7 +534,7 @@ SQLDatabasePool::OpenDatabase(SQLDatabase* p_dbs,CString& p_connectionName)
     text.Format("Database created and opened: [%s:%s]"
                ,conn->m_datasource.GetString()
                ,conn->m_username.GetString());
-    LogPrint(LOGLEVEL_ACTION,text);
+    LogPrint(text);
 
     // One extra!
     ++m_openConnections;
@@ -543,7 +543,7 @@ SQLDatabasePool::OpenDatabase(SQLDatabase* p_dbs,CString& p_connectionName)
   {
     CString error;
     error.Format("Database [%s] selected, but no connection found in 'database.xml'",p_connectionName.GetString());
-    LogPrint(LOGLEVEL_ERROR,error);
+    LogPrint(error);
     throw StdException(error);
   }
 }
@@ -565,7 +565,7 @@ SQLDatabasePool::CloseAllInternally()
       text.Format("Database [%s] connection closed. User: %s"
                  ,database->GetConnectionName().GetString()
                  ,database->GetUserName().GetString());
-      LogPrint(LOGLEVEL_ACTION,text);
+      LogPrint(text);
 
       // Close the database connection to the RDBMS server 
       database->Close();
@@ -607,33 +607,42 @@ SQLDatabasePool::CleanupAllInternally()
 
 // Support printing to generic logfile
 void
-SQLDatabasePool::LogPrint(int p_level, const char* p_text)
+SQLDatabasePool::LogPrint(const char* p_text)
 {
-  if(p_level <= m_loggingLevel)
+  // If the loglevel is above the activation level
+  if(m_loggingLevel >= m_logActive)
   {
+    // If we have both the printing routine AND the context
     if(m_logPrinter && m_logContext)
     {
-      (*m_logPrinter)(m_logContext, p_text);
+      // Print to the logfile
+      (*m_logPrinter)(m_logContext,p_text);
     }
   }
 }
 
+// Getting the current loglevel
 int
 SQLDatabasePool::LogLevel()
 {
-  if(m_logLevel && m_logContext)
+  if(m_logContext)
   {
-    return (*m_logLevel)(m_logContext);
+    m_loggingLevel = (*m_logLevel)(m_logContext);
+    return m_loggingLevel;
   }
   return -1;
 }
 
 bool
-SQLDatabasePool::WilLog(int p_loglevel)
+SQLDatabasePool::WilLog()
 {
+  // If we have both the loglevel routine AND the context
   if(m_logLevel && m_logContext)
   {
-    if(p_loglevel <= (*m_logLevel)(m_logContext))
+    // Refresh the loglevel
+    m_loggingLevel = (*m_logLevel)(m_logContext);
+    // True if at logactive threshold or above
+    if(m_loggingLevel >= m_logActive)
     {
       return true;
     }

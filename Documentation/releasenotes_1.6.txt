@@ -14,6 +14,10 @@ Version 1.6.1 of 13-09-2019
 4) Version numbers and dates are moved from all files to the 
    SQLComponents.h header file. So changes in the future will
    not spread among *all* files of the product.
+5) Created a threshold for logging in SQLDatabase and SQLDatabasePool
+   Use "SetLoggingActivation(int p_level)" to set the minimum logging 
+   level. Logging at this level (or above) will trigger SQL logging
+   in the connected logfile (Of used RegisterLogContent(...))
 
 Version 1.6.0 of 22-06-2019
 ---------------------------

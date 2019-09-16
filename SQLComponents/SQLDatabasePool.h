@@ -76,9 +76,10 @@ public:
 
   // Support of logging functions (for all databases in the pool)
   void         RegisterLogContext(int p_level, LOGLEVEL p_loglevel, LOGPRINT p_logprinter, void* p_logContext);
-  void         LogPrint(int p_level, const char* p_text);
+  void         LogPrint(const char* p_text);
   int          LogLevel();
-  bool         WilLog(int p_loglevel);
+  bool         WilLog();
+  void         SetLoggingActivation(int p_loglevel);
 
 private:
   // Get OR make a logged in database connection
@@ -109,9 +110,16 @@ private:
   LOGLEVEL        m_logLevel     { nullptr };           // Getting the log level
   void*           m_logContext   { nullptr };           // Logging context (e.g. and object)
   int             m_loggingLevel { 0       };           // Current level
+  int             m_logActive    {LOGLEVEL_MAX};        // Threshold: Log only above this loglevel
 
   // Thread synchronization
   CRITICAL_SECTION m_lock;
 };
+
+inline void
+SQLDatabasePool::SetLoggingActivation(int p_loglevel)
+{
+  m_logActive = p_loglevel;
+}
 
 }

@@ -43,7 +43,11 @@ public:
 
  ~SQLAutoDBS()
   {
-    m_pool.GiveUp(m_database);
+    if(m_database)
+    {
+      m_database->RegisterLogContext(0,nullptr,nullptr,NULL);
+      m_pool.GiveUp(m_database);
+    }
   }
 
   bool Invalid()             { return (m_database == nullptr);  };

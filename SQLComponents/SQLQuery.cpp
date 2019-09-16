@@ -131,8 +131,8 @@ SQLQuery::Close()
         {
           if(m_database->GetSQLState() != "24000")
           {
-            m_database->LogPrint(0,m_lastError);
-            m_database->LogPrint(0,"Trying to continue without closing the cursor!");
+            m_database->LogPrint(m_lastError);
+            m_database->LogPrint("Trying to continue without closing the cursor!");
           }
         }
       }
@@ -345,7 +345,7 @@ SQLQuery::ReportQuerySpeed(LARGE_INTEGER p_start)
   {
     message.Format("Query time: %.6f seconds\n",secondsDBL);
   }
-  m_database->LogPrint(LOGLEVEL_MAX,message);
+  m_database->LogPrint(message);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -559,6 +559,8 @@ SQLQuery::DoSQLStatement(const CString& p_statement,const bcd&  p_param1)
 void
 SQLQuery::DoSQLStatement(const CString& p_statement)
 {
+  bool logging = false;
+
   // Check for filled statement
   if(p_statement.IsEmpty())
   {
@@ -595,11 +597,12 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
   }
 
   // Log the query, just before we run it, replaced macro's and all
-  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
+  if(m_database && m_database->WilLog())
   {
-    m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
-    m_database->LogPrint(LOGLEVEL_MAX,statement.GetString());
-    m_database->LogPrint(LOGLEVEL_MAX,"\n");
+    logging = true;
+    m_database->LogPrint("[Database query]\n");
+    m_database->LogPrint(statement.GetString());
+    m_database->LogPrint("\n");
   }
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
@@ -648,7 +651,7 @@ SQLQuery::DoSQLStatement(const CString& p_statement)
     // rcExec == SQL_STILL_EXECUTING
     // rcExec == SQL_NEED_DATA
   }
-  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
+  if(logging)
   {
     ReportQuerySpeed(start);
   }
@@ -810,11 +813,11 @@ SQLQuery::DoSQLPrepare(const CString& p_statement)
   }
 
   // Log the query, just before we run it, replaced macro's and all
-  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
+  if(m_database && m_database->WilLog())
   {
-    m_database->LogPrint(LOGLEVEL_MAX,"[Database query]\n");
-    m_database->LogPrint(LOGLEVEL_MAX,statement.GetString());
-    m_database->LogPrint(LOGLEVEL_MAX,"\n");
+    m_database->LogPrint("[Database query]\n");
+    m_database->LogPrint(statement.GetString());
+    m_database->LogPrint("\n");
   }
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
@@ -905,6 +908,8 @@ SQLQuery::DoSQLExecute(bool p_rebind /*=false*/)
 void
 SQLQuery::BindParameters()
 {
+  bool logging = false;
+
   // Optimize for no-parameters
   if(m_parameters.empty())
   {
@@ -915,6 +920,12 @@ SQLQuery::BindParameters()
   if(!m_paramMaxSizes.empty())
   {
     TruncateInputParameters();
+  }
+
+  // Optimize logging
+  if(m_database && m_database->WilLog())
+  {
+    logging = true;
   }
 
   // See if we have an extra function-return parameter
@@ -951,7 +962,10 @@ SQLQuery::BindParameters()
     sqlDatatype = RebindParameter(sqlDatatype);
 
     // Log what we bind here
-    LogParameter(icol,var);
+    if(logging)
+    {
+      LogParameter(icol,var);
+    }
 
     // Do the bindings
     m_retCode = SqlBindParameter(m_hstmt                     // Statement handle
@@ -1019,17 +1033,14 @@ SQLQuery::RebindParameter(short p_datatype)
 void
 SQLQuery::LogParameter(int p_column,SQLVariant* p_parameter)
 {
-  if(m_database && m_database->LogLevel() >= LOGLEVEL_MAX)
+  if(p_column == 1)
   {
-    if(p_column == 1)
-    {
-      m_database->LogPrint(LOGLEVEL_MAX,"Parameters as passed on to the database:\n");
-    }
-    CString text,value;
-    p_parameter->GetAsString(value);
-    text.Format("Parameter %d: %s\n",p_column,value.GetString());
-    m_database->LogPrint(LOGLEVEL_MAX,text);
+    m_database->LogPrint("Parameters as passed on to the database:\n");
   }
+  CString text,value;
+  p_parameter->GetAsString(value);
+  text.Format("Parameter %d: %s\n",p_column,value.GetString());
+  m_database->LogPrint(text);
 }
 
 void

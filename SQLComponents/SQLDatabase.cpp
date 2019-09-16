@@ -108,12 +108,12 @@ SQLDatabase::Close()
   catch(StdException& ex)
   {
     // Can go wrong in many places in the ODBC stack or the RDMBS drivers stack
-    LogPrint(0,ex.GetErrorMessage());
+    LogPrint(ex.GetErrorMessage());
   }
   catch(...)
   {
     // Can go wrong in many places in the ODBC stack or the RDMBS drivers stack
-    LogPrint(0,"Closing the database\n");
+    LogPrint("Closing the database\n");
   }
   // Empty parameter and column rebinding
   m_rebindParameters.clear();
@@ -394,7 +394,7 @@ SQLDatabase::CollectInfo()
 
   if(!IsOpen())
   {
-    LogPrint(LOGLEVEL_ACTION,"Database not open at the begin of CollectInfo.");
+    LogPrint("Database not open at the begin of CollectInfo.");
     return false;
   }
   // Set lock on the stack
@@ -658,7 +658,7 @@ SQLDatabase::RealDatabaseName()
   // Log the connection
   CString log;
   log.Format("Database connection at login => DATABASE: %s\n",databaseName.GetString());
-  LogPrint(LOGLEVEL_ACTION,log);
+  LogPrint(log);
   return result;
 }
 
@@ -841,8 +841,8 @@ SQLDatabase::FreeEnvHandle()
   if(Check(ret) == FALSE)
   {
     CString error = GetErrorString(0);
-    LogPrint(0,"Error at closing the database environment\n");
-    LogPrint(0,error);
+    LogPrint("Error at closing the database environment\n");
+    LogPrint(error);
   }
   m_henv = SQL_NULL_HANDLE;
 }
@@ -856,8 +856,8 @@ SQLDatabase::FreeDbcHandle()
   if(Check(ret) == FALSE)
   {
     CString error = GetErrorString(0);
-    LogPrint(0,"Error at closing the database\n");
-    LogPrint(0,error);
+    LogPrint("Error at closing the database\n");
+    LogPrint(error);
   }
   // And free the handle
   SqlFreeHandle(SQL_HANDLE_DBC,m_hdbc);
@@ -1070,14 +1070,11 @@ SQLDatabase::Check(INT nRetCode)
 {
   switch (nRetCode)
   {
-    case SQL_SUCCESS_WITH_INFO: if(m_logLevel && m_logPrinter && m_logContext)
+    case SQL_SUCCESS_WITH_INFO: if(WilLog())
                                 {
-                                  if((*m_logLevel)(m_logContext) >= LOGLEVEL_MAX)
-                                  {
-                                    CString error;
-                                    error.Format("=> ODBC Success with info: %s\n",GetErrorString().GetString());
-                                    LogPrint(LOGLEVEL_MAX,error);
-                                  }
+                                  CString error;
+                                  error.Format("=> ODBC Success with info: %s\n",GetErrorString().GetString());
+                                  LogPrint(error);
                                 }
     case SQL_SUCCESS:           // Fall through
     case SQL_NO_DATA_FOUND:     return TRUE;
@@ -1374,8 +1371,8 @@ SQLDatabase::CloseAllTransactions()
   if(Check(ret) == FALSE)
   {
     CString error = GetErrorString(0);
-    LogPrint(0,"Error in rollback at closing the database\n");
-    LogPrint(0,error);
+    LogPrint("Error in rollback at closing the database\n");
+    LogPrint(error);
   }
 }
 
@@ -1713,33 +1710,42 @@ SQLDatabase::GetSpecialDriver(CString p_base,CString p_extensie)
 
 // Support printing to generic logfile
 void
-SQLDatabase::LogPrint(int p_level,const char* p_text)
+SQLDatabase::LogPrint(const char* p_text)
 {
-  if(p_level <= m_loggingLevel)
+  // If the loglevel is above the activation level
+  if(m_loggingLevel >= m_logActive)
   {
+    // If we have both the printing routine AND the context
     if(m_logPrinter && m_logContext)
     {
+      // Print to the logfile
       (*m_logPrinter)(m_logContext,p_text);
     }
   }
 }
 
+// Getting the current loglevel
 int
 SQLDatabase::LogLevel()
 {
-  if(m_logLevel && m_logContext)
+  if(m_logContext)
   {
-    return (*m_logLevel)(m_logContext);
+    m_loggingLevel = (*m_logLevel)(m_logContext);
+    return m_loggingLevel;
   }
   return -1;
 }
 
 bool
-SQLDatabase::WilLog(int p_loglevel)
+SQLDatabase::WilLog()
 {
+  // If we have both the loglevel routine AND the context
   if(m_logLevel && m_logContext)
   {
-    if(p_loglevel <= (*m_logLevel)(m_logContext))
+    // Refresh the loglevel
+    m_loggingLevel = (*m_logLevel)(m_logContext);
+    // True if at logactive threshold or above
+    if(m_loggingLevel >= m_logActive)
     {
       return true;
     }
