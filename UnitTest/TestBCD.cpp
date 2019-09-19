@@ -581,5 +581,40 @@ namespace DatabaseUnitTest
       PrecisionTest("0.000001",7,6);
       PrecisionTest("0.0000001",8,7);
     }
+
+    TEST_METHOD(BCDDisplayString)
+    {
+      Logger::WriteMessage("Testing BCD Display string capabilities");
+
+      bcd basenum("123456.123456");
+
+      // BEWARE: I'am testing in "The Netherlands", so my locale settings are:
+      // Thousand seperator: .
+      // Decimal  seperator: ,
+      CString test;
+      test = TestDisplay(basenum,0);   Assert::AreEqual("123.456",         test.GetString());
+      test = TestDisplay(basenum,1);   Assert::AreEqual("123.456,1",       test.GetString());
+      test = TestDisplay(basenum,2);   Assert::AreEqual("123.456,12",      test.GetString());
+      test = TestDisplay(basenum,3);   Assert::AreEqual("123.456,123",     test.GetString());
+      test = TestDisplay(basenum,4);   Assert::AreEqual("123.456,1235",    test.GetString());
+      test = TestDisplay(basenum,5);   Assert::AreEqual("123.456,12346",   test.GetString());
+      test = TestDisplay(basenum,6);   Assert::AreEqual("123.456,123456",  test.GetString());
+      test = TestDisplay(basenum,7);   Assert::AreEqual("123.456,1234560", test.GetString());
+      test = TestDisplay(basenum,8);   Assert::AreEqual("123.456,12345600",test.GetString());
+
+      basenum = bcd("123");
+      test = TestDisplay(basenum,0);   Assert::AreEqual("123",    test.GetString());
+      test = TestDisplay(basenum,1);   Assert::AreEqual("123,0",  test.GetString());
+      test = TestDisplay(basenum,2);   Assert::AreEqual("123,00", test.GetString());
+      test = TestDisplay(basenum,3);   Assert::AreEqual("123,000",test.GetString());
+    }
+
+    CString TestDisplay(bcd p_num,int precision)
+    {
+      bcd number(p_num);
+      CString str = number.AsDisplayString(precision);
+      Logger::WriteMessage(str);
+      return str;
+    }
   };
 }

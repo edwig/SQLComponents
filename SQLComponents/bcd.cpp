@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "SQLComponents.h"
 #include "bcd.h"
+#include "SQLVariantFormat.h"
 #include <math.h> // Still needed for conversions of double
 #include <intsafe.h>
 
@@ -1847,6 +1848,9 @@ bcd::AsString(int p_format /*=Bookkeeping*/,bool p_printPositive /*=false*/) con
 CString 
 bcd::AsDisplayString(int p_decimals /*=2*/) const
 {
+  // Initalize locale strings
+  InitValutaString();
+
   // Not in the bookkeeping range
   if(m_exponent > 12 || m_exponent < -2)
   {
@@ -1856,21 +1860,44 @@ bcd::AsDisplayString(int p_decimals /*=2*/) const
   number.Round(p_decimals);
 
   CString str = number.AsString();
-  str.Replace(".",",");
-
-  int pos = str.Find(",");
-  if(pos > 0)
+  int pos = str.Find('.');
+  if(pos >= 0)
   {
-    CString result = str.Mid(pos);
-    str = str.Left(pos);
+    str.Replace(".",g_locale_decimalSep);
+  }
+
+  // Apply thousand seperators in first part of the number
+  if((pos > 0) || (pos == -1 && str.GetLength() > 3))
+  {
+    CString result = pos > 0 ? str.Mid(pos) : "";
+    str = pos > 0 ? str.Left(pos) : str;
+    pos = result.GetLength();
 
     while(str.GetLength() > 3)
     {
-      result = "." + str.Right(3) + result;
+      result = CString(g_locale_thousandSep) + str.Right(3) + result;
       str = str.Left(str.GetLength() - 3);
     }
-    result = str + result;
-    return result;
+    str += result;
+  }
+  
+  // Extra zero's for the decimals?
+  if((pos <= 0 && p_decimals > 0) || (0 < pos && pos <= p_decimals))
+  {
+    // Round on this number of decimals
+    int decimals(p_decimals);
+    if(pos < 0)
+    {
+      str += g_locale_decimalSep;
+    }
+    else
+    {
+      decimals = p_decimals - pos + 1;
+    }
+    for(int index = 0;index < decimals; ++index)
+    {
+      str += "0";
+    }
   }
   return str;
 }

@@ -44,28 +44,28 @@ namespace SQLComponents
 #define SEP_LEN 10
 
 // string format number and money format functions
-static bool ValutaInit = false;
-static char DecimalSep [SEP_LEN + 1];
-static char ThousandSep[SEP_LEN + 1];
-static char strCurrency[SEP_LEN + 1];
-static int  DecimalSepLen;
-static int  ThousandSepLen;
-static int  strCurrencyLen;
+bool g_locale_valutaInit = false;
+char g_locale_decimalSep [SEP_LEN + 1];
+char g_locale_thousandSep[SEP_LEN + 1];
+char g_locale_strCurrency[SEP_LEN + 1];
+int  g_locale_decimalSepLen   = 0;
+int  g_locale_thousandSepLen  = 0;
+int  g_locale_strCurrencyLen  = 0;
 
-static void 
+void 
 InitValutaString()
 {
-  if(ValutaInit == false)
+  if(g_locale_valutaInit == false)
   {
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL,  DecimalSep, SEP_LEN);
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, ThousandSep,SEP_LEN);
-    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SCURRENCY, strCurrency,SEP_LEN);
-    DecimalSepLen  = (int)strlen(DecimalSep);
-    ThousandSepLen = (int)strlen(ThousandSep);
-    strCurrencyLen = (int)strlen(strCurrency);
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL,  g_locale_decimalSep, SEP_LEN);
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, g_locale_thousandSep,SEP_LEN);
+    GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SCURRENCY, g_locale_strCurrency,SEP_LEN);
+    g_locale_decimalSepLen  = (int)strlen(g_locale_decimalSep);
+    g_locale_thousandSepLen = (int)strlen(g_locale_thousandSep);
+    g_locale_strCurrencyLen = (int)strlen(g_locale_strCurrency);
 
     setlocale(LC_NUMERIC, "C");
-    ValutaInit = true;
+    g_locale_valutaInit = true;
   }
 }
 
@@ -412,7 +412,7 @@ SQLVariantFormat::StringDoubleValue()
     else
     {
       CString newGetal;
-      if(IsWinNumber(waarde,DecimalSep,ThousandSep,strCurrency,&newGetal))
+      if(IsWinNumber(waarde,g_locale_decimalSep,g_locale_thousandSep,g_locale_strCurrency,&newGetal))
       {
         result = atof(newGetal);
       }
@@ -420,19 +420,19 @@ SQLVariantFormat::StringDoubleValue()
       {
         CString newWaarde = waarde;
         StrValutaNLOmzetten(newWaarde,true);
-        if(IsWinNumber(newWaarde,DecimalSep,ThousandSep,strCurrency,&newGetal))
+        if(IsWinNumber(newWaarde,g_locale_decimalSep,g_locale_thousandSep,g_locale_strCurrency,&newGetal))
         {
           result = atof(newGetal);
         }
         else
         {
-          if(IsWinNumber(newWaarde,",",".",strCurrency,&newGetal))
+          if(IsWinNumber(newWaarde,",",".",g_locale_strCurrency,&newGetal))
           {
             result = atof(newGetal);
           }
           else
           {
-            if(IsWinNumber(newWaarde,".",",",strCurrency,&newGetal))
+            if(IsWinNumber(newWaarde,".",",",g_locale_strCurrency,&newGetal))
             {
               result = atof(newGetal);
             }
@@ -1137,8 +1137,8 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
       {
         switch (*pFormat)
         {
-          case '^': strcpy_s(&RestString[RestPos],10, strCurrency);
-                    RestPos += (int)strlen(strCurrency);
+          case '^': strcpy_s(&RestString[RestPos],10, g_locale_strCurrency);
+                    RestPos += (int)strlen(g_locale_strCurrency);
                     break;
           case '+': RestString[RestPos++] = 1;
                     break;
@@ -1453,8 +1453,8 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
                   break;
       case ',' :  if (bNummer)
                   {
-                    strcpy_s(&Buffer[Pos], NUMBER_BUFFER_SIZE, ThousandSep);
-                    Pos += (int)strlen(ThousandSep);
+                    strcpy_s(&Buffer[Pos], NUMBER_BUFFER_SIZE, g_locale_thousandSep);
+                    Pos += (int)strlen(g_locale_thousandSep);
                   }
                   else
                   {
@@ -1473,8 +1473,8 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
                   }
                   if (iTrailingDigits > 0)
                   {
-                    strcpy_s(&Buffer[Pos], NUMBER_BUFFER_SIZE, DecimalSep);
-                    Pos += (int)strlen(DecimalSep);
+                    strcpy_s(&Buffer[Pos], NUMBER_BUFFER_SIZE, g_locale_decimalSep);
+                    Pos += (int)strlen(g_locale_decimalSep);
                   }
                   if (*pFormat == ':')
                   {
