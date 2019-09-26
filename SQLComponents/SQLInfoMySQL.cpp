@@ -1547,5 +1547,12 @@ SQLInfoMySQL::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p
   return nullptr;
 }
 
+// Calling a stored function with named parameters, returning a value
+SQLVariant*
+SQLInfoMySQL::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
+{
+  return nullptr;
+}
+
 // End of namespace
 }

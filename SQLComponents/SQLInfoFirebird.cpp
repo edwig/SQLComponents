@@ -2314,6 +2314,13 @@ SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,CString& /*p_schema*/,CString& p_pr
   return result ? p_query->GetParameter(0) : nullptr;
 }
 
+// Calling a stored function with named parameters, returning a value
+SQLVariant*
+SQLInfoFirebird::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
+{
+  return nullptr;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // PRIVATE PART

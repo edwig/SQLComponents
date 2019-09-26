@@ -2058,5 +2058,45 @@ SQLInfoOracle::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*
   return nullptr;
 }
 
+// Calling a stored function with named parameters, returning a value
+SQLVariant*
+SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,CString& p_schema,CString& p_procedure)
+{
+  CString sql = "SELECT ";
+  if(!p_schema.IsEmpty())
+  {
+    sql += p_schema;
+    sql += ".";
+  }
+  sql += p_procedure;
+  sql += "(";
+
+  bool found = true;
+  int index = 1;
+  while(found)
+  {
+    CString name;
+    found = p_query->GetColumnName(index++,name);
+    if(found)
+    {
+      if(index > 2)
+      {
+        sql += ",";
+      }
+      sql += name;
+      sql += " => ? ";
+    }
+  }
+  sql += ") FROM DUAL";
+
+  // Now find the result
+  p_query->DoSQLStatement(sql);
+  if(p_query->GetRecord())
+  {
+    return p_query->GetColumn(1);
+  }
+  return nullptr;
+}
+
 // End of namespace
 }

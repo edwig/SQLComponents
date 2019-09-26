@@ -34,16 +34,22 @@
 // DSN "testing" points to the "testing.fdb" database
 // in the project root folder
 //
-CString g_dsn("testing");
-CString g_user("sysdba");
-CString g_password("altijd");
-CString g_schema("");
+// CString g_dsn("testing");
+// CString g_user("sysdba");
+// CString g_password("altijd");
+// CString g_schema("");
 
 // TESTING ON INFORMIX
 // CString g_dsn("magdev04");
 // CString g_user("informix");
 // CString g_password("inform01");
 // CString g_schema("informix");
+
+// TESTING ON ORACLE
+CString g_dsn("owoc09");
+CString g_user("kdba");
+CString g_password("testen01");
+CString g_schema("kdba");
 
 void CALLBACK LogPrint(void* p_context,const char* p_text)
 {

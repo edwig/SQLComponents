@@ -59,25 +59,28 @@ void TestCalling()
       // Call with 1 input and 1 output parameter
       SQLQuery query(dbs);
       SQLTransaction trans(&dbs,"testing");
-      var* result = query.DoSQLCall(g_schema,"testmul2",12);
-      printf("Result of the function call: %d\n",result->GetAsSLong());
+//       var* result = query.DoSQLCall(g_schema,"testmul2",12);
+//       printf("Result of the function call: %d\n",result->GetAsSLong());
+// 
+//       long endTime = clock();
+//       printf("Calling test 1 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+//       
+//       // Call to get a decimal
+//       query.ResetParameters();
+//       query.SetParameter(0,bcd(10000.01),P_SQL_PARAM_OUTPUT);
+//       query.SetParameter(1,"234.99");
+//       result = query.DoSQLCall(g_schema,"getdecimal",true);
+//       printf("Conversion of number 234.99 is: %s\n",result->GetAsBCD().AsString().GetString());
 
-      long endTime = clock();
-      printf("Calling test 1 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
-      
-      // Call to get a decimal
-      query.ResetParameters();
-      query.SetParameter(0,bcd(10000.01),P_SQL_PARAM_OUTPUT);
-      query.SetParameter(1,"234.99");
-      result = query.DoSQLCall(g_schema,"getdecimal",true);
-      printf("Conversion of number 234.99 is: %s\n",result->GetAsBCD().AsString().GetString());
-
-      // Call with 1 input parameter and NO return value
+      // Call with 1 input parameter and LONG return value
       beginTime = clock();
       SQLQuery q2(&dbs);
-      q2.DoSQLCall(g_schema,"testins","TESTING");
+      q2.SetParameter(1,"TESTING");
+      q2.SetParameterName(1,"p_text");
+      SQLVariant* result = q2.DoSQLCall(g_schema,"testins");
+      printf("Result: %d\n",result->GetAsSLong());
 
-      endTime = clock();
+      long endTime = clock();
       printf("Calling test 2 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 
       // Call with 1 input parameter and return value AND return parameter

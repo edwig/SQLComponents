@@ -529,6 +529,16 @@ SQLQuery::SetParameter(const bcd& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT
   InternalSetParameter(size,var,p_type);
 }
 
+// Named parameters for DoSQLCall()
+void 
+SQLQuery::SetParameterName(int p_param,CString p_name)
+{
+  SQLVariant* var = GetParameter(p_param);
+  var->SetColumnNumber(p_param);
+  // Keep as name
+  m_nameMap.insert(std::make_pair(p_name,var));
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // STATEMENTS
@@ -1863,10 +1873,16 @@ SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,bool p_hasReturn /*=fal
 
   // Make sure we have a minimal output parameter (SQL_SLONG !!)
   // OTHERWISE, YOU HAVE TO PROVIDE IT YOURSELF!
-  if(p_hasReturn && m_parameters.find(0) == m_parameters.end())
+  if(p_hasReturn && m_parameters.find(0) == m_parameters.end() && m_nameMap.empty())
   {
     SQLVariant* var = new SQLVariant((long)0L);
     InternalSetParameter(0,var,P_SQL_PARAM_OUTPUT);
+  }
+
+  // See if we ask for a call with named parameters
+  if(!m_nameMap.empty())
+  {
+    return m_database->GetSQLInfoDB()->DoSQLCallNamedParameters(this,p_schema,p_procedure);
   }
 
   // Is we support standard ODBC, do that call
@@ -1944,7 +1960,6 @@ SQLQuery::ConstructSQLForCall(CString& p_schema,CString& p_procedure,bool p_hasR
       if(param.first > 1) sql += ",";
       sql += "?";
     }
-
     // Closing parenthesis
     sql += ")";
   }

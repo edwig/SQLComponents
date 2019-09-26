@@ -112,6 +112,9 @@ public:
   void SetParameter  (SQLTimestamp& p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
   void SetParameter  (const bcd&    p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
 
+  // Named parameters for DoSQLCall()
+  void SetParameterName(int p_num,CString p_name);
+
   // SINGLE STATEMENT
 
   // Do a SQL statement

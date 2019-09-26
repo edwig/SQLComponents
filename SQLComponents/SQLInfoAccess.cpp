@@ -1233,5 +1233,12 @@ SQLInfoAccess::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*
   return nullptr;
 }
 
+// Calling a stored function with named parameters, returning a value
+SQLVariant*
+SQLInfoAccess::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
+{
+  return nullptr;
+}
+
 // End of namespace
 }

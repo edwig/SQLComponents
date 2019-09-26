@@ -358,6 +358,8 @@ public:
 
   // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
   SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_schema,CString& p_procedure);
+  // Calling a stored function with named parameters, returning a value
+  SQLVariant* DoSQLCallNamedParameters(SQLQuery* p_query,CString& p_schema,CString& p_procedure);
 };
 
 // End of namespace

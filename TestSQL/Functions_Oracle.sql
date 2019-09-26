@@ -11,6 +11,7 @@ RETURN INTEGER AS
 BEGIN
   RETURN p_num * 2;
 END testmul;
+/
 
 CREATE OR REPLACE PROCEDURE testins(p_text IN VARCHAR2)
   AS
