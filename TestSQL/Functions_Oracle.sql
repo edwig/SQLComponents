@@ -13,11 +13,11 @@ BEGIN
 END testmul;
 /
 
-CREATE OR REPLACE PROCEDURE testins(p_text IN VARCHAR2)
-  AS
+
+CREATE OR REPLACE FUNCTION testins(p_text IN VARCHAR2)
+RETURN NUMBER as
 BEGIN
-  INSERT INTO testrecord(naam) VALUES p_text;
-  COMMIT;
+  RETURN Length(p_text);
 END testins;
 /
 
@@ -34,6 +34,10 @@ BEGIN
 END multinout;
 /
 
+SELECT testins('wocas') FROM dual;
 
 SELECT * FROM testrecord;
 DELETE FROM testrecord;
+
+
+SELECT testins(p_text => 'wocas') FROM dual;

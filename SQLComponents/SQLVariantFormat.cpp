@@ -603,7 +603,11 @@ SQLVariantFormat::FormatDate(CString p_pattern)
     {
       if(!GetDateFromStringVariant(m_variant,m_format,&date))
       {
-        return ER_FormatDateTypeValue;
+        if(m_variant)
+        {
+          return ER_FormatDateTypeValue;
+        }
+        return OK;
       }
     }
     // Is there a time present in the string?
@@ -779,7 +783,11 @@ SQLVariantFormat::DateCalculate(char p_operator,CString p_argument)
     DATE_STRUCT date;
     if(!GetDateFromStringVariant(m_variant,m_format,&date))
     {
-      return ER_FormatDateTypeValue;
+      if(m_variant)
+      {
+        return ER_FormatDateTypeValue;
+      }
+      return OK;
     }
     if(m_owner)
     {
