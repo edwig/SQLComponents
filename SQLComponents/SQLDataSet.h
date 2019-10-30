@@ -155,7 +155,7 @@ public:
   // Set a new full query (Supersedes SetSelection, -Where, -groupby, -orderby and -having)
   void         SetQuery(CString& p_query);
   // Set primary table (for updates)
-  void         SetPrimaryTable(CString p_schema,CString p_tableName);
+  void         SetPrimaryTable(CString p_schema,CString p_tableName,CString p_alias = "");
   // Set primary key column name (for updates)
   void         SetPrimaryKeyColumn(CString p_name);
   void         SetPrimaryKeyColumn(WordList& p_list);
@@ -214,6 +214,7 @@ public:
   CString      GetGroupBy();
   CString      GetOrderBy();
   SQLFilterSet* GetHavings();
+  CString      GetApply();
 
   // XML Saving and loading
   bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
@@ -283,6 +284,7 @@ private:
   // Parts of the query
   CString      m_primarySchema;
   CString      m_primaryTableName;
+  CString      m_primaryAlias;
   CString      m_sequenceName;
   ParameterSet m_parameters;
   NamenMap     m_primaryKey;
@@ -321,10 +323,11 @@ SQLDataSet::IsOpen()
 }
 
 inline void
-SQLDataSet::SetPrimaryTable(CString p_schema,CString p_tableName)
+SQLDataSet::SetPrimaryTable(CString p_schema,CString p_tableName,CString p_alias /*= ""*/)
 {
   m_primarySchema    = p_schema;
   m_primaryTableName = p_tableName;
+  m_primaryAlias     = p_alias;
 }
 
 inline void
@@ -421,6 +424,12 @@ inline SQLFilterSet*
 SQLDataSet::GetHavings()
 {
   return m_havings;
+}
+
+inline CString
+SQLDataSet::GetApply()
+{
+  return m_apply;
 }
 
 inline void

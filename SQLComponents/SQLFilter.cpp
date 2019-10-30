@@ -115,6 +115,8 @@ SQLFilter::SQLFilter(SQLFilter* p_other)
 SQLFilter::SQLFilter(SQLFilter& p_other)
 {
   *this = p_other;
+  m_subfilters = p_other.m_subfilters;
+  p_other.m_subfilters = nullptr;
 }
 
 // DTOR: Remove all variant values
@@ -125,13 +127,14 @@ SQLFilter::~SQLFilter()
     delete val;
   }
   m_values.clear();
+  delete m_subfilters;
 }
 
 // Adding a comparison field (if not yet set)
 bool
 SQLFilter::SetField(CString p_field)
 {
-  if(m_field.IsEmpty())
+  if(m_field.IsEmpty() && m_subfilters == nullptr)
   {
     m_field = p_field;
     return true;
@@ -251,8 +254,8 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
     case OP_IN:           sql += " IN (";       break;
     case OP_Between:      sql += " BETWEEN ";   break;
     case OP_Exists:       sql += " EXISTS ";    break;
-    case OP_NOP:          // Fall through
-    default:              throw StdException("SQLFilter without an operator!");
+    //case OP_NOP:          // Fall through
+    //default:              throw StdException("SQLFilter without an operator!");
   }
 
   // In case of a LIKE search of a character field
@@ -270,7 +273,7 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
   {
     ConstructBetween(sql,p_query);
   }
-  else if(m_operator != OP_IsNULL && m_operator != OP_IsNotNULL)
+  else if(m_operator != OP_IsNULL && m_operator != OP_IsNotNULL && m_operator != OP_NOP)
   {
     // For all other operators, getting the argument
     // Getting the value as an SQL expression string (with ODBC escapes)
@@ -539,6 +542,10 @@ SQLFilter::ConstructFunctionSQL(SQLQuery& p_query)
   }
 
   // Construct ODBC Function
+  if (m_subfilters != nullptr)
+  {
+    m_field = m_subfilters->ParseFiltersToCondition(p_query);
+  }
   switch(parameters)
   {
     case 0: m_expression = sql = "{fn " + sql + "()}";

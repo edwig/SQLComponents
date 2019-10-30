@@ -2062,7 +2062,7 @@ SQLInfoOracle::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*
 SQLVariant*
 SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,CString& p_schema,CString& p_procedure)
 {
-  CString sql = "SELECT ";
+  CString sql = "BEGIN DECLARE x NUMBER; BEGIN ? := ";
   if(!p_schema.IsEmpty())
   {
     sql += p_schema;
@@ -2087,15 +2087,14 @@ SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,CString& p_schema,CStr
       sql += " => ? ";
     }
   }
-  sql += ") FROM DUAL";
+  sql += "); END; END;";
+
+  // Add parameter 0 as result parameter
+  p_query->SetParameter(0,0);
 
   // Now find the result
   p_query->DoSQLStatement(sql);
-  if(p_query->GetRecord())
-  {
-    return p_query->GetColumn(1);
-  }
-  return nullptr;
+  return p_query->GetParameter(0);
 }
 
 // End of namespace

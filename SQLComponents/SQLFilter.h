@@ -37,6 +37,7 @@ namespace SQLComponents
 // Forward declarations
 class SQLRecord;
 class SQLQuery;
+class SQLFilterSet;
 // Mapping typedefs
 typedef std::vector<SQLVariant*> VariantSet;
 
@@ -109,6 +110,7 @@ public:
 
   // Resetting the filter
   void        Reset();
+  void        SetSubFilters(SQLFilterSet* subfilters) { m_subfilters = subfilters; }
 
 private:
   // Check that we have at least one operand value
@@ -158,7 +160,7 @@ private:
               }
               m_extract;
   CString     m_field2;                        // Optional extra field as in "m_field <oper> m_fileld2"
-
+  SQLFilterSet* m_subfilters     { nullptr };
 };
 
 inline CString

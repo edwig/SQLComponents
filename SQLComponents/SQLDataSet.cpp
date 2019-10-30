@@ -180,6 +180,7 @@ SQLDataSet::Close()
   m_query.Empty();
   m_selection.Empty();
   m_primaryTableName.Empty();
+  m_primaryAlias.Empty();
 
   // Reset the open status
   m_open = false;
@@ -485,6 +486,11 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
     sql += m_primarySchema + ".";
   }
   sql += m_primaryTableName;
+  if(!m_primaryAlias.IsEmpty())
+  {
+    sql += " ";
+    sql += m_primaryAlias;
+  }
 
   int number = 0;
   ParameterSet::iterator it;
@@ -666,7 +672,7 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
   bool   result = false;
   CString query;
 
-  if(m_query.IsEmpty() && m_selection.IsEmpty())
+  if(m_query.IsEmpty() && m_selection.IsEmpty() && m_apply.IsEmpty())
   {
     return false;
   }
