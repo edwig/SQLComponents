@@ -215,7 +215,7 @@ SQLTransaction::AfterRollback()
 bool 
 SQLTransaction::SetTransactionDeferred()
 {
-  if(m_database == nullptr)
+  if(m_database == nullptr || m_active == false)
   {
     return false;
   }
@@ -234,13 +234,14 @@ SQLTransaction::SetTransactionDeferred()
 bool 
 SQLTransaction::SetTransactionImmediate()
 {
-  if(m_database == nullptr)
+  if(m_database == nullptr || m_active == false)
   {
     return false;
   }
   CString sql = m_database->GetSQLInfoDB()->GetSESSIONConstraintsImmediate();
   if(!sql.IsEmpty())
   {
+    // If this goes wrong, it throws. Commit would never work!
     SQLQuery query(m_database);
     query.DoSQLStatementNonQuery(sql);
     return true;
