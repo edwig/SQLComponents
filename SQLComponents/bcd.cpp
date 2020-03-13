@@ -8,7 +8,7 @@
 //  And is always stored in normalized mode after an operation or conversion
 //  with an implied decimal point between the first and second position
 //
-// Copyright (c) 1998-2019 ir. W.E. Huisman
+// Copyright (c) 1998-2020 ir. W.E. Huisman
 // Version 1.2 of 18-12-2019
 //
 //  Examples:

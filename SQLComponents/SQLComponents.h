@@ -2,7 +2,7 @@
 //
 // File: SQLComponents.h
 //
-// Copyright (c) 1998-2019 ir. W.E. Huisman
+// Copyright (c) 1998-2020 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -20,9 +20,6 @@
 // IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-// Last Revision:  13-09-2019
-// Version number: 1.6.1
 //
 #pragma once
 #include "SQLLanguage.h"
