@@ -80,7 +80,7 @@ void SQLConnectionsDlg::DoDataExchange(CDataExchange* pDX)
 
   DDX_Control(pDX, IDC_LIST,      m_list);
   DDX_Text   (pDX, IDC_NAME,      m_connectionName);
-  DDX_Text   (pDX, IDC_DATASOURCE,m_datasource);
+  DDX_Control(pDX, IDC_DATASOURCE,m_comboDatasource);
   DDX_Text   (pDX, IDC_USER,      m_username);
   DDX_Text   (pDX, IDC_PASSWORD1, m_password1);
   DDX_Text   (pDX, IDC_PASSWORD2, m_password2);
@@ -94,8 +94,8 @@ void SQLConnectionsDlg::DoDataExchange(CDataExchange* pDX)
   {
     SQLConnection* conn = m_connections.GetConnection(m_connectionName);
 
-    m_new.EnableWindow(conn == nullptr);
-    m_save.EnableWindow(conn != nullptr);
+    m_new   .EnableWindow(conn == nullptr);
+    m_save  .EnableWindow(conn != nullptr);
     m_delete.EnableWindow(conn != nullptr);
   }
 }
@@ -106,7 +106,7 @@ BEGIN_MESSAGE_MAP(SQLConnectionsDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
   ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST,  &SQLConnectionsDlg::OnLvnItemchangedList)
   ON_EN_CHANGE(IDC_NAME,                &SQLConnectionsDlg::OnEnChangeName)
-  ON_EN_CHANGE(IDC_DATASOURCE,          &SQLConnectionsDlg::OnEnChangeDatasource)
+  ON_CBN_CLOSEUP(IDC_DATASOURCE,        &SQLConnectionsDlg::OnCbnCloseupDatasource)
   ON_EN_CHANGE(IDC_USER,                &SQLConnectionsDlg::OnEnChangeUser)
   ON_EN_CHANGE(IDC_PASSWORD1,           &SQLConnectionsDlg::OnEnChangePassword1)
   ON_EN_CHANGE(IDC_PASSWORD2,           &SQLConnectionsDlg::OnEnChangePassword2)
@@ -154,12 +154,48 @@ BOOL SQLConnectionsDlg::OnInitDialog()
   m_list.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EDITLABELS);
   m_list.InsertColumn(0, "Connection",LVCFMT_LEFT,180);
 
+  // Load Datasource names
+  LoadDataSources();
+
   // Read in the complete list
   LoadConnections();
 
   // Set focus to the list, don't automatically set the focus
   m_list.SetFocus();
   return FALSE;
+}
+
+void 
+SQLConnectionsDlg::LoadDataSources()
+{
+  SQLDriverManager manager;
+  DataSources      sources;
+
+  m_comboDatasource.ResetContent();
+
+  // First: Get all the system data sources
+  manager.GetDataSources(sources,SQL_FETCH_FIRST_SYSTEM);
+  FillDatasources(sources);
+
+  // clear the list
+  sources.clear();
+
+  // Secondly: get all the user data sources
+  manager.GetDataSources(sources,SQL_FETCH_FIRST_USER);
+  FillDatasources(sources);
+
+  // Show first datasource found
+  m_comboDatasource.SetCurSel(0);
+  m_comboDatasource.GetLBText(0,m_datasource);
+}
+
+void 
+SQLConnectionsDlg::FillDatasources(DataSources& sources)
+{
+  for(auto& source : sources)
+  {
+    m_comboDatasource.AddString(source.m_datasource);
+  }
 }
 
 void
@@ -312,7 +348,18 @@ SQLConnectionsDlg::TestTheConnection()
     SQLDatabase database;
     if(database.Open(m_datasource,m_username,m_password1))
     {
-      AfxMessageBox("Database connection succeeded", MB_OK|MB_ICONINFORMATION);
+      CString message;
+      message.Format("The connection with [%s] as user [%s] has succeeded!\n\n"
+                     "The 'true' database name is: %s\n"
+                     "This database is a [%s:%s] database\n"
+                     "Vendors ODBC driver version is: %s"
+                    ,m_datasource
+                    ,m_username
+                    ,database.GetDatabaseName()
+                    ,database.GetDBVendorName()
+                    ,database.GetDBVendorVersion()
+                    ,database.GetDBVendorDriverVersion());
+      AfxMessageBox(message, MB_OK|MB_ICONINFORMATION);
       database.Close();
     }
     else
@@ -406,9 +453,13 @@ SQLConnectionsDlg::OnEnChangeName()
 }
 
 void 
-SQLConnectionsDlg::OnEnChangeDatasource()
+SQLConnectionsDlg::OnCbnCloseupDatasource()
 {
-  UpdateData();
+  int ind = m_comboDatasource.GetCurSel();
+  if(ind >= 0)
+  {
+    m_comboDatasource.GetLBText(ind,m_datasource);
+  }
   UpdateData(FALSE);
 }
 

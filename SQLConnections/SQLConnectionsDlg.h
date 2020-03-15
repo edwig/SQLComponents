@@ -25,6 +25,7 @@
 //
 #pragma once
 #include "SQLComponents\SQLConnections.h"
+#include <SQLDriverManager.h>
 
 // CSQLConnectionsDlg dialog
 class SQLConnectionsDlg : public CDialog
@@ -40,6 +41,7 @@ public:
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+          void LoadDataSources();
           void LoadConnections();
           bool SaveConnections();
           bool MakeCurrentConnection();
@@ -48,15 +50,18 @@ public:
           bool DropCurrentConnection();
           bool SanityChecks();
           void TestTheConnection();
+          void FillDatasources(DataSources& sources);
 
 // Implementation
 protected:
 	HICON     m_hIcon;
   CListCtrl m_list;
+  CComboBox m_comboDatasource;
   CButton   m_test;
   CButton   m_new;
   CButton   m_save;
   CButton   m_delete;
+
 
   CString   m_connectionName;
   CString   m_datasource;
@@ -79,7 +84,7 @@ protected:
 public:
   afx_msg void OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult);
   afx_msg void OnEnChangeName();
-  afx_msg void OnEnChangeDatasource();
+  afx_msg void OnCbnCloseupDatasource();
   afx_msg void OnEnChangeUser();
   afx_msg void OnEnChangePassword1();
   afx_msg void OnEnChangePassword2();

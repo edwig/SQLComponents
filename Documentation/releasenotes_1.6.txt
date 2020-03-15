@@ -3,6 +3,12 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.6
 ===== Released since: 22-06-2019 =====
 ======================================
 
+Version 1.6.x
+---------------------------
+1) Added the SQLDriverManager class
+2) Added a combo box with ODBC datasources to SQLConnections application
+   with the help of the SQLDriverManager.
+
 Version 1.6.2 of 13-03-2020
 ---------------------------
 1) Forward port of 6 issues for the 'bcd' datatype

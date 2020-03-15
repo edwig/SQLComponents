@@ -13,3 +13,4 @@ DESIGN RULES FOR SQLCOMPONENTS
    - method parameters have the "p_" prefix
 6) All ODBC driver datatypes are covered by SQLVariant natively
 7) All ODBC binary data is covered by m_data of SQLVariant
+8) All functionality must be covered by C++ unit tests
