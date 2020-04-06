@@ -3,16 +3,19 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.6
 ===== Released since: 22-06-2019 =====
 ======================================
 
-Version 1.6.x
----------------------------
-1) Added the SQLDriverManager class
-2) Added a combo box with ODBC datasources to SQLConnections application
-   with the help of the SQLDriverManager.
-
-Version 1.6.2 of 13-03-2020
+Version 1.6.2 of 06-04-2020
 ---------------------------
 1) Forward port of 6 issues for the 'bcd' datatype
    coming from the "https://github.com/edwig/bcd" project
+2) Added the SQLDriverManager class
+3) Added a combo box with ODBC datasources to SQLConnections application
+   with the help of the SQLDriverManager.
+4) Changed the "ResetDataType()" method of the SQLVariant to be a private method
+   Added a new method "Reset()" with the intended purpose of the reset.
+   "Reset()" now frees the allocated memory for char and binary pointers
+   If this is not your intention: change your code to use "MakeNULL()"
+   Fixed the unit tests with this method, and fixed all memory leaks in the process.
+5) Fixed two memory leaks in the SQLDatabasePool::Cleanup() method
 
 Version 1.6.1 of 13-09-2019
 ---------------------------

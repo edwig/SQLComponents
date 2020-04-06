@@ -49,8 +49,8 @@ namespace OperatorUnitTest
 
     void FillArrays()
     {
-      bcd num1((long)42);
-      bcd num2((long)5);
+      bcd num1("42");
+      bcd num2("5");
 
       // Init the test array
       variants[CT_CHAR]     = SQLVariant("42");
@@ -86,8 +86,8 @@ namespace OperatorUnitTest
     {
       for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        variants[x].Init();
-        other[x].Init();
+        variants[x].Reset();
+        other[x].Reset();
       }
     }
 

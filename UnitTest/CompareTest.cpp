@@ -86,8 +86,8 @@ namespace OperatorUnitTest
     {
       for(int x = CT_CHAR; x <= CT_NUMERIC; ++x)
       {
-        variants[x].Init();
-        other[x].Init();
+        variants[x].Reset();
+        other[x].Reset();
       }
     }
 

@@ -433,6 +433,7 @@ SQLDatabasePool::CleanupInternally(bool p_aggressive)
             // Optionally remove the whole list, if it was the last one
             if(all->empty())
             {
+              delete all;
               m_allDatabases.erase(lit);
             }
           }
@@ -451,6 +452,7 @@ SQLDatabasePool::CleanupInternally(bool p_aggressive)
     // Optionally remove the complete list
     if(list->empty())
     {
+      delete list;
       it = m_freeDatabases.erase(it);
     }
     else

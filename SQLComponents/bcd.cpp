@@ -32,6 +32,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+#ifndef COMPILED_TOGETHER_WITH_MARLIN
+
 namespace SQLComponents
 {
 
@@ -3993,3 +3995,5 @@ bcd::ReadFromFile(FILE* p_fp)
 //////////////////////////////////////////////////////////////////////////
 
 }
+
+#endif // Compiled with Marlin

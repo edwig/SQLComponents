@@ -101,8 +101,8 @@ public:
    // Destructor
   ~SQLVariant();
    
-  // Init empty variant
-  void     Init(); 
+   // Reset the current value. BEWARE: Frees the char and binary pointers!!
+   void    Reset();
 
    // STATUS
    bool    IsNULL();
@@ -257,6 +257,8 @@ public:
    operator bcd();
 
 private:
+   // Init empty variant
+   void    Init();
    // Total internal reset (type and data store)
    void    ResetDataType(int p_type);
    // Internal conversions

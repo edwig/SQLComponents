@@ -608,6 +608,12 @@ SQLVariant::IsDateTimeType()
 }
 
 void
+SQLVariant::Reset()
+{
+  ResetDataType(m_datatype);
+}
+
+void
 SQLVariant::ResetDataType(int p_type)
 {
   switch(m_datatype)
