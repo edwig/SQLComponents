@@ -28,6 +28,7 @@
 #include "SQLVariant.h"
 #include "SQLDatabase.h"
 #include "Locker.h"
+#include "bcd.h"
 #include <sql.h>
 #include <map>
 
@@ -50,7 +51,6 @@ namespace SQLComponents
 #define SQL_STATEMENT_SEPARATOR "<@>"
 #define SQL_SEPARATOR_LENGTH    3
 
-class bcd;
 class SQLDate;
 class SQLDatabase;
 

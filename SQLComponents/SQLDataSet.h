@@ -151,7 +151,9 @@ public:
   // Set the ordering by explicitly
   void         SetOrderBy(CString p_orderby);
   // Set the apply
-  void         SetApply(CString p_having);
+  void         SetApply(CString p_apply);
+  // Set the expand
+  void         SetExpand(CString p_expand);
   // Set a new full query (Supersedes SetSelection, -Where, -groupby, -orderby and -having)
   void         SetQuery(CString& p_query);
   // Set primary table (for updates)
@@ -215,6 +217,7 @@ public:
   CString      GetOrderBy();
   SQLFilterSet* GetHavings();
   CString      GetApply();
+  CString      GetExpand();
 
   // XML Saving and loading
   bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
@@ -278,6 +281,7 @@ private:
   CString      m_query;
   CString      m_selection;
   CString      m_apply;
+  CString      m_expand;
   CString      m_whereCondition;
   CString      m_orderby;
   CString      m_groupby;
@@ -430,6 +434,12 @@ inline CString
 SQLDataSet::GetApply()
 {
   return m_apply;
+}
+
+inline CString
+SQLDataSet::GetExpand()
+{
+  return m_expand;
 }
 
 inline void

@@ -25,6 +25,7 @@
 //
 #pragma  once
 #include <sqlext.h>
+#include "bcd.h"
 
 namespace SQLComponents
 {
@@ -32,12 +33,14 @@ namespace SQLComponents
 #ifndef SQLNUM_MAX_PREC
 // Max precision of a NUMERIC as a bcd (Binary Coded Decimal)
 #define SQLNUM_MAX_PREC    38
+#endif 
+
+#ifndef SQLNUM_DEF_SCALE
 // The default scaling of a NUMERIC
 #define SQLNUM_DEF_SCALE    2
 #endif
 
 // Forwarded declarations
-class bcd;
 class SQLDate;
 class SQLTime;
 class SQLTimestamp;

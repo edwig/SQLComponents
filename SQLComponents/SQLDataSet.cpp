@@ -358,6 +358,7 @@ SQLDataSet::SetQuery(CString& p_query)
   m_groupby.Empty();
   m_orderby.Empty();
   m_apply.Empty();
+  m_expand.Empty();
   m_filters = nullptr;
   m_havings = nullptr;
 
@@ -405,6 +406,13 @@ SQLDataSet::SetApply(CString p_apply)
 {
   m_query.Empty();
   m_apply = p_apply;
+}
+
+void
+SQLDataSet::SetExpand(CString p_expand)
+{
+  m_query.Empty();
+  m_expand = p_expand;
 }
 
 // Replace $name for the value of a parameter

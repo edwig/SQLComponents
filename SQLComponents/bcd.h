@@ -14,6 +14,10 @@
 #pragma once
 #include <sqltypes.h>   // Needed for conversions of SQL_NUMERIC_STRUCT
 
+#ifdef COMPILED_TOGETHER_WITH_MARLIN
+#include "..\Marlin\bcd.h"
+#else
+
 namespace SQLComponents
 {
 
@@ -428,3 +432,5 @@ private:
 
 // End of namespace
 }
+
+#endif // COMPILED_TOGETHER_WITH_MARLIN
