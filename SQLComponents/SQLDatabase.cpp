@@ -475,10 +475,10 @@ SQLDatabase::CollectInfo()
     m_rdbmsType = RDBMS_ODBC_STANDARD;
   }
 
-  // After findint the databasea type, set the rebinds
+  // After finding the database type, set the rebinds
   SetKnownRebinds();
 
-  // Now find the 'real' databasename
+  // Now find the 'real' database name
   if(RealDatabaseName() == false)
   {
     return DatabaseNameFromDSN();
@@ -546,6 +546,20 @@ SQLDatabase::SetKnownRebinds()
     m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
     m_rebindParameters[SQL_C_ULONG] = SQL_C_LONG;
   }
+}
+
+// Add a column rebind for this database session: No bounds checking!
+void
+SQLDatabase::AddColumnRebind(int p_sqlType,int p_cppType)
+{
+  m_rebindColumns[p_sqlType] = p_cppType;
+}
+
+// Add a parameter rebind for this database session: No bounds checking!
+void
+SQLDatabase::AddParameterRebind(int p_sqlType,int p_cppType)
+{
+  m_rebindParameters[p_sqlType] = p_cppType;
 }
 
 // Get the SQL Info object by database

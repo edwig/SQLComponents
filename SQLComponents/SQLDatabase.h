@@ -161,6 +161,11 @@ public:
   void           SetLastActionTime();
   bool           PastWaitingTime();
 
+  // Add a column rebind for this database session: No bounds checking!
+  void           AddColumnRebind(int p_sqlType,int p_cppType);
+  // Add a parameter rebind for this database session: No bounds checking!
+  void           AddParameterRebind(int p_sqlType,int p_cppType);
+
   // GETTERS
   CString        GetUserName();
   CString        GetPassword();

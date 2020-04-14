@@ -16,6 +16,14 @@ Version 1.6.2 of 06-04-2020
    If this is not your intention: change your code to use "MakeNULL()"
    Fixed the unit tests with this method, and fixed all memory leaks in the process.
 5) Fixed two memory leaks in the SQLDatabasePool::Cleanup() method
+6) Added 'AddColumnRebind' and 'AddParamterRebind' methods to both the classes
+   SQLDatabase and SQLDatabasePool.
+   You can now preset datatype rebinds in the database pool. Those will be forewarded
+   to the SQLDatabase class, and thus used in a SQLQuery to the database.
+   Remark: rebind info that you configure in the SQLDatabasePool will be used for every
+           database connection in your application. 
+           If you are using multiple database types, set this info in the SQLDatabase
+           just before you are querying.
 
 Version 1.6.1 of 13-09-2019
 ---------------------------
