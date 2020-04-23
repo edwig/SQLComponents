@@ -168,6 +168,20 @@ SQLInfoOracle::GetRDBMSMustCommitDDL() const
   return false;
 }
 
+// Correct maximum precision,scale for a NUMERIC datatype
+// If no precision and scale are given, Oracle assumes NUMERIC(38,0)
+// This does not work for database views with a different scale in the backing table.
+// So we change this to NUMERIC(38,18)
+void
+SQLInfoOracle::GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& p_scale) const
+{
+  if(p_precision == NUMERIC_MAX_PRECISION &&
+     p_scale     == NUMERIC_MIN_SCALE)
+  {
+    p_scale     = NUMERIC_DEFAULT_SCALE;
+  }
+}
+
 // KEYWORDS
 
 // Keyword for the current date and time

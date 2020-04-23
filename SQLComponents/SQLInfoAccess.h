@@ -82,6 +82,9 @@ public:
   // Database must commit DDL commands in a transaction
   bool GetRDBMSMustCommitDDL() const;
 
+  // Correct maximum precision,scale for a NUMERIC datatype
+  void GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& p_scale) const;
+
   // KEYWORDS
 
   // Keyword for the current date and time

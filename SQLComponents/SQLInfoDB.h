@@ -135,6 +135,9 @@ public:
   // Database must commit DDL commands in a transaction
   virtual bool GetRDBMSMustCommitDDL() const = 0;
 
+  // Correct maximum precision,scale for a NUMERIC datatype
+  virtual void GetRDBMSNumericPrecisionScale(SQLULEN& p_precision,SQLSMALLINT& p_scale) const = 0;
+
   //////////////////////////////////////////////////////////////////////////
   // KEYWORDS
 

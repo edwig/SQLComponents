@@ -29,6 +29,10 @@
 namespace SQLComponents
 {
 
+#define NUMERIC_MAX_PRECISION      38
+#define NUMERIC_MIN_SCALE           0
+#define NUMERIC_DEFAULT_SCALE      18
+
 class SQLInfoOracle : public SQLInfoDB
 {
 public:
@@ -79,6 +83,9 @@ public:
 
   // Database must commit DDL commands in a transaction
   bool GetRDBMSMustCommitDDL() const;
+
+  // Correct maximum precision,scale for a NUMERIC datatype
+  void GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& p_scale) const;
 
   // KEYWORDS
 

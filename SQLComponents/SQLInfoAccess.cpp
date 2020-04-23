@@ -150,6 +150,13 @@ SQLInfoAccess::GetRDBMSMustCommitDDL() const
   return false;
 }
 
+// Correct maximum precision,scale for a NUMERIC datatype
+void 
+SQLInfoAccess::GetRDBMSNumericPrecisionScale(SQLULEN& /*p_precision*/, SQLSMALLINT& /*p_scale*/) const
+{
+  // NO-OP
+}
+
 // KEYWORDS
 
 // Keyword for the current date and time

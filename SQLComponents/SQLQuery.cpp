@@ -1105,23 +1105,23 @@ SQLQuery::BindColumns()
       }
       else
       {
-      int BUFFERSIZE = m_bufferSize ? m_bufferSize : OPTIM_BUFFERSIZE;
-      if(precision > (unsigned)BUFFERSIZE)
-      {
-        // Must use AT_EXEC SQLGetData Interface
-        atexec = min((int)m_maxColumnLength,BUFFERSIZE);
-        if(atexec == 0)
+        int BUFFERSIZE = m_bufferSize ? m_bufferSize : OPTIM_BUFFERSIZE;
+        if(precision > (unsigned)BUFFERSIZE)
         {
-          // Provide arbitrary border value
-          atexec = BUFFERSIZE;
+          // Must use AT_EXEC SQLGetData Interface
+          atexec = min((int)m_maxColumnLength,BUFFERSIZE);
+          if(atexec == 0)
+          {
+            // Provide arbitrary border value
+            atexec = BUFFERSIZE;
+          }
+          precision = atexec;
         }
-        precision = atexec;
-      }
-      // Some ODBC drivers crash as a result of the fact
-      // that CHAR types could be WCHAR types and they 
-      // reserve the privilege to allocate double the memory
-      // IF YOU DON'T DO THIS, YOU WILL CRASH!!
-      precision *= 2;
+        // Some ODBC drivers crash as a result of the fact
+        // that CHAR types could be WCHAR types and they 
+        // reserve the privilege to allocate double the memory
+        // IF YOU DON'T DO THIS, YOU WILL CRASH!!
+        precision *= 2;
       }
     }
     // Create new variant and reserve space for CHAR and BINARY types
@@ -1139,6 +1139,10 @@ SQLQuery::BindColumns()
     if(type == SQL_C_NUMERIC)
     {
       SQL_NUMERIC_STRUCT* numeric = var->GetAsNumeric();
+      if (m_database)
+      {
+        m_database->GetSQLInfoDB()->GetRDBMSNumericPrecisionScale(precision,scale);
+      }
       numeric->precision = (SQLCHAR)  precision;
       numeric->scale     = (SQLSCHAR) scale;
     }

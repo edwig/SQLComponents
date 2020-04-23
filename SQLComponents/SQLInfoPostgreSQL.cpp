@@ -160,6 +160,13 @@ SQLInfoPostgreSQL::GetRDBMSMustCommitDDL() const
   return true;
 }
 
+// Correct maximum precision,scale for a NUMERIC datatype
+void
+SQLInfoPostgreSQL::GetRDBMSNumericPrecisionScale(SQLULEN& /*p_precision*/, SQLSMALLINT& /*p_scale*/) const
+{
+  // NO-OP
+}
+
 // KEYWORDS
 
 // Keyword for the current date and time
