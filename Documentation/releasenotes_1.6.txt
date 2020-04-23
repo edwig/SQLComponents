@@ -24,6 +24,11 @@ Version 1.6.2 of 06-04-2020
            database connection in your application. 
            If you are using multiple database types, set this info in the SQLDatabase
            just before you are querying.
+7) Added the methods 'GetRDBMSNumericPrecisionScale' to the SQLInfoDB class and subclasses.
+   This enables us to bind a NUMERIC to a view column in the database.
+   Oracle reports the precision as the maximum and the scale as 0.
+   Binding the NUMERIC in this way will result in a throw when you try to fetch a record,
+   where the underlying NUMBER column has 1 or more decimal places.
 
 Version 1.6.1 of 13-09-2019
 ---------------------------
