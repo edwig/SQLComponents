@@ -90,16 +90,16 @@ class SQLDataSet
 public:
   SQLDataSet();
   SQLDataSet(CString p_name,SQLDatabase* p_database = NULL);
- ~SQLDataSet();
+  virtual ~SQLDataSet();
 
+  // Perform query: Do SetQuery first
+  virtual bool Open(bool p_stopIfNoColumns = false);
+  // Append (read extra) into the dataset
+  virtual bool Append();
+  // Remove result set
+  virtual void Close();
   // Query done and records gotten?
   bool IsOpen();
-  // Perform query: Do SetQuery first
-  bool Open(bool p_stopIfNoColumns = false);
-  // Append (read extra) into the dataset
-  bool Append();
-  // Remove result set
-  void Close();
 
   // Navigate in the records
   int  First();
@@ -141,35 +141,34 @@ public:
   // SETTERS
 
   // Set database connection
-  void         SetDatabase(SQLDatabase* p_database);
-  // Set one or more columns to select
-  void         SetSelection(CString p_selection);
-  // Set the where condition by hand
-  void         SetWhereCondition(CString p_condition);
-  // Set the group-by 
-  void         SetGroupBy(CString p_groupby);
-  // Set the ordering by explicitly
-  void         SetOrderBy(CString p_orderby);
-  // Set the apply
-  void         SetApply(CString p_apply);
-  // Set the expand
-  void         SetExpand(CString p_expand);
-  // Set a new full query (Supersedes SetSelection, -Where, -groupby, -orderby and -having)
-  void         SetQuery(CString& p_query);
-  // Set primary table (for updates)
-  void         SetPrimaryTable(CString p_schema,CString p_tableName,CString p_alias = "");
+  virtual void SetDatabase(SQLDatabase* p_database);
+  // Set SELECT one or more columns to select
+  virtual void SetSelection(CString p_selection);
+  // Set FROM  primary table (for updates)
+  virtual void SetPrimaryTable(CString p_schema, CString p_tableName, CString p_alias = "");
+  // Set WHERE condition by hand
+  virtual void SetWhereCondition(CString p_condition);
+  // Set WHERE filters for a query
+  virtual void SetFilters(SQLFilterSet* p_filters);
+  // Set GROUP BY 
+  virtual void SetGroupBy(CString p_groupby);
+  // Set ORDER BY
+  virtual void SetOrderBy(CString p_orderby);
+  // Set HAVING
+  virtual void SetHavings(SQLFilterSet* p_havings);
+  // Set SQL-QUERY:  a new full query (Supersedes SetSelection, -Where, -groupby, -orderby and -having)
+  virtual void SetQuery(CString& p_query);
   // Set primary key column name (for updates)
-  void         SetPrimaryKeyColumn(CString p_name);
-  void         SetPrimaryKeyColumn(WordList& p_list);
+  virtual void SetPrimaryKeyColumn(CString p_name);
+  virtual void SetPrimaryKeyColumn(WordList& p_list);
+
   // Setting the sequence/generator name to something different than "<tablename>_seq"
   void         SetSequenceName(CString p_sequence);
   // Set parameter for a query
   void         SetParameter(SQLParameter p_parameter);
   void         SetParameter(CString p_naam,SQLVariant p_waarde);
-  // Set filters for a query
-  void         SetFilters(SQLFilterSet* p_filters);
-  // Set the having filters
-  void         SetHavings(SQLFilterSet* p_havings);
+  // Set maximum number of milliseconds alloted to the Open query
+  void         SetQueryTime(int p_milliseconds);
   // Set top <n> records selection
   void         SetTopNRecords(int p_top,int p_skip = 0);
   // Set columns that can be updated
@@ -216,33 +215,30 @@ public:
   CString      GetGroupBy();
   CString      GetOrderBy();
   SQLFilterSet* GetHavings();
-  CString      GetApply();
-  CString      GetExpand();
+  void         AddGroupby(const CString& p_property);
 
   // XML Saving and loading
   bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
   bool         XMLLoad(CString p_filename);
   void         XMLSave(XMLMessage* p_msg,XMLElement* p_dataset);
   void         XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset);
-private:
+
+protected:
   // Set parameters in the query
-  CString      ParseQuery();
+  virtual CString ParseQuery();
   // Construct the selection SQL for opening the dataset
-  CString      GetSelectionSQL(SQLQuery& p_qry);
+  virtual CString GetSelectionSQL(SQLQuery& p_qry);
   // Parse the selection
-  CString      ParseSelection(SQLQuery& p_query);
-  // Parse the apply
-  void         ParseApply(CString& p_sql);
+  virtual CString ParseSelection(SQLQuery& p_query);
   // Parse the filters
-  CString      ParseFilters(SQLQuery& p_query,CString p_sql);
+  virtual CString ParseFilters(SQLQuery& p_query,CString p_sql);
+
   // Get the variant of a parameter
   SQLVariant*  GetParameter(CString& p_name);
   // Get all the columns of the record
   void         ReadNames(SQLQuery& qr);
   // Get all the datatypes of the columns
   void         ReadTypes(SQLQuery& qr);
-  // Check that column names are unique
-  void         CheckDuplicateColumns();
   // Check that all names are the same
   void         CheckNames(SQLQuery& p_query);
     // Check that all the types are the same
@@ -259,6 +255,9 @@ private:
   // Forget about a record
   bool         ForgetRecord(SQLRecord* p_record,bool p_force);
   void         ForgetPrimaryObject(SQLRecord* p_record);
+  // Init the high performance counter
+  void         InitCounter();
+  ULONG64      GetCounter();
 
   // WRITEBACK OPERATIONS
 
@@ -272,7 +271,7 @@ private:
   CString      GetSQLInsert  (SQLQuery* p_query,SQLRecord* p_record,CString& p_serial);
   CString      GetWhereClause(SQLQuery* p_query,SQLRecord* p_record,int& p_parameter);
 
-  // Private data of the dataset
+  // Base class data of the dataset
 
   CString      m_name;
   SQLDatabase* m_database;
@@ -280,8 +279,6 @@ private:
   // The query to run
   CString      m_query;
   CString      m_selection;
-  CString      m_apply;
-  CString      m_expand;
   CString      m_whereCondition;
   CString      m_orderby;
   CString      m_groupby;
@@ -299,13 +296,16 @@ private:
   SQLFilterSet* m_filters { nullptr };
   SQLFilterSet* m_havings { nullptr };
 
-protected:
+  // Records and objects
   int          m_status      { SQL_Empty };
   int          m_current     { -1 };
   NamenMap     m_names;
   TypenMap     m_types;
   RecordSet    m_records;
   ObjectMap    m_objects;
+  // Maximum query timing
+  int          m_queryTime { 0 };
+  ULONG64      m_frequency { 0 };
 };
 
 inline void 
@@ -418,6 +418,16 @@ SQLDataSet::GetGroupBy()
   return m_groupby;
 }
 
+inline void 
+SQLDataSet::AddGroupby(const CString& p_property)
+{
+  if (!m_groupby.IsEmpty())
+  {
+    m_groupby += ", ";
+  }
+  m_groupby += p_property;
+}
+
 inline CString
 SQLDataSet::GetOrderBy()
 {
@@ -428,18 +438,6 @@ inline SQLFilterSet*
 SQLDataSet::GetHavings()
 {
   return m_havings;
-}
-
-inline CString
-SQLDataSet::GetApply()
-{
-  return m_apply;
-}
-
-inline CString
-SQLDataSet::GetExpand()
-{
-  return m_expand;
 }
 
 inline void

@@ -654,13 +654,11 @@ SQLDataSetXLS::Open()
   }
 }
 
-bool
+void
 SQLDataSetXLS::Close()
 {
   m_append = false;
   SQLDataSet::Close();
-
-  return true;
 }
 
 // Convert Excel column in alphabet into column number

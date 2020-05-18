@@ -237,6 +237,18 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
     sql += m_field;
   }
 
+  // Test for special ISNULL case
+  if(m_operator == OP_Equal && m_values.size() == 1)
+  {
+    SQLVariant* var = m_values.front();
+    CString value;
+    var->GetAsString(value);
+    if(var->IsNULL() || value.CompareNoCase("null") == 0)
+    {
+      m_operator = OP_IsNULL;
+    }
+  }
+
   // Add the operator
   switch(m_operator)
   {

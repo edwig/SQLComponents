@@ -115,7 +115,7 @@ bcd::bcd(const long p_value, const long p_restValue /*= 0*/)
   SetValueLong(p_value,p_restValue);
 }
 
-// bcd::bcd(value, value)
+// bcd::bcd(value,value)
 // Description: Construct a BCD from an unsigned long and an unsigned optional long
 // Technical:   See description of SetValueLong
 bcd::bcd(const unsigned long p_value, const unsigned long p_restValue /*= 0*/)

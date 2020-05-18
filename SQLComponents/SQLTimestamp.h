@@ -102,6 +102,8 @@ public:
   SQLInterval   operator- (const SQLTimestamp& p_timestamp) const;
   SQLTimestamp  operator+ (const SQLInterval&  p_interval)  const;
   SQLTimestamp  operator- (const SQLInterval&  p_interval)  const;
+  SQLTimestamp  operator+ (const SQLTime&      p_time)      const;
+  SQLTimestamp  operator- (const SQLTime&      p_time)      const;
   // Comparison operators
   bool          operator==(const SQLTimestamp& p_timestamp) const;
   bool          operator!=(const SQLTimestamp& p_timestamp) const;

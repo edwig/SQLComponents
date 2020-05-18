@@ -677,14 +677,18 @@ SQLTimestamp::ParseMoment(const CString& p_string)
         SetTimestamp(temp.m_year,temp.m_month,temp.m_day,temp.m_hour,temp.m_minute,temp.m_second);
         return;
       }
+      *this = CurrentTimestamp();
+      return;
     }
-    else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_TODAY]) == 0)
+    else if(CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_TODAY]) == 0)
     { 
       if (GetVirtualMoment(Sign, ExtraTime, interval, temp))
       {
-        SetTimestamp(temp.m_year, temp.m_month, temp.m_day, 0, 0, 0);
+        SetTimestamp(temp.m_year,temp.m_month,temp.m_day,temp.m_hour,temp.m_minute,temp.m_second);
         return;
       }
+      *this = SQLDate::Today();
+      return;
     }
     else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_FOM]) == 0)
     {
@@ -1140,6 +1144,28 @@ SQLTimestamp::operator-(const SQLInterval& p_interval) const
   StampValue value = m_value - (sign * p_interval.AsValue() / NANOSECONDS_PER_SEC);
   int  fraction = m_fraction - (sign * p_interval.AsValue() % NANOSECONDS_PER_SEC);
   SQLTimestamp stamp(value,fraction);
+  return stamp;
+}
+
+SQLTimestamp  
+SQLTimestamp::operator+ (const SQLTime& p_time) const
+{
+  SQLTimestamp stamp(*this);
+  stamp.AddHours  (p_time.Hour());
+  stamp.AddMinutes(p_time.Minute());
+  stamp.AddSeconds(p_time.Second());
+
+  return stamp;
+}
+
+SQLTimestamp  
+SQLTimestamp::operator-(const SQLTime& p_time) const
+{
+  SQLTimestamp stamp(*this);
+  stamp.AddHours  (- p_time.Hour());
+  stamp.AddMinutes(- p_time.Minute());
+  stamp.AddSeconds(- p_time.Second());
+
   return stamp;
 }
 
