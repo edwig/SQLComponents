@@ -101,6 +101,23 @@ SQLTime::SQLTime(__int64 p_seconden)
   Normalise();
 }
 
+// CTOR from a SQL_TIME_STRUCT
+//
+SQLTime::SQLTime(SQL_TIME_STRUCT* p_timestruct)
+{
+  if (p_timestruct == nullptr)
+  {
+    SetNull();
+  }
+  else
+  {
+    m_theTime.m_hour   = p_timestruct->hour;
+    m_theTime.m_minute = p_timestruct->minute;
+    m_theTime.m_second = p_timestruct->second;
+    SetTime();
+  }
+}
+
 // DTOR for SQLTime
 //
 SQLTime::~SQLTime()

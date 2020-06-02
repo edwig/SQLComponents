@@ -59,6 +59,7 @@ public:
   SQLTime(const int p_hours,const int p_minutes,const int p_seconds);
   SQLTime(__int64 p_seconds);
   SQLTime(const SQLTimestamp& p_timestamp);
+  SQLTime(SQL_TIME_STRUCT* p_timestruct);
  ~SQLTime();
 
   CString AsString() const;

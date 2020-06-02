@@ -79,7 +79,7 @@ public:
   SQLTimestamp(const SQLTimestamp& p_timestamp);
   SQLTimestamp(const SQLDate& p_date, const SQLTime& p_time);
   SQLTimestamp(int p_year,int p_month,int p_day,int p_hour,int p_min,int p_sec,int p_fraction = 0);
-  SQLTimestamp(TIMESTAMP_STRUCT  p_stamp);
+  SQLTimestamp(TIMESTAMP_STRUCT* p_stamp);
   SQLTimestamp(StampValue p_value,int p_fraction = 0);
  ~SQLTimestamp();
  

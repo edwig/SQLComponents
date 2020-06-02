@@ -25,6 +25,7 @@
 //
 #pragma  once
 #include <sqlext.h>
+#include "SQLVariantOperator.h"
 #include "bcd.h"
 
 namespace SQLComponents
@@ -236,6 +237,19 @@ public:
    SQLVariant  operator  /(SQLVariant& p_right);
    SQLVariant  operator  %(SQLVariant& p_right);
 
+   // Arithmetic assignment operators
+   SQLVariant& operator  +=(SQLVariant& p_right);
+   SQLVariant& operator  -=(SQLVariant& p_right);
+   SQLVariant& operator  *=(SQLVariant& p_right);
+   SQLVariant& operator  /=(SQLVariant& p_right);
+   SQLVariant& operator  %=(SQLVariant& p_right);
+
+   // Unary increment/decrement operators
+   SQLVariant& operator ++();       // Prefix  increment
+   SQLVariant& operator --();       // Prefix  decrement
+   SQLVariant  operator ++(int);    // Postfix increment
+   SQLVariant  operator --(int);    // Postfix decrement
+
    // Cast operators
    operator bool();
    operator char();
@@ -269,6 +283,8 @@ private:
    bool    BinaryToString (unsigned char* buffer,int buflen);
    // Throw error as a result of internal trimming
    void*   ThrowErrorDatatype(int p_getas);
+   // Throw error as a result of an impossible operator
+   void    ThrowErrorOperator(SQLVarOperator p_operator);
 
    // Private Data
    int    m_datatype;         // Primary datatype SQL_C_XXXX

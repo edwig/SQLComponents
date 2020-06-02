@@ -100,18 +100,18 @@ SQLTimestamp::SQLTimestamp(const CString& p_string)
 
 // Construct from a SQL TIMESTAMP_STRUCT
 //
-SQLTimestamp::SQLTimestamp(TIMESTAMP_STRUCT p_stamp)
+SQLTimestamp::SQLTimestamp(TIMESTAMP_STRUCT* p_stamp)
 {
-  if(p_stamp.year == 0 && p_stamp.month == 0 && p_stamp.day == 0)
+  if(p_stamp == nullptr || (p_stamp->year == 0 && p_stamp->month == 0 && p_stamp->day == 0))
   {
     // Most likely a database NULL value
     SetNull();
   }
   else
   {
-    SetTimestamp(p_stamp.year,p_stamp.month, p_stamp.day,
-                 p_stamp.hour,p_stamp.minute,p_stamp.second,
-                 p_stamp.fraction);
+    SetTimestamp(p_stamp->year,p_stamp->month, p_stamp->day,
+                 p_stamp->hour,p_stamp->minute,p_stamp->second,
+                 p_stamp->fraction);
   }
 }
 

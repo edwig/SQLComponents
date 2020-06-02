@@ -30,6 +30,22 @@ namespace SQLComponents
 
 class SQLVariant;
 
+// Operator types 
+// (Only used to produce the correct exceptions)
+typedef enum _variantOperator
+{
+  SVO_PreIncrement
+ ,SVO_PreDecrement
+ ,SVO_PostIncrement
+ ,SVO_PostDecrement
+ ,SVO_AssignAdd
+ ,SVO_AssignSubtract
+ ,SVO_AssignMultiply
+ ,SVO_AssignDivide
+ ,SVO_AssignModulo
+}
+SQLVarOperator;
+
 // Datatypes, same as SQL_C_* but now as an ordinal type
 // so we can create a function pointer array from the values
 
