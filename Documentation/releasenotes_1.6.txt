@@ -3,6 +3,14 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.6
 ===== Released since: 22-06-2019 =====
 ======================================
 
+Version 1.6.3 of 02-06-2020
+---------------------------
+1) Added arithmetic assignment operators to SQLVariant (+=, -=, *=, /=, %=)
+2) Added prefix and postfix increment and decrement operators to SQLVariant
+3) Fixed SQLTime (added SQL_TIME_STRUCT to the constructors)
+4) WARNING: Fixed the SQLTimestamp constructor for SQL_TIMESTAMP_STRUCT
+            it is now a pointer instead of a copy of the struct
+
 Version 1.6.2 of 06-04-2020
 ---------------------------
 1) Forward port of 6 issues for the 'bcd' datatype
