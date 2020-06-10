@@ -7044,14 +7044,9 @@ BasicExcelCell::GetDouble() const
 const char* 
 BasicExcelCell::GetString() const
 {
-  vector<char> str(str_.size());
-
-  if (type_ == STRING) 
-  {
-    if (!str.empty() && Get(&*(str.begin())))
+  if(type_ == STRING) 
     {
-      return &*(str_.begin());
-    }
+    return &str_[0];
   } 
   else if (type_ == FORMULA) 
   {
@@ -7065,14 +7060,9 @@ BasicExcelCell::GetString() const
 const wchar_t* 
 BasicExcelCell::GetWString() const
 {
-  vector<wchar_t> wstr(wstr_.size());
-
   if (type_ == WSTRING) 
   {
-    if (!wstr.empty() && Get(&*(wstr.begin())))
-    {
-      return &*(wstr_.begin());
-    }
+    return &wstr_[0];
   } 
   else if (type_ == FORMULA) 
   {

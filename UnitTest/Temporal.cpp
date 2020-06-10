@@ -262,5 +262,17 @@ namespace DatabaseUnitTest
       }
       number_of_tests++;
     }
+
+    TEST_METHOD(XMLDate)
+    {
+      Logger::WriteMessage("Unit testing recognition of XML dates");
+
+      InitSQLComponents();
+
+      SQLDate day("1959-10-15");
+      CString display = day.AsString();
+      CString expect  = "15-10-1959";
+      Assert::AreEqual(expect.GetString(),display.GetString());
+    }
   };
 }
