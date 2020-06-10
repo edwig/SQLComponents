@@ -41,6 +41,9 @@ namespace SQLComponents
     // Setting our default language for SQLDate, SQLTime and SQLTimestamp processing
     SetDefaultSQLLanguage(p_language);
 
+    // SQLComponents always works in localtime (UTC +/- timezone)
+    SQLSetLocalTimezone();
+
     // Check if something to do for memory
     if(g_SQLComponentsInitialized)
     {

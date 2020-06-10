@@ -64,7 +64,7 @@ typedef enum _dateNames
   ,DN_FOM            // FOM     EVM      First Of Month    Monatsersten        Premier Jour du Mois
   ,DN_LOM            // LOM     LVM      Last  Of Month    Monatsletzten       Dernier Jour du Mois
   ,DN_FOY            // FOY     EVJ      First of Year     Erste des Jahres    Premier de l'annee
-  ,DN_CY             // CY      HJ       Current  Year     Laufende Jahr       Anee en cours
+  ,DN_CY             // CY      HJ       Current  Year     Laufendes Jahr      Anee en cours
   ,DN_LOY            // LOY     LVJ      Last  Of Year     Letzte des Jahres   Dernier Jour de l'annee
   ,DN_SEC
   ,DN_SECONDS

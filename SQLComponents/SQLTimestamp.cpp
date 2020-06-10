@@ -44,6 +44,40 @@ static char THIS_FILE[] = __FILE__;
 namespace SQLComponents
 {
 
+// Difference between local time zone and UTC (Coordinated Universal Time)
+bool g_west_of_greenwich   = false;
+int  g_sql_timezone_hour   = 0;
+int  g_sql_timezone_minute = 0;
+SQLInterval g_sql_timezone;
+
+// SQLComponents always works in localtime (UTC +/- timezone)
+void SQLSetLocalTimezone()
+{
+  // Ask system for UTC and localtime
+  SYSTEMTIME system;
+  SYSTEMTIME local;
+  ::GetSystemTime(&system);
+  ::GetLocalTime(&local);
+
+  // Convert to timestamps
+  SQLTimestamp sys(system.wYear,system.wMonth,system.wDay,system.wHour,system.wMinute,0);
+  SQLTimestamp loc( local.wYear, local.wMonth, local.wDay, local.wHour, local.wMinute,0);
+
+  // Difference between localtime and UTC time is our timezone correction from Greenwich
+  g_sql_timezone = loc - sys;
+  
+  // Cache times and position
+  g_sql_timezone_hour   = abs(g_sql_timezone.GetHours());
+  g_sql_timezone_minute = abs(g_sql_timezone.GetMinutes()) % 60;
+  g_west_of_greenwich   = g_sql_timezone.GetIsNegative();
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// SQLTimestamp begins here
+//
+//////////////////////////////////////////////////////////////////////////
+
 SQLTimestamp::SQLTimestamp()
 {
   SetNull();
@@ -872,12 +906,8 @@ SQLTimestamp::AsXMLStringUTC(int p_precision /*=0*/) const
   if(IsNull() == false)
   {
     SQLTimestamp stamp(*this);
-    TIME_ZONE_INFORMATION tziCurrent;
-    ::ZeroMemory(&tziCurrent,sizeof(tziCurrent));
-    if(::GetTimeZoneInformation(&tziCurrent) != TIME_ZONE_ID_INVALID)
-    {
-      stamp = AddMinutes(tziCurrent.Bias);
-    }
+    stamp = stamp - g_sql_timezone;
+
     theStamp.Format("%04d-%02d-%02dT%02d:%02d:%02d"
                     ,stamp.Year(),stamp.Month(), stamp.Day()
                     ,stamp.Hour(),stamp.Minute(),stamp.Second());
@@ -885,8 +915,16 @@ SQLTimestamp::AsXMLStringUTC(int p_precision /*=0*/) const
     {
       theStamp += PrintFraction(p_precision);
     }
-    // Mark as UTC string
-    theStamp += "Z";
+    // Mark as UTC string, timezone difference
+    if(g_sql_timezone_hour == 0 && g_sql_timezone_minute == 0)
+    {
+      theStamp += "Z";  // Exact on the spot: Wintertime in London
+    }
+    else
+    {
+      theStamp += g_west_of_greenwich ? "-" : "+";
+      theStamp.AppendFormat("%2.2d:%2.2d",g_sql_timezone_hour,g_sql_timezone_minute);
+    }
   }
   return theStamp;
 }

@@ -86,6 +86,7 @@ public:
 
   // Get in different formats
   CString     AsString() const;
+  CString     AsXMLString() const;
   DateValue   AsNumber() const;
   DateValue   AsMJD()    const;
   DateValue   AsJulianDate()     const;
