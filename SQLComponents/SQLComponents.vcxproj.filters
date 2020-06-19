@@ -358,6 +358,7 @@
     <ClInclude Include="SQLDriverManager.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
+    <ClInclude Include="SQLComponentsVersion.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Headers Files">

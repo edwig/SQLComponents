@@ -106,6 +106,7 @@ BEGIN_MESSAGE_MAP(SQLConnectionsDlg, CDialog)
 	ON_WM_QUERYDRAGICON()
   ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST,  &SQLConnectionsDlg::OnLvnItemchangedList)
   ON_EN_CHANGE(IDC_NAME,                &SQLConnectionsDlg::OnEnChangeName)
+  ON_CBN_SELCHANGE(IDC_DATASOURCE,      &SQLConnectionsDlg::OnCbnCloseupDatasource)
   ON_CBN_CLOSEUP(IDC_DATASOURCE,        &SQLConnectionsDlg::OnCbnCloseupDatasource)
   ON_EN_CHANGE(IDC_USER,                &SQLConnectionsDlg::OnEnChangeUser)
   ON_EN_CHANGE(IDC_PASSWORD1,           &SQLConnectionsDlg::OnEnChangePassword1)
@@ -165,7 +166,7 @@ BOOL SQLConnectionsDlg::OnInitDialog()
   return FALSE;
 }
 
-void 
+void
 SQLConnectionsDlg::LoadDataSources()
 {
   SQLDriverManager manager;
@@ -227,6 +228,7 @@ SQLConnectionsDlg::LoadConnections()
 bool
 SQLConnectionsDlg::SaveConnections()
 {
+  SaveCurrentConnection();
   if(!m_connections.SaveConnectionsFile())
   {
     AfxMessageBox("Could **NOT** save the 'database.xml' file",MB_OK|MB_ICONERROR);
@@ -255,6 +257,11 @@ SQLConnectionsDlg::LoadCurrentConnection(int p_index /*=-1*/)
     m_password2       = conn->m_password;
     m_options         = conn->m_options;
 
+    int source = m_comboDatasource.FindStringExact(0,m_datasource);
+    if(source >= 0)
+    {
+      m_comboDatasource.SetCurSel(source);
+    }
     UpdateData(FALSE);
   }
 }
@@ -438,6 +445,7 @@ SQLConnectionsDlg::OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 {
   LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 
+  SaveCurrentConnection();
   if(pNMLV->iItem >= 0 && pNMLV->uNewState == 3)
   {
     LoadCurrentConnection(pNMLV->iItem);
@@ -448,8 +456,12 @@ SQLConnectionsDlg::OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 void 
 SQLConnectionsDlg::OnEnChangeName()
 {
+  CString name = m_connectionName;
   UpdateData();
-  UpdateData(FALSE);
+  if(name.Compare(m_connectionName))
+  {
+    m_changed = true;
+  }
 }
 
 void 
@@ -458,7 +470,13 @@ SQLConnectionsDlg::OnCbnCloseupDatasource()
   int ind = m_comboDatasource.GetCurSel();
   if(ind >= 0)
   {
-    m_comboDatasource.GetLBText(ind,m_datasource);
+    CString datasource;
+    m_comboDatasource.GetLBText(ind,datasource);
+    if(datasource.Compare(m_datasource))
+    {
+      m_datasource = datasource;
+      m_changed = true;
+    }
   }
   UpdateData(FALSE);
 }
@@ -466,29 +484,45 @@ SQLConnectionsDlg::OnCbnCloseupDatasource()
 void 
 SQLConnectionsDlg::OnEnChangeUser()
 {
+  CString user = m_username;
   UpdateData();
-  UpdateData(FALSE);
+  if(user.Compare(m_username))
+  {
+    m_changed = true;
+  }
 }
 
 void 
 SQLConnectionsDlg::OnEnChangePassword1()
 {
+  CString password = m_password1;
   UpdateData();
-  UpdateData(FALSE);
+  if (password.Compare(m_password1))
+  {
+    m_changed = true;
+  }
 }
 
 void 
 SQLConnectionsDlg::OnEnChangePassword2()
 {
+  CString password = m_password2;
   UpdateData();
-  UpdateData(FALSE);
+  if (password.Compare(m_password2))
+  {
+    m_changed = true;
+  }
 }
 
 void 
 SQLConnectionsDlg::OnEnChangeOptions()
 {
+  CString options = m_options;
   UpdateData();
-  UpdateData(FALSE);
+  if (options.Compare(m_options))
+  {
+    m_changed = true;
+  }
 }
 
 void

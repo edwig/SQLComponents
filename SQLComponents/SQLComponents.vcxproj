@@ -264,6 +264,7 @@
     <ClInclude Include="DDLCreateTable.h" />
     <ClInclude Include="DefuseBOM.h" />
     <ClInclude Include="ExcelFormat.h" />
+    <ClInclude Include="SQLComponentsVersion.h" />
     <ClInclude Include="SQLConnections.h" />
     <ClInclude Include="SQLDatabasePool.h" />
     <ClInclude Include="SQLDriverManager.h" />
