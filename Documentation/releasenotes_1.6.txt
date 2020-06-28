@@ -3,6 +3,15 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.6
 ===== Released since: 22-06-2019 =====
 ======================================
 
+Version 1.6.4 of 28-06-2020
+---------------------------
+1) Removed the need to compile with the "COMPILED_WITH_MARLIN" switch in case of use
+   in projects where the "Marlin" library is used. This makes it possible to release a 
+   binary version of the library, together with th include files
+   This removes the need of recompiling the library again and again
+2) A binary version is build in the "Deployment" directory and zipped
+3) Use the zipped "SQLComponents.zip" version in a project of your own.
+
 Version 1.6.3 of 10-06-2020
 ---------------------------
 1) Added arithmetic assignment operators to SQLVariant (+=, -=, *=, /=, %=)

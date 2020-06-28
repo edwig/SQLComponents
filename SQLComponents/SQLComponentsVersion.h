@@ -26,7 +26,7 @@
 // General version, date and copyright
 // of the SQLComponents library
 
-#define SQL_COMPONENTS_VERSION   "1.6.3"
-#define SQL_COMPONENTS_BINVERSION 1,6,3,0
-#define SQL_COMPONENTS_DATE      "10-06-2020"
+#define SQL_COMPONENTS_VERSION   "1.6.4"
+#define SQL_COMPONENTS_BINVERSION 1,6,4,0
+#define SQL_COMPONENTS_DATE      "28-06-2020"
 #define SQL_COMPONENTS_COPYRIGHT "Copyright (c) 2020 ir. W.E. Huisman"
