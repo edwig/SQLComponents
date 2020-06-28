@@ -31,6 +31,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLConnections", "SQLConnec
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968} = {0E56E030-9CDD-47A7-B580-DCD4E103F968}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Deployment", "Deployment\Deployment.vcxproj", "{9FD80E97-450B-4724-971E-58C09839034A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0E56E030-9CDD-47A7-B580-DCD4E103F968} = {0E56E030-9CDD-47A7-B580-DCD4E103F968}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -71,6 +76,14 @@ Global
 		{09647FC9-DE27-4058-919C-72CB033517DA}.Release|Win32.Build.0 = Release|Win32
 		{09647FC9-DE27-4058-919C-72CB033517DA}.Release|x64.ActiveCfg = Release|x64
 		{09647FC9-DE27-4058-919C-72CB033517DA}.Release|x64.Build.0 = Release|x64
+		{9FD80E97-450B-4724-971E-58C09839034A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9FD80E97-450B-4724-971E-58C09839034A}.Debug|Win32.Build.0 = Debug|Win32
+		{9FD80E97-450B-4724-971E-58C09839034A}.Debug|x64.ActiveCfg = Debug|x64
+		{9FD80E97-450B-4724-971E-58C09839034A}.Debug|x64.Build.0 = Debug|x64
+		{9FD80E97-450B-4724-971E-58C09839034A}.Release|Win32.ActiveCfg = Release|Win32
+		{9FD80E97-450B-4724-971E-58C09839034A}.Release|Win32.Build.0 = Release|Win32
+		{9FD80E97-450B-4724-971E-58C09839034A}.Release|x64.ActiveCfg = Release|x64
+		{9FD80E97-450B-4724-971E-58C09839034A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

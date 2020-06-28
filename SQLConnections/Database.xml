@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Connections>
+  <Connect>
+    <Name>HibernationTest</Name>
+    <DSN>hibtest</DSN>
+    <User>sysdba</User>
+    <Options />
+    <Password>1F140C17161C</Password>
+  </Connect>
+</Connections>
