@@ -56,31 +56,35 @@ public:
 
   // DB INTERFACE
 
+  // Default list of granted users on a created object
   void    SetGrantedUsers(CString p_users);
   CString GetGrantedUsers() const;
+  // We prefer the 'standard' ODBC drivers meta queries
+  void    SetPreferODBC(bool p_prefer);
+  bool    GetPreferODBC();
 
   // OVERRIDES AND EXTRAS OF THE ODBC MakeInfo<object> functions
 
   // Meta info about meta types
-  bool    MakeInfoMetaTypes      (MMetaMap&     p_objects,  CString& p_errors,int p_type);
+  virtual bool    MakeInfoMetaTypes      (MMetaMap&     p_objects,  CString& p_errors,int p_type) override;
   // Tables
-  bool    MakeInfoTableObject    (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // Not known which type!
-  bool    MakeInfoTableTable     (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // TABLE   only
-  bool    MakeInfoTableView      (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // VIEW    only
-  bool    MakeInfoTableSynonyms  (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // SYNONYM only
-  bool    MakeInfoTableCatalog   (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // CATALOG only
+  virtual bool    MakeInfoTableObject    (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // Not known which type!
+  virtual bool    MakeInfoTableTable     (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // TABLE   only
+  virtual bool    MakeInfoTableView      (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // VIEW    only
+  virtual bool    MakeInfoTableSynonyms  (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // SYNONYM only
+  virtual bool    MakeInfoTableCatalog   (MTableMap&    p_tables,   CString& p_errors,CString p_schema,CString p_tablename);  // CATALOG only
   // Attributes of a table
-  bool    MakeInfoTableColumns   (MColumnMap&   p_columns,  CString& p_errors,CString p_schema,CString p_tablename,CString p_columname = "") override;
-  bool    MakeInfoTablePrimary   (MPrimaryMap&  p_primary,  CString& p_errors,CString p_schema,CString p_tablename)                          override;
-  bool    MakeInfoTableForeign   (MForeignMap&  p_foreigns, CString& p_errors,CString p_schema,CString p_tablename,bool p_referenced   = false) override;
-  bool    MakeInfoTableStatistics(MIndicesMap&  p_indices,  CString& p_errors,CString p_schema,CString p_tablename,MPrimaryMap* p_keymap,bool p_all = true) override;
-  bool    MakeInfoTableTriggers  (MTriggerMap&  p_triggers, CString& p_errors,CString p_schema,CString p_tablename,CString p_trigger   = "");
-  bool    MakeInfoTableSequences (MSequenceMap& p_sequences,CString& p_errors,CString p_schema,CString p_tablename);
+  virtual bool    MakeInfoTableColumns   (MColumnMap&   p_columns,  CString& p_errors,CString p_schema,CString p_tablename,CString p_columname = "") override;
+  virtual bool    MakeInfoTablePrimary   (MPrimaryMap&  p_primary,  CString& p_errors,CString p_schema,CString p_tablename)                          override;
+  virtual bool    MakeInfoTableForeign   (MForeignMap&  p_foreigns, CString& p_errors,CString p_schema,CString p_tablename,bool p_referenced   = false) override;
+  virtual bool    MakeInfoTableStatistics(MIndicesMap&  p_indices,  CString& p_errors,CString p_schema,CString p_tablename,MPrimaryMap* p_keymap,bool p_all = true) override;
+  virtual bool    MakeInfoTableTriggers  (MTriggerMap&  p_triggers, CString& p_errors,CString p_schema,CString p_tablename,CString p_trigger   = "");
+  virtual bool    MakeInfoTableSequences (MSequenceMap& p_sequences,CString& p_errors,CString p_schema,CString p_tablename);
   // Procedures
-  bool    MakeInfoPSMProcedures(MProcedureMap& p_procedures,CString& p_errors,CString p_schema,CString p_procedure) override;
-  bool    MakeInfoPSMParameters(MParameterMap& p_parameters,CString& p_errors,CString p_schema,CString p_procedure) override;
+  virtual bool    MakeInfoPSMProcedures(MProcedureMap& p_procedures,CString& p_errors,CString p_schema,CString p_procedure) override;
+  virtual bool    MakeInfoPSMParameters(MParameterMap& p_parameters,CString& p_errors,CString p_schema,CString p_procedure) override;
   // Read extra source code for database that can only do it by an extra procedure
-  CString MakeInfoPSMSourcecode(CString p_schema, CString p_procedure);
+  virtual CString MakeInfoPSMSourcecode(CString p_schema, CString p_procedure);
 
   // PURE VIRTUAL INTERFACE
 
@@ -426,6 +430,8 @@ private:
 
   // All default granted users for GRANT statements
   CString m_grantedUsers;
+  // Prefer ODBC metaqueries above hand crafted ones
+  bool    m_preferODBC { true };
 };
 
 inline void    
@@ -438,6 +444,18 @@ inline CString
 SQLInfoDB::GetGrantedUsers() const
 {
   return m_grantedUsers;
+}
+
+inline void
+SQLInfoDB::SetPreferODBC(bool p_prefer)
+{
+  m_preferODBC = p_prefer;
+}
+
+inline bool
+SQLInfoDB::GetPreferODBC()
+{
+  return m_preferODBC;
 }
 
 // End of namespace

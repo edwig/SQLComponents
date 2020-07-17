@@ -69,7 +69,7 @@ SQLInfoDB::MakeInfoTableObject(MTableMap& p_tables
   CString sql3 = GetCATALOGTableSynonyms  (p_schema,p_tablename);
   CString sql4 = GetCATALOGTableCatalog   (p_schema,p_tablename);
 
-  if(sql1.IsEmpty() || sql2.IsEmpty() || sql3.IsEmpty() || sql4.IsEmpty())
+  if(sql1.IsEmpty() || sql2.IsEmpty() || sql3.IsEmpty() || sql4.IsEmpty() || m_preferODBC)
   {
     // Ask ODBC to find all object types (empty search argument)
     return SQLInfo::MakeInfoTableTable(p_tables,p_errors,p_schema,p_tablename,"");
@@ -98,7 +98,7 @@ bool
 SQLInfoDB::MakeInfoMetaTypes(MMetaMap& p_objects,CString& p_errors,int p_type)
 {
   CString sql = GetCATALOGMetaTypes(p_type);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     // Ask ODBC driver to find the required meta types
     return SQLInfo::MakeInfoMetaTypes(p_objects,p_errors,p_type);
@@ -124,7 +124,7 @@ SQLInfoDB::MakeInfoTableTable(MTableMap& p_tables
                              ,CString    p_tablename)
 {
   CString sql = GetCATALOGTableAttributes(p_schema,p_tablename);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     // Ask ODBC driver to find tables
     return SQLInfo::MakeInfoTableTable(p_tables,p_errors,p_schema,p_tablename,"TABLE");
@@ -151,7 +151,7 @@ SQLInfoDB::MakeInfoTableView(MTableMap& p_tables
                             ,CString    p_tablename)
 {
   CString sql = GetCATALOGViewAttributes(p_schema,p_tablename);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     // Ask ODBC driver to find views
     return SQLInfo::MakeInfoTableTable(p_tables,p_errors,p_schema,p_tablename,"VIEW");
@@ -178,7 +178,7 @@ SQLInfoDB::MakeInfoTableSynonyms(MTableMap& p_tables
                                 ,CString    p_tablename)
 {
   CString sql = GetCATALOGTableSynonyms(p_schema,p_tablename);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     // Ask ODBC driver to find synonyms
     bool result = SQLInfo::MakeInfoTableTable(p_tables,p_errors,p_schema,p_tablename,"SYNONYM");
@@ -211,7 +211,7 @@ SQLInfoDB::MakeInfoTableCatalog(MTableMap&  p_tables
                                ,CString     p_tablename)
 {
   CString sql = GetCATALOGTableCatalog(p_schema,p_tablename);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     p_schema = "%";
     p_tablename = "%";
@@ -241,7 +241,7 @@ SQLInfoDB::MakeInfoTableColumns(MColumnMap& p_columns
                                ,CString     p_columname /*=""*/)
 {
   CString sql = GetCATALOGColumnAttributes(p_schema,p_tablename,p_columname);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     return SQLInfo::MakeInfoTableColumns(p_columns,p_errors,p_schema,p_tablename,p_columname);
   }
@@ -299,7 +299,7 @@ SQLInfoDB::MakeInfoTablePrimary(MPrimaryMap&  p_primaries
                                ,CString       p_tablename)
 {
   CString sql = GetCATALOGPrimaryAttributes(p_schema,p_tablename);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     return SQLInfo::MakeInfoTablePrimary(p_primaries,p_errors,p_schema,p_tablename);
   }
@@ -340,7 +340,7 @@ SQLInfoDB::MakeInfoTableForeign(MForeignMap&  p_foreigns
                                ,bool          p_referenced /* = false */) 
 {
   CString sql = GetCATALOGForeignAttributes(p_schema,p_tablename,"",p_referenced);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     return SQLInfo::MakeInfoTableForeign(p_foreigns,p_errors,p_schema,p_tablename,p_referenced);
   }
@@ -392,10 +392,10 @@ SQLInfoDB::MakeInfoTableStatistics(MIndicesMap& p_indices
                                   ,CString      p_schema
                                   ,CString      p_tablename
                                   ,MPrimaryMap* p_keymap
-                                  ,bool         p_all /*= true*/)
+                                  ,bool         p_all         /*=true*/)
 {
   CString sql = GetCATALOGIndexAttributes(p_schema,p_tablename,"");
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     return SQLInfo::MakeInfoTableStatistics(p_indices,p_errors,p_schema,p_tablename,p_keymap,p_all);
   }
@@ -451,7 +451,7 @@ SQLInfoDB::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
   }
 
   // Let ODBC handle the call
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     return SQLInfo::MakeInfoPSMProcedures(p_procedures,p_errors,p_schema,p_procedure);
   }
@@ -533,7 +533,7 @@ SQLInfoDB::MakeInfoPSMParameters(MParameterMap& p_parameters
                                 ,CString        p_procedure)
 {
   CString sql = GetPSMProcedureParameters(p_schema,p_procedure);
-  if(sql.IsEmpty())
+  if(sql.IsEmpty() || m_preferODBC)
   {
     // No SQL, let ODBC handle the parameters
     return SQLInfo::MakeInfoPSMParameters(p_parameters,p_errors,p_schema,p_procedure);
