@@ -55,12 +55,16 @@ typedef enum _databaseType
  ,RDBMS_POSTGRESQL    = 6
  ,RDBMS_FIREBIRD      = 7
  ,RDBMS_MYSQL         = 8
+ ,RDBMS_MARIADB       = 9
 }
 DatabaseType;
 
+// We are running in a background server (No message boxes allowed!)
+extern bool g_SQLComponentsInServer;
+
 // Initialization of the SQLComponents library
 // Call at least **ONCE** at the beginning of your program
-void InitSQLComponents(Language p_language = LN_ENGLISH);
+void InitSQLComponents(Language p_language = LN_ENGLISH,bool p_inServer = false);
 
 // Test if we are properly initialized
 void SQLComponentsInitialized();

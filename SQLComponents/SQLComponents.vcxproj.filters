@@ -196,6 +196,12 @@
     <ClCompile Include="CrackURL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SQLMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SQLInfoMariaDB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicExcel.h">
@@ -390,6 +396,12 @@
       <Filter>Headers Files</Filter>
     </ClInclude>
     <ClInclude Include="CrackURL.h">
+      <Filter>Headers Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLMessage.h">
+      <Filter>Headers Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SQLInfoMariaDB.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
   </ItemGroup>

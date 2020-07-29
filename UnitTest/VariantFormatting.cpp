@@ -224,7 +224,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(NumberFormatting)
     {
-      Logger::WriteMessage("Formatting: Formatting the date/time");
+      Logger::WriteMessage("Formatting: Formatting numbers");
       var num( 45123.12);
       var neg(-66789.56);
       SQLVariantFormat form(num);

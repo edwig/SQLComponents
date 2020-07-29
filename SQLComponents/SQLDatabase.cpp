@@ -32,6 +32,7 @@
 #include "SQLInfoMySQL.h"
 #include "SQLInfoAccess.h"
 #include "SQLInfoOracle.h"
+#include "SQLInfoMariaDB.h"
 #include "SQLInfoFirebird.h"
 #include "SQLInfoInformix.h"
 #include "SQLInfoSQLServer.h"
@@ -469,6 +470,7 @@ SQLDatabase::CollectInfo()
   else if(baseName.CompareNoCase("FIREBI") == 0)  m_rdbmsType = RDBMS_FIREBIRD;
   else if(baseName.CompareNoCase("POSTGR") == 0)  m_rdbmsType = RDBMS_POSTGRESQL;
   else if(baseName.CompareNoCase("MYSQL")  == 0)  m_rdbmsType = RDBMS_MYSQL;
+  else if(baseName.CompareNoCase("MARIAD") == 0)  m_rdbmsType = RDBMS_MARIADB;
   else
   {
     // Generic default type, now supported by SQLInfoGenericODBC class
@@ -578,6 +580,7 @@ SQLDatabase::GetSQLInfoDB()
       case RDBMS_POSTGRESQL:m_info = new SQLInfoPostgreSQL (this); break;
       case RDBMS_FIREBIRD:  m_info = new SQLInfoFirebird   (this); break;
       case RDBMS_MYSQL:     m_info = new SQLInfoMySQL      (this); break;
+      case RDBMS_MARIADB:   m_info = new SQLInfoMariaDB    (this); break;
       default:              m_info = new SQLInfoGenericODBC(this); break;
     }
   }
@@ -594,7 +597,7 @@ SQLDatabase::RealDatabaseName()
   bool  result = false;
 
   CString databaseName;
-  // ODBC 1.x method. Databasename.
+  // ODBC 1.x method. Database name.
   buffer = databaseName.GetBuffer(SQL_MAX_OPTION_STRING_LENGTH);
   SQLGetInfo(m_hdbc, SQL_DATABASE_NAME, buffer, SQL_MAX_OPTION_STRING_LENGTH, &len);
   databaseName.ReleaseBuffer();
@@ -736,6 +739,7 @@ SQLDatabase::GetDatabaseTypeName()
     case RDBMS_POSTGRESQL:    return "PostgreSQL";
     case RDBMS_FIREBIRD:      return "Firebird";
     case RDBMS_MYSQL:         return "MySQL";
+    case RDBMS_MARIADB:       return "MariaDB";
     case RDBMS_ODBC_STANDARD: return "Generic ODBC";
   }
   return "";

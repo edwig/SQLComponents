@@ -3,6 +3,36 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.6
 ===== Released since: 22-06-2019 =====
 ======================================
 
+Version 1.6.5 of 29-07-2020
+---------------------------
+1) Added a "in-server" parameter to the initialisation of the library in the
+   call to "InitSQLComponents". If the "p_server" parameter is called with true
+   (default = false), the library will not throw a message box in case of an error
+   in SQLInfo, but will record the error in the WMI event logging of the OS.
+   The message is now handled in the new "SQLMessage" function
+2) Added extra performance queries to the SQLInfoOracle class. These are:
+   - GetCATALOGColumnAttributes
+   - GetCATALOGIndexAttributes
+   - GetCATALOGTablePrivileges
+   - GetCATALOGColumnPrivileges (NEW!)
+   All queries are designed to perform a factor better than the original Oracle
+   ODBC driver (respectively: 2, 4, 100, 100)
+3) Fixed a 64bits bug in "SQLQuery::GetColumnLength"
+4) Various small corrections for Oracle 19c in SQLInfoOracle class
+   - "dba_*" system views are now all replaced by "all_*" views
+   - Selection of "META_CATALOGS" is corrected
+   - Fixed schema/tables where they where not forced to uppercase
+   - Corrected IndexAttributes to also return the table statistics
+   - Faster selection of 'filter' expressions in indices
+   - Fixed the selection of the current catalog for global-naming variations
+5) Added support for "MariaDB" database (further open source development on MySQL)
+   a new class "SQLInfoMariDB" was created for the support.
+   A new "DatabaseType" was created: RDBMS_MARIADB.
+6) Changed most of the "GetCATALOG****" methods of SQLInfoDB from embedded arguments
+   to parameter bindings (schema, object, detail). This is done in interest of the
+   performance of those methods, and for security benefits, as SQL injection is
+   prevented in this way. Most of the parameters are changed from "CString" to "CString&"
+
 Version 1.6.4 of 28-06-2020
 ---------------------------
 1) Removed the need to compile with the "COMPILED_WITH_MARLIN" switch in case of use

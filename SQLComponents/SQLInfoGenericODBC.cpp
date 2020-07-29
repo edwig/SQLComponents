@@ -446,35 +446,35 @@ SQLInfoGenericODBC::GetCATALOGMetaTypes(int p_type) const
 // ALL FUNCTIONS FOR TABLE(s)
 
 CString
-SQLInfoGenericODBC::GetCATALOGTableExists(CString p_schema,CString p_tablename) const
+SQLInfoGenericODBC::GetCATALOGTableExists(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot do this, let ODBC handle this
   return "";
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
+SQLInfoGenericODBC::GetCATALOGTablesList(CString& /*p_schema*/,CString& /*p_pattern*/) const
 {
   // Cannot do this, let ODBC handle this
   return "";
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTableAttributes(CString /*p_schema*/,CString /*p_tablename*/) const
+SQLInfoGenericODBC::GetCATALOGTableAttributes(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot do this, let ODBC handle this
   return "";
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTableSynonyms(CString /*p_schema*/,CString /*p_tablename*/) const
+SQLInfoGenericODBC::GetCATALOGTableSynonyms(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot do this, let ODBC handle this
   return false;
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTableCatalog(CString /*p_schema*/,CString /*p_tablename*/) const
+SQLInfoGenericODBC::GetCATALOGTableCatalog(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot do this, let ODBC handle this
   return false;
@@ -532,21 +532,21 @@ SQLInfoGenericODBC::GetCATALOGTemptableDrop(CString p_schema,CString p_tablename
 // ALL COLUMN FUNCTIONS
 
 CString 
-SQLInfoGenericODBC::GetCATALOGColumnExists(CString p_schema,CString p_tablename,CString p_columname) const
+SQLInfoGenericODBC::GetCATALOGColumnExists(CString p_schema,CString p_tablename,CString p_columnname) const
 {
   // Cannot now that, use ODBC!
   return "";
 }
 
 CString 
-SQLInfoGenericODBC::GetCATALOGColumnList(CString p_schema,CString p_tablename) const
+SQLInfoGenericODBC::GetCATALOGColumnList(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot now that, use ODBC!
   return "";
 }
 
 CString 
-SQLInfoGenericODBC::GetCATALOGColumnAttributes(CString p_schema,CString p_tablename,CString p_columname) const
+SQLInfoGenericODBC::GetCATALOGColumnAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
 {
   // Cannot now that, use ODBC!
   return "";
@@ -613,7 +613,7 @@ SQLInfoGenericODBC::GetCATALOGIndexExists(CString p_schema,CString p_tablename,C
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGIndexList(CString p_schema,CString p_tablename)   const
+SQLInfoGenericODBC::GetCATALOGIndexList(CString& /*p_schema*/,CString& /*p_tablename*/)   const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -621,7 +621,7 @@ SQLInfoGenericODBC::GetCATALOGIndexList(CString p_schema,CString p_tablename)   
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGIndexAttributes(CString p_schema,CString p_tablename,CString p_indexname)  const
+SQLInfoGenericODBC::GetCATALOGIndexAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_indexname*/)  const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -640,7 +640,7 @@ SQLInfoGenericODBC::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
     {
       // New index
       query = "CREATE ";
-      if(index.m_unique)
+      if(index.m_nonunique == false)
       {
         query += "UNIQUE ";
       }
@@ -697,7 +697,7 @@ SQLInfoGenericODBC::GetCATALOGPrimaryExists(CString /*p_schema*/,CString /*p_tab
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGPrimaryAttributes(CString p_schema,CString p_tablename) const
+SQLInfoGenericODBC::GetCATALOGPrimaryAttributes(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot do this, Use ODBC functions!
   return "";
@@ -752,7 +752,7 @@ SQLInfoGenericODBC::GetCATALOGForeignExists(CString p_schema,CString p_tablename
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGForeignList(CString p_schema,CString p_tablename,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoGenericODBC::GetCATALOGForeignList(CString& /*p_schema*/,CString& /*p_tablename*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -760,7 +760,7 @@ SQLInfoGenericODBC::GetCATALOGForeignList(CString p_schema,CString p_tablename,i
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGForeignAttributes(CString p_schema,CString p_tablename,CString p_constraintname,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoGenericODBC::GetCATALOGForeignAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_constraintname*/,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -940,14 +940,14 @@ SQLInfoGenericODBC::GetCATALOGTriggerExists(CString p_schema, CString p_tablenam
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTriggerList(CString p_schema, CString p_tablename) const
+SQLInfoGenericODBC::GetCATALOGTriggerList(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Not standard enough
   return "";
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename, CString p_triggername) const
+SQLInfoGenericODBC::GetCATALOGTriggerAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_triggername*/) const
 {
   // Not standard enough
   return "";
@@ -977,13 +977,13 @@ SQLInfoGenericODBC::GetCATALOGSequenceExists(CString p_schema, CString p_sequenc
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGSequenceList(CString p_schema,CString p_pattern) const
+SQLInfoGenericODBC::GetCATALOGSequenceList(CString& /*p_schema*/,CString& /*p_pattern*/) const
 {
   return "";
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGSequenceAttributes(CString p_schema, CString p_sequence) const
+SQLInfoGenericODBC::GetCATALOGSequenceAttributes(CString& /*p_schema*/,CString& /*p_sequence*/) const
 {
   return "";
 }
@@ -1004,19 +1004,19 @@ SQLInfoGenericODBC::GetCATALOGSequenceDrop(CString p_schema, CString p_sequence)
 // ALL VIEW FUNCTIONS
 
 CString 
-SQLInfoGenericODBC::GetCATALOGViewExists(CString p_schema,CString p_viewname) const
+SQLInfoGenericODBC::GetCATALOGViewExists(CString& /*p_schema*/,CString& /*p_viewname*/) const
 {
   return "";
 }
 
 CString 
-SQLInfoGenericODBC::GetCATALOGViewList(CString p_schema,CString p_pattern) const
+SQLInfoGenericODBC::GetCATALOGViewList(CString& /*p_schema*/,CString& /*p_pattern*/) const
 {
   return "";
 }
 
 CString 
-SQLInfoGenericODBC::GetCATALOGViewAttributes(CString p_schema,CString p_viewname) const
+SQLInfoGenericODBC::GetCATALOGViewAttributes(CString& /*p_schema*/,CString& /*p_viewname*/) const
 {
   return "";
 }
@@ -1038,6 +1038,19 @@ SQLInfoGenericODBC::GetCATALOGViewDrop(CString p_schema,CString p_viewname,CStri
 {
   p_precursor.Empty();
   return "DROP VIEW " + p_schema + "." + p_viewname;
+}
+
+// All Privilege functions
+CString
+SQLInfoGenericODBC::GetCATALOGTablePrivileges(CString& /*p_schema*/,CString& /*p_tablename*/) const
+{
+  return "";
+}
+
+CString 
+SQLInfoGenericODBC::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
+{
+  return "";
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1076,13 +1089,13 @@ SQLInfoGenericODBC::GetPSMProcedureExists(CString p_schema, CString p_procedure)
 }
 
 CString
-SQLInfoGenericODBC::GetPSMProcedureList(CString p_schema) const
+SQLInfoGenericODBC::GetPSMProcedureList(CString& /*p_schema*/) const
 {
   return "";
 }
 
 CString
-SQLInfoGenericODBC::GetPSMProcedureAttributes(CString p_schema, CString p_procedure) const
+SQLInfoGenericODBC::GetPSMProcedureAttributes(CString& /*p_schema*/,CString& /*p_procedure*/) const
 {
   return "";
 }
@@ -1114,7 +1127,7 @@ SQLInfoGenericODBC::GetPSMProcedureErrors(CString p_schema,CString p_procedure) 
 
 // And it's parameters
 CString
-SQLInfoGenericODBC::GetPSMProcedureParameters(CString p_schema,CString p_procedure) const
+SQLInfoGenericODBC::GetPSMProcedureParameters(CString& /*p_schema*/,CString& /*p_procedure*/) const
 {
   return "";
 }

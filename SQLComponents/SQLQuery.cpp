@@ -770,7 +770,7 @@ SQLQuery::DoSQLStatementBatch(CString p_statements)
       }
       else
       {
-        DoSQLStatement(statement);
+        DoSQLStatement(statement); 
       }
     }
     // Find next statement
@@ -1709,7 +1709,7 @@ SQLQuery::GetColumnLength(int p_column)
   UCHAR	      characters[1] = "";
   SQLSMALLINT inputSize = 1;
   SQLSMALLINT outputSize;
-  SQLINTEGER  integerValue = 0;
+  SQLLEN     integerValue = 0;
 
   if(p_column <= m_numColumns)
   {

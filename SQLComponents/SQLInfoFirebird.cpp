@@ -449,25 +449,27 @@ SQLInfoFirebird::GetCATALOGMetaTypes(int p_type) const
 
 // Get SQL to check if a table already exists in the database
 CString
-SQLInfoFirebird::GetCATALOGTableExists(CString /*p_schema*/,CString p_tablename) const
+SQLInfoFirebird::GetCATALOGTableExists(CString& p_schema,CString& p_tablename) const
 {
+  p_schema.Empty(); // Do not bind as a parameter
   p_tablename.MakeUpper();
   CString query = "SELECT COUNT(*)\n"
                   "  FROM rdb$relations\n"
-                  " WHERE rdb$relation_name = '" + p_tablename + "'";
+                  " WHERE rdb$relation_name = ?";
   return query;
 }
 
 CString
-SQLInfoFirebird::GetCATALOGTablesList(CString p_schema,CString p_pattern) const
+SQLInfoFirebird::GetCATALOGTablesList(CString& p_schema,CString& p_pattern) const
 {
   return GetCATALOGTableAttributes(p_schema,p_pattern);
 }
 
 // Attributes can fill in 'm_temporary' 
 CString
-SQLInfoFirebird::GetCATALOGTableAttributes(CString /*p_schema*/,CString p_tablename) const
+SQLInfoFirebird::GetCATALOGTableAttributes(CString& p_schema,CString& p_tablename) const
 {
+  p_schema.Empty(); // do not bind as parameter
   p_tablename.MakeUpper();
   CString sql = "SELECT CAST('' AS VARCHAR(31))  AS table_catalog\n"
                 "      ,trim(rdb$owner_name)     AS table_schema\n"
@@ -493,15 +495,16 @@ SQLInfoFirebird::GetCATALOGTableAttributes(CString /*p_schema*/,CString p_tablen
   if(!p_tablename.IsEmpty())
   {
     sql += "\n   AND rdb$relation_name ";
-    sql += (p_tablename.Find("%") >= 0) ? "LIKE '" : "= '";
-    sql += p_tablename + "'";
+    sql += (p_tablename.Find("%") >= 0) ? "LIKE" : "=";
+    sql += " ?";
   }
   return sql;
 }
 
 CString
-SQLInfoFirebird::GetCATALOGTableSynonyms(CString /*p_schema*/,CString p_tablename) const
+SQLInfoFirebird::GetCATALOGTableSynonyms(CString& p_schema,CString& p_tablename) const
 {
+  p_schema.Empty(); // Do not bind as parameter
   p_tablename.MakeUpper();
   CString sql = "SELECT CAST('' AS varchar(31))             AS table_catalog\n"
                 "      ,trim(rdb$owner_name)                AS table_schema\n"
@@ -514,15 +517,16 @@ SQLInfoFirebird::GetCATALOGTableSynonyms(CString /*p_schema*/,CString p_tablenam
   if(!p_tablename.IsEmpty())
   {
     sql += "\n WHERE rdb$relation_name ";
-    sql += (p_tablename.Find("%") >= 0) ? "LIKE '" : "= '";
-    sql += p_tablename + "'";
+    sql += (p_tablename.Find("%") >= 0) ? "LIKE" : "=";
+    sql += " ?";
   }
   return sql;
 }
 
 CString
-SQLInfoFirebird::GetCATALOGTableCatalog(CString /*p_schema*/,CString p_tablename) const
+SQLInfoFirebird::GetCATALOGTableCatalog(CString& p_schema,CString& p_tablename) const
 {
+  p_schema.Empty(); // Do not bind as parameter
   p_tablename.MakeUpper();
   CString sql = "SELECT CAST('' AS varchar(31))             AS table_catalog\n"
                 "      ,trim(rdb$owner_name)                AS table_schema\n"
@@ -537,8 +541,8 @@ SQLInfoFirebird::GetCATALOGTableCatalog(CString /*p_schema*/,CString p_tablename
   if(!p_tablename.IsEmpty())
   {
     sql += "\n   AND rdb$relation_name ";
-    sql += (p_tablename.Find("%") >= 0) ? "LIKE '" : "= '";
-    sql += p_tablename + "'";
+    sql += (p_tablename.Find("%") >= 0) ? "LIKE" : "=";
+    sql += " ?";
   }
   return sql;
 }
@@ -602,14 +606,16 @@ SQLInfoFirebird::GetCATALOGColumnExists(CString p_schema,CString p_tablename,CSt
 }
 
 CString 
-SQLInfoFirebird::GetCATALOGColumnList(CString p_schema,CString p_tablename) const
+SQLInfoFirebird::GetCATALOGColumnList(CString& p_schema,CString& p_tablename) const
 {
-  return GetCATALOGColumnAttributes(p_schema,p_tablename,"");
+  CString column;
+  return GetCATALOGColumnAttributes(p_schema,p_tablename,column);
 }
 
 CString 
-SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_tablename,CString p_columnname) const
+SQLInfoFirebird::GetCATALOGColumnAttributes(CString& p_schema,CString& p_tablename,CString& p_columnname) const
 {
+  p_schema.Empty(); // Do not bind as a parameter
   p_tablename.MakeUpper();
   p_columnname.MakeUpper();
   CString sql;
@@ -755,12 +761,16 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(CString /*p_schema*/,CString p_table
         "      ,rdb$fields           fld\n"
         "      ,rdb$relations        tbl\n"
         " WHERE col.rdb$field_source  = fld.rdb$field_name\n"
-        "     AND col.rdb$relation_name = tbl.rdb$relation_name\n"
-        "     AND tbl.rdb$relation_name = '" + p_tablename + "'\n";
+        "   AND col.rdb$relation_name = tbl.rdb$relation_name\n";
+  // Table name
+  if(!p_tablename.IsEmpty())
+  {
+    sql += "   AND tbl.rdb$relation_name = ?\n";
+  }
   // Optionally add the column name
   if(!p_columnname.IsEmpty())
   {
-    sql += "   AND col.rdb$field_name = '" + p_columnname + "'\n";
+    sql += "   AND col.rdb$field_name = ?\n";
   }
   sql += " ORDER BY col.rdb$field_position";
   return sql;
@@ -825,14 +835,23 @@ SQLInfoFirebird::GetCATALOGIndexExists(CString /*p_schema*/,CString /*p_tablenam
 }
 
 CString
-SQLInfoFirebird::GetCATALOGIndexList(CString p_schema,CString p_tablename) const
+SQLInfoFirebird::GetCATALOGIndexList(CString& p_schema,CString& p_tablename) const
 {
-  return GetCATALOGIndexAttributes(p_schema,p_tablename,"");
+  CString indexname;
+  return GetCATALOGIndexAttributes(p_schema,p_tablename,indexname);
 }
 
 CString
-SQLInfoFirebird::GetCATALOGIndexAttributes(CString /*p_schema*/,CString p_tablename,CString p_indexname) const
+SQLInfoFirebird::GetCATALOGIndexAttributes(CString& p_schema,CString& p_tablename,CString& p_indexname) const
 {
+  p_schema.Empty(); // Do not bind as parameter
+
+  // No table statistics (YET)
+  if(p_indexname.Compare("0") == 0)
+  {
+    return "";
+  }
+
   p_tablename.MakeUpper();
   p_indexname.MakeUpper();
 
@@ -857,11 +876,15 @@ SQLInfoFirebird::GetCATALOGIndexAttributes(CString /*p_schema*/,CString p_tablen
                   "      ,rdb$relations      tab\n"
                   " WHERE idx.rdb$index_name    = col.rdb$index_name\n"
                   "   AND idx.rdb$relation_name = tab.rdb$relation_name\n"
-                  "   AND idx.rdb$system_flag   = 0\n"
-                  "   AND idx.rdb$relation_name = '" + p_tablename + "'\n";
+                  "   AND idx.rdb$system_flag   = 0\n";
+                  
+  if(!p_tablename.IsEmpty())
+  {
+    query += "   AND idx.rdb$relation_name = ?\n";
+  }
   if(!p_indexname.IsEmpty())
   {
-    query += "   AND idx.rdb$index_name = '" + p_indexname + "'\n";
+    query += "   AND idx.rdb$index_name = ?\n";
   }
   query += " ORDER BY 6";
   return query;
@@ -877,7 +900,7 @@ SQLInfoFirebird::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
     {
       // New index
       query = "CREATE ";
-      if(index.m_unique)
+      if(index.m_nonunique == false)
       {
         query += "UNIQUE ";
       }
@@ -952,8 +975,9 @@ SQLInfoFirebird::GetCATALOGPrimaryExists(CString /*p_schema*/,CString p_tablenam
 }
 
 CString
-SQLInfoFirebird::GetCATALOGPrimaryAttributes(CString /*p_schema*/,CString p_tablename) const
+SQLInfoFirebird::GetCATALOGPrimaryAttributes(CString& p_schema,CString& p_tablename) const
 {
+  p_schema.Empty(); // Do not bind as parameter
   p_tablename.MakeUpper();
   CString sql = "SELECT cast('' as varchar(31))       as catalog_name\n"
                 "      ,cast('' as varchar(31))       as schema_name\n"
@@ -968,7 +992,7 @@ SQLInfoFirebird::GetCATALOGPrimaryAttributes(CString /*p_schema*/,CString p_tabl
                 "      ,rdb$index_segments ind\n"
                 " WHERE ind.rdb$index_name = con.rdb$index_name\n"
                 "   AND con.rdb$constraint_type = 'PRIMARY KEY'\n"
-                "   AND con.rdb$relation_name   = '" + p_tablename + "'";
+                "   AND con.rdb$relation_name   = ?";
   return sql;
 }
 
@@ -1029,16 +1053,17 @@ SQLInfoFirebird::GetCATALOGForeignExists(CString /*p_schema*/,CString p_tablenam
 }
 
 CString
-SQLInfoFirebird::GetCATALOGForeignList(CString p_schema,CString p_tablename,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoFirebird::GetCATALOGForeignList(CString& p_schema,CString& p_tablename,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
 {
-  return GetCATALOGForeignAttributes(p_schema,p_tablename,"",p_maxColumns);
+  CString constraint;
+  return GetCATALOGForeignAttributes(p_schema,p_tablename,constraint,p_maxColumns);
 }
 
 CString
-SQLInfoFirebird::GetCATALOGForeignAttributes(CString p_schema
-                                            ,CString p_tablename
-                                            ,CString p_constraint
-                                            ,bool    p_referenced /*=false*/
+SQLInfoFirebird::GetCATALOGForeignAttributes(CString& p_schema
+                                            ,CString& p_tablename
+                                            ,CString& p_constraint
+                                            ,bool     p_referenced /*=false*/
                                             ,int    /*p_maxColumns =SQLINFO_MAX_COLUMNS*/) const
 {
   p_schema.MakeUpper();
@@ -1094,24 +1119,27 @@ SQLInfoFirebird::GetCATALOGForeignAttributes(CString p_schema
   {
     if(p_referenced)
     {
-      query += "   AND idx.rdb$relation_name   = '" + p_tablename + "'\n";
+      query += "   AND idx.rdb$relation_name   = ?\n";
     }
     else
     {
-      query += "   AND con.rdb$relation_name   = '" + p_tablename + "'\n";
+      query += "   AND con.rdb$relation_name   = ?\n";
     }
   }
   if(!p_constraint.IsEmpty())
   {
     if(p_referenced)
     {
-      query += "   AND ref.rdb$constraint_name = '" + p_constraint + "'\n";
+      query += "   AND ref.rdb$constraint_name = ?\n";
     }
     else
     {
-      query += "   AND con.rdb$constraint_name = '" + p_constraint + "'\n";
+      query += "   AND con.rdb$constraint_name = ?\n";
     }
   }
+
+  // Do not bind as a parameter
+  p_schema.Empty(); 
 
   // Add ordering up to column number
   query += " ORDER BY 1,2,3,4,5,6,7,8,9";
@@ -1224,16 +1252,17 @@ SQLInfoFirebird::GetCATALOGTriggerExists(CString /*p_schema*/, CString p_tablena
 }
 
 CString
-SQLInfoFirebird::GetCATALOGTriggerList(CString p_schema, CString p_tablename) const
+SQLInfoFirebird::GetCATALOGTriggerList(CString& p_schema,CString& p_tablename) const
 {
-  return GetCATALOGTriggerAttributes(p_schema,p_tablename,"");
+  CString triggername;
+  return GetCATALOGTriggerAttributes(p_schema,p_tablename,triggername);
 }
 
 CString
-SQLInfoFirebird::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablename, CString p_triggername) const
+SQLInfoFirebird::GetCATALOGTriggerAttributes(CString& p_schema,CString& p_tablename,CString& p_triggername) const
 {
-  p_schema.MakeUpper();
-  p_triggername.MakeUpper();
+  p_schema.Empty(); // Do not bind as a parameter
+  p_tablename.MakeUpper();
   p_triggername.MakeUpper();
 
   CString sql("SELECT cast('' as varchar(31)) AS catalog_name\n"
@@ -1314,11 +1343,11 @@ SQLInfoFirebird::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablena
   {
     if(p_tablename.Find('%') >= 0)
     {
-      sql.AppendFormat("   AND rdb$relation_name LIKE '%s'\n",p_tablename.GetString());
+      sql += "   AND rdb$relation_name LIKE ?\n";
     }
     else
     {
-      sql.AppendFormat("   AND rdb$relation_name = '%s'\n",p_tablename.GetString());
+      sql += "   AND rdb$relation_name = ?\n";
     }
   }
 
@@ -1327,11 +1356,11 @@ SQLInfoFirebird::GetCATALOGTriggerAttributes(CString p_schema, CString p_tablena
   {
     if(p_triggername.Find('%') >= 0)
     {
-      sql.AppendFormat("   AND rdb$trigger_name LIKE '%s'\n",p_triggername.GetString());
+      sql += "   AND rdb$trigger_name LIKE ?\n";
     }
     else
     {
-      sql.AppendFormat("   AND rdb$trigger_name = '%s'\n",p_triggername.GetString());
+      sql += "   AND rdb$trigger_name = ?\n";
     }
   }
 
@@ -1419,8 +1448,9 @@ SQLInfoFirebird::GetCATALOGSequenceExists(CString /*p_schema*/, CString p_sequen
 }
 
 CString
-SQLInfoFirebird::GetCATALOGSequenceList(CString /*p_schema*/,CString p_pattern) const
+SQLInfoFirebird::GetCATALOGSequenceList(CString& p_schema,CString& p_pattern) const
 {
+  p_schema.Empty(); // Do not bind the schema name
   p_pattern.MakeUpper();
   p_pattern = "%" + p_pattern + "%";
 
@@ -1435,13 +1465,14 @@ SQLInfoFirebird::GetCATALOGSequenceList(CString /*p_schema*/,CString p_pattern) 
                 "      ,0  as ordering\n"
                 "  FROM rdb$generators\n"
                 " WHERE rdb$system_flag    = 0\n"
-                "   AND rdb$generator_name LIKE '" + p_pattern + "'";
+                "   AND rdb$generator_name LIKE ?";
   return sql;
 }
 
 CString
-SQLInfoFirebird::GetCATALOGSequenceAttributes(CString /*p_schema*/, CString p_sequence) const
+SQLInfoFirebird::GetCATALOGSequenceAttributes(CString& p_schema,CString& p_sequence) const
 {
+  p_schema.Empty(); // Do not use as a bound parameter
   p_sequence.MakeUpper();
 
   CString sql = "SELECT cast('' as varchar(31))  as catalog_name\n"
@@ -1455,7 +1486,7 @@ SQLInfoFirebird::GetCATALOGSequenceAttributes(CString /*p_schema*/, CString p_se
                 "      ,0  as ordering\n"
                 "  FROM rdb$generators\n"
                 " WHERE rdb$system_flag    = 0\n"
-                "   AND rdb$generator_name = '" + p_sequence + "'";
+                "   AND rdb$generator_name = ?";
   return sql;
 }
 
@@ -1480,26 +1511,28 @@ SQLInfoFirebird::GetCATALOGSequenceDrop(CString /*p_schema*/, CString p_sequence
 // ALL VIEW FUNCTIONS
 
 CString 
-SQLInfoFirebird::GetCATALOGViewExists(CString /*p_schema*/,CString p_viewname) const
+SQLInfoFirebird::GetCATALOGViewExists(CString& p_schema,CString& p_viewname) const
 {
+  p_schema.Empty();  // Do not bind as a parameter
   p_viewname.MakeUpper();
 
   CString sql = "SELECT count(*)\n"
                 "  FROM rdb$relations\n"
-                " WHERE rdb$relation_name = '" + p_viewname + "'\n"
+                " WHERE rdb$relation_name = ?\n"
                 "   AND rdb$relation_type = 1";
   return sql;
 }
 
 CString 
-SQLInfoFirebird::GetCATALOGViewList(CString p_schema,CString p_pattern) const
+SQLInfoFirebird::GetCATALOGViewList(CString& p_schema,CString& p_pattern) const
 {
   return GetCATALOGViewAttributes(p_schema,p_pattern);
 }
 
 CString 
-SQLInfoFirebird::GetCATALOGViewAttributes(CString /*p_schema*/,CString p_viewname) const
+SQLInfoFirebird::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) const
 {
+  p_schema.Empty(); // do not bind as parameter
   p_viewname.MakeUpper();
   CString sql = "SELECT CAST('' AS VARCHAR(31))             AS table_catalog\n"
                 "      ,CAST(rdb$owner_name AS VARCHAR(31)) AS table_schema\n"
@@ -1514,8 +1547,8 @@ SQLInfoFirebird::GetCATALOGViewAttributes(CString /*p_schema*/,CString p_viewnam
   if(!p_viewname.IsEmpty())
   {
     sql += "\n AND rdb$relation_name ";
-    sql += (p_viewname.Find("%") >= 0) ? "LIKE '" : "= '";
-    sql += p_viewname + "'";
+    sql += (p_viewname.Find("%") >= 0) ? "LIKE" : "=";
+    sql += " ?";
   }
   return sql;
 }
@@ -1545,6 +1578,19 @@ SQLInfoFirebird::GetCATALOGViewDrop(CString /*p_schema*/,CString p_viewname,CStr
                 " WHERE rdb$depended_on_name = '" + p_viewname + "'\n"
                 "   AND rdb$depended_on_type = 0";
   return "DROP VIEW " + p_viewname;
+}
+
+// All Privilege functions
+CString
+SQLInfoFirebird::GetCATALOGTablePrivileges(CString& /*p_schema*/,CString& /*p_tablename*/) const
+{
+  return "";
+}
+
+CString 
+SQLInfoFirebird::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
+{
+  return "";
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1587,7 +1633,7 @@ SQLInfoFirebird::GetPSMProcedureExists(CString /*p_schema*/, CString p_procedure
 }
 
 CString
-SQLInfoFirebird::GetPSMProcedureList(CString p_schema) const
+SQLInfoFirebird::GetPSMProcedureList(CString& p_schema) const
 {
   p_schema.MakeUpper();
   CString sql1("SELECT '' as catalog_name\n"
@@ -1609,12 +1655,14 @@ SQLInfoFirebird::GetPSMProcedureList(CString p_schema) const
     sql2 += " WHERE fun.rdb$owner = '" + p_schema + "'\n";
   }
 
+  p_schema.Empty(); // Do not bind parameters
   return sql1 + " UNION ALL\n" + sql2 + " ORDER BY 1,2,3";
 }
 
 CString
-SQLInfoFirebird::GetPSMProcedureAttributes(CString /*p_schema*/, CString p_procedure) const
+SQLInfoFirebird::GetPSMProcedureAttributes(CString& p_schema,CString& p_procedure) const
 {
+  p_schema.Empty(); // Do not bind as a parameter
   p_procedure.MakeUpper();
   CString sql1 ("SELECT '' as catalog_name\n"
                 "      ,trim(rdb$owner_name) as schema_name\n"
@@ -1658,8 +1706,10 @@ SQLInfoFirebird::GetPSMProcedureAttributes(CString /*p_schema*/, CString p_proce
 
   if(!p_procedure.IsEmpty())
   {
-    sql1 += " WHERE rdb$procedure_name = '" + p_procedure + "'\n";
-    sql2 += " WHERE rdb$function_name  = '" + p_procedure + "'\n";
+    // Bind as 2 parameters.
+    p_schema = p_procedure;
+    sql1 += " WHERE rdb$procedure_name = ?\n";
+    sql2 += " WHERE rdb$function_name  = ?\n";
   }
   return sql1 + " UNION ALL\n" + sql2;
 }
@@ -1693,9 +1743,11 @@ SQLInfoFirebird::GetPSMProcedureErrors(CString p_schema,CString p_procedure) con
 
 // And it's parameters
 CString
-SQLInfoFirebird::GetPSMProcedureParameters(CString /*p_schema*/,CString p_procedure) const
+SQLInfoFirebird::GetPSMProcedureParameters(CString& p_schema,CString& p_procedure) const
 {
+  p_schema.Empty(); // Do not bind as a parameter
   p_procedure.MakeUpper();
+  p_schema = p_procedure;
 
   CString sql = "SELECT '' as catalog_name\n"
                 "      ,(SELECT trim(rdb$owner_name)\n"
@@ -1840,7 +1892,7 @@ SQLInfoFirebird::GetPSMProcedureParameters(CString /*p_schema*/,CString p_proced
                 "  FROM rdb$procedure_parameters par\n"
                 "      ,rdb$fields fld\n"
                 " WHERE fld.rdb$field_name = par.rdb$field_source\n"
-                "   AND par.rdb$procedure_name = '" + p_procedure + "'\n"
+                "   AND par.rdb$procedure_name = ?\n"  // <== PARAMETER !!
                 "UNION ALL\n"
                 "SELECT '' as catalog_name\n"
                 "      ,(SELECT trim(rdb$owner_name)\n"
@@ -1988,7 +2040,7 @@ SQLInfoFirebird::GetPSMProcedureParameters(CString /*p_schema*/,CString p_proced
                 "  FROM rdb$function_arguments par\n"
                 "      ,rdb$fields fld\n"
                 " WHERE fld.rdb$field_name = par.rdb$field_source\n"
-                "   AND par.rdb$function_name = '" + p_procedure + "'";
+                "   AND par.rdb$function_name = ?";  // <== PARAMETER !!
   return sql;
 }
 

@@ -73,7 +73,7 @@ InitValutaString()
 {
   if(g_locale_valutaInit == false)
   {
-    setlocale(LC_NUMERIC, "");
+    setlocale(LC_NUMERIC,"C");
 
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_SDECIMAL,  g_locale_decimalSep, SEP_LEN);
     GetLocaleInfo(LOCALE_USER_DEFAULT, LOCALE_STHOUSAND, g_locale_thousandSep,SEP_LEN);

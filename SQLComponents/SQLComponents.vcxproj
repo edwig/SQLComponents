@@ -22,7 +22,7 @@
     <ProjectName>SQLComponents</ProjectName>
     <ProjectGuid>{0E56E030-9CDD-47A7-B580-DCD4E103F968}</ProjectGuid>
     <RootNamespace>SQLComponenten</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -104,6 +104,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
@@ -119,7 +120,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -142,6 +143,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
@@ -217,12 +219,14 @@
     <ClCompile Include="SQLInfoFirebird.cpp" />
     <ClCompile Include="SQLInfoGenericODBC.cpp" />
     <ClCompile Include="SQLInfoInformix.cpp" />
+    <ClCompile Include="SQLInfoMariaDB.cpp" />
     <ClCompile Include="SQLInfoMySQL.cpp" />
     <ClCompile Include="SQLInfoOracle.cpp" />
     <ClCompile Include="SQLInfoPostgreSQL.cpp" />
     <ClCompile Include="SQLInfoSQLServer.cpp" />
     <ClCompile Include="SQLInterval.cpp" />
     <ClCompile Include="SQLLanguage.cpp" />
+    <ClCompile Include="SQLMessage.cpp" />
     <ClCompile Include="SQLMutation.cpp" />
     <ClCompile Include="SQLQuery.cpp" />
     <ClCompile Include="SQLRecord.cpp" />
@@ -300,6 +304,7 @@
     <ClInclude Include="SQLInfoFirebird.h" />
     <ClInclude Include="SQLInfoGenericODBC.h" />
     <ClInclude Include="SQLInfoInformix.h" />
+    <ClInclude Include="SQLInfoMariaDB.h" />
     <ClInclude Include="SQLInfoMySQL.h" />
     <ClInclude Include="SQLInfoOracle.h" />
     <ClInclude Include="SQLInfoPostgreSQL.h" />
@@ -307,6 +312,7 @@
     <ClInclude Include="SQLInterval.h" />
     <ClInclude Include="SQLLanguage.h" />
     <ClInclude Include="SQLMemoryDebug.h" />
+    <ClInclude Include="SQLMessage.h" />
     <ClInclude Include="SQLMetaInfo.h" />
     <ClInclude Include="SQLMutation.h" />
     <ClInclude Include="SQLOperator.h" />

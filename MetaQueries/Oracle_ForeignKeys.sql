@@ -33,19 +33,17 @@ SELECT /*+ RULE +*/
                             ELSE 1 END AS initially_deferred
       ,CASE con.status      WHEN 'ENABLED' THEN 1
                             ELSE 0 END AS enabled
-  FROM all_tables tab
-       INNER JOIN all_constraints  con ON (con.owner           = tab.owner
-                                      AND  con.table_name      = tab.table_name)
+  FROM all_constraints con
        INNER JOIN all_cons_columns col ON (con.owner           = col.owner
                                       AND  con.constraint_name = col.constraint_name)
        INNER JOIN all_constraints  pri ON (pri.owner           = con.r_owner
                                       AND  pri.constraint_name = con.r_constraint_name)
        INNER JOIN all_cons_columns pky ON (pri.owner           = pky.owner
-                                      AND  pri.constraint_name = pky.constraint_name)
- WHERE col.position        = pky.position
-   AND con.constraint_type = 'R'
-   AND tab.owner           = 'MDBA'
-   AND tab.table_name      = 'KBS_EI'
+                                      AND  pri.constraint_name = pky.constraint_name
+                                      And  col.position        = pky.position)
+ WHERE con.constraint_type = 'R'
+   AND con.owner           = 'MDBA'
+   AND con.table_name      = 'KBS_EI'
  ORDER BY 1,2,3,4,5,6,7,8,9
 ;
 
@@ -67,10 +65,3 @@ SELECT con.*
    AND con.constraint_type IN ('P','R')
 ;
 
-
-
-SELECT *
-  FROM all_views -- KU$_CONSTRAINT_EXISTS_VIEW;
- WHERE view_name LIKE '%CONS%';
-
-SELECT * FROM REF_CONSTRAINT_EXISTS_VIEW;

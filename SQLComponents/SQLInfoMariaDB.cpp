@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 //
-// File: SQLInfoMySQL.cpp
+// File: SQLInfoMariaDB.cpp
 //
 // Copyright (c) 1998-2020 ir. W.E. Huisman
 // All rights reserved
@@ -25,7 +25,7 @@
 //
 #include "stdafx.h"
 #include "SQLComponents.h"
-#include "SQLInfoMySQL.h"
+#include "SQLInfoMariaDB.h"
 #include "SQLQuery.h"
 
 #ifdef _DEBUG
@@ -38,13 +38,13 @@ namespace SQLComponents
 {
 
 // Constructor
-SQLInfoMySQL::SQLInfoMySQL(SQLDatabase* p_database)
-             :SQLInfoDB(p_database)
+SQLInfoMariaDB::SQLInfoMariaDB(SQLDatabase* p_database)
+               :SQLInfoDB(p_database)
 {
 }
 
 // Destructor. Does nothing
-SQLInfoMySQL::~SQLInfoMySQL()
+SQLInfoMariaDB::~SQLInfoMariaDB()
 {
 }
 
@@ -57,22 +57,22 @@ SQLInfoMySQL::~SQLInfoMySQL()
 // Get the database type
 // DatabaseType GetDatabaseType() const;
 DatabaseType
-SQLInfoMySQL::GetRDBMSDatabaseType() const
+SQLInfoMariaDB::GetRDBMSDatabaseType() const
 {
-  return RDBMS_MYSQL;
+  return RDBMS_MARIADB;
 }
 
 // The name of the database vendor
 CString
-SQLInfoMySQL::GetRDBMSVendorName() const
+SQLInfoMariaDB::GetRDBMSVendorName() const
 {
   // The name of the database vendor
-  return "MySQL A.B. / Oracle";
+  return "MariaDB";
 }
 
 // Get the physical database name
 CString
-SQLInfoMySQL::GetRDBMSPhysicalDatabaseName() const
+SQLInfoMariaDB::GetRDBMSPhysicalDatabaseName() const
 {
   // See to it that "SQLDatabase:GetDatabaseName" does it's work
   return m_database->GetDatabaseName();
@@ -80,28 +80,28 @@ SQLInfoMySQL::GetRDBMSPhysicalDatabaseName() const
 
 // System catalog is stored in uppercase in the database?
 bool
-SQLInfoMySQL::GetRDBMSIsCatalogUpper() const
+SQLInfoMariaDB::GetRDBMSIsCatalogUpper() const
 {
   return false;
 }
 
 // System catalog supports full ISO schemas (same tables per schema)
 bool
-SQLInfoMySQL::GetRDBMSUnderstandsSchemas() const
+SQLInfoMariaDB::GetRDBMSUnderstandsSchemas() const
 {
   return false;
 }
 
 // Supports database/ODBCdriver comments in SQL
 bool
-SQLInfoMySQL::GetRDBMSSupportsComments() const
+SQLInfoMariaDB::GetRDBMSSupportsComments() const
 {
   return true;
 }
 
 // Database can defer constraints until the end of a transaction
 bool
-SQLInfoMySQL::GetRDBMSSupportsDeferredConstraints() const
+SQLInfoMariaDB::GetRDBMSSupportsDeferredConstraints() const
 {
   // NO CONSTRAINTS DEFERRED 
   // If transactions are supported we assume that constraints can be deferred
@@ -111,21 +111,21 @@ SQLInfoMySQL::GetRDBMSSupportsDeferredConstraints() const
 
 // Database has ORDER BY with an expression, e.g. ORDER BY UPPER(columnname)
 bool
-SQLInfoMySQL::GetRDBMSSupportsOrderByExpression() const
+SQLInfoMariaDB::GetRDBMSSupportsOrderByExpression() const
 {
   return true;
 }
 
 // Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
 bool
-SQLInfoMySQL::GetRDBMSSupportsODBCCallEscapes() const
+SQLInfoMariaDB::GetRDBMSSupportsODBCCallEscapes() const
 {
   return true;
 }
 
 // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
 bool
-SQLInfoMySQL::GetRDBMSSupportsDatatypeTime() const
+SQLInfoMariaDB::GetRDBMSSupportsDatatypeTime() const
 {
   // Time can be implemented as TIME
   return true;
@@ -133,7 +133,7 @@ SQLInfoMySQL::GetRDBMSSupportsDatatypeTime() const
 
 // If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
 bool
-SQLInfoMySQL::GetRDBMSSupportsDatatypeInterval() const
+SQLInfoMariaDB::GetRDBMSSupportsDatatypeInterval() const
 {
   // Interval not supported, can be implemented as DECIMALS
   return false;
@@ -141,7 +141,7 @@ SQLInfoMySQL::GetRDBMSSupportsDatatypeInterval() const
 
 // Gets the maximum length of an SQL statement
 unsigned long
-SQLInfoMySQL::GetRDBMSMaxStatementLength() const
+SQLInfoMariaDB::GetRDBMSMaxStatementLength() const
 {
   // No Limit
   return 0;
@@ -149,14 +149,14 @@ SQLInfoMySQL::GetRDBMSMaxStatementLength() const
 
 // Database must commit DDL commands in a transaction
 bool
-SQLInfoMySQL::GetRDBMSMustCommitDDL() const
+SQLInfoMariaDB::GetRDBMSMustCommitDDL() const
 {
   return false;
 }
 
 // Correct maximum precision,scale for a NUMERIC datatype
 void
-SQLInfoMySQL::GetRDBMSNumericPrecisionScale(SQLULEN& /*p_precision*/, SQLSMALLINT& /*p_scale*/) const
+SQLInfoMariaDB::GetRDBMSNumericPrecisionScale(SQLULEN& /*p_precision*/, SQLSMALLINT& /*p_scale*/) const
 {
   // NO-OP
 }
@@ -165,21 +165,21 @@ SQLInfoMySQL::GetRDBMSNumericPrecisionScale(SQLULEN& /*p_precision*/, SQLSMALLIN
 
 // Keyword for the current date and time
 CString
-SQLInfoMySQL::GetKEYWORDCurrentTimestamp() const
+SQLInfoMariaDB::GetKEYWORDCurrentTimestamp() const
 {
   return "current_timestamp";
 }
 
 // String for the current date
 CString
-SQLInfoMySQL::GetKEYWORDCurrentDate() const
+SQLInfoMariaDB::GetKEYWORDCurrentDate() const
 {
   return "current_date";
 }
 
 // Get the concatenation operator
 CString
-SQLInfoMySQL::GetKEYWORDConcatanationOperator() const
+SQLInfoMariaDB::GetKEYWORDConcatanationOperator() const
 {
   // BEWARE: Officially the concatenation operator is "CONCAT(string1,string2)"
   // MYSQL supports 'one' 'two' concatenation of two strings (no operator)
@@ -188,14 +188,14 @@ SQLInfoMySQL::GetKEYWORDConcatanationOperator() const
 
 // Get quote character for strings
 CString
-SQLInfoMySQL::GetKEYWORDQuoteCharacter() const
+SQLInfoMariaDB::GetKEYWORDQuoteCharacter() const
 {
   return "\'";
 }
 
 // Get default NULL for parameter list input
 CString
-SQLInfoMySQL::GetKEYWORDParameterDefaultNULL() const
+SQLInfoMariaDB::GetKEYWORDParameterDefaultNULL() const
 {
   // Standard, no definition defines the NULL state
   return "";
@@ -203,21 +203,21 @@ SQLInfoMySQL::GetKEYWORDParameterDefaultNULL() const
 
 // Parameter is for INPUT and OUTPUT in parameter list
 CString
-SQLInfoMySQL::GetKEYWORDParameterINOUT() const
+SQLInfoMariaDB::GetKEYWORDParameterINOUT() const
 {
   return "";
 }
 
 // Parameter is for OUTPUT only in parameter list
 CString
-SQLInfoMySQL::GetKEYWORDParameterOUT() const
+SQLInfoMariaDB::GetKEYWORDParameterOUT() const
 {
   return "";
 }
 
 // Get datatype of the IDENTITY primary key in a Network database
 CString
-SQLInfoMySQL::GetKEYWORDNetworkPrimaryKeyType() const
+SQLInfoMariaDB::GetKEYWORDNetworkPrimaryKeyType() const
 {
   // Use SEQUENCE to fill!
   return "INTEGER";
@@ -225,14 +225,14 @@ SQLInfoMySQL::GetKEYWORDNetworkPrimaryKeyType() const
 
 // Get datatype for timestamp (year to second)
 CString
-SQLInfoMySQL::GetKEYWORDTypeTimestamp() const
+SQLInfoMariaDB::GetKEYWORDTypeTimestamp() const
 {
   return "TIMESTAMP";
 }
 
 // Prefix for a parameter in a stored procedure
 CString
-SQLInfoMySQL::GetKEYWORDParameterPrefix() const
+SQLInfoMariaDB::GetKEYWORDParameterPrefix() const
 {
   return "";
 }
@@ -240,35 +240,35 @@ SQLInfoMySQL::GetKEYWORDParameterPrefix() const
 // Get select part to add new record identity to a table
 // Can be special column like 'OID' or a sequence select
 CString
-SQLInfoMySQL::GetKEYWORDIdentityString(CString& p_tablename,CString p_postfix /*= "_seq"*/) const
+SQLInfoMariaDB::GetKEYWORDIdentityString(CString& p_tablename,CString p_postfix /*= "_seq"*/) const
 {
   return p_tablename + p_postfix + ".nextval";
 }
 
 // Gets the UPPER function
 CString
-SQLInfoMySQL::GetKEYWORDUpper(CString& p_expression) const
+SQLInfoMariaDB::GetKEYWORDUpper(CString& p_expression) const
 {
   return "UPPER(" + p_expression + ")";
 }
 
 // Gets the construction for 1 minute ago
 CString
-SQLInfoMySQL::GetKEYWORDInterval1MinuteAgo() const
+SQLInfoMariaDB::GetKEYWORDInterval1MinuteAgo() const
 {
   return "ERROR";
 }
 
 // Gets the Not-NULL-Value statement of the database
 CString
-SQLInfoMySQL::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
+SQLInfoMariaDB::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
 {
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
 }
 
 // Gets the construction for inline generating a key within an INSERT statement
 CString
-SQLInfoMySQL::GetSQLNewSerial(CString /*p_table*/, CString /*p_sequence*/) const
+SQLInfoMariaDB::GetSQLNewSerial(CString /*p_table*/, CString /*p_sequence*/) const
 {
   // Insert a zero in an IDENTITY column
   return "0";
@@ -276,7 +276,7 @@ SQLInfoMySQL::GetSQLNewSerial(CString /*p_table*/, CString /*p_sequence*/) const
 
 // Gets the construction / select for generating a new serial identity
 CString
-SQLInfoMySQL::GetSQLGenerateSerial(CString p_table) const
+SQLInfoMariaDB::GetSQLGenerateSerial(CString p_table) const
 {
   // NO WAY OF KNOWNING THIS
   return "0";
@@ -284,7 +284,7 @@ SQLInfoMySQL::GetSQLGenerateSerial(CString p_table) const
 
 // Gets the construction / select for the resulting effective generated serial
 CString
-SQLInfoMySQL::GetSQLEffectiveSerial(CString p_identity) const
+SQLInfoMariaDB::GetSQLEffectiveSerial(CString p_identity) const
 {
   // THIS IS MOST LIKELY NOT THE CORRECT VALUE.
   // NO WAY OF DETERMINING THIS
@@ -293,21 +293,21 @@ SQLInfoMySQL::GetSQLEffectiveSerial(CString p_identity) const
 
 // Gets the sub-transaction commands
 CString
-SQLInfoMySQL::GetSQLStartSubTransaction(CString p_savepointName) const
+SQLInfoMariaDB::GetSQLStartSubTransaction(CString p_savepointName) const
 {
   // Generic ODBC does not known about sub transactions!
   return CString("");
 }
 
 CString
-SQLInfoMySQL::GetSQLCommitSubTransaction(CString p_savepointName) const
+SQLInfoMariaDB::GetSQLCommitSubTransaction(CString p_savepointName) const
 {
   // Generic ODBC does not known about sub transactions!
   return CString("");
 }
 
 CString
-SQLInfoMySQL::GetSQLRollbackSubTransaction(CString p_savepointName) const
+SQLInfoMariaDB::GetSQLRollbackSubTransaction(CString p_savepointName) const
 {
   // Generic ODBC does not known about sub transactions!
   return CString("");
@@ -315,7 +315,7 @@ SQLInfoMySQL::GetSQLRollbackSubTransaction(CString p_savepointName) const
 
 // FROM-Part for a query to select only 1 (one) record / or empty!
 CString
-SQLInfoMySQL::GetSQLFromDualClause() const
+SQLInfoMariaDB::GetSQLFromDualClause() const
 {
   // MySQL does bare SELECT!
   return "";
@@ -323,7 +323,7 @@ SQLInfoMySQL::GetSQLFromDualClause() const
 
 // Get SQL to lock  a table 
 CString
-SQLInfoMySQL::GetSQLLockTable(CString /*p_schema*/, CString p_tablename, bool p_exclusive) const
+SQLInfoMariaDB::GetSQLLockTable(CString /*p_schema*/, CString p_tablename, bool p_exclusive) const
 {
   // Standard ISO SQL Syntax
   CString query = "LOCK TABLE " + p_tablename + " IN ";
@@ -334,7 +334,7 @@ SQLInfoMySQL::GetSQLLockTable(CString /*p_schema*/, CString p_tablename, bool p_
 
 // Get query to optimize the table statistics
 CString
-SQLInfoMySQL::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
+SQLInfoMariaDB::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
 {
   // To be implemented
   return "";
@@ -342,7 +342,7 @@ SQLInfoMySQL::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
 
 // Transform query to select top <n> rows
 CString
-SQLInfoMySQL::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
+SQLInfoMariaDB::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
 {
   if(p_top > 0)
   {
@@ -366,7 +366,7 @@ SQLInfoMySQL::GetSQLTopNRows(CString p_sql,int p_top,int p_skip /*= 0*/) const
 
 // Makes a SQL string from a given string, with all the right quotes
 CString
-SQLInfoMySQL::GetSQLString(const CString& p_string) const
+SQLInfoMariaDB::GetSQLString(const CString& p_string) const
 {
   CString s = p_string;
   s.Replace("'","''");
@@ -376,7 +376,7 @@ SQLInfoMySQL::GetSQLString(const CString& p_string) const
 
 // Get date string in engine format
 CString
-SQLInfoMySQL::GetSQLDateString(int p_year,int p_month,int p_day) const
+SQLInfoMariaDB::GetSQLDateString(int p_year,int p_month,int p_day) const
 {
   CString dateString;
   dateString.Format("{d '%04d-%02d-%02d'}",p_year,p_month,p_day);
@@ -385,7 +385,7 @@ SQLInfoMySQL::GetSQLDateString(int p_year,int p_month,int p_day) const
 
 // Get time string in database engine format
 CString
-SQLInfoMySQL::GetSQLTimeString(int p_hour,int p_minute,int p_second) const
+SQLInfoMariaDB::GetSQLTimeString(int p_hour,int p_minute,int p_second) const
 {
   CString retval;
   retval.Format("{t '%02d:%02d:%02d'}",p_hour,p_minute,p_second);
@@ -394,7 +394,7 @@ SQLInfoMySQL::GetSQLTimeString(int p_hour,int p_minute,int p_second) const
 
 // Get date-time string in database engine format
 CString
-SQLInfoMySQL::GetSQLDateTimeString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
+SQLInfoMariaDB::GetSQLDateTimeString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
 {
   CString string;
   string.Format("{ts '%04d-%02d-%02d %02d:%02d:%02d'}"
@@ -405,14 +405,14 @@ SQLInfoMySQL::GetSQLDateTimeString(int p_year,int p_month,int p_day,int p_hour,i
 
 // Get date-time bound parameter string in database format
 CString
-SQLInfoMySQL::GetSQLDateTimeBoundString() const
+SQLInfoMariaDB::GetSQLDateTimeBoundString() const
 {
   return "{ts ?}";
 }
 
 // Stripped data for the parameter binding
 CString
-SQLInfoMySQL::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
+SQLInfoMariaDB::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const
 {
   CString string;
   string.Format("%04d-%02d-%02d %02d:%02d:%02d"
@@ -449,7 +449,7 @@ SQLInfoMySQL::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int 
 // Meta info about meta types
 // Standard ODBC functions are good enough
 CString
-SQLInfoMySQL::GetCATALOGMetaTypes(int p_type) const
+SQLInfoMariaDB::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
@@ -457,20 +457,20 @@ SQLInfoMySQL::GetCATALOGMetaTypes(int p_type) const
 
 // Get SQL to check if a table already exists in the database
 CString
-SQLInfoMySQL::GetCATALOGTableExists(CString& /*p_schema*/,CString& /*p_tablename*/) const
+SQLInfoMariaDB::GetCATALOGTableExists(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Still to do in MySQL
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTablesList(CString& p_schema,CString& p_pattern) const
+SQLInfoMariaDB::GetCATALOGTablesList(CString& p_schema,CString& p_pattern) const
 {
   return GetCATALOGTableAttributes(p_schema,p_pattern);
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTableAttributes(CString& p_schema,CString& p_tablename) const
+SQLInfoMariaDB::GetCATALOGTableAttributes(CString& p_schema,CString& p_tablename) const
 {
   CString sql;
   sql = "SELECT table_catalog\n"
@@ -502,14 +502,14 @@ SQLInfoMySQL::GetCATALOGTableAttributes(CString& p_schema,CString& p_tablename) 
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTableSynonyms(CString& /*p_schema*/,CString& /*p_tablename*/) const
+SQLInfoMariaDB::GetCATALOGTableSynonyms(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // MS-Access cannot do this
   return false;
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTableCatalog(CString& p_schema,CString& p_tablename) const
+SQLInfoMariaDB::GetCATALOGTableCatalog(CString& p_schema,CString& p_tablename) const
 {
   p_schema.Empty(); // do not bind as a parameter
 
@@ -535,20 +535,20 @@ SQLInfoMySQL::GetCATALOGTableCatalog(CString& p_schema,CString& p_tablename) con
   return sql;}
 
 CString
-SQLInfoMySQL::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+SQLInfoMariaDB::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CString p_newname) const
+SQLInfoMariaDB::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CString p_newname) const
 {
   CString sql("RENAME TABLE" + p_tablename + " TO " + p_newname);
   return sql;
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename) const
+SQLInfoMariaDB::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename) const
 {
   CString sql("DROP TABLE " + p_tablename);
   return sql;
@@ -558,20 +558,20 @@ SQLInfoMySQL::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename) cons
 // ALL TEMPORARY TABLE FUNCTIONS
 
 CString 
-SQLInfoMySQL::GetCATALOGTemptableCreate(CString /*p_schema*/,CString p_tablename,CString p_select) const
+SQLInfoMariaDB::GetCATALOGTemptableCreate(CString /*p_schema*/,CString p_tablename,CString p_select) const
 {
   // BEWARE: THIS IS A GUESS. 
   return "CREATE TEMPORARY TABLE " + p_tablename + "\nAS " + p_select;
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGTemptableIntoTemp(CString /*p_schema*/,CString p_tablename,CString p_select) const
+SQLInfoMariaDB::GetCATALOGTemptableIntoTemp(CString /*p_schema*/,CString p_tablename,CString p_select) const
 {
   return "INSERT INTO " + p_tablename + "\n" + p_select;
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGTemptableDrop(CString /*p_schema*/,CString p_tablename) const
+SQLInfoMariaDB::GetCATALOGTemptableDrop(CString /*p_schema*/,CString p_tablename) const
 {
   return "DROP TABLE " + p_tablename;
 }
@@ -580,27 +580,27 @@ SQLInfoMySQL::GetCATALOGTemptableDrop(CString /*p_schema*/,CString p_tablename) 
 // ALL COLUMN FUNCTIONS
 
 CString 
-SQLInfoMySQL::GetCATALOGColumnExists(CString /*p_schema*/,CString p_tablename,CString p_columnname) const
+SQLInfoMariaDB::GetCATALOGColumnExists(CString /*p_schema*/,CString p_tablename,CString p_columnname) const
 {
   return "";
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGColumnList(CString& /*p_schema*/,CString& /*p_tablename*/) const
-{
-  // Standard ODBC driver suffices
-  return "";
-}
-
-CString 
-SQLInfoMySQL::GetCATALOGColumnAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
+SQLInfoMariaDB::GetCATALOGColumnList(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Standard ODBC driver suffices
   return "";
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGColumnCreate(MetaColumn& p_column) const
+SQLInfoMariaDB::GetCATALOGColumnAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
+{
+  // Standard ODBC driver suffices
+  return "";
+}
+
+CString 
+SQLInfoMariaDB::GetCATALOGColumnCreate(MetaColumn& p_column) const
 {
   CString sql = "ALTER TABLE "  + p_column.m_table  + "\n"
                 "  ADD COLUMN " + p_column.m_column + " " + p_column.m_typename;
@@ -613,7 +613,7 @@ SQLInfoMySQL::GetCATALOGColumnCreate(MetaColumn& p_column) const
   return sql;}
 
 CString 
-SQLInfoMySQL::GetCATALOGColumnAlter(MetaColumn& p_column) const
+SQLInfoMariaDB::GetCATALOGColumnAlter(MetaColumn& p_column) const
 {
   // The MODIFY keyword is a-typical
   CString sql = "ALTER  TABLE  " + p_column.m_table + "\n"
@@ -628,7 +628,7 @@ SQLInfoMySQL::GetCATALOGColumnAlter(MetaColumn& p_column) const
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGColumnRename(CString p_schema,CString p_tablename,CString p_columnname,CString p_newname,CString /*p_datatype*/) const
+SQLInfoMariaDB::GetCATALOGColumnRename(CString p_schema,CString p_tablename,CString p_columnname,CString p_newname,CString /*p_datatype*/) const
 {
   // General ISO syntax
   CString sql("ALTER  TABLE  " + p_tablename + "\n"
@@ -637,7 +637,7 @@ SQLInfoMySQL::GetCATALOGColumnRename(CString p_schema,CString p_tablename,CStrin
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGColumnDrop(CString p_schema,CString p_tablename,CString p_columnname) const
+SQLInfoMariaDB::GetCATALOGColumnDrop(CString p_schema,CString p_tablename,CString p_columnname) const
 {
   CString sql("ALTER TABLE  " + p_tablename + "\n"
               " DROP COLUMN " + p_columnname);
@@ -649,7 +649,7 @@ SQLInfoMySQL::GetCATALOGColumnDrop(CString p_schema,CString p_tablename,CString 
 
 // All index functions
 CString
-SQLInfoMySQL::GetCATALOGIndexExists(CString /*p_schema*/,CString p_tablename,CString p_indexname) const
+SQLInfoMariaDB::GetCATALOGIndexExists(CString /*p_schema*/,CString p_tablename,CString p_indexname) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -657,7 +657,7 @@ SQLInfoMySQL::GetCATALOGIndexExists(CString /*p_schema*/,CString p_tablename,CSt
 }
 
 CString
-SQLInfoMySQL::GetCATALOGIndexList(CString& /*p_schema*/,CString& /*p_tablename*/) const
+SQLInfoMariaDB::GetCATALOGIndexList(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -665,7 +665,7 @@ SQLInfoMySQL::GetCATALOGIndexList(CString& /*p_schema*/,CString& /*p_tablename*/
 }
 
 CString
-SQLInfoMySQL::GetCATALOGIndexAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_indexname*/) const
+SQLInfoMariaDB::GetCATALOGIndexAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_indexname*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -673,7 +673,7 @@ SQLInfoMySQL::GetCATALOGIndexAttributes(CString& /*p_schema*/,CString& /*p_table
 }
 
 CString
-SQLInfoMySQL::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
+SQLInfoMariaDB::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
 {
   // Get SQL to create an index for a table
   // CREATE [UNIQUE] INDEX [<schema>.]indexname ON [<schema>.]tablename(column [ASC|DESC] [,...]);
@@ -713,7 +713,7 @@ SQLInfoMySQL::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
 }
 
 CString
-SQLInfoMySQL::GetCATALOGIndexDrop(CString /*p_schema*/,CString /*p_tablename*/,CString p_indexname) const
+SQLInfoMariaDB::GetCATALOGIndexDrop(CString /*p_schema*/,CString /*p_tablename*/,CString p_indexname) const
 {
   CString sql = "DROP INDEX " + p_indexname;
   return sql;
@@ -721,7 +721,7 @@ SQLInfoMySQL::GetCATALOGIndexDrop(CString /*p_schema*/,CString /*p_tablename*/,C
 
 // Get extra filter expression for an index column
 CString
-SQLInfoMySQL::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
+SQLInfoMariaDB::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 {
   return "";
 }
@@ -730,21 +730,21 @@ SQLInfoMySQL::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 // ALL PRIMARY KEY FUNCTIONS
 
 CString
-SQLInfoMySQL::GetCATALOGPrimaryExists(CString /*p_schema*/,CString p_tablename) const
+SQLInfoMariaDB::GetCATALOGPrimaryExists(CString /*p_schema*/,CString p_tablename) const
 {
   // To be implemented
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGPrimaryAttributes(CString& /*p_schema*/,CString& /*p_tablename*/) const
+SQLInfoMariaDB::GetCATALOGPrimaryAttributes(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // To be implemented
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
+SQLInfoMariaDB::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
 {
   CString query("ALTER TABLE ");
 
@@ -768,7 +768,7 @@ SQLInfoMySQL::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
 }
 
 CString
-SQLInfoMySQL::GetCATALOGPrimaryDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
+SQLInfoMariaDB::GetCATALOGPrimaryDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
 {
   CString sql("ALTER TABLE " + p_tablename + "\n"
               " DROP CONSTRAINT " + p_constraintname);
@@ -779,7 +779,7 @@ SQLInfoMySQL::GetCATALOGPrimaryDrop(CString /*p_schema*/,CString p_tablename,CSt
 // ALL FOREIGN KEY FUNCTIONS
 
 CString
-SQLInfoMySQL::GetCATALOGForeignExists(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
+SQLInfoMariaDB::GetCATALOGForeignExists(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -787,7 +787,7 @@ SQLInfoMySQL::GetCATALOGForeignExists(CString /*p_schema*/,CString p_tablename,C
 }
 
 CString
-SQLInfoMySQL::GetCATALOGForeignList(CString& /*p_schema*/,CString& /*p_tablename*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoMariaDB::GetCATALOGForeignList(CString& /*p_schema*/,CString& /*p_tablename*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -795,7 +795,7 @@ SQLInfoMySQL::GetCATALOGForeignList(CString& /*p_schema*/,CString& /*p_tablename
 }
 
 CString
-SQLInfoMySQL::GetCATALOGForeignAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_constraintname*/,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoMariaDB::GetCATALOGForeignAttributes(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_constraintname*/,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -803,7 +803,7 @@ SQLInfoMySQL::GetCATALOGForeignAttributes(CString& /*p_schema*/,CString& /*p_tab
 }
 
 CString
-SQLInfoMySQL::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
+SQLInfoMariaDB::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
 {
   // Get first record
   MetaForeign& foreign = p_foreigns.front();
@@ -872,7 +872,7 @@ SQLInfoMySQL::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
 }
 
 CString
-SQLInfoMySQL::GetCATALOGForeignAlter(MForeignMap& p_original, MForeignMap& p_requested) const
+SQLInfoMariaDB::GetCATALOGForeignAlter(MForeignMap& p_original, MForeignMap& p_requested) const
 {
   // Make sure we have both
   if(p_original.empty() || p_requested.empty())
@@ -938,7 +938,7 @@ SQLInfoMySQL::GetCATALOGForeignAlter(MForeignMap& p_original, MForeignMap& p_req
 }
 
 CString
-SQLInfoMySQL::GetCATALOGForeignDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
+SQLInfoMariaDB::GetCATALOGForeignDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
 {
   CString sql("ALTER TABLE " + p_tablename + "\n"
               " DROP CONSTRAINT " + p_constraintname);
@@ -949,20 +949,20 @@ SQLInfoMySQL::GetCATALOGForeignDrop(CString /*p_schema*/,CString p_tablename,CSt
 // ALL TRIGGER FUNCTIONS
 
 CString
-SQLInfoMySQL::GetCATALOGTriggerExists(CString /*p_schema*/, CString p_tablename, CString p_triggername) const
+SQLInfoMariaDB::GetCATALOGTriggerExists(CString /*p_schema*/, CString p_tablename, CString p_triggername) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTriggerList(CString& p_schema,CString& p_tablename) const
+SQLInfoMariaDB::GetCATALOGTriggerList(CString& p_schema,CString& p_tablename) const
 {
   CString triggername;
   return GetCATALOGTriggerAttributes(p_schema,p_tablename,triggername);
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTriggerAttributes(CString& p_schema,CString& p_tablename,CString& p_triggername) const
+SQLInfoMariaDB::GetCATALOGTriggerAttributes(CString& p_schema,CString& p_tablename,CString& p_triggername) const
 {
   CString sql;
   sql = "SELECT event_object_catalog\n"
@@ -1010,13 +1010,13 @@ SQLInfoMySQL::GetCATALOGTriggerAttributes(CString& p_schema,CString& p_tablename
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTriggerCreate(MetaTrigger& /*p_trigger*/) const
+SQLInfoMariaDB::GetCATALOGTriggerCreate(MetaTrigger& /*p_trigger*/) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGTriggerDrop(CString /*p_schema*/, CString p_tablename, CString p_triggername) const
+SQLInfoMariaDB::GetCATALOGTriggerDrop(CString /*p_schema*/, CString p_tablename, CString p_triggername) const
 {
   return "";
 }
@@ -1025,31 +1025,31 @@ SQLInfoMySQL::GetCATALOGTriggerDrop(CString /*p_schema*/, CString p_tablename, C
 // ALL SEQUENCE FUNCTIONS
 
 CString
-SQLInfoMySQL::GetCATALOGSequenceExists(CString /*p_schema*/, CString p_sequence) const
+SQLInfoMariaDB::GetCATALOGSequenceExists(CString /*p_schema*/, CString p_sequence) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGSequenceList(CString& /*p_schema*/,CString& /*p_pattern*/) const
+SQLInfoMariaDB::GetCATALOGSequenceList(CString& /*p_schema*/,CString& /*p_pattern*/) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGSequenceAttributes(CString& /*p_schema*/,CString& /*p_sequence*/) const
+SQLInfoMariaDB::GetCATALOGSequenceAttributes(CString& /*p_schema*/,CString& /*p_sequence*/) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGSequenceCreate(MetaSequence& /*p_sequence*/) const
+SQLInfoMariaDB::GetCATALOGSequenceCreate(MetaSequence& /*p_sequence*/) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetCATALOGSequenceDrop(CString /*p_schema*/, CString p_sequence) const
+SQLInfoMariaDB::GetCATALOGSequenceDrop(CString /*p_schema*/, CString p_sequence) const
 {
   return "";
 }
@@ -1058,19 +1058,19 @@ SQLInfoMySQL::GetCATALOGSequenceDrop(CString /*p_schema*/, CString p_sequence) c
 // ALL VIEW FUNCTIONS
 
 CString 
-SQLInfoMySQL::GetCATALOGViewExists(CString& /*p_schema*/,CString& /*p_viewname*/) const
+SQLInfoMariaDB::GetCATALOGViewExists(CString& /*p_schema*/,CString& /*p_viewname*/) const
 {
   return "";
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGViewList(CString& p_schema,CString& p_pattern) const
+SQLInfoMariaDB::GetCATALOGViewList(CString& p_schema,CString& p_pattern) const
 {
   return GetCATALOGViewAttributes(p_schema,p_pattern);
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) const
+SQLInfoMariaDB::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) const
 {
   CString sql;
   sql = "SELECT table_catalog\n"
@@ -1099,19 +1099,19 @@ SQLInfoMySQL::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) co
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGViewCreate(CString /*p_schema*/,CString p_viewname,CString p_contents) const
+SQLInfoMariaDB::GetCATALOGViewCreate(CString /*p_schema*/,CString p_viewname,CString p_contents) const
 {
   return "CREATE VIEW " + p_viewname + "\n" + p_contents;
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGViewRename(CString p_schema,CString p_viewname,CString p_newname)    const
+SQLInfoMariaDB::GetCATALOGViewRename(CString p_schema,CString p_viewname,CString p_newname)    const
 {
   return "";
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGViewDrop(CString /*p_schema*/,CString p_viewname,CString& p_precursor) const
+SQLInfoMariaDB::GetCATALOGViewDrop(CString /*p_schema*/,CString p_viewname,CString& p_precursor) const
 {
   p_precursor.Empty();
   return "DROP VIEW " + p_viewname;
@@ -1119,13 +1119,13 @@ SQLInfoMySQL::GetCATALOGViewDrop(CString /*p_schema*/,CString p_viewname,CString
 
 // All Privilege functions
 CString
-SQLInfoMySQL::GetCATALOGTablePrivileges(CString& /*p_schema*/,CString& /*p_tablename*/) const
+SQLInfoMariaDB::GetCATALOGTablePrivileges(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   return "";
 }
 
 CString 
-SQLInfoMySQL::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
+SQLInfoMariaDB::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
 {
   return "";
 }
@@ -1160,7 +1160,7 @@ SQLInfoMySQL::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tabl
 //////////////////////////////////////////////////////////////////////////
 
 CString
-SQLInfoMySQL::GetPSMProcedureExists(CString p_schema, CString p_procedure) const
+SQLInfoMariaDB::GetPSMProcedureExists(CString p_schema, CString p_procedure) const
 {
   CString sql;
   sql = "SELECT SELECT COUNT(*)\n"
@@ -1177,7 +1177,7 @@ SQLInfoMySQL::GetPSMProcedureExists(CString p_schema, CString p_procedure) const
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureList(CString& p_schema) const
+SQLInfoMariaDB::GetPSMProcedureList(CString& p_schema) const
 {
   CString sql;
   sql = "SELECT routine_catalog\n"
@@ -1194,7 +1194,7 @@ SQLInfoMySQL::GetPSMProcedureList(CString& p_schema) const
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureAttributes(CString& p_schema,CString& p_procedure) const
+SQLInfoMariaDB::GetPSMProcedureAttributes(CString& p_schema,CString& p_procedure) const
 {
   CString sql;
   sql = "SELECT routine_catalog\n"
@@ -1242,33 +1242,33 @@ SQLInfoMySQL::GetPSMProcedureAttributes(CString& p_schema,CString& p_procedure) 
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
+SQLInfoMariaDB::GetPSMProcedureSourcecode(CString p_schema, CString p_procedure) const
 {
   // Source-code already gotten with attributes
   return "";
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
+SQLInfoMariaDB::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureDrop(CString /*p_schema*/, CString p_procedure) const
+SQLInfoMariaDB::GetPSMProcedureDrop(CString /*p_schema*/, CString p_procedure) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
+SQLInfoMariaDB::GetPSMProcedureErrors(CString p_schema,CString p_procedure) const
 {
   return "";
 }
 
 // And it's parameters
 CString
-SQLInfoMySQL::GetPSMProcedureParameters(CString& p_schema,CString& p_procedure) const
+SQLInfoMariaDB::GetPSMProcedureParameters(CString& p_schema,CString& p_procedure) const
 {
   CString sql;
 
@@ -1330,7 +1330,7 @@ SQLInfoMySQL::GetPSMProcedureParameters(CString& p_schema,CString& p_procedure) 
 //////////////////////////////////////////////////////////////////////////
 
 CString
-SQLInfoMySQL::GetPSMDeclaration(bool    /*p_first*/
+SQLInfoMariaDB::GetPSMDeclaration(bool    /*p_first*/
                                ,CString p_variable
                                ,int     p_datatype
                                ,int     p_precision /*= 0 */
@@ -1368,7 +1368,7 @@ SQLInfoMySQL::GetPSMDeclaration(bool    /*p_first*/
 }
 
 CString
-SQLInfoMySQL::GetPSMAssignment(CString p_variable,CString p_statement /*=""*/) const
+SQLInfoMariaDB::GetPSMAssignment(CString p_variable,CString p_statement /*=""*/) const
 {
   CString line(p_variable);
   line += " [?=] ";
@@ -1381,7 +1381,7 @@ SQLInfoMySQL::GetPSMAssignment(CString p_variable,CString p_statement /*=""*/) c
 }
 
 CString
-SQLInfoMySQL::GetPSMIF(CString p_condition) const
+SQLInfoMariaDB::GetPSMIF(CString p_condition) const
 {
   CString line("IF (");
   line += p_condition;
@@ -1390,55 +1390,55 @@ SQLInfoMySQL::GetPSMIF(CString p_condition) const
 }
 
 CString
-SQLInfoMySQL::GetPSMIFElse() const
+SQLInfoMariaDB::GetPSMIFElse() const
 {
   return "ELSE\n";
 }
 
 CString
-SQLInfoMySQL::GetPSMIFEnd() const
+SQLInfoMariaDB::GetPSMIFEnd() const
 {
   return "END IF;\n";
 }
 
 CString
-SQLInfoMySQL::GetPSMWhile(CString p_condition) const
+SQLInfoMariaDB::GetPSMWhile(CString p_condition) const
 {
   return "WHILE (" + p_condition + ") DO\n";
 }
 
 CString
-SQLInfoMySQL::GetPSMWhileEnd() const
+SQLInfoMariaDB::GetPSMWhileEnd() const
 {
   return "END WHILE;\n";
 }
 
 CString
-SQLInfoMySQL::GetPSMLOOP() const
+SQLInfoMariaDB::GetPSMLOOP() const
 {
   return "LOOP\n";
 }
 
 CString
-SQLInfoMySQL::GetPSMLOOPEnd() const
+SQLInfoMariaDB::GetPSMLOOPEnd() const
 {
   return "END LOOP;\n";
 }
 
 CString
-SQLInfoMySQL::GetPSMBREAK() const
+SQLInfoMariaDB::GetPSMBREAK() const
 {
   return "LEAVE\n";
 }
 
 CString
-SQLInfoMySQL::GetPSMRETURN(CString p_statement /*= ""*/) const
+SQLInfoMariaDB::GetPSMRETURN(CString p_statement /*= ""*/) const
 {
   return "RETURN " + p_statement;
 }
 
 CString
-SQLInfoMySQL::GetPSMExecute(CString p_procedure,MParameterMap& p_parameters) const
+SQLInfoMariaDB::GetPSMExecute(CString p_procedure,MParameterMap& p_parameters) const
 {
   CString line;
   line.Format("EXECUTE %s USING ",p_procedure.GetString());
@@ -1458,13 +1458,13 @@ SQLInfoMySQL::GetPSMExecute(CString p_procedure,MParameterMap& p_parameters) con
 
 // The CURSOR
 CString
-SQLInfoMySQL::GetPSMCursorDeclaration(CString p_cursorname,CString p_select) const
+SQLInfoMariaDB::GetPSMCursorDeclaration(CString p_cursorname,CString p_select) const
 {
   return "DECLARE " + p_cursorname + " CURSOR FOR " + p_select + ";";
 }
 
 CString
-SQLInfoMySQL::GetPSMCursorFetch(CString p_cursorname,std::vector<CString>& /*p_columnnames*/,std::vector<CString>& p_variablenames) const
+SQLInfoMariaDB::GetPSMCursorFetch(CString p_cursorname,std::vector<CString>& /*p_columnnames*/,std::vector<CString>& p_variablenames) const
 {
   CString query = "FETCH " + p_cursorname + " INTO ";
   bool moreThenOne = false;
@@ -1483,21 +1483,21 @@ SQLInfoMySQL::GetPSMCursorFetch(CString p_cursorname,std::vector<CString>& /*p_c
 // PSM Exceptions
 
 CString
-SQLInfoMySQL::GetPSMExceptionCatchNoData() const
+SQLInfoMariaDB::GetPSMExceptionCatchNoData() const
 {
   return "DECLARE EXIT HANDLER FOR SQLSTATE '02000'\n";
   // Must be followed by a (block)statement
 }
 
 CString
-SQLInfoMySQL::GetPSMExceptionCatch(CString p_sqlState) const
+SQLInfoMariaDB::GetPSMExceptionCatch(CString p_sqlState) const
 {
   return "DECLARE EXIT HANDLER FOR SQLSTATE '" + p_sqlState + "'\n";
   // Must be followed by a (block)statement
 }
 
 CString
-SQLInfoMySQL::GetPSMExceptionRaise(CString p_sqlState) const
+SQLInfoMariaDB::GetPSMExceptionRaise(CString p_sqlState) const
 {
   return "SIGNAL SQLSTATE '" + p_sqlState + "'\n";
 }
@@ -1518,25 +1518,25 @@ SQLInfoMySQL::GetPSMExceptionRaise(CString p_sqlState) const
 //////////////////////////////////////////////////////////////////////////
 
 CString
-SQLInfoMySQL::GetSESSIONMyself() const
+SQLInfoMariaDB::GetSESSIONMyself() const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetSESSIONExists(CString p_sessionID) const
+SQLInfoMariaDB::GetSESSIONExists(CString p_sessionID) const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetSESSIONList() const
+SQLInfoMariaDB::GetSESSIONList() const
 {
   return "";
 }
 
 CString
-SQLInfoMySQL::GetSESSIONAttributes(CString p_sessionID) const
+SQLInfoMariaDB::GetSESSIONAttributes(CString p_sessionID) const
 {
   return "";
 }
@@ -1545,14 +1545,14 @@ SQLInfoMySQL::GetSESSIONAttributes(CString p_sessionID) const
 // Transactions
 
 CString
-SQLInfoMySQL::GetSESSIONConstraintsDeferred() const
+SQLInfoMariaDB::GetSESSIONConstraintsDeferred() const
 {
   // MySQL cannot defer constraints
   return "";
 }
 
 CString
-SQLInfoMySQL::GetSESSIONConstraintsImmediate() const
+SQLInfoMariaDB::GetSESSIONConstraintsImmediate() const
 {
   // MySQL constraints are always active
   return "";
@@ -1567,14 +1567,14 @@ SQLInfoMySQL::GetSESSIONConstraintsImmediate() const
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant*
-SQLInfoMySQL::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
+SQLInfoMariaDB::DoSQLCall(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
 {
   return nullptr;
 }
 
 // Calling a stored function with named parameters, returning a value
 SQLVariant*
-SQLInfoMySQL::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
+SQLInfoMariaDB::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
 {
   return nullptr;
 }

@@ -660,7 +660,7 @@ namespace DatabaseUnitTest
       index.m_indexName  = indexname;
       index.m_columnName = "id";
       index.m_position   = 0;
-      index.m_unique     = true;
+      index.m_nonunique  = false;
       index.m_ascending  = "A";
 
       MetaTable    tables;

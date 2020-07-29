@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 //
-// File: SQLComponentsVersion.h
+// File: SQLMessage.h
 //
 // Copyright (c) 1998-2020 ir. W.E. Huisman
 // All rights reserved
@@ -21,12 +21,12 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION 
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+// Version number: See SQLComponents.h
+//
 #pragma once
 
-// General version, date and copyright
-// of the SQLComponents library
-
-#define SQL_COMPONENTS_VERSION   "1.6.5"
-#define SQL_COMPONENTS_BINVERSION 1,6,5,0
-#define SQL_COMPONENTS_DATE      "29-07-2020"
-#define SQL_COMPONENTS_COPYRIGHT "Copyright (c) 2020 ir. W.E. Huisman"
+namespace SQLComponents
+{
+  // Message in the foreground or to the WMI Event log
+  INT_PTR SQLMessage(HWND p_wnd,CString p_message,CString p_title,int p_buttons);
+}
