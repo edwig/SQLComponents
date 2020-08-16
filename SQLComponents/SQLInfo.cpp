@@ -735,16 +735,25 @@ SQLInfo::ReadingDataTypes()
 
 // Getting datatype info
 TypeInfo* 
-SQLInfo::GetTypeInfo(int p_sqlDatatype) const
+SQLInfo::GetTypeInfo(int p_sqlDatatype,CString p_typename /*=""*/) const
 {
+  TypeInfo* result = nullptr;
+
   for(auto& type : m_dataTypes)
   {
     if(type.second->m_data_type == p_sqlDatatype)
     {
-      return type.second;
+      result = type.second;
+      if(p_typename.GetLength())
+      {
+        if(type.second->m_type_name.CompareNoCase(p_typename) == 0)
+        {
+          return type.second;
+        }
+      }
     }
   }
-  return nullptr;
+  return result;
 }
 
 // Returns the fact whether an API function is supported
@@ -1524,7 +1533,7 @@ SQLInfo::MakeInfoTableColumns(MColumnMap& p_columns
                              ,CString     p_schema
                              ,CString     p_tablename
                              ,CString     p_columnname /*=""*/)
-  {
+{
   SQLCHAR      szCatalogName [SQL_MAX_BUFFER+1];
   SQLLEN       cbCatalogName = 0;
   SQLCHAR      szSchemaName  [SQL_MAX_BUFFER+1];
@@ -1650,10 +1659,10 @@ SQLInfo::MakeInfoTableColumns(MColumnMap& p_columns
          {
            theColumn.m_datatype = DataType;                            // 5
            type = ODBCDataType(DataType);
-         if(cbTypeName > 0)
-         {
-           if(type.CompareNoCase((char*)szTypeName))
+           if(cbTypeName > 0)
            {
+             if(type.CompareNoCase((char*)szTypeName))
+             {
                type = szTypeName;                                      // 6
              }
            }

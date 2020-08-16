@@ -138,6 +138,13 @@ SQLInfoGenericODBC::GetRDBMSSupportsDatatypeInterval() const
   return true;
 }
 
+// Supports functions at the place of table columns in create/alter index statement
+bool
+SQLInfoGenericODBC::GetRDBMSSupportsFunctionalIndexes() const
+{
+  return false;
+}
+
 // Gets the maximum length of an SQL statement
 unsigned long 
 SQLInfoGenericODBC::GetRDBMSMaxStatementLength() const
@@ -188,6 +195,13 @@ CString
 SQLInfoGenericODBC::GetKEYWORDQuoteCharacter() const
 {
   return "\'";
+}
+
+// Get quote character around reserved words as an identifier
+CString
+SQLInfoGenericODBC::GetKEYWORDReservedWordQuote() const
+{
+  return "\"";
 }
 
 // Get default NULL for parameter list input
@@ -263,6 +277,20 @@ CString
 SQLInfoGenericODBC::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
 {
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
+}
+
+// Gets the RDBMS definition of the datatype
+CString
+SQLInfoGenericODBC::GetKEYWORDDataType(MetaColumn* p_column)
+{
+  return p_column->m_typename = SQLInfo::ODBCDataType(p_column->m_datatype);
+}
+
+// Connects to a default schema in the database/instance
+CString
+SQLInfoGenericODBC::GetSQLDefaultSchema(CString /*p_schema*/) const
+{
+  return "";
 }
 
 // Gets the construction for inline generating a key within an INSERT statement
@@ -481,9 +509,15 @@ SQLInfoGenericODBC::GetCATALOGTableCatalog(CString& /*p_schema*/,CString& /*p_ta
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+SQLInfoGenericODBC::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/) const
 {
-  return "";
+  CString sql = "CREATE ";
+  if (p_table.m_temporary)
+  {
+    sql += "TEMPORARY ";
+  }
+  sql += "TABLE " + p_table.m_table;
+  return sql;
 }
 
 CString
@@ -494,7 +528,7 @@ SQLInfoGenericODBC::GetCATALOGTableRename(CString p_schema,CString p_tablename,C
 }
 
 CString
-SQLInfoGenericODBC::GetCATALOGTableDrop(CString p_schema,CString p_tablename) const
+SQLInfoGenericODBC::GetCATALOGTableDrop(CString p_schema,CString p_tablename,bool /*p_ifExist = false*/,bool /*p_restrict = false*/,bool /*p_cascade = false*/) const
 {
   CString sql = "DROP TABLE ";
   if(!p_schema.IsEmpty())
@@ -1051,6 +1085,26 @@ CString
 SQLInfoGenericODBC::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
 {
   return "";
+}
+
+CString 
+SQLInfoGenericODBC::GetCatalogGrantPrivilege(CString p_schema,CString p_objectname,CString p_privilege,CString p_grantee,bool p_grantable)
+{
+  CString sql;
+  sql.Format("GRANT %s ON %s.%s TO %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  if(p_grantable)
+  {
+    sql += " WITH GRANT OPTION";
+  }
+  return sql;
+}
+
+CString 
+SQLInfoGenericODBC::GetCatalogRevokePrivilege(CString p_schema,CString p_objectname,CString p_privilege,CString p_grantee)
+{
+  CString sql;
+  sql.Format("REVOKE %s ON %s.%s FROM %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////

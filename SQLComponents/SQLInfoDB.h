@@ -59,7 +59,7 @@ public:
   // Default list of granted users on a created object
   void    SetGrantedUsers(CString p_users);
   CString GetGrantedUsers() const;
-  // We prefer the 'standard' ODBC drivers meta queries
+  // We prefer the strict 'standard' ODBC drivers meta queries
   void    SetPreferODBC(bool p_prefer);
   bool    GetPreferODBC();
 
@@ -136,6 +136,9 @@ public:
   // BEWARE BOOL INVERTED!!
   virtual bool GetRDBMSSupportsDatatypeInterval() const = 0;
 
+  // Supports functions at the place of table columns in create/alter index statement
+  virtual bool GetRDBMSSupportsFunctionalIndexes() const = 0;
+
   // Gets the maximum length of an SQL statement
   virtual unsigned long GetRDBMSMaxStatementLength() const = 0;
 
@@ -159,6 +162,9 @@ public:
 
   // Get quote character for strings
   virtual CString GetKEYWORDQuoteCharacter() const = 0;
+
+  // Get quote character around reserved words as an identifier
+  virtual CString GetKEYWORDReservedWordQuote() const = 0;
 
   // Get default NULL for parameter list input
   virtual CString GetKEYWORDParameterDefaultNULL() const = 0;
@@ -191,8 +197,14 @@ public:
   // Gets the Not-NULL-Value statement of the database
   virtual CString GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const = 0;
 
+  // Gets the RDBMS definition of the datatype
+  virtual CString GetKEYWORDDataType(MetaColumn* p_column) = 0;
+
   //////////////////////////////////////////////////////////////////////////
   // SQL FOR SUB-PROCESSING
+
+  // Connects to a default schema in the database/instance
+  virtual CString GetSQLDefaultSchema(CString p_schema) const = 0;
 
   // Gets the construction for inline generating a key within an INSERT statement
   virtual CString GetSQLNewSerial(CString p_table,CString p_sequence) const = 0;
@@ -277,7 +289,7 @@ public:
   virtual CString GetCATALOGTableCatalog      (CString& p_schema,CString& p_tablename) const = 0;
   virtual CString GetCATALOGTableCreate       (MetaTable& p_table,MetaColumn& p_column) const = 0;
   virtual CString GetCATALOGTableRename       (CString  p_schema,CString  p_tablename,CString p_newname) const = 0;
-  virtual CString GetCATALOGTableDrop         (CString  p_schema,CString  p_tablename) const = 0;
+  virtual CString GetCATALOGTableDrop         (CString  p_schema,CString  p_tablename,bool p_ifExist = false,bool p_restrict = false,bool p_cascade = false) const = 0;
   // All Temporary table functions
   virtual CString GetCATALOGTemptableCreate   (CString p_schema,CString p_tablename,CString p_select) const = 0;
   virtual CString GetCATALOGTemptableIntoTemp (CString p_schema,CString p_tablename,CString p_select) const = 0;
@@ -331,6 +343,8 @@ public:
   // All Privilege functions
   virtual CString GetCATALOGTablePrivileges   (CString& p_schema,CString& p_tablename) const = 0;
   virtual CString GetCATALOGColumnPrivileges  (CString& p_schema,CString& p_tablename,CString& p_columnname) const = 0;
+  virtual CString GetCatalogGrantPrivilege    (CString  p_schema,CString  p_objectname,CString p_privilege,CString p_grantee,bool p_grantable) = 0;
+  virtual CString GetCatalogRevokePrivilege   (CString  p_schema,CString  p_objectname,CString p_privilege,CString p_grantee) = 0;
 
   //////////////////////////////////////////////////////////////////////////
   //

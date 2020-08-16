@@ -34,12 +34,12 @@
 #define new DEBUG_NEW
 #endif
 
-// CAboutDlg dialog used for App About
+// AboutDlg dialog used for App About
 
-class CAboutDlg : public CDialog
+class AboutDlg : public CDialog
 {
 public:
-	CAboutDlg();
+	AboutDlg();
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -54,16 +54,16 @@ protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-CAboutDlg::CAboutDlg() : CDialog(IDD_ABOUTBOX)
+AboutDlg::AboutDlg() : CDialog(IDD_ABOUTBOX)
 {
 }
 
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+void AboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
+BEGIN_MESSAGE_MAP(AboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 // CSQLConnectionsDlg dialog
@@ -395,7 +395,7 @@ SQLConnectionsDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
-		CAboutDlg dlgAbout;
+		AboutDlg dlgAbout;
 		dlgAbout.DoModal();
 	}
 	else

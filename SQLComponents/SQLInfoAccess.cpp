@@ -135,6 +135,13 @@ SQLInfoAccess::GetRDBMSSupportsDatatypeInterval() const
   return false;
 }
 
+// Supports functions at the place of table columns in create/alter index statement
+bool
+SQLInfoAccess::GetRDBMSSupportsFunctionalIndexes() const
+{
+  return false;
+}
+
 // Gets the maximum length of an SQL statement
 unsigned long 
 SQLInfoAccess::GetRDBMSMaxStatementLength() const
@@ -185,6 +192,13 @@ CString
 SQLInfoAccess::GetKEYWORDQuoteCharacter() const
 {
   return "\'";
+}
+
+// Get quote character around reserved words as an identifier
+CString 
+SQLInfoAccess::GetKEYWORDReservedWordQuote() const
+{
+  return "\"";
 }
 
 // Get default NULL for parameter list input
@@ -257,6 +271,20 @@ CString
 SQLInfoAccess::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
 {
   return CString("IIF(ISNULL(") + p_test + ")," + p_isnull + "," + p_test + ")";
+}
+
+// Gets the RDBMS definition of the datatype
+CString 
+SQLInfoAccess::GetKEYWORDDataType(MetaColumn* p_column)
+{
+  return p_column->m_typename;
+}
+
+// Connects to a default schema in the database/instance
+CString 
+SQLInfoAccess::GetSQLDefaultSchema(CString /*p_schema*/) const
+{
+  return "";
 }
 
 // Gets the construction for inline generating a key within an INSERT statement
@@ -465,9 +493,11 @@ SQLInfoAccess::GetCATALOGTableCatalog(CString& /*p_schema*/,CString& /*p_tablena
 }
 
 CString 
-SQLInfoAccess::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+SQLInfoAccess::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/) const
 {
-  return "";
+  CString sql = "CREATE TABLE ";
+  sql += p_table.m_table;
+  return sql;
 }
 
 // Rename a database table 
@@ -480,7 +510,7 @@ SQLInfoAccess::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CS
 }
 
 CString 
-SQLInfoAccess::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename) const
+SQLInfoAccess::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename,bool /*p_ifExist = false*/,bool /*p_restrict = false*/,bool /*p_cascade = false*/) const
 {
   return "DROP TABLE " + p_tablename;
 }
@@ -955,6 +985,26 @@ CString
 SQLInfoAccess::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
 {
   return "";
+}
+
+CString 
+SQLInfoAccess::GetCatalogGrantPrivilege(CString /*p_schema*/,CString p_objectname,CString p_privilege,CString p_grantee,bool p_grantable)
+{
+  CString sql;
+  sql.Format("GRANT %s ON %s TO %s",p_privilege.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  if(p_grantable)
+  {
+    sql += " WITH GRANT OPTION";
+  }
+  return sql;
+}
+
+CString 
+SQLInfoAccess::GetCatalogRevokePrivilege(CString p_schema,CString p_objectname,CString p_privilege,CString p_grantee)
+{
+  CString sql;
+  sql.Format("REVOKE %s ON %s FROM %s",p_privilege.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////

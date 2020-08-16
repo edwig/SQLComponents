@@ -153,6 +153,13 @@ SQLInfoOracle::GetRDBMSSupportsDatatypeInterval() const
   return false;
 }
 
+// Supports functions at the place of table columns in create/alter index statement
+bool
+SQLInfoOracle::GetRDBMSSupportsFunctionalIndexes() const
+{
+  return true;
+}
+
 // Gets the maximum length of an SQL statement
 unsigned long
 SQLInfoOracle::GetRDBMSMaxStatementLength() const
@@ -210,6 +217,13 @@ CString
 SQLInfoOracle::GetKEYWORDQuoteCharacter() const
 {
   return "\'";
+}
+
+// Get quote character around reserved words as an identifier
+CString
+SQLInfoOracle::GetKEYWORDReservedWordQuote() const
+{
+  return "\"";
 }
 
 // Get default NULL for parameter list input
@@ -282,6 +296,83 @@ CString
 SQLInfoOracle::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
 {
   return CString("NVL(") + p_test + "," + p_isnull + ")";
+}
+
+// Gets the RDBMS definition of the datatype
+CString
+SQLInfoOracle::GetKEYWORDDataType(MetaColumn* p_column)
+{
+  CString type;
+  switch(p_column->m_datatype)
+  {
+    case SQL_CHAR:                      // fall through
+    case SQL_VARCHAR:                   // fall through
+    case SQL_WCHAR:                     // fall through
+    case SQL_WVARCHAR:                  type = "VARCHAR2";      
+                                        break;
+    case SQL_LONGVARCHAR:               // fall through
+    case SQL_WLONGVARCHAR:              type = "CLOB";          
+                                        break;
+    case SQL_NUMERIC:                   // fall through
+    case SQL_DECIMAL:                   // fall through
+    case SQL_INTEGER:                   // fall through
+    case SQL_SMALLINT:                  // fall through
+    case SQL_FLOAT:                     // fall through
+    case SQL_REAL:                      // fall through
+    case SQL_DOUBLE:                    // fall through
+    case SQL_BIGINT:                    // fall through
+    case SQL_TINYINT:                   // fall through
+    case SQL_BIT:                       type = "NUMBER";
+                                        p_column->m_columnSize    = 0;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+  //case SQL_DATE:
+    case SQL_DATETIME:                  // fall through
+    case SQL_TYPE_DATE:                 // fall through
+    case SQL_TIMESTAMP:                 // fall through
+    case SQL_TYPE_TIMESTAMP:            type = "DATE";
+                                        p_column->m_columnSize    = 0;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_TIME:                      // fall through
+    case SQL_TYPE_TIME:                 type = "TIMESTAMP";
+                                        p_column->m_columnSize = 0;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_BINARY:                    type = "BLOB";          break;
+    case SQL_VARBINARY:                 type = "BLOB";          break;
+    case SQL_LONGVARBINARY:             type = "BLOB";          break;
+    case SQL_GUID:                      type = "GUID";          break;
+    case SQL_INTERVAL_YEAR:             // fall through
+    case SQL_INTERVAL_YEAR_TO_MONTH:    // fall through
+    case SQL_INTERVAL_MONTH:            type = "VARCHAR2";
+                                        p_column->m_columnSize    = 80;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_INTERVAL_DAY:              // fall through
+    case SQL_INTERVAL_HOUR:             // fall through
+    case SQL_INTERVAL_MINUTE:           // fall through
+    case SQL_INTERVAL_SECOND:           // fall through
+    case SQL_INTERVAL_DAY_TO_HOUR:      // fall through
+    case SQL_INTERVAL_DAY_TO_MINUTE:    // fall through
+    case SQL_INTERVAL_HOUR_TO_MINUTE:   // fall through
+    case SQL_INTERVAL_HOUR_TO_SECOND:   // fall through
+    case SQL_INTERVAL_MINUTE_TO_SECOND: // fall through
+    case SQL_INTERVAL_DAY_TO_SECOND:    type = "VARCHAR2";
+                                        p_column->m_columnSize    = 80;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_UNKNOWN_TYPE:              // fall through
+    default:                            break;
+  }
+  return p_column->m_typename = type;
+}
+
+// Connects to a default schema in the database/instance
+CString
+SQLInfoOracle::GetSQLDefaultSchema(CString p_schema) const
+{
+  return "ALTER SESSION SET CURRENT_SCHEMA = " + p_schema;
 }
 
 // Gets the construction for inline generating a key within an INSERT statement
@@ -670,9 +761,21 @@ SQLInfoOracle::GetCATALOGTableCatalog(CString& p_schema,CString& p_tablename) co
 
 
 CString
-SQLInfoOracle::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+SQLInfoOracle::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/) const
 {
-  return "";
+  CString sql = "CREATE ";
+  if (p_table.m_temporary)
+  {
+    sql += "GLOBAL TEMPORARY ";
+  }
+  sql += "TABLE ";
+  if (!p_table.m_schema.IsEmpty())
+  {
+    sql += p_table.m_schema;
+    sql += ".";
+  }
+  sql += p_table.m_table;
+  return sql;
 }
 
 CString
@@ -684,7 +787,7 @@ SQLInfoOracle::GetCATALOGTableRename(CString p_schema,CString p_tablename,CStrin
 }
 
 CString
-SQLInfoOracle::GetCATALOGTableDrop(CString p_schema,CString p_tablename) const
+SQLInfoOracle::GetCATALOGTableDrop(CString p_schema,CString p_tablename,bool /*p_ifExist = false*/,bool /*p_restrict = false*/,bool p_cascade /*= false*/) const
 {
   CString sql("DROP TABLE ");
   if(!p_schema.IsEmpty())
@@ -692,6 +795,10 @@ SQLInfoOracle::GetCATALOGTableDrop(CString p_schema,CString p_tablename) const
     sql += p_schema + ".";
   }
   sql += p_tablename;
+  if(p_cascade)
+  {
+    sql += " CASCADE CONSTRAINTS";
+  }
   return sql;
 }
 
@@ -1866,6 +1973,26 @@ SQLInfoOracle::GetCATALOGColumnPrivileges(CString& p_schema,CString& p_tablename
     sql += "column_name = ?\n";
   }
   sql += " ORDER BY 1,2,3,4,6,5,7";
+  return sql;
+}
+
+CString 
+SQLInfoOracle::GetCatalogGrantPrivilege(CString p_schema,CString p_objectname,CString p_privilege,CString p_grantee,bool p_grantable)
+{
+  CString sql;
+  sql.Format("GRANT %s ON %s.%s TO %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  if(p_grantable)
+  {
+    sql += " WITH GRANT OPTION";
+  }
+  return sql;
+}
+
+CString 
+SQLInfoOracle::GetCatalogRevokePrivilege(CString p_schema,CString p_objectname,CString p_privilege,CString p_grantee)
+{
+  CString sql;
+  sql.Format("REVOKE %s ON %s.%s FROM %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
   return sql;
 }
 

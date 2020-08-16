@@ -527,8 +527,8 @@ SQLDatabase::SetKnownRebinds()
   if(m_rdbmsType == RDBMS_ORACLE)
   {
     m_rebindColumns.clear();
-    m_rebindColumns[SQL_REAL   ] = SQL_C_DOUBLE;
-    m_rebindColumns[SQL_FLOAT  ] = SQL_C_DOUBLE;
+//     m_rebindColumns[SQL_REAL   ] = SQL_C_DOUBLE;
+//     m_rebindColumns[SQL_FLOAT  ] = SQL_C_DOUBLE;
   }
   else if(m_rdbmsType == RDBMS_SQLSERVER)
   {
@@ -547,6 +547,11 @@ SQLDatabase::SetKnownRebinds()
     m_rebindParameters.clear();
     m_rebindParameters[SQL_C_SLONG] = SQL_C_LONG;
     m_rebindParameters[SQL_C_ULONG] = SQL_C_LONG;
+  }
+  else if (m_rdbmsType == RDBMS_MARIADB)
+  {
+    m_rebindParameters.clear();
+    m_rebindParameters[SQL_VARCHAR] = SQL_VARCHAR;
   }
 }
 
@@ -585,6 +590,26 @@ SQLDatabase::GetSQLInfoDB()
     }
   }
   return m_info;
+}
+
+// Setting the default database schema after login
+bool
+SQLDatabase::SetDefaultSchema(CString p_schema)
+{
+  CString sql = GetSQLInfoDB()->GetSQLDefaultSchema(p_schema);
+  if(!sql.IsEmpty())
+  {
+    try
+    {
+      SQLQuery query(this);
+      query.DoSQLStatement(sql);
+    }
+    catch(StdException& /*ex*/)
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 // Find the **REAL** database name

@@ -1,0 +1,27 @@
+RELEASENOTES SQLCOMPONENTS VERSION 1.7
+======================================
+===== Released since: 16-08-2020 =====
+======================================
+
+Version 1.7.0 of 16-08-2020
+---------------------------
+1) Added a SQL Migration wizard to migrate the database contents from a source database
+   to a target database of a different brand. Currently supported databases are:
+   MS-Access, Firebird, Informix, MariaDB, MySQL, Oracle, PostgreSQL, MS-SQLServer
+   From these databases the following are migrated
+   - Tables and columns including datatypes
+   - Primary keys
+   - Indices
+   - Foreign keys
+   - Sequences (if applicable)
+   - Access rights
+   If the migration goes between databases of the same brand, also table triggers are supported
+
+   PLEASE BE ADVISED:
+   Although the program has been in-use for more than 15 years, no conversion or migration 
+   that we have seen was without program changes. It stays a work-in-progress. Expect to do
+   some programming to get a near-perfect result.
+
+2) Lots of extra methods have been added to the SQLInfoDB derived classes.
+3) SQLQuery has been expanded to support better data pumping from one database to another.
+4) The DDLCreateTable class is now used in the SQLMigrate program. It has been largely enhanced.

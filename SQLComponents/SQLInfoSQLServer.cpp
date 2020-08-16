@@ -145,6 +145,13 @@ SQLInfoSQLServer::GetRDBMSSupportsDatatypeInterval() const
   return false;
 }
 
+// Supports functions at the place of table columns in create/alter index statement
+bool
+SQLInfoSQLServer::GetRDBMSSupportsFunctionalIndexes() const
+{
+  return false;
+}
+
 // Gets the maximum length of an SQL statement
 unsigned long
 SQLInfoSQLServer::GetRDBMSMaxStatementLength() const
@@ -195,6 +202,13 @@ CString
 SQLInfoSQLServer::GetKEYWORDQuoteCharacter() const
 {
   return "\'";
+}
+
+// Get quote character around reserved words as an identifier
+CString
+SQLInfoSQLServer::GetKEYWORDReservedWordQuote() const
+{
+  return "\"";
 }
 
 // Get default NULL for parameter list input
@@ -266,6 +280,91 @@ CString
 SQLInfoSQLServer::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
 {
   return CString("NVL(") + p_test + "," + p_isnull + ")";
+}
+
+// Gets the RDBMS definition of the datatype
+CString
+SQLInfoSQLServer::GetKEYWORDDataType(MetaColumn* p_column)
+{
+  CString type;
+  switch(p_column->m_datatype)
+  {
+    case SQL_CHAR:                      // fall through
+    case SQL_VARCHAR:                   // fall through
+    case SQL_WCHAR:                     // fall through
+    case SQL_WVARCHAR:                  type = "VARCHAR";  break;
+    case SQL_LONGVARCHAR:               // fall through
+    case SQL_WLONGVARCHAR:              type = "VARBINARY";break;
+    case SQL_NUMERIC:                   type = "NUMERIC";  break;
+    case SQL_DECIMAL:                   type = "DECIMAL";  break;
+    case SQL_INTEGER:                   type = "INT";      break;
+    case SQL_SMALLINT:                  type = "SMALLINT"; break;
+    case SQL_FLOAT:                     if(p_column->m_columnSize == 38)
+										                    {
+											                    type = "INT";
+											                    p_column->m_columnSize    = 0;
+											                    p_column->m_decimalDigits = 0;
+										                    }
+										                    else
+										                    {
+											                    type = "FLOAT";
+										                    }
+										                    break;
+    case SQL_REAL:                      // fall through
+    case SQL_DOUBLE:                    type = "REAL";     break;
+    case SQL_BIGINT:                    type = "BIGINT";   break;
+    case SQL_TINYINT:                   type = "TINYINT";  break;
+    case SQL_BIT:                       type = "TINYINT";
+                                        p_column->m_columnSize    = 0;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+  //case SQL_DATE:
+    case SQL_DATETIME:                  // fall through
+    case SQL_TYPE_DATE:                 // fall through
+    case SQL_TIMESTAMP:                 // fall through
+    case SQL_TYPE_TIMESTAMP:            type = "DATETIME";
+                                        p_column->m_columnSize    = 0;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_TIME:                      // fall through
+    case SQL_TYPE_TIME:                 type = "TIME";
+                                        p_column->m_columnSize    = 0;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_BINARY:                    type = "BINARY";        break;
+    case SQL_VARBINARY:                 type = "VARBINARY";     break;
+    case SQL_LONGVARBINARY:             type = "VARBINARY";     break;
+    case SQL_GUID:                      type = "UNIQUEIDENTIFIER"; break;
+    case SQL_INTERVAL_YEAR:             // fall through
+    case SQL_INTERVAL_YEAR_TO_MONTH:    // fall through
+    case SQL_INTERVAL_MONTH:            type = "VARCHAR";
+                                        p_column->m_columnSize    = 80;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_INTERVAL_DAY:              // fall through
+    case SQL_INTERVAL_HOUR:             // fall through
+    case SQL_INTERVAL_MINUTE:           // fall through
+    case SQL_INTERVAL_SECOND:           // fall through
+    case SQL_INTERVAL_DAY_TO_HOUR:      // fall through
+    case SQL_INTERVAL_DAY_TO_MINUTE:    // fall through
+    case SQL_INTERVAL_HOUR_TO_MINUTE:   // fall through
+    case SQL_INTERVAL_HOUR_TO_SECOND:   // fall through
+    case SQL_INTERVAL_MINUTE_TO_SECOND: // fall through
+    case SQL_INTERVAL_DAY_TO_SECOND:    type = "VARCHAR";
+                                        p_column->m_columnSize    = 80;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_UNKNOWN_TYPE:              // fall through
+    default:                            break;
+  }
+  return type;
+}
+
+// Connects to a default schema in the database/instance
+CString
+SQLInfoSQLServer::GetSQLDefaultSchema(CString p_schema) const
+{
+  return "EXECUTE AS " + p_schema;
 }
 
 // Gets the construction for inline generating a key within an INSERT statement
@@ -545,9 +644,21 @@ SQLInfoSQLServer::GetCATALOGTableCatalog(CString& p_schema,CString& p_tablename)
 }
 
 CString
-SQLInfoSQLServer::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+SQLInfoSQLServer::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/) const
 {
-  return "";
+  CString sql = "CREATE ";
+  if (p_table.m_temporary)
+  {
+    sql += "TEMPORARY ";
+  }
+  sql += "TABLE ";
+  if (!p_table.m_schema.IsEmpty())
+  {
+    sql += p_table.m_schema;
+    sql += ".";
+  }
+  sql += p_table.m_table;
+  return sql;
 }
 
 CString
@@ -559,9 +670,19 @@ SQLInfoSQLServer::GetCATALOGTableRename(CString p_schema,CString p_tablename,CSt
 }
 
 CString
-SQLInfoSQLServer::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename) const
+SQLInfoSQLServer::GetCATALOGTableDrop(CString p_schema,CString p_tablename,bool p_ifExist /*= false*/,bool /*p_restrict = false*/,bool /*p_cascade = false*/) const
 {
-  return "DROP TABLE " + p_tablename;
+  CString sql("DROP TABLE "); 
+  if (p_ifExist)
+  {
+    sql += "IF EXISTS ";
+  }
+  if(!p_schema.IsEmpty())
+  {
+    sql += p_schema + ".";
+  }
+  sql += p_tablename;
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1333,6 +1454,26 @@ CString
 SQLInfoSQLServer::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
 {
   return "";
+}
+
+CString 
+SQLInfoSQLServer::GetCatalogGrantPrivilege(CString p_schema,CString p_objectname,CString p_privilege,CString p_grantee,bool p_grantable)
+{
+  CString sql;
+  sql.Format("GRANT %s ON %s.%s TO %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  if(p_grantable)
+  {
+    sql += " WITH GRANT OPTION";
+  }
+  return sql;
+}
+
+CString 
+SQLInfoSQLServer::GetCatalogRevokePrivilege(CString p_schema,CString p_objectname,CString p_privilege,CString p_grantee)
+{
+  CString sql;
+  sql.Format("REVOKE %s ON %s.%s FROM %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////

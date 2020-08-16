@@ -74,6 +74,9 @@ public:
   // If the database does not support the datatype INTERVAL, it can be implemented as a DECIMAL
   bool    GetRDBMSSupportsDatatypeInterval() const;
 
+  // Supports functions at the place of table columns in create/alter index statement
+  bool    GetRDBMSSupportsFunctionalIndexes() const;
+
   // Gets the maximum length of an SQL statement
   unsigned long GetRDBMSMaxStatementLength() const;
 
@@ -96,6 +99,9 @@ public:
 
   // Get quote character for strings
   CString GetKEYWORDQuoteCharacter() const;
+
+  // Get quote character around reserved words as an identifier
+  CString GetKEYWORDReservedWordQuote() const;
 
   // Get default NULL for parameter list input
   CString GetKEYWORDParameterDefaultNULL() const;
@@ -128,7 +134,13 @@ public:
   // Gets the Not-NULL-Value statement of the database
   CString GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const;
 
+  // Gets the RDBMS definition of the datatype
+  CString GetKEYWORDDataType(MetaColumn* p_column);
+
   // SQL
+
+  // Connects to a default schema in the database/instance
+  CString GetSQLDefaultSchema(CString p_schema) const;
 
   // Gets the construction for inline generating a key within an INSERT statement
   CString GetSQLNewSerial(CString p_table, CString p_sequence) const;
@@ -212,7 +224,7 @@ public:
   CString GetCATALOGTableCatalog    (CString& p_schema,CString& p_tablename) const;
   CString GetCATALOGTableCreate     (MetaTable& p_table,MetaColumn& p_column) const;
   CString GetCATALOGTableRename     (CString  p_schema,CString  p_tablename,CString p_newname) const;
-  CString GetCATALOGTableDrop       (CString  p_schema,CString  p_tablename) const;
+  CString GetCATALOGTableDrop       (CString  p_schema,CString  p_tablename,bool p_ifExist = false,bool p_restrict = false,bool p_cascade = false) const;
   // All Temporary table functions
   CString GetCATALOGTemptableCreate  (CString p_schema,CString p_tablename,CString p_select) const;
   CString GetCATALOGTemptableIntoTemp(CString p_schema,CString p_tablename,CString p_select) const;
@@ -266,6 +278,9 @@ public:
   // All Privilege functions
   CString GetCATALOGTablePrivileges  (CString& p_schema,CString& p_tablename) const;
   CString GetCATALOGColumnPrivileges (CString& p_schema,CString& p_tablename,CString& p_columnname) const;
+  CString GetCatalogGrantPrivilege   (CString  p_schema,CString  p_objectname,CString p_privilege,CString p_grantee,bool p_grantable);
+  CString GetCatalogRevokePrivilege  (CString  p_schema,CString  p_objectname,CString p_privilege,CString p_grantee);
+
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -364,6 +379,12 @@ public:
   SQLVariant* DoSQLCall(SQLQuery* p_query,CString& p_schema,CString& p_procedure);
   // Calling a stored function with named parameters, returning a value
   SQLVariant* DoSQLCallNamedParameters(SQLQuery* p_query,CString& p_schema,CString& p_procedure);
+
+private:
+  void DetectOracleMode();
+
+  // Since version 10.3 MariaDB can be set to Oracle mode
+  bool m_oracleMode{ false };
 };
 
 // End of namespace

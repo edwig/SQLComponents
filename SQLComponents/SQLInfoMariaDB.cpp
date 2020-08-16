@@ -41,6 +41,7 @@ namespace SQLComponents
 SQLInfoMariaDB::SQLInfoMariaDB(SQLDatabase* p_database)
                :SQLInfoDB(p_database)
 {
+  DetectOracleMode();
 }
 
 // Destructor. Does nothing
@@ -139,6 +140,13 @@ SQLInfoMariaDB::GetRDBMSSupportsDatatypeInterval() const
   return false;
 }
 
+// Supports functions at the place of table columns in create/alter index statement
+bool
+SQLInfoMariaDB::GetRDBMSSupportsFunctionalIndexes() const
+{
+  return false;
+}
+
 // Gets the maximum length of an SQL statement
 unsigned long
 SQLInfoMariaDB::GetRDBMSMaxStatementLength() const
@@ -182,8 +190,13 @@ CString
 SQLInfoMariaDB::GetKEYWORDConcatanationOperator() const
 {
   // BEWARE: Officially the concatenation operator is "CONCAT(string1,string2)"
-  // MYSQL supports 'one' 'two' concatenation of two strings (no operator)
-  return "";
+  // MariaDB supports 'one' 'two' concatenation of two strings (no operator)
+  // Or in ORACLE mode the standard '||' operator
+  if(m_oracleMode)
+  {
+    return "||";
+  }
+  else return "";
 }
 
 // Get quote character for strings
@@ -193,26 +206,45 @@ SQLInfoMariaDB::GetKEYWORDQuoteCharacter() const
   return "\'";
 }
 
+// Get quote character around reserved words as an identifier
+CString
+SQLInfoMariaDB::GetKEYWORDReservedWordQuote() const
+{
+  return "`";
+}
+
 // Get default NULL for parameter list input
 CString
 SQLInfoMariaDB::GetKEYWORDParameterDefaultNULL() const
 {
   // Standard, no definition defines the NULL state
-  return "";
+  if (m_oracleMode)
+  {
+    return "DEFAULT NULL";
+  }
+  else return "";
 }
 
 // Parameter is for INPUT and OUTPUT in parameter list
 CString
 SQLInfoMariaDB::GetKEYWORDParameterINOUT() const
 {
-  return "";
+  if (m_oracleMode)
+  {
+    return "INOUT";
+  }
+  else return "";
 }
 
 // Parameter is for OUTPUT only in parameter list
 CString
 SQLInfoMariaDB::GetKEYWORDParameterOUT() const
 {
-  return "";
+  if (m_oracleMode)
+  {
+    return "OUT";
+  }
+  else return "";
 }
 
 // Get datatype of the IDENTITY primary key in a Network database
@@ -256,7 +288,7 @@ SQLInfoMariaDB::GetKEYWORDUpper(CString& p_expression) const
 CString
 SQLInfoMariaDB::GetKEYWORDInterval1MinuteAgo() const
 {
-  return "ERROR";
+  return "TIMESTAMPADD(MINUTE,-1,CURRENT_TIMESTAMP)";
 }
 
 // Gets the Not-NULL-Value statement of the database
@@ -266,28 +298,148 @@ SQLInfoMariaDB::GetKEYWORDStatementNVL(CString& p_test,CString& p_isnull) const
   return "{fn IFNULL(" + p_test + "," + p_isnull + ")}";
 }
 
+// Gets the RDBMS definition of the datatype
+CString
+SQLInfoMariaDB::GetKEYWORDDataType(MetaColumn* p_column)
+{
+  CString type;
+
+  switch(p_column->m_datatype)
+  {
+    case SQL_CHAR:                      type = "CHAR";          break;
+    case SQL_VARCHAR:                   type = "VARCHAR";       break;
+    case SQL_LONGVARCHAR:               type = "TEXT";          break;
+    case SQL_WCHAR:                     type = "CHAR charset ucs2";         break;   // TBF
+    case SQL_WVARCHAR:                  type = "VARCHAR charset ucs2";      break;   // TBF
+    case SQL_WLONGVARCHAR:              type = "TEXT charset ucs2";         break;   // TBF
+    case SQL_NUMERIC:                   // Fall through
+    case SQL_DECIMAL:                   type = "DECIMAL";
+                                        if(p_column->m_decimalDigits == 0)
+                                        {
+                                          if(p_column->m_columnSize <= 2)
+                                          {
+                                            type = "TINYINT";
+                                            p_column->m_datatype  = SQL_TINYINT;
+                                            p_column->m_datatype3 = SQL_TINYINT;
+                                          }
+                                          else if(p_column->m_columnSize <= 4)
+                                          {
+                                            type = "SMALLINT";
+                                            p_column->m_datatype  = SQL_SMALLINT;
+                                            p_column->m_datatype3 = SQL_SMALLINT;
+                                          }
+                                          else if(p_column->m_columnSize <= 9)
+                                          {
+                                            type = "INTEGER";
+                                            p_column->m_datatype  = SQL_INTEGER;
+                                            p_column->m_datatype3 = SQL_INTEGER;
+                                          }
+                                          else if(p_column->m_columnSize <= 18)
+                                          {
+                                            type = "BIGINT";
+                                            p_column->m_datatype  = SQL_BIGINT;
+                                            p_column->m_datatype3 = SQL_BIGINT;
+                                          }
+                                          else if(p_column->m_columnSize >= SQLNUM_MAX_PREC)
+                                          {
+                                            // Unspecified DECIMAL FOUND.
+                                            // See to it that we get some decimals at least
+                                            p_column->m_decimalDigits = SQLNUM_MAX_PREC / 2;
+                                          }
+                                        }
+                                        break;
+    case SQL_INTEGER:                   type = "INTEGER";
+                                        p_column->m_columnSize = 10;
+                                        break;
+    case SQL_SMALLINT:                  type = "SMALLINT";
+                                        p_column->m_columnSize = 5;
+                                        break;
+    case SQL_FLOAT:                     type = "FLOAT";         break;
+    case SQL_REAL:                      type = "REAL";          break;
+    case SQL_DOUBLE:                    type = "DOUBLE";        break;
+    //case SQL_DATE:
+    case SQL_DATETIME:                  type = "DATETIME";      break;
+    case SQL_TYPE_DATE:                 type = "DATE";          break;
+    case SQL_TIME:                      type = "TIME";          break;
+    case SQL_TYPE_TIME:                 type = "TIME";          break;
+    case SQL_TIMESTAMP:                 type = "TIMESTAMP";     break;
+    case SQL_TYPE_TIMESTAMP:            type = "TIMESTAMP";     break;
+    case SQL_BINARY:                    type = "BINARY";        break;
+    case SQL_VARBINARY:                 type = "VARBINARY";     break;
+    case SQL_LONGVARBINARY:             type = "LONGBLOB";      break;
+    case SQL_BIGINT:                    type = "BIGINT";
+                                        p_column->m_columnSize = 19;
+                                        break;
+    case SQL_TINYINT:                   type = "TINYINT";
+                                        p_column->m_columnSize = 3;
+                                        break;
+    case SQL_BIT:                       type = "BIT";           break;
+    case SQL_GUID:                      type = "VARCHAR";
+                                        p_column->m_columnSize    = 45;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_INTERVAL_YEAR:             // Fall through
+    case SQL_INTERVAL_MONTH:            // Fall through
+    case SQL_INTERVAL_DAY:              // Fall through
+    case SQL_INTERVAL_HOUR:             // Fall through
+    case SQL_INTERVAL_MINUTE:           // Fall through
+    case SQL_INTERVAL_SECOND:           // Fall through
+    case SQL_INTERVAL_YEAR_TO_MONTH:    // Fall through
+    case SQL_INTERVAL_DAY_TO_HOUR:      // Fall through
+    case SQL_INTERVAL_DAY_TO_MINUTE:    // Fall through
+    case SQL_INTERVAL_DAY_TO_SECOND:    // Fall through
+    case SQL_INTERVAL_HOUR_TO_MINUTE:   // Fall through
+    case SQL_INTERVAL_HOUR_TO_SECOND:   // Fall through
+    case SQL_INTERVAL_MINUTE_TO_SECOND: type = "VARCHAR";
+                                        p_column->m_columnSize    = 40;
+                                        p_column->m_decimalDigits = 0;
+                                        break;
+    case SQL_UNKNOWN_TYPE:
+    default:                            type = "UNKNOWN ODBC DATA TYPE!";  break;
+  }
+  return p_column->m_typename = type;
+}
+
+// Connects to a default schema in the database/instance
+CString
+SQLInfoMariaDB::GetSQLDefaultSchema(CString p_schema) const
+{
+  return "USE " + p_schema;
+}
+
 // Gets the construction for inline generating a key within an INSERT statement
 CString
-SQLInfoMariaDB::GetSQLNewSerial(CString /*p_table*/, CString /*p_sequence*/) const
+SQLInfoMariaDB::GetSQLNewSerial(CString p_table, CString p_sequence) const
 {
-  // Insert a zero in an IDENTITY column
-  return "0";
+  if(!m_oracleMode)
+  {
+    return "";
+  }
+
+  CString sequence(p_sequence);
+  if(sequence.IsEmpty() && !p_table.IsEmpty())
+  {
+    sequence = p_table + "_seq";
+  }
+  // Select next value from a generator sequence
+  return sequence + ".NEXTVAL";
 }
 
 // Gets the construction / select for generating a new serial identity
 CString
 SQLInfoMariaDB::GetSQLGenerateSerial(CString p_table) const
 {
-  // NO WAY OF KNOWNING THIS
-  return "0";
+  if (m_oracleMode)
+  {
+    return "SELECT " + p_table + "_seq.nextval FROM DUAL";
+  }
+  else return "";
 }
 
 // Gets the construction / select for the resulting effective generated serial
 CString
 SQLInfoMariaDB::GetSQLEffectiveSerial(CString p_identity) const
 {
-  // THIS IS MOST LIKELY NOT THE CORRECT VALUE.
-  // NO WAY OF DETERMINING THIS
   return p_identity;
 }
 
@@ -295,28 +447,29 @@ SQLInfoMariaDB::GetSQLEffectiveSerial(CString p_identity) const
 CString
 SQLInfoMariaDB::GetSQLStartSubTransaction(CString p_savepointName) const
 {
-  // Generic ODBC does not known about sub transactions!
-  return CString("");
+  return CString("SAVEPOINT ") + p_savepointName;
 }
 
 CString
 SQLInfoMariaDB::GetSQLCommitSubTransaction(CString p_savepointName) const
 {
-  // Generic ODBC does not known about sub transactions!
-  return CString("");
+  return CString("RELEASE SAVEPOINT") = p_savepointName;
 }
 
 CString
 SQLInfoMariaDB::GetSQLRollbackSubTransaction(CString p_savepointName) const
 {
-  // Generic ODBC does not known about sub transactions!
-  return CString("");
+  return CString("ROLLBACK TO SAVEPOINT ") + p_savepointName;
 }
 
 // FROM-Part for a query to select only 1 (one) record / or empty!
 CString
 SQLInfoMariaDB::GetSQLFromDualClause() const
 {
+  if(m_oracleMode)
+  {
+    return " FROM DUAL";
+  }
   // MySQL does bare SELECT!
   return "";
 }
@@ -336,8 +489,7 @@ SQLInfoMariaDB::GetSQLLockTable(CString /*p_schema*/, CString p_tablename, bool 
 CString
 SQLInfoMariaDB::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
 {
-  // To be implemented
-  return "";
+  return "OPTIMIZE TABLE " + p_tablename + " NOWAIT";
 }
 
 // Transform query to select top <n> rows
@@ -535,9 +687,15 @@ SQLInfoMariaDB::GetCATALOGTableCatalog(CString& p_schema,CString& p_tablename) c
   return sql;}
 
 CString
-SQLInfoMariaDB::GetCATALOGTableCreate(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+SQLInfoMariaDB::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/) const
 {
-  return "";
+  CString sql = "CREATE ";
+  if(p_table.m_temporary)
+  {
+    sql += "TEMPORARY ";
+  }
+  sql += "TABLE " + p_table.m_table;
+  return sql;
 }
 
 CString
@@ -548,9 +706,22 @@ SQLInfoMariaDB::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,C
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename) const
+SQLInfoMariaDB::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename,bool p_ifExist /*= false*/,bool p_restrict /*= false*/,bool p_cascade /*= false*/) const
 {
-  CString sql("DROP TABLE " + p_tablename);
+  CString sql("DROP TABLE ");
+  if (p_ifExist)
+  {
+    sql += "IF EXISTS ";
+  }
+  sql += p_tablename;
+  if (p_restrict)
+  {
+    sql += " RESTRICT";
+  }
+  else if (p_cascade)
+  {
+    sql += " CASCADE";
+  }
   return sql;
 }
 
@@ -703,6 +874,8 @@ SQLInfoMariaDB::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
       query += ",";
     }
     query += index.m_columnName;
+
+    // Descending column
     if(index.m_ascending != "A")
     {
       query += " DESC";
@@ -1025,33 +1198,89 @@ SQLInfoMariaDB::GetCATALOGTriggerDrop(CString /*p_schema*/, CString p_tablename,
 // ALL SEQUENCE FUNCTIONS
 
 CString
-SQLInfoMariaDB::GetCATALOGSequenceExists(CString /*p_schema*/, CString p_sequence) const
+SQLInfoMariaDB::GetCATALOGSequenceExists(CString p_schema, CString p_sequence) const
 {
-  return "";
+  p_schema.Empty();
+  p_sequence.MakeLower();
+
+  CString sql = "SELECT COUNT(*)\n"
+                "  FROM information_schema.tables tab\n"
+                " WHERE tab.table_type = 'SEQUENCE'\n";
+                "   AND sequence_name  = '";
+  sql += p_sequence;
+  sql += "\'";
+  return sql;
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGSequenceList(CString& /*p_schema*/,CString& /*p_pattern*/) const
+SQLInfoMariaDB::GetCATALOGSequenceList(CString& p_schema,CString& p_pattern) const
 {
-  return "";
+  p_schema.Empty();
+  p_pattern.MakeLower();
+  p_pattern = "%" + p_pattern + "%";
+
+  CString sql = "SELECT ''               AS catalog_name\n"
+                "      ,tab.table_schema AS schema_name\n"
+                "      ,tab.table_name   AS sequence_name\n"
+                "      ,0 AS current_value\n"
+                "      ,0 AS minimal_value\n"
+                "      ,0 AS seq_increment\n"
+                "      ,0 AS cache\n"
+                "      ,0 AS cycle\n"
+                "      ,0 AS ordering\n"
+                "  FROM information_schema.tables tab\n"
+                " WHERE tab.table_type = 'SEQUENCE'\n"
+                "   AND table_name  LIKE ?";
+  return sql;
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGSequenceAttributes(CString& /*p_schema*/,CString& /*p_sequence*/) const
+SQLInfoMariaDB::GetCATALOGSequenceAttributes(CString& p_schema,CString& p_sequence) const
 {
-  return "";
+  p_schema.Empty();
+  p_sequence.MakeLower();
+
+  CString sql = "SELECT ''                  AS catalog_name\n"
+                "      ,tab.table_schema    AS schema_name\n"
+                "      ,tab.table_name      AS sequence_name\n"
+                "      ,seq.start_value     AS current_value\n"
+                "      ,seq.minimum_value   AS minimal_value\n"
+                "      ,seq.increment       AS seq_increment\n"
+                "      ,seq.cache_size      AS cache\n"
+                "      ,seq.cycle_option    AS cycle\n"
+                "      ,0                   AS ordering\n"
+                "  FROM information_schema.tables tab\n"
+                " WHERE tab.table_type = 'SEQUENCE'\n";
+                "   AND sequence_name  = ?";
+  return sql;
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGSequenceCreate(MetaSequence& /*p_sequence*/) const
+SQLInfoMariaDB::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
 {
-  return "";
+  CString sql("CREATE OR REPLACE SEQUENCE ");
+
+  sql += p_sequence.m_sequenceName;
+  sql.AppendFormat("\n START WITH %-12.0f", p_sequence.m_currentValue);
+  sql.AppendFormat("\n INCREMENT BY %d",    p_sequence.m_increment);
+
+  sql += p_sequence.m_cycle ? "\n CYCLE" : "\n NOCYCLE";
+  if (p_sequence.m_cache > 0)
+  {
+    sql.AppendFormat("\n CACHE %d",p_sequence.m_cache);
+  }
+  else
+  {
+    sql += "\n NOCACHE";
+  }
+  return sql;
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGSequenceDrop(CString /*p_schema*/, CString p_sequence) const
+SQLInfoMariaDB::GetCATALOGSequenceDrop(CString /*p_schema*/,CString p_sequence) const
 {
-  return "";
+  CString sql("DROP SEQUENCE " + p_sequence);
+  return  sql;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1128,6 +1357,38 @@ CString
 SQLInfoMariaDB::GetCATALOGColumnPrivileges(CString& /*p_schema*/,CString& /*p_tablename*/,CString& /*p_columnname*/) const
 {
   return "";
+}
+
+CString 
+SQLInfoMariaDB::GetCatalogGrantPrivilege(CString /*p_schema*/,CString p_objectname,CString p_privilege,CString p_grantee,bool p_grantable)
+{
+  CString sql;
+  p_grantee.MakeLower();
+
+  // MariaDB does not know the concept of "PUBLIC"
+  if(p_grantee.Compare("public"))
+  {
+    sql.Format("GRANT %s ON %s TO %s", p_privilege.GetString(), p_objectname.GetString(), p_grantee.GetString());
+    if (p_grantable)
+    {
+      sql += " WITH GRANT OPTION";
+    }
+  }
+  return sql;
+}
+
+CString 
+SQLInfoMariaDB::GetCatalogRevokePrivilege(CString /*p_schema*/,CString p_objectname,CString p_privilege,CString p_grantee)
+{
+  CString sql;
+  p_grantee.MakeLower();
+
+  // MariaDB does not know the concept of "PUBLIC"
+  if(p_grantee.Compare("public"))
+  {
+    sql.Format("REVOKE %s ON %s FROM %s", p_privilege.GetString(), p_objectname.GetString(), p_grantee.GetString());
+  }
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1577,6 +1838,28 @@ SQLVariant*
 SQLInfoMariaDB::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,CString& /*p_schema*/,CString& /*p_procedure*/)
 {
   return nullptr;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// PRIVATE PART
+//
+//////////////////////////////////////////////////////////////////////////
+
+void
+SQLInfoMariaDB::DetectOracleMode()
+{
+  CString sql = "SELECT INSTR(@@sql_mode,'ORACLE') > 0 AS IsOracle";
+
+  try
+  {
+    SQLQuery query(m_database);
+    m_oracleMode = query.DoSQLStatementScalar(sql)->GetAsBoolean();
+  }
+  catch(StdException& /*ex*/)
+  {
+    m_oracleMode = false;
+  }
 }
 
 // End of namespace
