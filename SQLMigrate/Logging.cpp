@@ -152,7 +152,9 @@ void
 Logging::WriteLog(CString message)
 {
 #ifdef DEBUG
+#if    DEBUG_DUMPING
   afxDump << message << "\n";
+#endif
 #endif
   SQLMigrateApp* appl   = (SQLMigrateApp*)AfxGetApp();
   SQLMigrateDialog* dlg = (SQLMigrateDialog*)(appl->m_pMainWnd);
@@ -193,7 +195,9 @@ void
 Logging::WriteOut(CString statement,bool p_delim /* = false*/)
 {
 #ifdef DEBUG
+#if    DEBUG_DUMPING
   afxDump << statement << "\n";
+#endif
 #endif
   if(m_fout == nullptr)
   {
@@ -214,7 +218,9 @@ void
 Logging::WriteDrop(CString statement,bool p_delim /*=false*/)
 {
 #ifdef DEBUG
+#if    DEBUG_DUMPING
   afxDump << statement << "\n";
+#endif
 #endif
   if(m_fdrop == nullptr)
   {

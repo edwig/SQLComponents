@@ -10,4 +10,4 @@ SELECT 'alter table ' || TABLE_NAME || ' modify ' || COLUMN_NAME || ' integer;'
  WHERE data_type = 'decimal'
    AND numeric_precision = 38
    AND numeric_scale     = 19;
-
+idba
