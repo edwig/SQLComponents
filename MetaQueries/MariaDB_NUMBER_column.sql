@@ -5,9 +5,11 @@ SELECT TABLE_NAME
    AND numeric_precision = 38
    AND numeric_scale     = 19;
 
-SELECT 'alter table ' || TABLE_NAME || ' modify ' || COLUMN_NAME || ' integer;'
+SELECT 'alter table ' || TABLE_NAME || ' modify `' || COLUMN_NAME || '` integer;'
   FROM information_schema.columns
  WHERE data_type = 'decimal'
    AND numeric_precision = 38
-   AND numeric_scale     = 19;
-idba
+   AND numeric_scale     = 19
+	AND table_schema      = 'idba';
+
+COMMIT;

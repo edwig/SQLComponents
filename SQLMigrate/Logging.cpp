@@ -89,9 +89,9 @@ Logging::SetLogfile(CString p_logfile)
 int
 Logging::Open()
 {
-  m_flog = fopen(m_logfile,   "a");
-  m_fout = fopen(m_script,    "a");
-  m_fdrop= fopen(m_dropscript,"a");
+  m_flog = _fsopen(m_logfile,   "a+",_SH_DENYWR);
+  m_fout = _fsopen(m_script,    "a+",_SH_DENYWR);
+  m_fdrop= _fsopen(m_dropscript,"a+",_SH_DENYWR);
   if(m_flog == NULL || m_fout == NULL || m_fdrop == NULL)
   {
     if(!m_flog)
@@ -117,7 +117,7 @@ Logging::Open()
     }
     return 0;
   }
-  Close();
+  // Close();
   return 1;
 }
 
@@ -168,7 +168,7 @@ Logging::WriteLog(CString message)
   {
     if(m_flog == nullptr)
     {
-      m_flog = fopen(m_logfile, "a");
+      m_flog = _fsopen(m_logfile,"a",_SH_DENYWR);
     }
     if(m_flog)
     {
@@ -201,7 +201,7 @@ Logging::WriteOut(CString statement,bool p_delim /* = false*/)
 #endif
   if(m_fout == nullptr)
   {
-    m_fout = fopen(m_script, "a");
+    m_fout = _fsopen(m_script,"a",_SH_DENYWR);
   }
   if(m_fout)
   {
@@ -224,7 +224,7 @@ Logging::WriteDrop(CString statement,bool p_delim /*=false*/)
 #endif
   if(m_fdrop == nullptr)
   {
-    m_fdrop = fopen(m_dropscript, "a");
+    m_fdrop = _fsopen(m_dropscript,"a",_SH_DENYWR);
   }
   if(m_fdrop)
   {

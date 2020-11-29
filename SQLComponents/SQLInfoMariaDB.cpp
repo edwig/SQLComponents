@@ -699,6 +699,17 @@ SQLInfoMariaDB::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*
 }
 
 CString
+SQLInfoMariaDB::GetCATALOGTableCreatePostfix(MetaTable& p_table,MetaColumn& /*p_column*/) const
+{
+  CString sql;
+  if(p_table.m_temporary)
+  {
+    sql += "ENGINE = MEMORY";
+  }
+  return sql;
+}
+
+CString
 SQLInfoMariaDB::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CString p_newname) const
 {
   CString sql("RENAME TABLE" + p_tablename + " TO " + p_newname);

@@ -38,6 +38,8 @@
 #define IDC_TARGET_USER2                1027
 #define IDC_TARGET_TYPE                 1027
 #define IDC_VERSION                     1028
+#define IDC_LOGLINES2                   1028
+#define IDC_ESTIMATED                   1028
 #define IDC_VERSION2                    1029
 #define IDC_COPYRIGHT                   1029
 #define IDC_CHECK1                      1029

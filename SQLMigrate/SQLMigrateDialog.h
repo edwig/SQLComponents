@@ -67,6 +67,9 @@ public:
   CProgressCtrl m_table_gauge;
   CProgressCtrl m_tables_gauge;
 
+  clock_t m_start;
+  CString m_estimated;
+
   BOOL m_toLogfile;
   BOOL m_allTables;        //
 
@@ -98,6 +101,12 @@ protected:
   virtual void DoDataExchange(CDataExchange* pDX);
   void SetComboBoxes();
   void SetDirectory();
+  void EstimateRemainingTime(int p_num,int p_maxnum);
+
+  // Migration
+  void GetMigrationParameters();
+  void PerformMigration();
+  void PostMigration();
 
   HICON m_hIcon;
   virtual BOOL OnInitDialog();

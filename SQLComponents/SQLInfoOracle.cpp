@@ -779,6 +779,12 @@ SQLInfoOracle::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/
 }
 
 CString
+SQLInfoOracle::GetCATALOGTableCreatePostfix(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+{
+  return "";
+}
+
+CString
 SQLInfoOracle::GetCATALOGTableRename(CString p_schema,CString p_tablename,CString p_newname) const
 {
   // Beware: No 'TABLE' in the statement

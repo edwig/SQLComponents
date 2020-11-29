@@ -41,8 +41,17 @@ public:
   // Request DDL for "table" or "schema.table" 
   // Where "table" can be of type: "TABLE" / "VIEW"
   CString GetTableDDL(CString p_tableName);
-  DDLS    GetTableStatements(CString p_tablename);
   bool    SaveDDL(CString p_filename);
+  DDLS    GetTableStatements(CString p_tablename);
+  DDLS    GetTableStatements(CString p_tableName
+                            ,bool p_columns
+                            ,bool p_options
+                            ,bool p_indices
+                            ,bool p_primaries
+                            ,bool p_foreigns
+                            ,bool p_triggers
+                            ,bool p_sequences
+                            ,bool p_access);
 
   // Internal delivery of all table information
   void    SetTableInfoTable    (MTableMap&     p_info);
@@ -91,14 +100,15 @@ private:
   CString    m_createDDL;
 
   // Info gotten
-  bool m_hasTable      { false };
-  bool m_hasColumns    { false };
-  bool m_hasIndices    { false };
-  bool m_hasPrimary    { false };
-  bool m_hasForeigns   { false };
-  bool m_hasTriggers   { false };
-  bool m_hasSequence   { false };
-  bool m_hasPrivileges { false };
+  bool m_didTable      { false };
+  bool m_didColumns    { false };
+  bool m_didOptions    { false };
+  bool m_didIndices    { false };
+  bool m_didPrimary    { false };
+  bool m_didForeigns   { false };
+  bool m_didTriggers   { false };
+  bool m_didSequence   { false };
+  bool m_didPrivileges { false };
 
 public:
   // Mappings are public. We may examine/change them directly!

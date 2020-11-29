@@ -288,6 +288,7 @@ public:
   virtual CString GetCATALOGTableSynonyms     (CString& p_schema,CString& p_tablename) const = 0;
   virtual CString GetCATALOGTableCatalog      (CString& p_schema,CString& p_tablename) const = 0;
   virtual CString GetCATALOGTableCreate       (MetaTable& p_table,MetaColumn& p_column) const = 0;
+  virtual CString GetCATALOGTableCreatePostfix(MetaTable& p_table,MetaColumn& p_column) const = 0;
   virtual CString GetCATALOGTableRename       (CString  p_schema,CString  p_tablename,CString p_newname) const = 0;
   virtual CString GetCATALOGTableDrop         (CString  p_schema,CString  p_tablename,bool p_ifExist = false,bool p_restrict = false,bool p_cascade = false) const = 0;
   // All Temporary table functions

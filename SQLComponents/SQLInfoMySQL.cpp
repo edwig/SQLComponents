@@ -575,6 +575,12 @@ SQLInfoMySQL::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/)
 }
 
 CString
+SQLInfoMySQL::GetCATALOGTableCreatePostfix(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+{
+  return "";
+}
+
+CString
 SQLInfoMySQL::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CString p_newname) const
 {
   CString sql("RENAME TABLE" + p_tablename + " TO " + p_newname);

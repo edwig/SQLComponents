@@ -56,6 +56,7 @@ public:
   CString v_createscript;   // Script with all CREATE and INSERT statements
 
   // Options
+  int     v_allTables       {    0 };    // Explicitly convert all tables
   int     v_do_tables       {    0 };    // Convert tables (drop and re-create)
   int     v_do_data         {    0 };    // Convert data in the tables
   int     v_truncate        {    0 };    // Truncate char fields in table before converting

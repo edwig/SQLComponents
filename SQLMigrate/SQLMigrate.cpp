@@ -38,7 +38,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
 namespace SQLComponents
 {
 
@@ -71,14 +70,23 @@ SQLMigrate::Migrate()
 {
   bool result = false;
 
+  // Check the input parameters first.
+  // Will throw StdException if parameters are incorrect and/or non-conforming
+  CheckMigrateParameters();
+
+  // Open the log files
+  // Show all migration parameters in the logfile
+  WriteMigrateParameters();
+
+  // Prepare for migration
   m_totalTables     = 0;
   m_directMigration = m_params.v_direct;
 
   m_log.SetScript    (m_params.v_createscript);
   m_log.SetDropScript(m_params.v_dropscript);
 
-  m_databaseSource = new SQLDatabase();
-  m_databaseTarget = new SQLDatabase();
+  if(!m_databaseSource)  m_databaseSource = new SQLDatabase();
+  if(!m_databaseTarget)  m_databaseTarget = new SQLDatabase();
 
   CString error;
   CString connectSource;
@@ -153,14 +161,15 @@ SQLMigrate::Migrate()
         CreateTables();
       }
       
+      // If minimum object-ID requested: do not truncate the contents
+      // CXHibernate and network databases uses a "OID" primary key
+      if(m_params.v_deletes && m_params.v_minOid == 0)
+      {
+        TruncateTables();
+      }
+
       if(m_params.v_do_data)
       {
-        // If minimum object-ID requested: do not truncate the contents
-        // CXHibernate and network databases uses a "OID" primary key
-        if(m_params.v_deletes && m_params.v_minOid == 0)
-        {
-          TruncateTables();
-        }
 
         switch(m_directMigration)
         {
@@ -210,6 +219,215 @@ SQLMigrate::Migrate()
   m_log.WriteLog("*** End of migration. ***");
 
   return result;
+}
+
+//////////////////////////////////////////////////////////////
+//
+// Check parameters. Can throw!
+// Here are all the checks on the logic sanity of all
+// filled in options. Does everything belong together?
+// In the mean time we build the logfile header
+//
+//////////////////////////////////////////////////////////////
+
+void
+SQLMigrate::CheckMigrateParameters()
+{
+  CString create   = m_params.v_directory + "\\" + m_params.v_createscript;
+  CString dropping = m_params.v_directory + "\\" + m_params.v_dropscript;
+  CString logging  = m_params.v_directory + "\\" + FILENAME_LOGFILE;
+
+  m_log.SetScript(create);
+  m_log.SetDropScript(dropping);
+  m_log.SetLogfile(logging);
+
+  if (!m_log.Open())
+  {
+    throw StdException("Cannot open a *.sql or *.txt file. File is read-only or no space left on file system!");
+  }
+
+  // check source database 
+  if (m_params.v_source_dsn =="")
+  {
+    throw StdException("No source database found. Enter a source database DataSourceName (DSN)");
+  }
+  if (m_params.v_source_user =="")
+  {
+    throw StdException("No source user found for the source database. Enter a source user name");
+  }
+
+  if (m_params.v_source_password =="")
+  {
+    throw StdException("No source user password found. Enter a source password");
+  }
+
+
+  if(m_params.v_direct < 2) 
+  {  
+    // Check target database
+    if(m_params.v_target_dsn =="")
+    {
+      throw StdException("No target database found. Enter a target database DataSourceName (DSN)");
+    }
+    // Check target user
+    if (m_params.v_target_user =="")
+    {
+      throw StdException("No target database user found. Enter a target database user");
+    }
+    // Check target password
+    if (m_params.v_target_password =="")
+    {
+      throw StdException("No target user password found. Enter a target password");
+    }
+  }
+
+  if(m_params.v_direct == 2)
+  {
+    if ( m_params.v_dropscript =="")
+    {
+      throw StdException("No file name for the dropscript given. Enter a file name...");
+    }
+    if (m_params.v_createscript == "")
+    {
+      throw StdException("No file name for a create-script given. Enter a file name...");
+    }
+  }
+  if(m_params.v_allTables == 0 && m_params.v_table == "")
+  {
+    throw StdException("No tablename given for a table migration. Enter a table name or table pattern...");
+  }
+
+
+  if(m_params.v_minOid < 0)
+  {
+    throw StdException("Not a valid number for a primary identity key");
+  }
+
+  // Check value of logging amount per rows
+  if(m_params.v_logLines)
+  {
+    if(m_params.v_logLines < 10 || m_params.v_logLines > 100000)
+    {
+      throw StdException("Number of rows per line in the logfile in an invalid range.\n"
+                         "Fill in a number between 10 and 100.000");
+    }
+  }
+
+  // Check if we have something to do!
+  if(m_params.v_do_tables + m_params.v_do_data   +
+     m_params.v_primarys  + m_params.v_indices   + 
+     m_params.v_foreigns  + m_params.v_sequences + 
+     m_params.v_triggers  + m_params.v_access    +
+     m_params.v_deletes   == 0)
+  {
+    throw StdException("Nothing will be migrated because all options are in the OFF position.\n");
+    return;
+  }
+  // Hurray: Reached the end of all checks
+  // We are good to go!
+}
+
+void
+SQLMigrate::WriteMigrateParameters()
+{
+  m_log.WriteLog("MIGRATION");
+  // Extra empty line
+  m_log.WriteLog(" ");
+
+  // check sourace database
+  if(!m_params.v_source_dsn.IsEmpty())
+  {
+    // Ruler       "------------------- : "
+    m_log.WriteLog("Source database     : " + m_params.v_source_dsn);
+  }
+  if(!m_params.v_source_user.IsEmpty())
+  {
+    // Ruler       "------------------- : "
+    m_log.WriteLog("Source user name    : " + m_params.v_source_user);
+  }
+  m_log.WriteLog(" ");
+
+
+  if(m_params.v_direct < 2)
+  {
+    // Check target database
+    if(!m_params.v_target_dsn.IsEmpty())
+    {
+      // Ruler       "------------------- : "
+      m_log.WriteLog("Target database     : " + m_params.v_target_dsn);
+    }
+    // Check target user
+    if(!m_params.v_target_user.IsEmpty())
+    {
+      // Ruler       "------------------- : "
+      m_log.WriteLog("Target user name    : " + m_params.v_target_user);
+    }
+  }
+  m_log.WriteLog("");
+
+  if(m_params.v_direct == 2)
+  {
+    // Ruler       "-------------------- : "
+    m_log.WriteLog("Direct migration     : No");
+    if(!m_params.v_dropscript.IsEmpty())
+    {
+      // Ruler       "------------------- : "
+      m_log.WriteLog("Dropscript          : " + m_params.v_dropscript);
+    }
+    if(!m_params.v_createscript.IsEmpty())
+    {
+      // Ruler       "------------------ : "
+      m_log.WriteLog("Create script      : " + m_params.v_createscript);
+    }
+  }
+  else
+  {
+    // Ruler               "------------------- : "
+    m_log.WriteLog(CString("Direct migration    : ") + ((m_params.v_direct == 0) ? "Datapump" : "SELECT/INSERT"));
+  }
+  if(!(m_params.v_allTables == 0 && m_params.v_table == ""))
+  {
+    if(!m_params.v_table.IsEmpty())
+    {
+      // Ruler       "------------------- : "
+      m_log.WriteLog("Tables              : All");
+    }
+    else
+    {
+      // Ruler       "------------------- : "
+      m_log.WriteLog("Table(s)            : " + m_params.v_table);
+    }
+  }
+  // Ruler       "------------------- : "
+  m_log.WriteLog("Tablespace          : " + m_params.v_tablespace);
+
+
+  if(m_params.v_minOid > 0)
+  {
+    // Ruler       "------------------- : "
+    m_log.WriteLog("Start with identity : " + m_params.v_minOid);
+  }
+
+  // Logging per number of rows converted
+  if(m_params.v_logLines > 0)
+  {
+    // Ruler       "------------------- : "
+    m_log.WriteLog("Log line after rows : " + m_params.v_logLines);
+  }
+
+  // Logging of all migration options
+  // Ruler               "------------------- : "
+  m_log.WriteLog(CString("Create new tables   : ") + (m_params.v_do_tables ? "yes" : "no"));
+  m_log.WriteLog(CString("Delete  table data  : ") + (m_params.v_deletes   ? "yes" : "no"));
+  m_log.WriteLog(CString("Convert table data  : ") + (m_params.v_do_data   ? "yes" : "no"));
+  m_log.WriteLog(CString("Truncate char fields: ") + (m_params.v_truncate  ? "yes" : "no"));
+  m_log.WriteLog(CString("Create new indices  : ") + (m_params.v_indices   ? "yes" : "no"));
+  m_log.WriteLog(CString("Create primary keys : ") + (m_params.v_primarys  ? "yes" : "no"));
+  m_log.WriteLog(CString("Create foreign keys : ") + (m_params.v_foreigns  ? "yes" : "no"));
+  m_log.WriteLog(CString("Create sequences    : ") + (m_params.v_sequences ? "yes" : "no"));
+  m_log.WriteLog(CString("Create triggers     : ") + (m_params.v_triggers  ? "yes" : "no"));
+  m_log.WriteLog(CString("Grant access rights : ") + (m_params.v_access    ? "yes" : "no"));
+  m_log.WriteLog("");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -389,46 +607,23 @@ SQLMigrate::CreateTables()
       tablename = m_params.v_source_schema + "." + tablename;
     }
 
-    // Getting the table info (and throw away the results!)
-    create.GetTableStatements(tablename);
-
     // If we migrate to another type, PSM cannot be converted
-    MTriggerMap emptyTriggers;
-    if(m_databaseSource->GetDatabaseType() != m_databaseTarget->GetDatabaseType())
+    if(m_params.v_triggers && (m_databaseSource->GetDatabaseType() != m_databaseTarget->GetDatabaseType()))
     {
-      create.SetTableInfoTrigger(emptyTriggers);
+      m_params.v_triggers = false;
+      m_log.WriteLog("ERROR: Cannot convert triggers to another database type!");
     }
 
-    // Optional parts: If not set. empty out the info again
-    MPrimaryMap emptyPrimary;
-    if (!m_params.v_primarys)
-    {
-      create.SetTableInfoPrimary(emptyPrimary);
-    }
-    MIndicesMap emptyIndices;
-    if (!m_params.v_indices)
-    {
-      create.SetTableInfoIndices(emptyIndices);
-    }
-    MForeignMap emptyForeigns;
-    if (!m_params.v_foreigns)
-    {
-      create.SetTableInfoForeign(emptyForeigns);
-    }
-    MSequenceMap emptySequences;
-    if (!m_params.v_sequences)
-    {
-      create.SetTableInfoSequence(emptySequences);
-    }
-    if (!m_params.v_triggers)
-    {
-      create.SetTableInfoTrigger(emptyTriggers);
-    }
-    MPrivilegeMap emptyPrivileges;
-    if (!m_params.v_access)
-    {
-      create.SetTableInfoPrivilege(emptyPrivileges);
-    }
+    // Getting the table info (and throw away the results!)
+    create.GetTableStatements(tablename
+                             ,m_params.v_do_tables || m_params.v_do_data
+                             ,m_params.v_do_tables
+                             ,m_params.v_indices
+                             ,m_params.v_primarys
+                             ,m_params.v_foreigns
+                             ,m_params.v_triggers
+                             ,m_params.v_sequences
+                             ,m_params.v_access);
 
     // Set the target database
     create.SetInfoDB(target);
@@ -443,6 +638,7 @@ SQLMigrate::CreateTables()
     // Tweak the columns from source to target database !!
     if(source->GetRDBMSDatabaseType() != target->GetRDBMSDatabaseType())
     {
+      OrderTableColumns(create);
       FixupTableColumns(create);
       FixupTableIndices(create);
     }
@@ -491,6 +687,54 @@ SQLMigrate::CreateTables()
     // Show number of tables
     m_log.SetTablesGauge(++numTables);
   }
+}
+
+// Hard coded special columns for Pronto MDA applications
+const char* specials[]
+{
+   "oid"
+  ,"object"
+  ,"av_oid"
+  ,"h_trans_van"
+  ,"h_geldig_van"
+  ,"h_geldig_tot"
+  ,"h_gebruiker"
+  ,"h_actief"
+};
+
+void
+SQLMigrate::OrderTableColumns(DDLCreateTable& p_create)
+{
+  // Quick check if we should order all columns
+  if(FindColumn(p_create.m_columns,"oid") < 0)
+  {
+    return;
+  }
+
+  MColumnMap columns;
+
+  // Specials at the front in this order
+  for(int index = 0; index < ((sizeof specials) / sizeof(const char*)); ++index)
+  {
+    int num = FindColumn(p_create.m_columns,specials[index]);
+    if(num >= 0)
+    {
+      columns.push_back(p_create.m_columns[num]);
+    }
+  }
+
+  // Other columns in any order
+  for(auto& column : p_create.m_columns)
+  {
+    if(FindColumn(columns,column.m_column) < 0)
+    {
+      columns.push_back(column);
+    }
+  }
+
+  // Replace
+  p_create.m_columns.clear();
+  p_create.m_columns = columns;
 }
 
 void
@@ -565,8 +809,22 @@ SQLMigrate::FixupTableIndices(DDLCreateTable& p_create)
   }
 }
 
+int
+SQLMigrate::FindColumn(MColumnMap& p_columns,CString p_name)
+{
+  int index = 0;
+  for(auto& column : p_columns)
+  {
+    if(column.m_column.CompareNoCase(p_name) == 0)
+    {
+      return index;
+    }
+    ++index;
+  }
+  return -1;
+}
 
-//////////////////////////////////////////////////////////////////////////\
+//////////////////////////////////////////////////////////////////////////
 //
 // MAKE TABLES INITIALLY EMPTY
 //
@@ -647,6 +905,7 @@ void
 SQLMigrate::FillTablesViaPump()
 {
   int  numTables = 0;
+  CString text;
 
   m_log.WriteLog("");
   m_log.WriteLog("MIGRATING TABLE CONTENT TO TARGET DATABASE");
@@ -728,9 +987,8 @@ SQLMigrate::FillTablesViaPump()
               m_log.SetTableGauge(++rows,totrows);
               if(rows % m_params.v_logLines == 0)
               {
-                CString meld;
-                meld.Format("Table: %s Rows: %ld [%5.2f %%]",table,rows,((double) rows / (double)totrows * 100.0));
-                m_log.WriteLog(meld);
+                text.Format("Table: %s Rows: %ld [%6.2f %%]",table,rows,((double) rows / (double)totrows * 100.0));
+                m_log.WriteLog(text);
               }
             }
             else
@@ -757,6 +1015,11 @@ SQLMigrate::FillTablesViaPump()
         }
         query2.SetParameters(nullptr);
         trans.Commit();
+
+        // End
+        m_log.SetTableGauge(rows,totrows);
+        text.Format("Table: %s Rows: %ld [%6.2f %%]",table,rows,((double)rows / (double)totrows * 100.0));
+        m_log.WriteLog(text);
       }
     }
     catch(StdException& ex)

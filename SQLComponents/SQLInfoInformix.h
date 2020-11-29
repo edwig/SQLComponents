@@ -221,14 +221,15 @@ public:
   // Meta info about meta types
   CString GetCATALOGMetaTypes(int p_type) const;
   // All table functions
-  CString GetCATALOGTableExists      (CString& p_schema,CString& p_tablename) const;
-  CString GetCATALOGTablesList       (CString& p_schema,CString& p_pattern)   const;
-  CString GetCATALOGTableAttributes  (CString& p_schema,CString& p_tablename) const;
-  CString GetCATALOGTableSynonyms    (CString& p_schema,CString& p_tablename) const;
-  CString GetCATALOGTableCatalog     (CString& p_schema,CString& p_tablename) const;
-  CString GetCATALOGTableCreate      (MetaTable& p_table,MetaColumn& p_column) const;
-  CString GetCATALOGTableRename      (CString  p_schema,CString  p_tablename,CString p_newname) const;
-  CString GetCATALOGTableDrop        (CString  p_schema,CString  p_tablename,bool p_ifExist = false,bool p_restrict = false,bool p_cascade = false) const;
+  CString GetCATALOGTableExists       (CString& p_schema,CString& p_tablename)  const;
+  CString GetCATALOGTablesList        (CString& p_schema,CString& p_pattern)    const;
+  CString GetCATALOGTableAttributes   (CString& p_schema,CString& p_tablename)  const;
+  CString GetCATALOGTableSynonyms     (CString& p_schema,CString& p_tablename)  const;
+  CString GetCATALOGTableCatalog      (CString& p_schema,CString& p_tablename)  const;
+  CString GetCATALOGTableCreate       (MetaTable& p_table,MetaColumn& p_column) const;
+  CString GetCATALOGTableCreatePostfix(MetaTable& p_table,MetaColumn& p_column) const;
+  CString GetCATALOGTableRename       (CString  p_schema,CString  p_tablename,CString p_newname) const;
+  CString GetCATALOGTableDrop         (CString  p_schema,CString  p_tablename,bool p_ifExist = false,bool p_restrict = false,bool p_cascade = false) const;
   // All Temporary table functions
   CString GetCATALOGTemptableCreate  (CString p_schema,CString p_tablename,CString p_select) const;
   CString GetCATALOGTemptableIntoTemp(CString p_schema,CString p_tablename,CString p_select) const;

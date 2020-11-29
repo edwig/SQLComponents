@@ -569,6 +569,12 @@ SQLInfoInformix::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column
   return sql;
 }
 
+CString
+SQLInfoInformix::GetCATALOGTableCreatePostfix(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
+{
+  return "";
+}
+
 // Rename a database table 
 CString
 SQLInfoInformix::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CString p_newname) const

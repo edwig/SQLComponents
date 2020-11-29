@@ -41,6 +41,7 @@ SQLMigrateDialog::SQLMigrateDialog(CWnd* pParent)
                  :CDialog(SQLMigrateDialog::IDD, pParent)
                  ,m_migrate(nullptr)
                  ,m_font(nullptr)
+                 ,m_start(0L)
 {
   m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
@@ -111,6 +112,7 @@ SQLMigrateDialog::DoDataExchange(CDataExchange* pDX)
   DDX_Check(pDX,IDC_DO_ACCESS,        m_do_access);
 
   DDX_Control(pDX, IDC_LOG,           m_log);
+  DDX_Text   (pDX, IDC_ESTIMATED,     m_estimated);
 }
 
 BEGIN_MESSAGE_MAP(SQLMigrateDialog, CDialog)
@@ -531,6 +533,142 @@ SQLMigrateDialog::SaveProfile(CString initFile)
   WritePrivateProfileString("OPTION","access",   option_m_access  ? "1" : "0",m_profile);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+//
+//   MIGRATION
+//
+///////////////////////////////////////////////////////////////////////////////////////
+
+void
+SQLMigrateDialog::GetMigrationParameters()
+{
+  // Getting all the parameters from the dialog
+  UpdateData();
+
+  GetDlgItemText(IDC_SOURCE,           m_parameters.v_source_dsn);  
+  GetDlgItemText(IDC_SOURCE_USER,      m_parameters.v_source_user);  
+  GetDlgItemText(IDC_SOURCE_PASSWORD,  m_parameters.v_source_password);  
+
+  GetDlgItemText(IDC_TARGET,           m_parameters.v_target_dsn);  
+  GetDlgItemText(IDC_TARGET_USER,      m_parameters.v_target_user);  
+  GetDlgItemText(IDC_TARGET_PASSWORD,  m_parameters.v_target_password); 
+
+  GetDlgItemText(IDC_SOURCE_SCHEMA,    m_parameters.v_source_schema);
+  GetDlgItemText(IDC_TARGET_SCHEMA,    m_parameters.v_target_schema);
+
+  GetDlgItemText(IDC_DIRECTORY,        m_parameters.v_directory);
+  GetDlgItemText(IDC_DROP_FILE,        m_parameters.v_dropscript); 
+  GetDlgItemText(IDC_CREATE_FILE,      m_parameters.v_createscript); 
+
+  GetDlgItemText(IDC_TABLE,            m_parameters.v_table); 
+  GetDlgItemText(IDC_TABLESPACE,       m_parameters.v_tablespace); 
+
+  // Options: Booleans
+  m_parameters.v_do_tables = IsDlgButtonChecked(IDC_DO_TABLES);
+  m_parameters.v_do_data   = IsDlgButtonChecked(IDC_DO_DATA);
+  m_parameters.v_truncate  = IsDlgButtonChecked(IDC_DO_TRUNCATE);
+  m_parameters.v_deletes   = IsDlgButtonChecked(IDC_DO_DELETES);
+  m_parameters.v_primarys  = IsDlgButtonChecked(IDC_DO_PRIMARYS);
+  m_parameters.v_indices   = IsDlgButtonChecked(IDC_DO_INDICES);
+  m_parameters.v_foreigns  = IsDlgButtonChecked(IDC_DO_FOREIGN);
+  m_parameters.v_sequences = IsDlgButtonChecked(IDC_DO_SEQUENCES);
+  m_parameters.v_triggers  = IsDlgButtonChecked(IDC_DO_TRIGGERS);
+  m_parameters.v_access    = IsDlgButtonChecked(IDC_DO_ACCESS);
+  m_parameters.v_allTables = IsDlgButtonChecked(IDC_ALLTABLES);
+  // Options: Integers
+  m_parameters.v_minOid    = GetDlgItemInt(IDC_MINOID);
+  m_parameters.v_logLines  = GetDlgItemInt(IDC_LOGLINES);
+  // Options: selections
+  m_parameters.v_direct    = m_directMigration.GetCurSel();
+
+  // Empty the log window
+  m_log.SetWindowText(""); 
+}
+
+//   Perform the real migration now!
+void
+SQLMigrateDialog::PerformMigration()
+{
+  m_migrate = new SQLMigrate(m_parameters, m_logfile);
+
+  try
+  {
+    // Record starting time;
+    m_start = clock();
+
+    // block all buttons
+    m_exportRunning = true;
+    m_exportResult  = m_migrate->Migrate();
+  }
+  catch(StdException& ex)
+  {
+    if(m_commandLineMode)
+    {
+      m_logfile.WriteLog("");
+      m_logfile.WriteLog("STOPPED WITH ERROR!");
+      m_logfile.WriteLog(ex.GetErrorMessage());
+    }
+    else
+    {
+      MessageBox(ex.GetErrorMessage(),SQL_MIGRATE,MB_OK|MB_ICONERROR);
+    }
+  }
+  catch(...)
+  {
+    CString text("Migration is stopped with an error");
+    if(m_commandLineMode)
+    {
+      m_logfile.WriteLog("");
+      m_logfile.WriteLog(text);
+    }
+    else
+    {
+      MessageBox(text,SQL_MIGRATE,MB_OK|MB_ICONERROR);
+    }
+  }
+  m_exportRunning = false;
+  delete m_migrate;
+  m_migrate = nullptr;
+}
+
+// POST MIGRATION: CLEAN-UP
+void
+SQLMigrateDialog::PostMigration()
+{
+  // Reset the time
+  m_estimated.Empty();
+  m_start = 0L;
+
+  // Reset the status box on the window
+  SetTableGauge (0,100);
+  SetTablesGauge(0,100);
+  SetDlgItemText(IDC_SOURCE_TYPE,"");
+  SetDlgItemText(IDC_TARGET_TYPE,"");
+  SetStatus("");
+
+  if(m_exportResult)
+  {
+    CString text("The migration is complete");
+    if (m_commandLineMode)
+    {
+      m_logfile.WriteLog("");
+      m_logfile.WriteLog(text);
+    }
+    else
+    {
+      MessageBox(text,SQL_MIGRATE,MB_OK);
+    }
+  }
+  // Closing the logfile now. we are done.
+  m_logfile.Close();
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// Message handlers
+//
+//////////////////////////////////////////////////////////////////////////
+
 void SQLMigrateDialog::OnPaint() 
 {
   if (IsIconic())
@@ -703,8 +841,9 @@ SQLMigrateDialog::SetTablesGauge(int num,int maxnum)
 {
   m_tables_gauge.SetRange(0,(short)maxnum);
   m_tables_gauge.SetPos(num);
-}
 
+  EstimateRemainingTime(num,maxnum);
+}
 
 void  
 SQLMigrateDialog::SetSourceType(CString p_type)
@@ -728,282 +867,9 @@ SQLMigrateDialog::SetStatus(CString status)
 void 
 SQLMigrateDialog::OnMigrate()
 {
-  m_log.SetWindowText(""); // Empty the log window
-  GetDlgItemText(IDC_SOURCE,           m_parameters.v_source_dsn);  
-  GetDlgItemText(IDC_SOURCE_USER,      m_parameters.v_source_user);  
-  GetDlgItemText(IDC_SOURCE_PASSWORD,  m_parameters.v_source_password);  
-
-  GetDlgItemText(IDC_TARGET,           m_parameters.v_target_dsn);  
-  GetDlgItemText(IDC_TARGET_USER,      m_parameters.v_target_user);  
-  GetDlgItemText(IDC_TARGET_PASSWORD,  m_parameters.v_target_password); 
-
-  GetDlgItemText(IDC_SOURCE_SCHEMA,    m_parameters.v_source_schema);
-  GetDlgItemText(IDC_TARGET_SCHEMA,    m_parameters.v_target_schema);
-
-  GetDlgItemText(IDC_DIRECTORY,        m_parameters.v_directory);
-  GetDlgItemText(IDC_DROP_FILE,        m_parameters.v_dropscript); 
-  GetDlgItemText(IDC_CREATE_FILE,      m_parameters.v_createscript); 
-
-  GetDlgItemText(IDC_TABLE,            m_parameters.v_table); 
-  GetDlgItemText(IDC_TABLESPACE,       m_parameters.v_tablespace); 
-
-  CString create   = m_parameters.v_directory + "\\" + m_parameters.v_createscript;
-  CString dropping = m_parameters.v_directory + "\\" + m_parameters.v_dropscript;
-  CString logging  = m_parameters.v_directory + "\\" + FILENAME_LOGFILE;
-
-  m_logfile.SetScript(create);
-  m_logfile.SetDropScript(dropping);
-  m_logfile.SetLogfile(logging);
-
-  if (!m_logfile.Open())
-  {
-    MessageBox("Cannot open a *.sql or *.txt file. File is read-only or no space left on file system!",SQL_MIGRATE,MB_OK);
-    return;
-  }
-
-  // Options
-  m_parameters.v_do_tables = IsDlgButtonChecked(IDC_DO_TABLES);
-  m_parameters.v_do_data   = IsDlgButtonChecked(IDC_DO_DATA);
-  m_parameters.v_truncate  = IsDlgButtonChecked(IDC_DO_TRUNCATE);
-  m_parameters.v_deletes   = IsDlgButtonChecked(IDC_DO_DELETES);
-  m_parameters.v_primarys  = IsDlgButtonChecked(IDC_DO_PRIMARYS);
-  m_parameters.v_indices   = IsDlgButtonChecked(IDC_DO_INDICES);
-  m_parameters.v_foreigns  = IsDlgButtonChecked(IDC_DO_FOREIGN);
-  m_parameters.v_sequences = IsDlgButtonChecked(IDC_DO_SEQUENCES);
-  m_parameters.v_triggers  = IsDlgButtonChecked(IDC_DO_TRIGGERS);
-  m_parameters.v_access    = IsDlgButtonChecked(IDC_DO_ACCESS);
-
-  CString getal;
-  GetDlgItemText(IDC_MINOID,getal);
-  m_parameters.v_minOid = atoi(getal);
-  GetDlgItemText(IDC_LOGLINES,getal);
-  m_parameters.v_logLines = atoi(getal);
-
-  //////////////////////////////////////////////////////////////
-  //
-  // Here are all the checks on the logic sanity of all
-  // filled in options. Does everything belong together?
-  // In the mean time we build the logfile header
-  //
-  //////////////////////////////////////////////////////////////
-
-  m_logfile.WriteLog("MIGRATION");
-  // Extra empty line
-  m_logfile.WriteLog(" ");
-
-  // check bron data m_gegevens
-  if (m_parameters.v_source_dsn =="")
-  {
-    MessageBox("No source database found. Enter a source database DataSourceName (DSN)",SQL_MIGRATE,MB_OK);
-    m_source_dsn.SetFocus();
-    return;
-  }
-  else
-  {
-    // Ruler           "------------------- : "
-    m_logfile.WriteLog("Source database     : " + m_parameters.v_source_dsn);
-  }
-  if (m_parameters.v_source_user =="")
-  {
-    MessageBox("No source user found for the source database. Enter a source user name",SQL_MIGRATE,MB_OK);
-    m_source_user.SetFocus();
-    return;
-  }
-  else
-  {
-    // Ruler           "------------------- : "
-    m_logfile.WriteLog("Source user name    : " + m_parameters.v_source_user);
-  }
-
-  if (m_parameters.v_source_password =="")
-  {
-    MessageBox("No source user password found. Enter a source password",SQL_MIGRATE,MB_OK);
-    m_source_password.SetFocus();
-    return;
-  }
-  m_logfile.WriteLog(" ");
-
-
-  int direct = m_directMigration.GetCurSel();
-  if(direct < 2) 
-  {  
-    // Check target
-    if(m_parameters.v_target_dsn =="")
-    {
-      MessageBox("No target database found. Enter a target database DataSourceName (DSN)",SQL_MIGRATE,MB_OK);
-      m_target_dsn.SetFocus();
-      return;
-    }
-    else
-    {
-      // Ruler           "------------------- : "
-      m_logfile.WriteLog("Target database     : " + m_parameters.v_target_dsn);
-    }
-    // Check target user
-    if (m_parameters.v_target_user =="")
-    {
-      MessageBox("No target database user found. Enter a target database user",SQL_MIGRATE,MB_OK);
-      m_target_user.SetFocus();
-      return;
-    }
-    else
-    {
-      // Ruler           "------------------- : "
-      m_logfile.WriteLog("Target user name    : " + m_parameters.v_target_user);
-    }
-    // Check target password
-    if (m_parameters.v_target_password =="")
-    {
-      MessageBox("No target user password found. Enter a target password",SQL_MIGRATE,MB_OK);
-      m_target_password.SetFocus();
-      return;
-    }
-  }
-  m_logfile.WriteLog("");
-
-  if(direct == 2)
-  {
-    // Ruler           "-------------------- : "
-    m_logfile.WriteLog("Direct migration     : No");
-    if ( m_parameters.v_dropscript =="")
-    {
-      MessageBox("No file name for the dropscript given. Enter a file name...",SQL_MIGRATE,MB_OK);
-      m_dropscript.SetFocus();
-      return;
-    }
-    else
-    {
-      // Ruler           "------------------- : "
-      m_logfile.WriteLog("Dropscript          : " + m_parameters.v_dropscript);
-    }
-    if (m_parameters.v_createscript == "")
-    {
-      MessageBox("No file name for a create-script given. Enter a file name...",SQL_MIGRATE,MB_OK);
-      m_createscript.SetFocus();
-      return;
-    }
-    else
-    {
-      // Ruler           "------------------ : "
-      m_logfile.WriteLog("Create script      : " + m_parameters.v_createscript);
-    }
-  }
-  else
-  {
-    // Ruler           "------------------- : "
-    m_logfile.WriteLog(CString("Direct migration    : ") + ((direct == 0) ? "Datapump" : "SELECT/INSERT"));
-  }
-  if (m_allTables == FALSE && m_parameters.v_table == "")
-  {
-    MessageBox("No tablename given for a table migration. Enter a table name or table pattern...",SQL_MIGRATE,MB_OK);
-    m_editTable.SetFocus();
-    return;
-  }
-  else
-  {
-    if (m_parameters.v_table =="")
-    {
-      // Ruler           "------------------- : "
-      m_logfile.WriteLog("Tables              : All");
-    }
-    else
-    {
-      // Ruler           "------------------- : "
-      m_logfile.WriteLog("Table(s)            : " + m_parameters.v_table);  
-    }
-  }
-  // Ruler           "------------------- : "
-  m_logfile.WriteLog("Tablespace          : " + m_parameters.v_tablespace);
-
-
-  if(m_parameters.v_minOid < 0)
-  {
-    MessageBox("Not a valid number for a primary identity key",SQL_MIGRATE,MB_OK);
-    m_minOid.SetFocus();
-    return;
-  }
-  GetDlgItemText(IDC_MINOID,getal);
-  m_logfile.WriteLog("Start with identity : " + getal);
-
-  // Controleer aantal regels in het logfile
-  if(m_parameters.v_logLines)
-  {
-    if(m_parameters.v_logLines < 10 || m_parameters.v_logLines > 100000)
-    {
-      MessageBox("Number of rows per line in the logfile in an invalid range.\n"
-                 "Fill in a number between 10 and 100.000",SQL_MIGRATE,MB_OK);
-      m_logPerRow.SetFocus();
-      return;
-    }
-  }
-  GetDlgItemText(IDC_LOGLINES,getal);
-  m_logfile.WriteLog("Logline after rows  : " + getal);
-
-  // Check if we have something to do!
-  if(m_parameters.v_do_tables + m_parameters.v_do_data   +
-     m_parameters.v_primarys  + m_parameters.v_indices   + 
-     m_parameters.v_foreigns  + m_parameters.v_sequences + 
-     m_parameters.v_triggers  + m_parameters.v_access == 0)
-  {
-    MessageBox("Nothing will be migrated because all options are in the OFF position.\n",SQL_MIGRATE,MB_OK);
-    return;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////////////////
-  //
-  //   MIGRATION
-  //   Perform the real migration now!
-  //
-  ///////////////////////////////////////////////////////////////////////////////////////
-
-  m_migrate = new SQLMigrate(m_parameters, m_logfile);
-
-  try
-  {
-    // block all buttons
-    m_exportRunning = true;
-    m_exportResult  = m_migrate->Migrate();
-  }
-  catch(...)
-  {
-    CString text("Migration is stopped with an error");
-    if(m_commandLineMode)
-    {
-      m_logfile.WriteLog("");
-      m_logfile.WriteLog(text);
-    }
-    else
-    {
-      MessageBox(text,SQL_MIGRATE,MB_OK);
-    }
-  }
-  m_exportRunning = false;
-  delete m_migrate;
-  m_migrate = nullptr;
-
-  // Closing the logfile now. we are done.
-  m_logfile.Close();
-
-  // Reset the status box on the window
-  SetTableGauge (0,100);
-  SetTablesGauge(0,100);
-  SetDlgItemText(IDC_SOURCE_TYPE,"");
-  SetDlgItemText(IDC_TARGET_TYPE,"");
-  SetStatus("");
-
-  if(m_exportResult)
-  {
-    CString text("The migration is complete");
-    if (m_commandLineMode)
-    {
-      m_logfile.WriteLog("");
-      m_logfile.WriteLog(text);
-    }
-    else
-    {
-      MessageBox(text,SQL_MIGRATE,MB_OK);
-    }
-  }
+  GetMigrationParameters();
+  PerformMigration();
+  PostMigration();
 }
 
 BOOL
@@ -1038,15 +904,44 @@ SQLMigrateDialog::AddLogLine(CString msg)
 }
 
 void 
+SQLMigrateDialog::EstimateRemainingTime(int p_num,int p_maxnum)
+{
+  // Check if we have something to do
+  m_estimated.Empty();
+  if(m_start)
+  {
+    clock_t now = clock();
+
+    long total  = ((now - m_start) / p_num) * p_maxnum;
+    long remain = total - (now - m_start);
+
+    int days = remain / (24 * 60 * 60 * CLOCKS_PER_SEC);
+    remain  -=   days * (24 * 60 * 60 * CLOCKS_PER_SEC);
+    int hour = remain /      (60 * 60 * CLOCKS_PER_SEC);
+    remain  -=   hour *      (60 * 60 * CLOCKS_PER_SEC);
+    int mins = remain /           (60 * CLOCKS_PER_SEC);
+    remain  -=   mins *           (60 * CLOCKS_PER_SEC);
+    int secs = remain /                 CLOCKS_PER_SEC;
+
+    if(days)
+    {
+      m_estimated.Format("%d days ",days);
+    }
+    m_estimated.AppendFormat("%2.2d:%2.2d:%2.2d",hour,mins,secs);
+  }
+  SetDlgItemText(IDC_ESTIMATED,m_estimated);
+}
+
+void 
 SQLMigrateDialog::HandleMessages()
 {
   // Handle only the PAINT messages for larger processes
   // So we can see the application
   // Potentially we can have an endless loop here
-  // so we limit te loop to a certain time frame
+  // so we limit the loop to a certain time frame
   MSG msg;
   UINT ticks = GetTickCount();
-  while (GetTickCount() - ticks < 100 && (PeekMessage(&msg,NULL,WM_MOVE,WM_USER,PM_REMOVE)))
+  while (GetTickCount() - ticks < 50 && (PeekMessage(&msg,NULL,WM_MOVE,WM_USER,PM_REMOVE)))
   {
     try
     {

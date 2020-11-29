@@ -41,9 +41,15 @@ class SQLMigrate
 public:
   SQLMigrate(MigrateParameters& p_params,Logging& p_log);
  ~SQLMigrate();
-
+  
+  // Migrate the database
   bool     Migrate();
+
 private:
+  // Check parameters. Can throw!
+  void     CheckMigrateParameters();
+  void     WriteMigrateParameters();
+
   int      ReadTableStructures(CString p_owner,CString p_patroon,SQLDatabase* p_database);
   void     ReadTablesFromFile (CString& p_bestand);
   // Processing
@@ -52,7 +58,9 @@ private:
   void     FillTablesViaPump();
   void     FillTablesViaData(bool p_process);
   void     TruncateTables();
+  int      FindColumn(MColumnMap& p_columns,CString p_name);
 
+  void     OrderTableColumns(DDLCreateTable& p_create);
   void     FixupTableColumns(DDLCreateTable& p_create);
   void     FixupTableIndices(DDLCreateTable& p_create);
 
@@ -74,7 +82,7 @@ private:
 
   // DATA
   MigrateParameters m_params;
-  Logging           m_log;
+  Logging&          m_log;
 
   int          m_directMigration;
   int          m_totalTables;
