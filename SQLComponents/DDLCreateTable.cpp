@@ -94,6 +94,18 @@ DDLCreateTable::GetTableStatements(CString p_tableName
   return m_statements;
 }
 
+DDLS    
+DDLCreateTable::GetViewStatements(CString p_viewname)
+{
+  // Split schema name and view name
+  FindSchemaName(p_viewname);
+
+  GetViewInfo();
+  GetAccessInfo(true);
+
+  return m_statements;
+}
+
 bool
 DDLCreateTable::SaveDDL(CString p_filename)
 {
@@ -388,6 +400,49 @@ DDLCreateTable::GetOptionsInfo()
   m_createDDL.Empty();
 }
 
+void
+DDLCreateTable::GetViewInfo()
+{
+  // Get primary table info
+  CString errors;
+  CString ddl;
+
+  if(!m_didTable)
+  {
+    // Find table info
+    m_tables.clear();
+    if(!m_info->MakeInfoTableView(m_tables,errors,m_schema,m_tableName) || m_tables.empty())
+    {
+      throw StdException(CString("Cannot find view: ") + m_tableName + " : " + errors);
+    }
+    m_didTable = !m_tables.empty();
+  }
+
+  // Some engines get a synonym AND a table/view record
+  // The table record always comes last.
+  MetaTable& table = m_tables.back();
+
+  // Construct table name
+  if(m_schema.IsEmpty() && !table.m_schema.IsEmpty())
+  {
+    m_schema = table.m_schema;
+  }
+
+  // Optional remarks to begin with
+  if(!table.m_remarks.IsEmpty())
+  {
+    ddl = "-- " + table.m_remarks;
+  }
+
+  CString definition;
+  if(m_info->MakeInfoViewDefinition(definition,errors,m_schema,m_tableName))
+  {
+    // Do our DDL part
+    ddl += m_info->GetCATALOGViewCreate(m_schema,table.m_table,definition);
+    ddl += "\n";
+  }
+  StashTheLine(ddl);
+}
 
 void
 DDLCreateTable::GetIndexInfo()
@@ -562,7 +617,7 @@ DDLCreateTable::GetSequenceInfo()
 }
 
 void
-DDLCreateTable::GetAccessInfo()
+DDLCreateTable::GetAccessInfo(bool p_strict /*=false*/)
 {
   CString errors;
   CString line;
@@ -579,7 +634,7 @@ DDLCreateTable::GetAccessInfo()
     m_didPrivileges = !m_access.empty();
   }
 
-  bool strict = m_info->GetPreferODBC();
+  bool strict = p_strict || m_info->GetPreferODBC();
 
   // Print all privileges
   for(auto& priv : m_access)
@@ -614,7 +669,6 @@ DDLCreateTable::FindSchemaName(CString p_tableName)
   m_tableName = p_tableName;
   return false;
 }
-
 
 void
 DDLCreateTable::StashTheLine(CString p_line)

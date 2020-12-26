@@ -52,6 +52,7 @@ public:
                             ,bool p_triggers
                             ,bool p_sequences
                             ,bool p_access);
+  DDLS    GetViewStatements(CString p_viewname);
 
   // Internal delivery of all table information
   void    SetTableInfoTable    (MTableMap&     p_info);
@@ -72,6 +73,7 @@ public:
 private:
   // Primary formatting of 'create table' DDL
   void    GetTableInfo();
+  void    GetViewInfo();
   void    GetColumnInfo();
   void    GetOptionsInfo();
   void    GetIndexInfo();
@@ -79,7 +81,7 @@ private:
   void    GetForeignKeyInfo();
   void    GetTriggerInfo();
   void    GetSequenceInfo();
-  void    GetAccessInfo();
+  void    GetAccessInfo(bool p_strict = false);
 
   // Service routines
 

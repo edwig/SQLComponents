@@ -90,7 +90,7 @@ SQLInfoMariaDB::GetRDBMSIsCatalogUpper() const
 bool
 SQLInfoMariaDB::GetRDBMSUnderstandsSchemas() const
 {
-  return false;
+  return true;
 }
 
 // Supports database/ODBCdriver comments in SQL
@@ -400,6 +400,13 @@ SQLInfoMariaDB::GetKEYWORDDataType(MetaColumn* p_column)
   return p_column->m_typename = type;
 }
 
+// Gets the USER (current-user) keyword function
+CString
+SQLInfoMariaDB::GetKEYWORDCurrentUser() const
+{
+  return "CURRENT_USER";
+}
+
 // Connects to a default schema in the database/instance
 CString
 SQLInfoMariaDB::GetSQLDefaultSchema(CString p_schema) const
@@ -476,10 +483,10 @@ SQLInfoMariaDB::GetSQLFromDualClause() const
 
 // Get SQL to lock  a table 
 CString
-SQLInfoMariaDB::GetSQLLockTable(CString /*p_schema*/, CString p_tablename, bool p_exclusive) const
+SQLInfoMariaDB::GetSQLLockTable(CString p_schema, CString p_tablename, bool p_exclusive) const
 {
   // Standard ISO SQL Syntax
-  CString query = "LOCK TABLE " + p_tablename + " IN ";
+  CString query = "LOCK TABLE " + p_schema + "." + p_tablename + " IN ";
   query += p_exclusive ? "EXCLUSIVE" : "SHARE";
   query += " MODE";
   return query;
@@ -489,7 +496,7 @@ SQLInfoMariaDB::GetSQLLockTable(CString /*p_schema*/, CString p_tablename, bool 
 CString
 SQLInfoMariaDB::GetSQLOptimizeTable(CString p_schema, CString p_tablename) const
 {
-  return "OPTIMIZE TABLE " + p_tablename + " NOWAIT";
+  return "OPTIMIZE TABLE " + p_schema + "." + p_tablename + " NOWAIT";
 }
 
 // Transform query to select top <n> rows
@@ -710,21 +717,21 @@ SQLInfoMariaDB::GetCATALOGTableCreatePostfix(MetaTable& p_table,MetaColumn& /*p_
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CString p_newname) const
+SQLInfoMariaDB::GetCATALOGTableRename(CString p_schema,CString p_tablename,CString p_newname) const
 {
-  CString sql("RENAME TABLE" + p_tablename + " TO " + p_newname);
+  CString sql("RENAME TABLE" + p_schema + "." + p_tablename + " TO " + p_newname);
   return sql;
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename,bool p_ifExist /*= false*/,bool p_restrict /*= false*/,bool p_cascade /*= false*/) const
+SQLInfoMariaDB::GetCATALOGTableDrop(CString p_schema,CString p_tablename,bool p_ifExist /*= false*/,bool p_restrict /*= false*/,bool p_cascade /*= false*/) const
 {
   CString sql("DROP TABLE ");
   if (p_ifExist)
   {
     sql += "IF EXISTS ";
   }
-  sql += p_tablename;
+  sql += p_schema + "." + p_tablename;
   if (p_restrict)
   {
     sql += " RESTRICT";
@@ -740,10 +747,10 @@ SQLInfoMariaDB::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename,boo
 // ALL TEMPORARY TABLE FUNCTIONS
 
 CString 
-SQLInfoMariaDB::GetCATALOGTemptableCreate(CString /*p_schema*/,CString p_tablename,CString p_select) const
+SQLInfoMariaDB::GetCATALOGTemptableCreate(CString p_schema,CString p_tablename,CString p_select) const
 {
   // BEWARE: THIS IS A GUESS. 
-  return "CREATE TEMPORARY TABLE " + p_tablename + "\nAS " + p_select;
+  return "CREATE TEMPORARY TABLE " + p_schema + "." + p_tablename + "\nAS " + p_select;
 }
 
 CString 
@@ -897,9 +904,10 @@ SQLInfoMariaDB::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGIndexDrop(CString /*p_schema*/,CString /*p_tablename*/,CString p_indexname) const
+SQLInfoMariaDB::GetCATALOGIndexDrop(CString p_schema,CString p_tablename,CString p_indexname) const
 {
-  CString sql = "DROP INDEX " + p_indexname;
+  CString sql = "ALTER TABLE " + p_schema + "." + p_tablename + "\n"
+                " DROP INDEX " + p_indexname;
   return sql;
 }
 
@@ -927,6 +935,8 @@ SQLInfoMariaDB::GetCATALOGPrimaryAttributes(CString& /*p_schema*/,CString& /*p_t
   return "";
 }
 
+// In MariaDB all primary keys are named "PRIMARY".
+// You can add a constraint name, but it WILL be ignored!
 CString
 SQLInfoMariaDB::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
 {
@@ -936,9 +946,8 @@ SQLInfoMariaDB::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
   {
     if(prim.m_columnPosition == 1)
     {
-      query += prim.m_table + "\n";
-      query += "  ADD CONSTRAINT " + prim.m_constraintName + "\n";
-      query += "      PRIMARY KEY (";
+      query += prim.m_schema + "." + prim.m_table + "\n";
+      query += "  ADD PRIMARY KEY (";
 
     }
     else
@@ -951,11 +960,12 @@ SQLInfoMariaDB::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
   return query;
 }
 
+// In MariaDB all primary keys are named "PRIMARY".
 CString
-SQLInfoMariaDB::GetCATALOGPrimaryDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
+SQLInfoMariaDB::GetCATALOGPrimaryDrop(CString p_schema,CString p_tablename,CString /*p_constraintname*/) const
 {
-  CString sql("ALTER TABLE " + p_tablename + "\n"
-              " DROP CONSTRAINT " + p_constraintname);
+  CString sql("ALTER TABLE " + p_schema + "." + p_tablename + "\n"
+              " DROP CONSTRAINT PRIMARY");
   return sql;
 }
 
@@ -1122,9 +1132,9 @@ SQLInfoMariaDB::GetCATALOGForeignAlter(MForeignMap& p_original, MForeignMap& p_r
 }
 
 CString
-SQLInfoMariaDB::GetCATALOGForeignDrop(CString /*p_schema*/,CString p_tablename,CString p_constraintname) const
+SQLInfoMariaDB::GetCATALOGForeignDrop(CString p_schema,CString p_tablename,CString p_constraintname) const
 {
-  CString sql("ALTER TABLE " + p_tablename + "\n"
+  CString sql("ALTER TABLE " + p_schema + "." + p_tablename + "\n"
               " DROP CONSTRAINT " + p_constraintname);
   return sql;
 }
@@ -1309,7 +1319,7 @@ SQLInfoMariaDB::GetCATALOGViewList(CString& p_schema,CString& p_pattern) const
   return GetCATALOGViewAttributes(p_schema,p_pattern);
 }
 
-CString 
+CString
 SQLInfoMariaDB::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) const
 {
   CString sql;
@@ -1338,7 +1348,14 @@ SQLInfoMariaDB::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) 
   return sql;
 }
 
-CString 
+CString
+SQLInfoMariaDB::GetCATALOGViewText(CString& /*p_schema*/,CString& /*p_viewname*/) const
+{
+  // Cannot query this, Use ODBC functions
+  return "";
+}
+
+CString
 SQLInfoMariaDB::GetCATALOGViewCreate(CString /*p_schema*/,CString p_viewname,CString p_contents) const
 {
   return "CREATE VIEW " + p_viewname + "\n" + p_contents;
@@ -1773,7 +1790,6 @@ SQLInfoMariaDB::GetPSMExceptionRaise(CString p_sqlState) const
 {
   return "SIGNAL SQLSTATE '" + p_sqlState + "'\n";
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 //

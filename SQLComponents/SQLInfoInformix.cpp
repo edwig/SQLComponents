@@ -298,6 +298,14 @@ SQLInfoInformix::GetKEYWORDDataType(MetaColumn* p_column)
   return p_column->m_typename;
 }
 
+// Gets the USER (current-user) keyword function
+CString
+SQLInfoInformix::GetKEYWORDCurrentUser() const
+{
+  // 'USER' and 'CURRENT_USER' are both valid
+  return "USER";
+}
+
 // Connects to a default schema in the database/instance
 CString
 SQLInfoInformix::GetSQLDefaultSchema(CString /*p_schema*/) const
@@ -1327,7 +1335,14 @@ SQLInfoInformix::GetCATALOGViewAttributes(CString& /*p_schema*/,CString& /*p_vie
   return "";
 }
 
-CString 
+CString
+SQLInfoInformix::GetCATALOGViewText(CString& /*p_schema*/,CString& /*p_viewname*/) const
+{
+  // Cannot query this, Use ODBC functions
+  return "";
+}
+
+CString
 SQLInfoInformix::GetCATALOGViewCreate(CString /*p_schema*/,CString p_viewname,CString p_contents) const
 {
   return "CREATE VIEW " + p_viewname + "\n" + p_contents;

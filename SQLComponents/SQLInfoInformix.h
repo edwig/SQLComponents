@@ -141,6 +141,9 @@ public:
   // Gets the RDBMS definition of the datatype
   CString GetKEYWORDDataType(MetaColumn* p_column);
   
+  // Gets the USER (current-user) keyword function
+  CString GetKEYWORDCurrentUser() const;
+
   // SQL
 
   // Connects to a default schema in the database/instance
@@ -277,6 +280,7 @@ public:
   CString GetCATALOGViewExists       (CString& p_schema,CString& p_viewname) const;
   CString GetCATALOGViewList         (CString& p_schema,CString& p_pattern)  const;
   CString GetCATALOGViewAttributes   (CString& p_schema,CString& p_viewname) const;
+  CString GetCATALOGViewText         (CString& p_schema,CString& p_viewname) const;
   CString GetCATALOGViewCreate       (CString  p_schema,CString  p_viewname,CString p_contents)   const;
   CString GetCATALOGViewRename       (CString  p_schema,CString  p_viewname,CString p_newname)    const;
   CString GetCATALOGViewDrop         (CString  p_schema,CString  p_viewname,CString& p_precursor) const;

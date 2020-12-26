@@ -80,6 +80,7 @@ public:
   CEdit m_logPerRow;
 
   BOOL  m_do_tables;
+  BOOL  m_do_views;
   BOOL  m_do_data;
   BOOL  m_do_truncate;
   BOOL  m_do_deletes;

@@ -280,6 +280,13 @@ SQLInfoAccess::GetKEYWORDDataType(MetaColumn* p_column)
   return p_column->m_typename;
 }
 
+// Gets the USER (current-user) keyword function
+CString 
+SQLInfoAccess::GetKEYWORDCurrentUser() const
+{
+  return "CurrentUser()";
+}
+
 // Connects to a default schema in the database/instance
 CString 
 SQLInfoAccess::GetSQLDefaultSchema(CString /*p_schema*/) const
@@ -962,6 +969,13 @@ SQLInfoAccess::GetCATALOGViewAttributes(CString& /*p_schema*/,CString& /*p_viewn
 }
 
 CString 
+SQLInfoAccess::GetCATALOGViewText(CString& /*p_schema*/,CString& /*p_viewname*/) const
+{
+  // Cannot query this, Use ODBC functions
+  return "";
+}
+
+CString
 SQLInfoAccess::GetCATALOGViewCreate(CString /*p_schema*/,CString p_viewname,CString p_contents) const
 {
   return "CREATE VIEW " + p_viewname + "\n" + p_contents;

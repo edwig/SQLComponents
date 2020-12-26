@@ -56,9 +56,10 @@ public:
   CString v_createscript;   // Script with all CREATE and INSERT statements
 
   // Options
-  int     v_allTables       {    0 };    // Explicitly convert all tables
+  int     v_allObjects      {    0 };    // Explicitly convert all tables/views/indexes/synonyms etc
   int     v_do_tables       {    0 };    // Convert tables (drop and re-create)
   int     v_do_data         {    0 };    // Convert data in the tables
+  int     v_do_views        {    0 };    // Convert views instead of tables
   int     v_truncate        {    0 };    // Truncate char fields in table before converting
   int     v_deletes         {    0 };    // Truncate/delete table contents before converting
   int     v_primarys        {    0 };    // Add primary key to tables

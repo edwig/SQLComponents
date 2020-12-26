@@ -102,6 +102,7 @@ SQLMigrateDialog::DoDataExchange(CDataExchange* pDX)
   // Options
   DDX_Check(pDX,IDC_DO_TABLES,        m_do_tables);
   DDX_Check(pDX,IDC_DO_DATA,          m_do_data);
+  DDX_Check(pDX,IDC_DO_VIEWS,         m_do_views);
   DDX_Check(pDX,IDC_DO_TRUNCATE,      m_do_truncate);
   DDX_Check(pDX,IDC_DO_DELETES,       m_do_deletes);
   DDX_Check(pDX,IDC_DO_PRIMARYS,      m_do_primarys);
@@ -386,6 +387,7 @@ SQLMigrateDialog::LoadProfile(CString initFile)
   // Options
   m_do_tables    = GetPrivateProfileInt("OPTION","tables",   1,m_profile);
   m_do_data      = GetPrivateProfileInt("OPTION","data",     1,m_profile);
+  m_do_views     = GetPrivateProfileInt("OPTION","views",    1,m_profile);
   m_do_truncate  = GetPrivateProfileInt("OPTION","truncate", 1,m_profile);
   m_do_deletes   = GetPrivateProfileInt("OPTION","deletes",  1,m_profile);
   m_do_primarys  = GetPrivateProfileInt("OPTION","primarys", 0,m_profile);
@@ -397,6 +399,7 @@ SQLMigrateDialog::LoadProfile(CString initFile)
 
   CheckDlgButton(IDC_DO_TABLES,   m_do_tables);
   CheckDlgButton(IDC_DO_DATA,     m_do_data);
+  CheckDlgButton(IDC_DO_VIEWS,    m_do_views);
   CheckDlgButton(IDC_DO_TRUNCATE, m_do_truncate);
   CheckDlgButton(IDC_DO_DELETES,  m_do_deletes);
   CheckDlgButton(IDC_DO_PRIMARYS, m_do_primarys);
@@ -439,6 +442,7 @@ SQLMigrateDialog::SaveProfile(CString initFile)
   int     log_logging;
   int     option_tables;
   int     option_data;
+  int     option_views;
   int     option_truncate;
   int     option_deletes;
   int     option_primarys;
@@ -512,6 +516,7 @@ SQLMigrateDialog::SaveProfile(CString initFile)
   // Options
   option_tables    = IsDlgButtonChecked(IDC_DO_TABLES);
   option_data      = IsDlgButtonChecked(IDC_DO_DATA);
+  option_views     = IsDlgButtonChecked(IDC_DO_VIEWS);
   option_truncate  = IsDlgButtonChecked(IDC_DO_TRUNCATE);
   option_deletes   = IsDlgButtonChecked(IDC_DO_DELETES);
   option_primarys  = IsDlgButtonChecked(IDC_DO_PRIMARYS);
@@ -523,6 +528,7 @@ SQLMigrateDialog::SaveProfile(CString initFile)
 
   WritePrivateProfileString("OPTION","tables",   option_tables    ? "1" : "0",m_profile);
   WritePrivateProfileString("OPTION","data",     option_data      ? "1" : "0",m_profile);
+  WritePrivateProfileString("OPTION","views",    option_views     ? "1" : "0",m_profile);
   WritePrivateProfileString("OPTION","truncate", option_truncate  ? "1" : "0",m_profile);
   WritePrivateProfileString("OPTION","deletes",  option_deletes   ? "1" : "0",m_profile);
   WritePrivateProfileString("OPTION","primarys", option_primarys  ? "1" : "0",m_profile);
@@ -564,17 +570,18 @@ SQLMigrateDialog::GetMigrationParameters()
   GetDlgItemText(IDC_TABLESPACE,       m_parameters.v_tablespace); 
 
   // Options: Booleans
-  m_parameters.v_do_tables = IsDlgButtonChecked(IDC_DO_TABLES);
-  m_parameters.v_do_data   = IsDlgButtonChecked(IDC_DO_DATA);
-  m_parameters.v_truncate  = IsDlgButtonChecked(IDC_DO_TRUNCATE);
-  m_parameters.v_deletes   = IsDlgButtonChecked(IDC_DO_DELETES);
-  m_parameters.v_primarys  = IsDlgButtonChecked(IDC_DO_PRIMARYS);
-  m_parameters.v_indices   = IsDlgButtonChecked(IDC_DO_INDICES);
-  m_parameters.v_foreigns  = IsDlgButtonChecked(IDC_DO_FOREIGN);
-  m_parameters.v_sequences = IsDlgButtonChecked(IDC_DO_SEQUENCES);
-  m_parameters.v_triggers  = IsDlgButtonChecked(IDC_DO_TRIGGERS);
-  m_parameters.v_access    = IsDlgButtonChecked(IDC_DO_ACCESS);
-  m_parameters.v_allTables = IsDlgButtonChecked(IDC_ALLTABLES);
+  m_parameters.v_do_tables  = IsDlgButtonChecked(IDC_DO_TABLES);
+  m_parameters.v_do_data    = IsDlgButtonChecked(IDC_DO_DATA);
+  m_parameters.v_do_views   = IsDlgButtonChecked(IDC_DO_VIEWS);
+  m_parameters.v_truncate   = IsDlgButtonChecked(IDC_DO_TRUNCATE);
+  m_parameters.v_deletes    = IsDlgButtonChecked(IDC_DO_DELETES);
+  m_parameters.v_primarys   = IsDlgButtonChecked(IDC_DO_PRIMARYS);
+  m_parameters.v_indices    = IsDlgButtonChecked(IDC_DO_INDICES);
+  m_parameters.v_foreigns   = IsDlgButtonChecked(IDC_DO_FOREIGN);
+  m_parameters.v_sequences  = IsDlgButtonChecked(IDC_DO_SEQUENCES);
+  m_parameters.v_triggers   = IsDlgButtonChecked(IDC_DO_TRIGGERS);
+  m_parameters.v_access     = IsDlgButtonChecked(IDC_DO_ACCESS);
+  m_parameters.v_allObjects = IsDlgButtonChecked(IDC_ALLTABLES);
   // Options: Integers
   m_parameters.v_minOid    = GetDlgItemInt(IDC_MINOID);
   m_parameters.v_logLines  = GetDlgItemInt(IDC_LOGLINES);

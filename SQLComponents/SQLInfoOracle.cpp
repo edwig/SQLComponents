@@ -368,6 +368,13 @@ SQLInfoOracle::GetKEYWORDDataType(MetaColumn* p_column)
   return p_column->m_typename = type;
 }
 
+// Gets the USER (current-user) keyword function
+CString
+SQLInfoOracle::GetKEYWORDCurrentUser() const
+{
+  return "USER";
+}
+
 // Connects to a default schema in the database/instance
 CString
 SQLInfoOracle::GetSQLDefaultSchema(CString p_schema) const
@@ -1879,10 +1886,24 @@ SQLInfoOracle::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) c
   return sql;
 }
 
-CString 
+CString
+SQLInfoOracle::GetCATALOGViewText(CString& p_schema,CString& p_viewname) const
+{
+  p_schema.MakeUpper();
+  p_viewname.MakeUpper();
+
+  // BEWARE works from Oracle 19 onwards
+  CString sql = "SELECT text\n"
+                "  FROM all_views\n"
+                " WHERE owner = '" + p_schema + "'\n"
+                "   AND view_name = '" + p_viewname + "'";
+  return sql;
+}
+
+CString
 SQLInfoOracle::GetCATALOGViewCreate(CString p_schema,CString p_viewname,CString p_contents) const
 {
-  return "CREATE OR REPLACE VIEW " + p_schema + "." + p_viewname + "\n" + p_contents;
+  return "CREATE OR REPLACE VIEW " + p_schema + "." + p_viewname + " AS\n" + p_contents;
 }
 
 CString 

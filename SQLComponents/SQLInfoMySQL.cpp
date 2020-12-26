@@ -287,6 +287,13 @@ SQLInfoMySQL::GetKEYWORDDataType(MetaColumn* p_column)
   return p_column->m_typename;
 }
 
+// Gets the USER (current-user) keyword function
+CString
+SQLInfoMySQL::GetKEYWORDCurrentUser() const
+{
+  return "CURRENT_USER";
+}
+
 // Connects to a default schema in the database/instance
 CString
 SQLInfoMySQL::GetSQLDefaultSchema(CString p_schema) const
@@ -1151,7 +1158,14 @@ SQLInfoMySQL::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) co
   return sql;
 }
 
-CString 
+CString
+SQLInfoMySQL::GetCATALOGViewText(CString& /*p_schema*/,CString& /*p_viewname*/) const
+{
+  // Cannot query this, Use ODBC functions
+  return "";
+}
+
+CString
 SQLInfoMySQL::GetCATALOGViewCreate(CString /*p_schema*/,CString p_viewname,CString p_contents) const
 {
   return "CREATE VIEW " + p_viewname + "\n" + p_contents;

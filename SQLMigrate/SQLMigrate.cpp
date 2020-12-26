@@ -161,6 +161,11 @@ SQLMigrate::Migrate()
         CreateTables();
       }
       
+      if(m_params.v_do_views)
+      {
+        CreateViews();
+      }
+
       // If minimum object-ID requested: do not truncate the contents
       // CXHibernate and network databases uses a "OID" primary key
       if(m_params.v_deletes && m_params.v_minOid == 0)
@@ -292,7 +297,7 @@ SQLMigrate::CheckMigrateParameters()
       throw StdException("No file name for a create-script given. Enter a file name...");
     }
   }
-  if(m_params.v_allTables == 0 && m_params.v_table == "")
+  if(m_params.v_allObjects == 0 && m_params.v_table == "")
   {
     throw StdException("No tablename given for a table migration. Enter a table name or table pattern...");
   }
@@ -313,12 +318,26 @@ SQLMigrate::CheckMigrateParameters()
     }
   }
 
+  // Check for views run
+  if(m_params.v_do_views)
+  {
+    if(m_params.v_do_tables + m_params.v_do_data   +
+       m_params.v_primarys  + m_params.v_indices   + 
+       m_params.v_foreigns  + m_params.v_sequences + 
+       m_params.v_triggers  + m_params.v_access    +
+       m_params.v_deletes   != 0)
+    {
+      throw StdException("Cannot convert anything other than views, if views are selected\n");
+      return;
+    }
+  }
+
   // Check if we have something to do!
   if(m_params.v_do_tables + m_params.v_do_data   +
      m_params.v_primarys  + m_params.v_indices   + 
      m_params.v_foreigns  + m_params.v_sequences + 
      m_params.v_triggers  + m_params.v_access    +
-     m_params.v_deletes   == 0)
+     m_params.v_deletes   + m_params.v_do_views  == 0)
   {
     throw StdException("Nothing will be migrated because all options are in the OFF position.\n");
     return;
@@ -385,7 +404,7 @@ SQLMigrate::WriteMigrateParameters()
     // Ruler               "------------------- : "
     m_log.WriteLog(CString("Direct migration    : ") + ((m_params.v_direct == 0) ? "Datapump" : "SELECT/INSERT"));
   }
-  if(!(m_params.v_allTables == 0 && m_params.v_table == ""))
+  if(!(m_params.v_allObjects == 0 && m_params.v_table == ""))
   {
     if(!m_params.v_table.IsEmpty())
     {
@@ -420,6 +439,7 @@ SQLMigrate::WriteMigrateParameters()
   m_log.WriteLog(CString("Create new tables   : ") + (m_params.v_do_tables ? "yes" : "no"));
   m_log.WriteLog(CString("Delete  table data  : ") + (m_params.v_deletes   ? "yes" : "no"));
   m_log.WriteLog(CString("Convert table data  : ") + (m_params.v_do_data   ? "yes" : "no"));
+  m_log.WriteLog(CString("Convert views       : ") + (m_params.v_do_views  ? "yes" : "no"));
   m_log.WriteLog(CString("Truncate char fields: ") + (m_params.v_truncate  ? "yes" : "no"));
   m_log.WriteLog(CString("Create new indices  : ") + (m_params.v_indices   ? "yes" : "no"));
   m_log.WriteLog(CString("Create primary keys : ") + (m_params.v_primarys  ? "yes" : "no"));
@@ -442,17 +462,37 @@ SQLMigrate::ReadTableStructures(CString p_owner,CString p_pattern,SQLDatabase* p
   CString errors;
 
   // Set status line of current step
-  m_log.SetStatus("Read table structures");
+  m_log.SetStatus("Read source object structures");
+
+  p_database->GetSQLInfoDB()->SetPreferODBC(false);
 
   if(p_pattern.IsEmpty())
   {
-    m_log.WriteLog("To migrate          : ALL TABLES");
-    p_database->GetSQLInfoDB()->MakeInfoTableTable(m_tables,errors,p_owner,p_pattern);
+    if(m_params.v_do_views)
+    {
+      m_log.WriteLog("To migrate          : ALL VIEWS");
+      p_database->GetSQLInfoDB()->MakeInfoTableView(m_tables,errors,p_owner,p_pattern);
+    }
+    else
+    {
+      m_log.WriteLog("To migrate          : ALL TABLES");
+      p_database->GetSQLInfoDB()->MakeInfoTableTable(m_tables,errors,p_owner,p_pattern);
+      RemoveTemporaries();
+    }
   }
   else if(p_pattern.Right(1) == "%")
   {
-    m_log.WriteLog("To migrate          : Selection from source database");
-    p_database->GetSQLInfoDB()->MakeInfoTableTable(m_tables,errors,p_owner,p_pattern);
+    if(m_params.v_do_views)
+    {
+      m_log.WriteLog("To migrate          : Selection from source database");
+      p_database->GetSQLInfoDB()->MakeInfoTableView(m_tables,errors,p_owner,p_pattern);
+    }
+    else
+    {
+      m_log.WriteLog("To migrate          : Selection from source database");
+      p_database->GetSQLInfoDB()->MakeInfoTableTable(m_tables,errors,p_owner,p_pattern);
+      RemoveTemporaries();
+    }
   }
   else if(p_pattern.Right(4).CompareNoCase(".txt") == 0)
   {
@@ -465,7 +505,7 @@ SQLMigrate::ReadTableStructures(CString p_owner,CString p_pattern,SQLDatabase* p
     m_log.WriteLog("One table with name : " + p_pattern);
     MetaTable table;
     table.m_schema = p_owner;
-    table.m_table  = p_pattern;
+    table.m_table = p_pattern;
     m_tables.push_back(table);
   }
   return (int) m_tables.size();
@@ -497,6 +537,32 @@ SQLMigrate::ReadTablesFromFile(CString& p_file)
     CString msg;
     msg.Format("Cannot open the text file with table names: %s",p_file);
     AfxMessageBox(msg,MB_OK|MB_ICONERROR);
+  }
+}
+
+void
+SQLMigrate::RemoveTemporaries()
+{
+  // If target database supports global temporary tables
+  // then we leave the temporaries in the data set
+  if(m_params.v_targetType == DatabaseType::RDBMS_ORACLE ||
+     m_params.v_targetType == DatabaseType::RDBMS_FIREBIRD)
+  {
+    return;
+  }
+
+  // Remove temp tables
+  MTableMap::iterator it = m_tables.begin();
+  while(it != m_tables.end())
+  {
+    if(it->m_temporary)
+    {
+      m_log.WriteLog(CString("Temporary not done  : ") + it->m_table);
+      it = m_tables.erase(it);
+      continue;
+    }
+    // Next table
+    ++it;
   }
 }
 
@@ -759,6 +825,10 @@ SQLMigrate::FixupTableColumns(DDLCreateTable& p_create)
       {
         column.m_default = target->GetKEYWORDCurrentTimestamp();
       }
+      else if(column.m_default.CompareNoCase(source->GetKEYWORDCurrentUser()) == 0)
+      {
+        column.m_default = target->GetKEYWORDCurrentUser();
+      }
       else if(column.m_default.Find('(') > 0)
       {
         // HACK: Functions cannot be converted
@@ -822,6 +892,94 @@ SQLMigrate::FindColumn(MColumnMap& p_columns,CString p_name)
     ++index;
   }
   return -1;
+}
+
+void
+SQLMigrate::CreateViews()
+{
+  int numViews = 0;
+
+  CString text;
+  CString comment("-- ");
+  CString header1("CREATING VIEWS IN THE TARGET DATABASE");
+  CString header2("=====================================");
+
+  m_log.WriteLog("");
+  m_log.WriteLog(header1);
+  m_log.WriteLog(header2);
+
+  // Set status of current step
+  m_log.SetStatus("Creating views");
+
+  // Try to get the optimal result
+  SQLInfoDB* source = m_databaseSource->GetSQLInfoDB();
+  SQLInfoDB* target = m_databaseTarget->GetSQLInfoDB();
+  source->SetPreferODBC(false);
+  target->SetPreferODBC(false);
+
+  for(unsigned int ind = 0; ind < m_tables.size(); ++ind)
+  {
+    DDLCreateTable create(source);
+
+    // Getting the table to migrate
+    CString viewName = m_tables[ind].m_table;
+    if(!m_params.v_source_schema.IsEmpty() && source->GetRDBMSUnderstandsSchemas())
+    {
+      viewName = m_params.v_source_schema + "." + viewName;
+    }
+
+    // Getting the view info (DO NOT THROW AWAY AS WITH TABLES!)
+    DDLS statements = create.GetViewStatements(viewName);
+
+     // Set the target database
+    create.SetInfoDB(target);
+
+    // Do something with the statement
+    for(auto& statement : statements)
+    {
+      bool first = true;
+      if(target->GetRDBMSIsCatalogUpper())
+      {
+        statement.MakeUpper();
+      }
+      else
+      {
+        statement.MakeLower();
+      }
+      m_log.WriteLog(statement);
+      if(m_directMigration < 2)
+      {
+        try
+        {
+          SQLQuery query(m_databaseTarget);
+          SQLTransaction trans(m_databaseTarget,"CreateView");
+          query.DoSQLStatement(statement);
+          trans.Commit();
+        }
+        catch(StdException& ex)
+        {
+          m_log.WriteLog("ERROR: View creation failed");
+          m_log.WriteLog(ex.GetErrorMessage());
+          m_params.v_errors++;
+
+          // If the first statement does NOT succeed,
+          // the others (GRANTS) have no use, so continue to next view
+          if(first)
+          {
+            break;
+          }
+        }
+      }
+      else
+      {
+        statement.Replace("\r","");
+        m_log.WriteOut(statement,true);
+      }
+      first = false;
+    }
+    // Show number of tables
+    m_log.SetTablesGauge(++numViews);
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////

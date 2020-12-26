@@ -292,6 +292,13 @@ SQLInfoPostgreSQL::GetKEYWORDDataType(MetaColumn* p_column)
   return p_column->m_typename;
 }
 
+// Gets the USER (current-user) keyword function
+CString
+SQLInfoPostgreSQL::GetKEYWORDCurrentUser() const
+{
+  return "CURRENT_USER";
+}
+
 // Connects to a default schema in the database/instance
 CString
 SQLInfoPostgreSQL::GetSQLDefaultSchema(CString p_schema) const
@@ -1551,9 +1558,17 @@ SQLInfoPostgreSQL::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewnam
   }
   query += " ORDER BY 1,2,3";
                   
-  return query;}
+  return query;
+}
 
-CString 
+CString
+SQLInfoPostgreSQL::GetCATALOGViewText(CString& /*p_schema*/,CString& /*p_viewname*/) const
+{
+  // Cannot query this, Use ODBC functions
+  return "";
+}
+
+CString
 SQLInfoPostgreSQL::GetCATALOGViewCreate(CString p_schema,CString p_viewname,CString p_contents) const
 {
   return "CREATE OR REPLACE VIEW " + p_schema + "." + p_viewname + "\n" + p_contents;

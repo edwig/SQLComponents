@@ -52,9 +52,11 @@ private:
 
   int      ReadTableStructures(CString p_owner,CString p_patroon,SQLDatabase* p_database);
   void     ReadTablesFromFile (CString& p_bestand);
+  void     RemoveTemporaries();
   // Processing
   void     DropTables();
   void     CreateTables();
+  void     CreateViews();
   void     FillTablesViaPump();
   void     FillTablesViaData(bool p_process);
   void     TruncateTables();

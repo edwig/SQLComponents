@@ -58,6 +58,8 @@
 #define IDC_DO_FOREIGN                  1037
 #define IDC_DO_PRIMARYS2                1038
 #define IDC_DO_DELETES                  1038
+#define IDC_DO_DATA2                    1039
+#define IDC_DO_VIEWS                    1039
 #define IDC_BUTT_DIR                    1040
 #define IDC_DIRECTORY                   1041
 

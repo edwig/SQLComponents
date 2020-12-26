@@ -392,6 +392,13 @@ SQLInfoFirebird::GetKEYWORDDataType(MetaColumn* p_column)
   return p_column->m_typename = type;
 }
 
+// Gets the USER (current-user) keyword function
+CString
+SQLInfoFirebird::GetKEYWORDCurrentUser() const
+{
+  return "CURRENT_USER";
+}
+
 // Connects to a default schema in the database/instance
 CString
 SQLInfoFirebird::GetSQLDefaultSchema(CString /*p_schema*/) const
@@ -1676,7 +1683,14 @@ SQLInfoFirebird::GetCATALOGViewList(CString& p_schema,CString& p_pattern) const
   return GetCATALOGViewAttributes(p_schema,p_pattern);
 }
 
-CString 
+CString
+SQLInfoFirebird::GetCATALOGViewText(CString& /*p_schema*/,CString& /*p_viewname*/) const
+{
+  // Cannot query this, Use ODBC functions
+  return "";
+}
+
+CString
 SQLInfoFirebird::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname) const
 {
   p_schema.Empty(); // do not bind as parameter

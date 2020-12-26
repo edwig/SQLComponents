@@ -860,6 +860,33 @@ SQLInfoDB::MakeInfoColumnPrivileges(MPrivilegeMap& p_privileges,CString& p_error
   return false;
 }
 
+bool    
+SQLInfoDB::MakeInfoViewDefinition(CString& p_defintion,CString& p_errors,CString p_schema,CString p_viewname)
+{
+  bool result = false;
+  CString sql = GetCATALOGViewText(p_schema,p_viewname);
+  if(!sql.IsEmpty())
+  {
+    try
+    {
+      // RDBMS might store view definition in multiple catalog records
+      SQLQuery query(m_database);
+      query.DoSQLStatement(sql);
+      while(query.GetRecord())
+      {
+        p_defintion += query.GetColumn(1)->GetAsChar();
+      }
+      result = true;
+    }
+    catch(StdException& er)
+    {
+      ReThrowSafeException(er);
+      p_errors += er.GetErrorMessage();
+    }
+  }
+  return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // PRIVATE

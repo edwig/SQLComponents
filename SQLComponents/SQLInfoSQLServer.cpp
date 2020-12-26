@@ -360,6 +360,13 @@ SQLInfoSQLServer::GetKEYWORDDataType(MetaColumn* p_column)
   return type;
 }
 
+// Gets the USER (current-user) keyword function
+CString
+SQLInfoSQLServer::GetKEYWORDCurrentUser() const
+{
+  return "CURRENT_USER";
+}
+
 // Connects to a default schema in the database/instance
 CString
 SQLInfoSQLServer::GetSQLDefaultSchema(CString p_schema) const
@@ -1428,9 +1435,17 @@ SQLInfoSQLServer::GetCATALOGViewAttributes(CString& p_schema,CString& p_viewname
     query += " ?\n";
   }
   query += " ORDER BY 1,2,3";
-  return query;}
+  return query;
+}
 
-CString 
+CString
+SQLInfoSQLServer::GetCATALOGViewText(CString& /*p_schema*/,CString& /*p_viewname*/) const
+{
+  // Cannot query this, Use ODBC functions
+  return "";
+}
+
+CString
 SQLInfoSQLServer::GetCATALOGViewCreate(CString p_schema,CString p_viewname,CString p_contents) const
 {
   return "CREATE VIEW " + p_schema + "." + p_viewname + "\n" + p_contents;

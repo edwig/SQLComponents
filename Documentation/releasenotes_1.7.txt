@@ -14,6 +14,7 @@ Version 1.7.0 of 16-08-2020
    - Indices
    - Foreign keys
    - Sequences (if applicable)
+   - Views
    - Access rights
    If the migration goes between databases of the same brand, also table triggers are supported
 
@@ -25,3 +26,4 @@ Version 1.7.0 of 16-08-2020
 2) Lots of extra methods have been added to the SQLInfoDB derived classes.
 3) SQLQuery has been expanded to support better data pumping from one database to another.
 4) The DDLCreateTable class is now used in the SQLMigrate program. It has been largely enhanced.
+ 
