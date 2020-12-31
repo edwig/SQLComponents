@@ -1122,12 +1122,25 @@ SQLInfo::IsCorrectName(CString p_name,int p_type)
     }
   }
 
+  // Cannot be in the ODBC keywords list or in de RDBMS extra reserved words list
+  if(IsReservedWord(p_name))
+  {
+    return false;
+  }
+  // Name OK
+  return true;
+}
+
+// Is reserved word
+bool
+SQLInfo::IsReservedWord(CString p_name)
+{
   // Cannot be in the ODBC keywords list
   for(auto& word : m_ODBCKeywords)
   {
     if(p_name.CompareNoCase(word) == 0)
     {
-      return false;
+      return true;
     }
   }
 
@@ -1136,12 +1149,10 @@ SQLInfo::IsCorrectName(CString p_name,int p_type)
   {
     if(p_name.CompareNoCase(word) == 0)
     {
-      return false;
+      return true;
     }
   }
-
-  // Name OK
-  return true;
+  return false;
 }
 
 // Can we start a transaction on the database

@@ -3,6 +3,14 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.7
 ===== Released since: 16-08-2020 =====
 ======================================
 
+Version 1.7.1 of 31-12-2020
+---------------------------
+1) Various bugs and enhancements for the MariaDB database.
+   Discovery of SQLColumns and SQLSequences has been corrected and expanded
+   Columns of tables in different schema's can now be found.
+   Sequences of a table can now directly be found through a new SequenceAttributes function.
+   Added extra reserved keywords for the MariaDB database in Oracle mode
+
 Version 1.7.0 of 16-08-2020
 ---------------------------
 1) Added a SQL Migration wizard to migrate the database contents from a source database

@@ -157,3 +157,36 @@ SELECT *
 
 
 
+CREATE TABLE test_types
+(
+  field1    CHAR(10)           NOT NULL
+ ,field2    VARCHAR2(200)
+ ,field3    NCHAR(10)          NOT NULL
+ ,field4    NCHAR varying(200) DEFAULT 'Génèpëlletje' NOT NULL
+ ,field5    NUMBER
+ ,field6    NUMBER(14)
+ ,field7    NUMBER(16,2)
+ ,field8    INTEGER            NOT NULL
+ ,field9    FLOAT
+ ,field10   REAL               NOT NULL
+ ,field11   binary_float
+ ,field12   binary_double
+ ,field13   DATE               DEFAULT SYSDATE NOT null
+ ,field14   TIMESTAMP(3)
+ ,field15   TIMESTAMP(6) WITH TIME zone
+ ,field16   TIMESTAMP WITH LOCAL TIME zone
+ ,field17   INTERVAL YEAR(5) TO MONTH
+ ,field18   INTERVAL DAY(6) TO SECOND(3) NOT NULL
+ ,field19   CLOB
+ ,field20   RAW (2000)
+ ,field21   LONG
+ ,field22   BLOB
+ ,field23   NCLOB
+);
+
+DROP TABLE test_types;
+
+SELECT *
+  FROM all_tab_columns
+ WHERE owner = 'KDBA'
+   AND table_name = 'TEST_TYPES';
