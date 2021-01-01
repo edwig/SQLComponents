@@ -3,6 +3,10 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.7
 ===== Released since: 16-08-2020 =====
 ======================================
 
+Version 1.7.2 of 01-01-2021
+---------------------------
+1) Copyrights bumped to the year 2021
+
 Version 1.7.1 of 31-12-2020
 ---------------------------
 1) Various bugs and enhancements for the MariaDB database.

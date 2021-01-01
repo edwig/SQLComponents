@@ -3,14 +3,8 @@
 // Bestand:      $Archive: /Tools/ExportDB_20/ExportDB_20/stdafx.h $
 // Auteurs:      Edwig Huisman [EH]
 //
-// Copyright (c) 1998 - 2010 Centric IT Solutions
-// Alle rechten voorbehouden
+// Copyright (c) 1998-2021 ir. W.E. Huisman
 //
-// Laatste wijziging: $JustDate: 26-05-10 $
-// Gewijzigd door:    $Author: Ehuisman $
-// Versienummer:      $Revision: 2 $
-//
-
 // stdafx.h : include file for standard system include files,
 // or project specific include files that are used frequently,
 // but are changed infrequently
