@@ -274,5 +274,37 @@ namespace DatabaseUnitTest
       CString expect  = "15-10-1959";
       Assert::AreEqual(expect.GetString(),display.GetString());
     }
+
+    TEST_METHOD(XMLDuration)
+    {
+      Logger::WriteMessage("Unit testing producing XML_Duration periods");
+
+      InitSQLComponents();
+
+      // Interval to Period (Day-second)
+      SQLInterval intval1(SQL_IS_DAY_TO_SECOND,CString("10 18:11:44"));
+      CString display = intval1.AsXMLDuration();
+      CString expect = "P10DT18H11M44S";
+      Assert::AreEqual(expect.GetString(), display.GetString());
+
+      // Interval to Period (Year-Month)
+      SQLInterval intval2(SQL_IS_YEAR_TO_MONTH, CString("12 7"));
+      display = intval2.AsXMLDuration();
+      expect = "P12Y7M";
+      Assert::AreEqual(expect.GetString(), display.GetString());
+
+      // Period to interval Duration to Day-second interval
+      SQLInterval intval3(CString("P3DT6H7M12S"));
+      Assert::AreEqual((int)0,     intval3.GetYears());
+      Assert::AreEqual((int)0,     intval3.GetMonths());
+      Assert::AreEqual((int)3,     intval3.GetDays());
+      Assert::AreEqual((int)78,    intval3.GetHours());
+      Assert::AreEqual((int)4687,  intval3.GetMinutes());
+      Assert::AreEqual((int)281232,intval3.GetSeconds());
+
+      display = intval3.AsString();
+      expect  = "3 6:7:12";
+      Assert::AreEqual(expect.GetString(), display.GetString());
+    }
   };
 }
