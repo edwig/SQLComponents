@@ -206,6 +206,7 @@
     <ClCompile Include="TestNULL.cpp" />
     <ClCompile Include="TestNumeric.cpp" />
     <ClCompile Include="TestOperators.cpp" />
+    <ClCompile Include="TestOracleOID.cpp" />
     <ClCompile Include="TestSQL.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -80,7 +80,8 @@ int main(int argc,char* argv[],char* envp[])
   TestOperators();
   // Test dataset
   TestDataSet();
-
+  // Test Oracle OID
+  // TestOracleOID();
 
   //////////////////////////////////////////////////////////////////////////
   // 
