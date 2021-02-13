@@ -39,7 +39,7 @@ TestAppend(SQLDatabase* p_dbs,long p_master)
   printf("====================================\n");
 
   SQLDataSet details("detail",p_dbs);
-  details.SetPrimaryTable(g_schema,"detail");
+  details.SetPrimaryTable("","detail");
   details.SetPrimaryKeyColumn("id");
   details.SetParameter("mast_id",SQLVariant(p_master));
   details.SetSelection("*"); // Select all columns
@@ -85,7 +85,7 @@ double
 ReadDetailSet(SQLDatabase* p_dbs,long p_master)
 {
   SQLDataSet details("detail",p_dbs);
-  details.SetPrimaryTable(g_schema,"detail");
+  details.SetPrimaryTable("","detail");
   details.SetPrimaryKeyColumn("id");
   details.SetParameter("mast_id",SQLVariant(p_master));
   details.SetSelection("*"); // Select all columns
@@ -127,14 +127,14 @@ double
 ReadMasterSet(SQLDatabase* p_dbs,long p_master,double p_amount)
 {
   SQLDataSet master("master",p_dbs);
-  master.SetPrimaryTable(g_schema,"master");
+  master.SetPrimaryTable("","master");
   master.SetPrimaryKeyColumn("id");
   master.SetParameter("key",SQLVariant(p_master));
   CString sql ("SELECT id\n"
                "      ,invoice\n"
                "      ,description\n"
                "      ,total\n"
-               "  FROM %SCHEMA%.master\n"
+               "  FROM master\n"
                " WHERE id = $key");
   master.SetQuery(sql);
   // Read in the dataset
@@ -172,7 +172,6 @@ TestDataSet()
   printf("=============================\n");
 
   SQLDatabase dbs;
-  dbs.AddMacro("%SCHEMA%.",g_schema);
   dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
   long beginTime = clock();
 

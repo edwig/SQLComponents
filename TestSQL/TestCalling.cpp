@@ -78,7 +78,7 @@ void TestCalling()
       q2.SetParameter(1,"TESTING");
       q2.SetParameterName(1,"p_text");
       SQLVariant* result = q2.DoSQLCall(g_schema,"testins");
-      printf("Result: %d\n",result->GetAsSLong());
+      printf("Result: %d\n", result ? result->GetAsSLong() : 0);
 
       long endTime = clock();
       printf("Calling test 2 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
