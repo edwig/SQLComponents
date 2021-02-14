@@ -1026,7 +1026,10 @@ SQLQuery::BindParameters()
     }
 
     // Bind NUMERIC/DECIMAL precision and scale
-    if(dataType == SQL_C_NUMERIC)
+    // But only if the sql datatype and the C++ datatype are the same (a SQLVariant from the application)
+    // In case of a SQLVariant that came from the ODBC driver earlier we may NOT rebind the precision and scale
+    // Oracle ODBC drivers beyond 12.x.x.x.x **WILL** crash on that
+    if(dataType == SQL_C_NUMERIC && (dataType == sqlDatatype))
     {
       BindColumnNumeric((ushort)icol,var,SQL_PARAM_INPUT);
     }

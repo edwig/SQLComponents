@@ -32,20 +32,53 @@
 #define new DEBUG_NEW
 #endif
 
-void PerformTest(SQLDatabase* p_dbs)
+void PerformUpdateTest1(SQLDatabase* p_dbs)
 {
   SQLDataSet set;
 
   set.SetDatabase(p_dbs);
-  set.SetPrimaryTable("kdba","ehmutatie");
+  set.SetPrimaryTable("kdba","kiw_gem");
   set.SetPrimaryKeyColumn("oid");
   set.SetSelection("*");
-  set.SetWhereCondition("oid = 1");
+//  set.SetWhereCondition("oid = 1323");
+  set.SetWhereCondition("gemhoortwrg = 23");
 
   if(set.Open())
   {
-    set.GetRecord(0)->ModifyField("naam", "Een");
-    set.Synchronize();
+    if(set.GetNumberOfRecords() == 1)
+    {
+      set.GetRecord(0)->ModifyField("gemeentenaam", "Capelle aan den IJssel");
+      set.Synchronize();
+    }
+    else
+    {
+      printf("Test record not found!\n");
+    }
+    set.Close();
+  }
+}
+
+void PerformUpdateTest2(SQLDatabase* p_dbs)
+{
+  SQLDataSet set;
+
+  set.SetDatabase(p_dbs);
+  set.SetPrimaryTable("kdba", "kiw_gem");
+  set.SetPrimaryKeyColumn("oid");
+  set.SetSelection("*");
+  set.SetWhereCondition("oid = 1323");
+
+  if (set.Open())
+  {
+    if (set.GetNumberOfRecords() == 1)
+    {
+      set.GetRecord(0)->ModifyField("gemeentenaam","Meppel");
+      set.Synchronize();
+    }
+    else
+    {
+      printf("Test record not found!\n");
+    }
     set.Close();
   }
 }
@@ -66,10 +99,12 @@ void TestOracleOID()
 
     // ORACLE OPTIONS
 
-    if(dbs.Open("ornd08","kdba","testen01"))
+    // Fill in your password!
+    if(dbs.Open("owoc1201","kdba","******"))
     {
       printf("Database opened.\n");
-      PerformTest(&dbs);
+      PerformUpdateTest1(&dbs);
+      PerformUpdateTest2(&dbs);
     }
     else
     {
