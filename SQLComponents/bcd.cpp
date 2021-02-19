@@ -1136,7 +1136,7 @@ bcd::Negate()
   }
   else
   {
-  m_sign = (m_sign == Positive) ? Negative : Positive;
+  	m_sign = (m_sign == Positive) ? Negative : Positive;
   }
 }
   

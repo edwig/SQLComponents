@@ -671,6 +671,17 @@ SQLVariant::SetSQLDataType(int p_type)
   }
 }
 
+void
+SQLVariant::SetDataTypeDate()
+{
+  if (m_datatype == SQL_C_TIMESTAMP || m_datatype == SQL_C_TYPE_TIMESTAMP)
+  {
+    m_datatype    = SQL_C_TYPE_DATE;
+    m_sqlDatatype = SQL_C_TYPE_DATE;
+  }
+}
+
+
 // Setting the NUMERIC precision and scale
 // Can e.g. be used for output parameter settings
 void    

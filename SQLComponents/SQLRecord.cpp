@@ -93,7 +93,7 @@ SQLRecord::Delete()
 
 // Add a new field upon reading in the record
 // or upon entering a new record (outside database read-in)
-void
+int 
 SQLRecord::AddField(SQLVariant* p_field
                    ,bool        p_insert /*= false*/)
 {
@@ -106,26 +106,28 @@ SQLRecord::AddField(SQLVariant* p_field
     m_status |= SQL_Record_Insert;
     m_dataSet->SetStatus(SQL_Insertions);
   }
+  return (int)m_fields.size() - 1;
 }
 
 // Mutate the field
-void
+bool
 SQLRecord::SetField(int p_num,SQLVariant* p_field,int p_mutationID /*=0*/)
 {
   if(m_status & SQL_Record_Deleted)
   {
-    return;
+    return false;
   }
   if(p_num >= 0 && p_num < (int)m_fields.size())
   {
-    m_fields[p_num]->Mutate(p_field,p_mutationID);
+    return m_fields[p_num]->Mutate(p_field,p_mutationID);
   }
+  return false;
 }
 
-void
+bool
 SQLRecord::SetField(CString p_name,SQLVariant* p_field,int p_mutationID /*=0*/)
 {
-  SetField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
+  return SetField(m_dataSet->GetFieldNumber(p_name),p_field,p_mutationID);
 }
 
 SQLVariant*     
