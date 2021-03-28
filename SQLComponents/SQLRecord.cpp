@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////
 //
-// File: SQLRercord.cpp
+// File: SQLRecord.cpp
 //
 // Copyright (c) 1998-2021 ir. W.E. Huisman
 // All rights reserved

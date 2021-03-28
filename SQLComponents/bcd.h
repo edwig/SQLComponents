@@ -34,8 +34,11 @@
 //
 // Version 1.2 of 18-12-2019
 //
-#ifndef __BCD__
-#define __BCD__
+#pragma once
+#ifdef COMPILED_TOGETHER_WITH_MARLIN
+#include "..\Marlin\bcd.h"
+#else
+
 #include <sqltypes.h>   // Needed for conversions of SQL_NUMERIC_STRUCT
 
 // The ODBC standard has a maximum of 38 decimal places
@@ -169,6 +172,9 @@ public:
 
   // BCD from a SQL_NUMERIC_STRUCT
   bcd(const SQL_NUMERIC_STRUCT* p_numeric);
+
+  // Destructor of class bcd.
+  ~bcd();
 
   // CONSTANTS
 
@@ -457,4 +463,4 @@ private:
   long   m_mantissa[bcdLength]; // Up to (bcdDigits * bcdLength) digits
 };
 
-#endif // __BCD__
+#endif // COMPILED_TOGETHER_WITH_MARLIN

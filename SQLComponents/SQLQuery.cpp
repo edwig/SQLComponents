@@ -784,7 +784,7 @@ SQLQuery::DoSQLStatementBatch(CString p_statements)
       }
       else
       {
-        DoSQLStatement(statement); 
+        DoSQLStatement(statement);
       }
     }
     // Find next statement
@@ -993,7 +993,7 @@ SQLQuery::BindParameters()
     }
 
     // Ugly hack!!
-    if(m_database->GetDatabaseType() == RDBMS_SQLSERVER)
+    if(m_database && m_database->GetDatabaseType() == RDBMS_SQLSERVER)
     {
       if(sqlDatatype == SQL_CHAR && columnSize > 8000)
       {
