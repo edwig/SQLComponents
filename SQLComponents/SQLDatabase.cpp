@@ -527,8 +527,9 @@ SQLDatabase::SetKnownRebinds()
   if(m_rdbmsType == RDBMS_ORACLE)
   {
     m_rebindColumns.clear();
-//     m_rebindColumns[SQL_REAL   ] = SQL_C_DOUBLE;
-//     m_rebindColumns[SQL_FLOAT  ] = SQL_C_DOUBLE;
+    m_rebindColumns[SQL_REAL   ] = SQL_C_NUMERIC;
+    m_rebindColumns[SQL_FLOAT  ] = SQL_C_NUMERIC;
+    m_rebindColumns[SQL_DOUBLE ] = SQL_C_NUMERIC;
   }
   else if(m_rdbmsType == RDBMS_SQLSERVER)
   {
