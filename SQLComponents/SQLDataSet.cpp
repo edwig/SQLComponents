@@ -1174,7 +1174,11 @@ SQLDataSet::SetField(int p_num,SQLVariant* p_value,int p_mutationID /*=0*/)
 {
   if(m_current >= 0)
   {
-    return m_records[m_current]->SetField(p_num,p_value,p_mutationID);
+    if(m_records[m_current]->SetField(p_num,p_value,p_mutationID))
+    {
+      m_status |= SQL_Updates;
+      return true;
+    }
   }
   return false;
 }

@@ -119,7 +119,11 @@ SQLRecord::SetField(int p_num,SQLVariant* p_field,int p_mutationID /*=0*/)
   }
   if(p_num >= 0 && p_num < (int)m_fields.size())
   {
-    return m_fields[p_num]->Mutate(p_field,p_mutationID);
+    if(m_fields[p_num]->Mutate(p_field,p_mutationID))
+    {
+      m_status |= SQL_Record_Updated;
+      return true;
+    }
   }
   return false;
 }
