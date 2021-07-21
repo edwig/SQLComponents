@@ -3,6 +3,18 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.7
 ===== Released since: 16-08-2020 =====
 ======================================
 
+Version 1.7.3 of 21-07-2021
+---------------------------
+1) Added a global function to preset session global statements. This function is:
+   bool SQLSetSessionInitialisation(DatabaseType p_type,int p_number,const char* p_statement);
+   Now inside the "SQLDatabase.Open()" all the SQL statements for this database type 
+   will be called, so that all sessions start with the same initialisation statements.
+   Currently meant to be used to set the "NLS_SETTINGS" in Oracle.
+
+   In the current implementation you can set a maximum of 10 statements for each database
+   implementation. All SQL statements that you pass must be "const char*" statements that
+   have a guaranteed lifetime throughout your program.
+
 Version 1.7.2 of 01-01-2021
 ---------------------------
 1) Copyrights bumped to the year 2021

@@ -275,6 +275,8 @@ protected:
   void           SetAttributesBeforeConnect();
   // Setting connection attributes AFTER connect
   void           SetAttributesAfterConnect(bool p_readOnly);
+  // Running the initialisations for the session
+  void           SetConnectionInitialisations();
   // Find number of quotes up to the lastpos position
   int            FindQuotes(CString& p_statement,int p_lastpos);
   // Replace **ONE** macro in the statement text

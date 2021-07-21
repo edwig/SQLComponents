@@ -320,6 +320,8 @@ SQLDatabase::Open(CString const& p_connectString,bool p_readOnly)
   // that can only be performed once-in-a connection, at the beginning
   SetAttributesAfterConnect(p_readOnly);
 
+  SetConnectionInitialisations();
+
   // Success
   return true;
 }
@@ -379,6 +381,29 @@ SQLDatabase::SetAttributesAfterConnect(bool p_readOnly)
 
   // Set our initial autocommit mode
   SetAutoCommitMode(m_autoCommitMode);
+}
+
+// Running the initialisations for the session
+void
+SQLDatabase::SetConnectionInitialisations()
+{
+  try
+  {
+    SQLQuery query(this);
+    for(int index = 0;index < SQLCOMP_MAX_SESS_SETTINGS;++index)
+    {
+      char* sql = g_SQLSessionInitialization[m_rdbmsType][index];
+      if(sql)
+      {
+        query.DoSQLStatementNonQuery(sql);
+      }
+      else break;
+    }
+  }
+  catch(StdException& ex)
+  {
+    ReThrowSafeException(ex);
+  }
 }
 
 bool 
