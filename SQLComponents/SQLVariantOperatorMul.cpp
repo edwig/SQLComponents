@@ -58,7 +58,7 @@ static SQL_OperUShortMulChar(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperSLongMulChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  long result = p_left.GetAsSLong();
+  int result = p_left.GetAsSLong();
   result *= p_right.GetAsSLong();
   return SQLVariant(result);
 }

@@ -113,14 +113,14 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = SLONG");
 
-      SQLVariant one((long)23);  // XTOR signed long -> to SQLVariant
+      SQLVariant one(23);  // XTOR signed long -> to SQLVariant
       CString oneString;
       one.GetAsString(oneString);
 
       Assert::AreEqual("23",oneString);
       Assert::AreEqual(SQL_C_SLONG,one.GetDataType());
 
-      SQLVariant two = (long) 34;  // Assignment signed long -> to SQLVariant
+      SQLVariant two = 34;  // Assignment signed long -> to SQLVariant
       CString twoString;
       two.GetAsString(twoString);
 
@@ -628,7 +628,7 @@ namespace OperatorUnitTest
       SQLVariant varUTiny ((unsigned char)189);
       SQLVariant varSShort((short)-567);
       SQLVariant varUShort((ushort)567);
-      SQLVariant varInt   ((long)2 * 42);
+      SQLVariant varInt   (2 * 42);
       SQLVariant varUInt  ((unsigned)0x84556677);
       SQLVariant varFloat ((float)9.87654E12);
       SQLVariant varDouble((double)1.12345678901234E88);

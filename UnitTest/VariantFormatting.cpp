@@ -39,7 +39,7 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Formatting: Initial words");
 
-      var number(1L);
+      var number(1);
       SQLVariantFormat form(number);
       CString input("THIS is A LONG and TireSome TesT");
 
@@ -57,7 +57,7 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Formatting: Is-a-constant-or-a-number (simple form)");
 
-      var number(1L);
+      var number(1);
       SQLVariantFormat form(number);
 
       form.SetFormat("123");       Assert::IsTrue(form.IsConstantOrNumber());
@@ -84,7 +84,7 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Formatting: Removing valuta markers");
 
-      var number(1L);
+      var number(1);
       SQLVariantFormat form(number);
       CString str;
 
@@ -111,7 +111,7 @@ namespace DatabaseUnitTest
     {
       Logger::WriteMessage("Formatting: String to double values");
 
-      var number(1L);
+      var number(1);
       SQLVariantFormat form(number);
       CString str;
 

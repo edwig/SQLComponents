@@ -548,7 +548,7 @@ CString
 SQLInfoPostgreSQL::GetCATALOGTableSynonyms(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // PostgreSQL cannot do this
-  return false;
+  return CString();
 }
 
 CString

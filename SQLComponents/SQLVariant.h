@@ -190,11 +190,11 @@ public:
    
    // INFO about type names/values
    static  int          FindDatatype   (char* p_type);
-   static  char*        FindDatatype   (int   p_type);
+   static  const char*  FindDatatype   (int   p_type);
    static  int          FindParamtype  (char* p_type);
-   static  char*        FindParamtype  (int   p_type);
+   static  const char*  FindParamtype  (int   p_type);
    static  int          FindSQLDatatype(char* p_type);
-   static  char*        FindSQLDatatype(int   p_type);
+   static  const char*  FindSQLDatatype(int   p_type);
            int          FindDataTypeFromSQLType();
 
    // Assignment operator

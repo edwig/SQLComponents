@@ -495,7 +495,7 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
 {
   CString sql("SELECT ");
   
-  sql += m_selection.IsEmpty() ? "*" : m_selection;
+  sql += m_selection.IsEmpty() ? CString("*") : m_selection;
   sql += "\n  FROM ";
 
   if(!m_primarySchema.IsEmpty())

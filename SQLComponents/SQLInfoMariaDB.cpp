@@ -667,7 +667,7 @@ CString
 SQLInfoMariaDB::GetCATALOGTableSynonyms(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // MS-Access cannot do this
-  return false;
+  return CString();
 }
 
 CString

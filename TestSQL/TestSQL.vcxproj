@@ -133,6 +133,8 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <ExceptionHandling>Async</ExceptionHandling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>rpcrt4.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -180,6 +182,8 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <AdditionalDependencies>rpcrt4.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>

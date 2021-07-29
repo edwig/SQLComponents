@@ -132,6 +132,8 @@
       <UseFullPaths>true</UseFullPaths>
       <ExceptionHandling>Async</ExceptionHandling>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -172,6 +174,8 @@
       <UseFullPaths>true</UseFullPaths>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ExceptionHandling>Async</ExceptionHandling>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

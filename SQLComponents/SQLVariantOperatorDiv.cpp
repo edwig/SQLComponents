@@ -58,7 +58,7 @@ static SQL_OperUShortDivChar(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperSLongDivChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  long result = p_left.GetAsSLong();
+  int result = p_left.GetAsSLong();
   result /= p_right.GetAsSLong();
   return SQLVariant(result);
 }

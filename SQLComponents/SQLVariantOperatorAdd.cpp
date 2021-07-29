@@ -71,7 +71,7 @@ static SQL_OperUShortAddChar(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperSLongAddChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  long result = p_left.GetAsSLong();
+  int result = p_left.GetAsSLong();
   result += p_right.GetAsSLong();
   return SQLVariant(result);
 }
@@ -373,7 +373,7 @@ static SQL_OperNumAddUShort(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperCharAddSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
-  long result = p_left.GetAsSLong();
+  int result = p_left.GetAsSLong();
   result += p_right.GetAsSLong();
   return SQLVariant(result);
 }
@@ -397,7 +397,7 @@ static SQL_OperUShortAddSLong(SQLVariant& p_left,SQLVariant& p_right)
 SQLVariant 
 static SQL_OperSLongAddSLong(SQLVariant& p_left,SQLVariant& p_right)
 {
-  long result = p_left.GetAsSLong();
+  int result = p_left.GetAsSLong();
   result += p_right.GetAsSLong();
   return SQLVariant(result);
 }

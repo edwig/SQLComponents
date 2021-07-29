@@ -146,7 +146,7 @@ SQLFilter::SetField(CString p_field)
 bool
 SQLFilter::SetOperator(SQLOperator p_oper)
 {
-  if(m_operator == FN_NOP)
+  if(m_operator == OP_NOP)
   {
     m_operator = p_oper;
     return true;

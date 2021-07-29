@@ -101,6 +101,8 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -188,6 +190,8 @@
       <AdditionalIncludeDirectories>$(SolutionDir)SQLComponents;$(SolutionDir)</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

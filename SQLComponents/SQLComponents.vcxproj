@@ -126,7 +126,8 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
@@ -165,7 +166,8 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <ProgramDataBaseFileName>$(IntDir)$(TargetName).pdb</ProgramDataBaseFileName>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>

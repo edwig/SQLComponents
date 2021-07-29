@@ -48,8 +48,8 @@ namespace SQLComponents
 // Translation list of SQL datatype constants and names
 typedef struct _types
 {
-  char* name;
-  int   type;
+  const char* name;
+  int         type;
 }
 DataTypes;
 
@@ -727,7 +727,7 @@ SQLVariant::FindDatatype(char* p_type)
   return 0;
 }
 
-char* 
+const char* 
 SQLVariant::FindDatatype(int p_type)
 {
   DataTypes* types = allTypes;
@@ -757,7 +757,7 @@ SQLVariant::FindParamtype(char* p_type)
   return 0;
 }
 
-char*
+const char*
 SQLVariant::FindParamtype(int p_type)
 {
   DataTypes* param = allParams;
@@ -789,7 +789,7 @@ SQLVariant::FindSQLDatatype(char* p_type)
   return 0;
 }
 
-char* 
+const char* 
 SQLVariant::FindSQLDatatype(int p_type)
 {
   DataTypes* types = allOther;
@@ -2838,8 +2838,8 @@ void*
 SQLVariant::ThrowErrorDatatype(int p_getas)
 {
   CString error;
-  char* type  = SQLVariant::FindDatatype(m_datatype);
-  char* getas = SQLVariant::FindDatatype(p_getas);
+  const char* type  = SQLVariant::FindDatatype(m_datatype);
+  const char* getas = SQLVariant::FindDatatype(p_getas);
   error.Format("Cannot get a %s as a %s datatype.",type,getas);
   throw StdException(error);
 }

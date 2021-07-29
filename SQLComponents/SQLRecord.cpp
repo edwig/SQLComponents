@@ -303,7 +303,7 @@ SQLRecord::ModifyField(const char* p_name,unsigned short& p_field,int p_mutation
 void
 SQLRecord::ModifyField(const char* p_name,int& p_field,int p_mutationID /*= 0*/)
 {
-  SQLVariant value((long)p_field);
+  SQLVariant value(p_field);
   ModifyField(m_dataSet->GetFieldNumber(p_name), &value, p_mutationID);
 }
 

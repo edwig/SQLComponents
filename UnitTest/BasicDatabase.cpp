@@ -169,7 +169,7 @@ namespace DatabaseUnitTest
     }
 
     // For DATASET tests
-    double TestAppend(SQLDatabase* p_dbs,long p_master)
+    double TestAppend(SQLDatabase* p_dbs,int p_master)
     {
       CString msg;
       Logger::WriteMessage("Testing the DataSet append function:");
@@ -235,7 +235,7 @@ namespace DatabaseUnitTest
       return info.m_sum;
     }
 
-    double ReadDetailSet(SQLDatabase* p_dbs,long p_master)
+    double ReadDetailSet(SQLDatabase* p_dbs,int p_master)
     {
       CString msg;
       SQLDataSet details("detail",p_dbs);
@@ -284,7 +284,7 @@ namespace DatabaseUnitTest
       return info.m_sum;
     }
 
-    double ReadMasterSet(SQLDatabase* p_dbs,long p_master,double p_amount)
+    double ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
     {
       CString msg;
       SQLDataSet master("master",p_dbs);
@@ -484,7 +484,7 @@ namespace DatabaseUnitTest
     bcd  FindAssociationSet(SQLDataSet&     master
                            ,SQLDataSet&     detail
                            ,SQLAssociation& assoc
-                           ,long            p_set)
+                           ,int             p_set)
     {
       // Set up a value
       SQLVariant val(p_set);

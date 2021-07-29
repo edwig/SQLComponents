@@ -468,35 +468,35 @@ CString
 SQLInfoAccess::GetCATALOGTableExists(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // MS-Access cannot do this
-  return "";
+  return CString();
 }
 
 CString 
 SQLInfoAccess::GetCATALOGTablesList(CString& /*p_schema*/,CString& /*p_pattern*/) const
 {
   // MS-Access cannot do this
-  return "";
+  return CString();
 }
 
 CString 
 SQLInfoAccess::GetCATALOGTableAttributes(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // MS-Access cannot do this
-  return false;
+  return CString();
 }
 
 CString 
 SQLInfoAccess::GetCATALOGTableSynonyms(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // MS-Access cannot do this
-  return false;
+  return CString();
 }
 
 CString 
 SQLInfoAccess::GetCATALOGTableCatalog(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // MS-Access cannot do this
-  return false;
+  return CString();
 }
 
 CString 
@@ -510,7 +510,7 @@ SQLInfoAccess::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*/
 CString 
 SQLInfoAccess::GetCATALOGTableCreatePostfix(MetaTable& /*p_table*/,MetaColumn& /*p_column*/) const
 {
-  return "";
+  return CString();
 }
 
 // Rename a database table 
@@ -525,7 +525,7 @@ SQLInfoAccess::GetCATALOGTableRename(CString /*p_schema*/,CString p_tablename,CS
 CString 
 SQLInfoAccess::GetCATALOGTableDrop(CString /*p_schema*/,CString p_tablename,bool /*p_ifExist = false*/,bool /*p_restrict = false*/,bool /*p_cascade = false*/) const
 {
-  return "DROP TABLE " + p_tablename;
+  return CString("DROP TABLE ") + p_tablename;
 }
 
 //////////////////////////////////////////////////////////////////////////

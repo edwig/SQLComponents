@@ -42,7 +42,7 @@ namespace DatabaseUnitTest
   }
   TestOperator;
 
-  char* operators[] =
+  const char* operators[] =
   {
      "adding"
     ,"subtracting"
@@ -75,7 +75,7 @@ namespace DatabaseUnitTest
   }
   TestFunction;
 
-  char* functions[] =
+  const char* functions[] =
   {
      "sine"
     ,"cosine"
@@ -141,7 +141,7 @@ namespace DatabaseUnitTest
       {
         switch(p)
         {
-          case 0: num = 0L; break;
+          case 0: num = 0; break;
         }
       }
       count.Stop();
@@ -203,18 +203,18 @@ namespace DatabaseUnitTest
 
     void TestOperatoren(int p_count)
     {
-      char* a_big1      = "1234567890123456.1234567890123456";
-      char* a_big2      =                "5.1234567890123456";
-      char* a_big3      =  "876543210876543.21087654321087654321";
-      char* r_big_mult  = "6325255238149668.8052126159533604";
-      char* r_big_div   =  "240963853305269.14298709106993387";
-      char* r_big_mod   =                "0.7325881824833792";
+      const char* a_big1      = "1234567890123456.1234567890123456";
+      const char* a_big2      =                "5.1234567890123456";
+      const char* a_big3      =  "876543210876543.21087654321087654321";
+      const char* r_big_mult  = "6325255238149668.8052126159533604";
+      const char* r_big_div   =  "240963853305269.14298709106993387";
+      const char* r_big_mod   =                "0.7325881824833792";
 
-      char* a_small1    = "0.8347366295099261173476093153791068840878";
-      char* a_small2    = "0.5506493978516714425340844117564672940305";
-      char* r_small_add = "1.5159130887395963684392407742872";
-      char* r_small_div = "2111111100999999,3343333322232221";
-      char* r_big_min   =  "358024679246912,91258024580146906";
+      const char* a_small1    = "0.8347366295099261173476093153791068840878";
+      const char* a_small2    = "0.5506493978516714425340844117564672940305";
+      const char* r_small_add = "1.5159130887395963684392407742872";
+      const char* r_small_div = "2111111100999999,3343333322232221";
+      const char* r_big_min   =  "358024679246912,91258024580146906";
 
       DoOperatorTest(Operator_mult, a_big1,   a_big2,   r_big_mult,   p_count);
       DoOperatorTest(Operator_div,  a_big1,   a_big2,   r_big_div,    p_count);
@@ -224,10 +224,10 @@ namespace DatabaseUnitTest
       DoOperatorTest(Operator_div,  a_small1, a_small2, r_small_div,  p_count);
     }
 
-    void DoOperatorTest(TestOperator p_operator,char* p_een,char* p_two,char* p_expect,int p_count)
+    void DoOperatorTest(TestOperator p_operator,const char* p_een,const char* p_two,const char* p_expect,int p_count)
     {
       CString msg;
-      char* name = operators[p_operator];
+      const char* name = operators[p_operator];
 
       msg.Format("Testing [%s] for a total of [%d] iterations:",name,p_count);
       Logger::WriteMessage(msg);
@@ -283,39 +283,39 @@ namespace DatabaseUnitTest
 
     void TestFuncties(int p_count)
     {
-      char* a_angle     = "0.9876543210123456";
-      char* r_sine      = "0,83473662950992611734760931537911";
-      char* r_cosine    = "0,55064939785167144253408441175647";
-      char* r_tangent   = "1,5159130887395963684392407742872";
+      const char* a_angle     = "0.9876543210123456";
+      const char* r_sine      = "0,83473662950992611734760931537911";
+      const char* r_cosine    = "0,55064939785167144253408441175647";
+      const char* r_tangent   = "1,5159130887395963684392407742872";
 
-      char* a_ratio     =  "0.765498765404321098765";
-      char* r_asine     = "0,87181613107055910102494602134303";
-      char* r_acosine   = "0,69898019572433751820637567029672";
-      char* r_atangent  = "0,653346752384431270749403109172";
+      const char* a_ratio     =  "0.765498765404321098765";
+      const char* r_asine     = "0,87181613107055910102494602134303";
+      const char* r_acosine   = "0,69898019572433751820637567029672";
+      const char* r_atangent  = "0,653346752384431270749403109172";
 
-      char* a_big       =  "98765432109876543210.123456789012345678901234567890";
-      char* a_big_n     = "-98765432109876543210.123456789012345678901234567890";
-      char* a_small1    =  "26.5566778899001122334455";
-      char* a_small2    =   "7.6655443322110099887766";
-      char* a_mini      =   "0.00000000000000077665544332211998877665544332211";
-      char* r_sqroot    =  "9938079900.558082311745752865316";
-      char* r_floor     =  "98765432109876543210";
-      char* r_ceiling   =  "98765432109876543211";
-      char* r_log10     =  "19,994604968162151965673558368195";
-      char* r_log       =  "46,039279339994856527044707840045";
-      char* r_exp       =  "341521984409,089389680737393624";
-      char* r_pow       =  "82616536947,2042654425347359351";
+      const char* a_big       =  "98765432109876543210.123456789012345678901234567890";
+      const char* a_big_n     = "-98765432109876543210.123456789012345678901234567890";
+      const char* a_small1    =  "26.5566778899001122334455";
+      const char* a_small2    =   "7.6655443322110099887766";
+      const char* a_mini      =   "0.00000000000000077665544332211998877665544332211";
+      const char* r_sqroot    =  "9938079900.558082311745752865316";
+      const char* r_floor     =  "98765432109876543210";
+      const char* r_ceiling   =  "98765432109876543211";
+      const char* r_log10     =  "19,994604968162151965673558368195";
+      const char* r_log       =  "46,039279339994856527044707840045";
+      const char* r_exp       =  "341521984409,089389680737393624";
+      const char* r_pow       =  "82616536947,2042654425347359351";
 
-      char* a_big1      = "1234567890123456.1234567890123456";
-      char* a_big2      =                "5.1234567890123456";
-      char* r_big_mod   =                "0.7325881824833792";
-      char* r_modf1     =                "0.1234567890123456";
-      char* r_modf2     = "1234567890123456";
-      char* r_frexp1    = "1.2345678901234561234567890123456";
-      char* r_frexp2    = "15";
-      char* r_frexp3    = "7,7665544332211998877665544332211";
-      char* r_frexp4    = "-16";
-      char* r_ldexp     = "3399.254769907214365881024";
+      const char* a_big1      = "1234567890123456.1234567890123456";
+      const char* a_big2      =                "5.1234567890123456";
+      const char* r_big_mod   =                "0.7325881824833792";
+      const char* r_modf1     =                "0.1234567890123456";
+      const char* r_modf2     = "1234567890123456";
+      const char* r_frexp1    = "1.2345678901234561234567890123456";
+      const char* r_frexp2    = "15";
+      const char* r_frexp3    = "7,7665544332211998877665544332211";
+      const char* r_frexp4    = "-16";
+      const char* r_ldexp     = "3399.254769907214365881024";
 
       DoFunctionTest(Func_sine,   a_angle,     "0",      r_sine,     "0",         p_count);
       DoFunctionTest(Func_cosine, a_angle,     "0",      r_cosine,   "0",         p_count);
@@ -340,17 +340,17 @@ namespace DatabaseUnitTest
     }
 
     void DoFunctionTest(TestFunction p_function
-                       ,char*        p_number1
-                       ,char*        p_number2
-                       ,char*        p_expect
-                       ,char*        p_extra
+                       ,const char*  p_number1
+                       ,const char*  p_number2
+                       ,const char*  p_expect
+                       ,const char*  p_extra
                        ,int          p_count)
     {
       CString msg;
       bool extraFloat   = p_function == Func_modf  ? true : false;
       bool extraInteger = p_function == Func_frexp ? true : false;
 
-      char* name = functions[p_function];
+      const char* name = functions[p_function];
       msg.Format("Testing the function [%s] for a total of [%d] iterations:",name,p_count);
       Logger::WriteMessage(msg);
 

@@ -45,7 +45,7 @@ namespace OperatorUnitTest
       InitSQLComponents(LN_ENGLISH);
 
       SQLVariant valText("Text");
-      SQLVariant valNumber(123L);
+      SQLVariant valNumber(123);
       SQLDate datum("15-10-1959");
       SQLVariant valDate(&datum);
       SQLTime then("08:23:49");
@@ -53,9 +53,9 @@ namespace OperatorUnitTest
       SQLTimestamp stamp("2017-01-22 11:45:16");
       SQLVariant valStamp(&stamp);
       SQLVariant valTextExtra("ZZZ");
-      SQLVariant valNumberHigh(999L);
-      SQLVariant valEx3(888L);
-      SQLVariant valEx4(777L);
+      SQLVariant valNumberHigh(999);
+      SQLVariant valEx3(888);
+      SQLVariant valEx4(777);
 
       TestFilter("fieldname",OP_Equal,valText,  "fieldname = ? : Text");
       TestFilter("fieldname",OP_Equal,valNumber,"fieldname = ? : 123");

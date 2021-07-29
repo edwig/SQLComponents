@@ -1917,7 +1917,7 @@ SQLQuery::DescribeColumn(int           p_col
 SQLVariant*
 SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,const int p_param1)
 {
-  SQLVariant* var = new SQLVariant((long)p_param1);
+  SQLVariant* var = new SQLVariant((int)p_param1);
   InternalSetParameter(1,var,P_SQL_PARAM_INPUT);
   return DoSQLCall(p_schema,p_procedure,true);
 }
@@ -1952,7 +1952,7 @@ SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,bool p_hasReturn /*=fal
   // OTHERWISE, YOU HAVE TO PROVIDE IT YOURSELF!
   if(p_hasReturn && m_parameters.find(0) == m_parameters.end() && m_nameMap.empty())
   {
-    SQLVariant* var = new SQLVariant((long)0L);
+    SQLVariant* var = new SQLVariant(0);
     InternalSetParameter(0,var,P_SQL_PARAM_OUTPUT);
   }
 

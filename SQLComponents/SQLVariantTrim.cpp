@@ -47,8 +47,8 @@ namespace SQLComponents
 void SQL_ThrowErrorTruncate(int p_from,int p_to)
 {
   CString error;
-  char* from = SQLVariant::FindDatatype(p_from);
-  char* to   = SQLVariant::FindDatatype(p_to);
+  const char* from = SQLVariant::FindDatatype(p_from);
+  const char* to   = SQLVariant::FindDatatype(p_to);
   error.Format("Cannot truncate %s to %s",from,to);
   throw StdException(error);
 }

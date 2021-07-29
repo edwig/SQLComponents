@@ -124,7 +124,7 @@ SQLMigrate::Migrate()
 
     // Try to use the target schema
     bool defschema = m_databaseTarget->SetDefaultSchema(m_params.v_target_schema);
-    m_log.WriteLog("Connect to schema   : " + (defschema ? m_params.v_target_schema : "NO SCHEMA!!"));
+    m_log.WriteLog(CString("Connect to schema   : ") + (defschema ? m_params.v_target_schema : CString("NO SCHEMA!!")));
 
     m_log.SetDBType(false,m_databaseTarget->GetDatabaseTypeName());
     m_params.v_targetType  = m_databaseTarget->GetDatabaseType();
@@ -1160,7 +1160,8 @@ SQLMigrate::FillTablesViaPump()
             // Show missing records for first 100 rows
             if(++missing < 100)
             {
-              LogMissingRecord(query1,ex.GetErrorMessage());
+              CString error = ex.GetErrorMessage();
+              LogMissingRecord(query1,error);
             }
             else if(missing == 100)
             {
@@ -1427,7 +1428,8 @@ SQLMigrate::FillTablesViaData(bool p_process)
           }
           catch(StdException& ex)
           {
-            LogMissingRecord(query1,ex.GetErrorMessage());
+            CString error = ex.GetErrorMessage();
+            LogMissingRecord(query1,error);
             m_log.WriteLog(insert);
             ++m_params.v_errors;
           }

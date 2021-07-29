@@ -394,7 +394,7 @@ SQLInfo::GetInfo()
   {
     woord[0] = '\0';
     pw = woord;
-    for(pb = SQL_ODBC_KEYWORDS;*pb != '\0';pb++)
+    for(pb = (char*) SQL_ODBC_KEYWORDS;*pb != '\0';pb++)
     {
       if (*pb == ',')
       {

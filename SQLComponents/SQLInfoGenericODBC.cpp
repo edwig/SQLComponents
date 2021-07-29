@@ -505,14 +505,14 @@ CString
 SQLInfoGenericODBC::GetCATALOGTableSynonyms(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot do this, let ODBC handle this
-  return false;
+  return CString();
 }
 
 CString
 SQLInfoGenericODBC::GetCATALOGTableCatalog(CString& /*p_schema*/,CString& /*p_tablename*/) const
 {
   // Cannot do this, let ODBC handle this
-  return false;
+  return CString();
 }
 
 CString

@@ -399,13 +399,13 @@ SQLVariantFormat::StringDoubleValue()
         }
         else
         {
-          if(IsWinNumber(newWaarde,",",".",::g_locale_strCurrency,&newGetal))
+          if(IsWinNumber(newWaarde,(char*)",",(char*)".",::g_locale_strCurrency,&newGetal))
           {
             result = atof(newGetal);
           }
           else
           {
-            if(IsWinNumber(newWaarde,".",",",::g_locale_strCurrency,&newGetal))
+            if(IsWinNumber(newWaarde,(char*)".",(char*)",",::g_locale_strCurrency,&newGetal))
             {
               result = atof(newGetal);
             }
@@ -450,7 +450,7 @@ SQLVariantFormat::GetTimeFromStringVariant(SQLVariant* p_variant,CString p_forma
   ZeroMemory(p_time,sizeof(TIME_STRUCT));
   //CString tijd("");
   
-  CString tijd(p_variant ? p_variant->GetAsChar() : p_format);
+  CString tijd(p_variant ? CString(p_variant->GetAsChar()) : p_format);
 
   int pos = tijd.Find(':');
   if(pos < 0)
@@ -1287,14 +1287,14 @@ SQLVariantFormat::FormatNumberTemplate(char *Getal,const char *strNumFormat,int 
   FmtString[FmtPos] = '\0';
 
   // Do the rounding if necessary
-  if (	bAfronden )
+  if(bAfronden)
   {
     NUMBERFMT NumFormat;
     NumFormat.NumDigits     = iAfronden;
     NumFormat.LeadingZero   = 0;
     NumFormat.Grouping      = 0;
-    NumFormat.lpDecimalSep  = ".";
-    NumFormat.lpThousandSep = ",";
+    NumFormat.lpDecimalSep  = (LPSTR)".";
+    NumFormat.lpThousandSep = (LPSTR)",";
     NumFormat.NegativeOrder = 0;
     BufLen = GetNumberFormat(0, 0, Getal, &NumFormat, Buffer, p_buflen);
     if (BufLen <= 0)

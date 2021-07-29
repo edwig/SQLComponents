@@ -166,7 +166,7 @@ SQLAssociation::FollowToMaster()
   // Check if we can do the update
   if(!BasicChecks())
   {
-    return false;
+    return nullptr;
   }
 
   // Create filterset and add to the master
@@ -195,7 +195,7 @@ SQLAssociation::FollowToDetails()
   // Check if we can do the update
   if(!BasicChecks())
   {
-    return false;
+    return nullptr;
   }
 
   // Create filterset and add to the detail

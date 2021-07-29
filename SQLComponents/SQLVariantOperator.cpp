@@ -590,8 +590,8 @@ void
 SQLVariant::ThrowErrorOperator(SQLVarOperator p_operator)
 {
   CString error;
-  char* type = FindDatatype(m_datatype);
-  char* oper = nullptr;
+  const char* type = FindDatatype(m_datatype);
+  const char* oper = nullptr;
   switch (p_operator)
   {
     case SVO_PreIncrement:    oper = "pre-increment";  break;

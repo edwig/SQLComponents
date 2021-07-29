@@ -39,7 +39,7 @@ void TestGreater()
   printf("===============================\n");
 
   SQLVariant var1((short)13);
-  SQLVariant var2((long) 15);
+  SQLVariant var2(15);
 
   if(var1 > var2)
   {

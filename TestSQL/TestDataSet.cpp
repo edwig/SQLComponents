@@ -33,7 +33,7 @@
 #endif
 
 double
-TestAppend(SQLDatabase* p_dbs,long p_master)
+TestAppend(SQLDatabase* p_dbs,int p_master)
 {
   printf("Testing the DataSet append function:\n");
   printf("====================================\n");
@@ -82,7 +82,7 @@ TestAppend(SQLDatabase* p_dbs,long p_master)
 
 
 double
-ReadDetailSet(SQLDatabase* p_dbs,long p_master)
+ReadDetailSet(SQLDatabase* p_dbs,int p_master)
 {
   SQLDataSet details("detail",p_dbs);
   details.SetPrimaryTable("","detail");
@@ -124,7 +124,7 @@ ReadDetailSet(SQLDatabase* p_dbs,long p_master)
 }
 
 double
-ReadMasterSet(SQLDatabase* p_dbs,long p_master,double p_amount)
+ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
 {
   SQLDataSet master("master",p_dbs);
   master.SetPrimaryTable("","master");
