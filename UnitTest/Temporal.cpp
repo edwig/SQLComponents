@@ -306,5 +306,45 @@ namespace DatabaseUnitTest
       expect  = "3 6:7:12";
       Assert::AreEqual(expect.GetString(), display.GetString());
     }
+
+    TEST_METHOD(StringToTimestamp)
+    {
+      Logger::WriteMessage("Unit testing string names to timestamp");
+
+      InitSQLComponents();
+
+      try
+      {
+        CString now   ("NOW");
+  //    CString name  ("NOW - 1000000 MIN");     // Works OK
+        CString name  ("NOW - 1000000 MINUTE");  // Works OK
+        CString plural("NOW - 1000000 MINUTES"); // Works OK
+        SQLTimestamp stamp1(now);
+        SQLTimestamp stamp2(name);
+        SQLTimestamp stamp3(plural);
+        Logger::WriteMessage(stamp1.AsString());
+        Logger::WriteMessage(stamp2.AsString());
+        Logger::WriteMessage(stamp3.AsString());
+
+        CString years("NOW - 2 YEAR");
+        SQLTimestamp backthen(years);
+        Logger::WriteMessage(backthen.AsString());
+
+        Assert::IsFalse(stamp1.IsNull());
+        Assert::IsFalse(stamp2.IsNull());
+        Assert::IsFalse(stamp3.IsNull());
+        Assert::IsFalse(backthen.IsNull());
+
+        // Check that we went back in time
+        // Test can fail on the brink of a whole second!
+        Assert::IsTrue(stamp2 < stamp1);
+        Assert::IsTrue(stamp3 < stamp1);
+      }
+      catch(StdException& ex)
+      {
+        Logger::WriteMessage("ERROR: " + ex.GetErrorMessage());
+        Assert::Fail();
+      }
+    }
   };
 }

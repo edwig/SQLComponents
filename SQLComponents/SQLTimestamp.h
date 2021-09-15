@@ -189,10 +189,11 @@ private:
   // Calculates the number of days in a month
   int     DaysInMonth(int p_year,int p_month) const;
   // Calculates a timestamp from an interface string with extra operands
-  static bool GetVirtualMoment(CString Sign
-                              ,CString ExtraTime
-                              ,int    interval
-                              ,StampStorage& temp);
+  bool    GetVirtualMoment(CString        p_sign
+                          ,CString        p_extraTime
+                          ,int            p_interval
+                          ,StampStorage&  p_temp
+                          ,bool           p_doTimes = true);
   // Validate the timestamp for valid values for a database
   void    Validate();
   // Print the fraction to a string

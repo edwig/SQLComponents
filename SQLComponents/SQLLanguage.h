@@ -67,8 +67,10 @@ typedef enum _dateNames
   ,DN_CY             // CY      HJ       Current  Year     Laufendes Jahr      Anee en cours
   ,DN_LOY            // LOY     LVJ      Last  Of Year     Letzte des Jahres   Dernier Jour de l'annee
   ,DN_SEC
+  ,DN_SECOND
   ,DN_SECONDS
   ,DN_MIN
+  ,DN_MINUTE
   ,DN_MINUTES
   ,DN_HOUR
   ,DN_HOURS

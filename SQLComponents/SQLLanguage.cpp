@@ -78,8 +78,10 @@ const char* g_dateNames[LN_NUMLANG][DN_LASTNAME] =
      ,"HJ"              // DN_CY
      ,"LVJ"             // DN_LOY
      ,"SEC"             // DN_SEC
+     ,"SECONDE"         // DN_SECOND
      ,"SECONDEN"        // DN_SECONDS
      ,"MIN"             // DN_MIN
+     ,"MINUTE"          // DN_MINUTE
      ,"MINUTEN"         // DN_MINUTES
      ,"UUR"             // DN_HOUR
      ,"UREN"            // DN_HOURS
@@ -103,8 +105,10 @@ const char* g_dateNames[LN_NUMLANG][DN_LASTNAME] =
      ,"CY"
      ,"LOY"
      ,"SEC"             // DN_SEC
+     ,"SECOND"          // DN_SECOND
      ,"SECONDS"         // DN_SECONDS
      ,"MIN"             // DN_MIN
+     ,"MINUTE"          // DN_MINUTE
      ,"MINUTES"         // DN_MINUTES
      ,"HOUR"            // DN_HOUR
      ,"HOURS"           // DN_HOURS
@@ -128,8 +132,10 @@ const char* g_dateNames[LN_NUMLANG][DN_LASTNAME] =
      ,"LJ"              // DN_CY      Laufenden Jahr
      ,"LDJ"             // DN_LOY     Letzten des Jahren
      ,"SEK"             // DN_SEC
+     ,"SEKUNDE"         // DN_SECOND
      ,"SEKUNDEN"        // DN_SECONDS
      ,"MIN"             // DN_MIN
+     ,"MINUTE"          // DN_MINUTE
      ,"MINUTEN"         // DN_MINUTES
      ,"STUNDE"          // DN_HOUR
      ,"STUNDEN"         // DN_HOURS
@@ -153,8 +159,10 @@ const char* g_dateNames[LN_NUMLANG][DN_LASTNAME] =
      ,"AC"              // DN_CY        Année en Cours
      ,"DJA"             // DN_LOY       Dernier jour de l'année
      ,"SEC"             // DN_SEC
+     ,"SECONDE"         // DN_SECOND
      ,"SECONDES"        // DN_SECONDS
      ,"MIN"             // DN_MIN
+     ,"MINUTE"          // DN_MINUTE
      ,"MINUTES"         // DN_MINUTES
      ,"HEURE"           // DN_HOUR
      ,"HEURES"          // DN_HOURS

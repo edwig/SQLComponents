@@ -680,9 +680,9 @@ SQLTimestamp::ParseMoment(const CString& p_string)
 {
   CString string(p_string);
   StampStorage temp;
-  CString CurrentDate = "";
-  CString Sign		    = "";
-  CString ExtraTime   = "";
+  CString currentDate = "";
+  CString sign		    = "";
+  CString extraTime   = "";
   int     interval    = 0;
 
   // Trim spaces from string
@@ -697,33 +697,47 @@ SQLTimestamp::ParseMoment(const CString& p_string)
   // Test if we are properly initialized
   SQLComponentsInitialized();
 
-  SQLDate::SplitStrDate(p_string, CurrentDate, Sign, ExtraTime, interval);
+  SQLDate::SplitStrDate(p_string,currentDate,sign,extraTime,interval);
 
-  if(isalpha(CurrentDate.GetAt(0)))
+  if(isalpha(currentDate.GetAt(0)))
   {
     // Speed optimization. only if alpha chars found parsed 
-    if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CURRENT]) == 0 ||
-        CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_NOW])     == 0 ) 
+    if(currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CURRENT]) == 0 ||
+       currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_NOW])     == 0 ) 
     {
-      if (GetVirtualMoment(Sign, ExtraTime, interval, temp))
+      if(GetVirtualMoment(sign,extraTime,interval,temp))
       {
         SetTimestamp(temp.m_year,temp.m_month,temp.m_day,temp.m_hour,temp.m_minute,temp.m_second);
         return;
+      }
+      if(interval || !extraTime.IsEmpty())
+      {
+        // Extra time definition not recognized
+        CString error;
+        error.Format("Extra timestamp not recognized: %d %s",interval,extraTime.GetString());
+        throw StdException(error);
       }
       *this = CurrentTimestamp();
       return;
     }
-    else if(CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_TODAY]) == 0)
+    else if(currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_TODAY]) == 0)
     { 
-      if (GetVirtualMoment(Sign, ExtraTime, interval, temp))
+      if(GetVirtualMoment(sign,extraTime,interval,temp,false))
       {
         SetTimestamp(temp.m_year,temp.m_month,temp.m_day,temp.m_hour,temp.m_minute,temp.m_second);
         return;
       }
+      if(interval || !extraTime.IsEmpty())
+      {
+        // Extra time definition not recognized
+        CString error;
+        error.Format("Extra date not recognized: %d %s",interval,extraTime.GetString());
+        throw StdException(error);
+      }
       *this = SQLDate::Today();
       return;
     }
-    else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_FOM]) == 0)
+    else if(currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_FOM]) == 0)
     {
       // FirstOfMonth
       SetTimestamp(CurrentTimestamp().Year()
@@ -732,7 +746,7 @@ SQLTimestamp::ParseMoment(const CString& p_string)
                   ,0,0,0);
       return;
     }
-    else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_LOM]) == 0)
+    else if(currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_LOM]) == 0)
     {
       // FirstOfMonth
       SetTimestamp(CurrentTimestamp().Year()
@@ -741,14 +755,14 @@ SQLTimestamp::ParseMoment(const CString& p_string)
                   ,23,59,59);
       return;
     }
-    else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_FOY]) == 0 ||
-             CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CY])  == 0 )
+    else if(currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_FOY]) == 0 ||
+            currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_CY])  == 0 )
     {
       // FirstOfYear / CurrentYear
       SetTimestamp(CurrentTimestamp().Year(),1,1,0,0,0);
       return;
     }
-    else if (CurrentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_LOY]) == 0)
+    else if(currentDate.CompareNoCase(g_dateNames[g_defaultLanguage][DN_LOY]) == 0)
     {
       // LastOfYear
       SetTimestamp(CurrentTimestamp().Year(),12,31,23,59,59);
@@ -980,59 +994,65 @@ SQLTimestamp::AsTimeStampStruct(TIMESTAMP_STRUCT* p_struct) const
 }
 
 bool 
-SQLTimestamp::GetVirtualMoment(CString Sign
-                              ,CString ExtraTime
-                              ,int    interval
-                              ,StampStorage& temp)
+SQLTimestamp::GetVirtualMoment(CString        p_sign
+                              ,CString        p_extraTime
+                              ,int            p_interval
+                              ,StampStorage&  p_temp
+                              ,bool           p_doTimes /*=true*/)
 { 	
   // Test if we are properly initialized
   SQLComponentsInitialized();
 
   SQLTimestamp mom(CurrentTimestamp());
-  if (!Sign.IsEmpty())
+  if (!p_sign.IsEmpty())
   {
-    int factor = (Sign == "+") ? 1 : -1;
-    if (Sign == "+" || Sign == "-")
+    int factor = (p_sign == "+") ? 1 : -1;
+    if (p_sign == "+" || p_sign == "-")
     {
-      ExtraTime.MakeUpper();
-      if (ExtraTime == "" )      
+      p_extraTime.MakeUpper();
+      if (p_extraTime == "" )      
       {
         return false;
       }
-      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_SEC]    || 
-               ExtraTime == g_dateNames[g_defaultLanguage][DN_SECONDS] )
+      else if (p_doTimes &&
+              (p_extraTime == g_dateNames[g_defaultLanguage][DN_SEC]    || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_SECOND] ||
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_SECONDS]))
       {
-        mom = mom.AddSeconds(factor * interval);
+        mom = mom.AddSeconds(factor * p_interval);
       }
-      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_MIN]    || 
-               ExtraTime == g_dateNames[g_defaultLanguage][DN_MINUTES] )
+      else if (p_doTimes &&
+              (p_extraTime == g_dateNames[g_defaultLanguage][DN_MIN]    || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_MINUTE] || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_MINUTES]))
       {
-        mom = mom.AddMinutes (factor * interval);
+        mom = mom.AddMinutes (factor * p_interval);
       }
-      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_HOUR] || 
-               ExtraTime == g_dateNames[g_defaultLanguage][DN_HOURS] )
+      else if (p_doTimes &&
+              (p_extraTime == g_dateNames[g_defaultLanguage][DN_HOUR] || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_HOURS]))
       {
-        mom = mom.AddHours(factor * interval);
+        mom = mom.AddHours(factor * p_interval);
       }
-      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_DAY]  || 
-               ExtraTime == g_dateNames[g_defaultLanguage][DN_DAYS]  )
+      else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_DAY]  || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_DAYS]  )
       {
-        mom = mom.AddDays(factor * interval);
+        mom = mom.AddDays(factor * p_interval);
       }
-      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_WEEK] || 
-               ExtraTime == g_dateNames[g_defaultLanguage][DN_WEEKS] )
+      else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_WEEK] || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_WEEKS] )
       {
-        mom = mom.AddDays(factor * 7 * interval);
+        mom = mom.AddDays(factor * 7 * p_interval);
       }
-      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_MONTH] || 
-               ExtraTime == g_dateNames[g_defaultLanguage][DN_MONTHS] )
+      else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_MONTH] || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_MONTHS] )
       {
-        mom = mom.AddMonths(factor * interval);
+        mom = mom.AddMonths(factor * p_interval);
       }
-      else if (ExtraTime == g_dateNames[g_defaultLanguage][DN_YEAR] || 
-               ExtraTime == g_dateNames[g_defaultLanguage][DN_YEARS] )
+      else if (p_extraTime == g_dateNames[g_defaultLanguage][DN_YEAR] || 
+               p_extraTime == g_dateNames[g_defaultLanguage][DN_YEARS] )
       {
-        mom = mom.AddYears(factor * interval);
+        mom = mom.AddYears(factor * p_interval);
       }
       else return false;
     }
@@ -1041,7 +1061,7 @@ SQLTimestamp::GetVirtualMoment(CString Sign
       return false;
     }
   }
-  temp = mom.m_timestamp;
+  p_temp = mom.m_timestamp;
   return true;
 }
 
