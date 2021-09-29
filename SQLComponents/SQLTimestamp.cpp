@@ -731,7 +731,7 @@ SQLTimestamp::ParseMoment(const CString& p_string)
       {
         // Extra time definition not recognized
         CString error;
-        error.Format("Extra date not recognized: %d %s",interval,extraTime.GetString());
+        error.Format("Extra timestamp not recognized: %d %s",interval,extraTime.GetString());
         throw StdException(error);
       }
       *this = SQLDate::Today();
