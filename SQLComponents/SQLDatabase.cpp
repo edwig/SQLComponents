@@ -974,7 +974,7 @@ SQLDatabase::ODBCNativeSQL(CString& p_sql)
   // Let the driver do the translation
   SQLRETURN ret = SQLNativeSql(m_hdbc
                               ,(UCHAR*)p_sql.GetString()
-                              ,p_sql.GetLength()
+                              ,p_sql.GetLength() + 1
                               ,(UCHAR*)buffer
                               ,2*len
                               ,&lengte);

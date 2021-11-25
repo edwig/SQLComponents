@@ -74,7 +74,7 @@ SQLQuery::SQLQuery(HDBC p_hdbc)
 
 SQLQuery::~SQLQuery()
 {
-  Close();
+  Close(false);
   ResetParameters();
 }
 
@@ -110,8 +110,10 @@ SQLQuery::Init(HDBC p_connection)
 }
 
 void
-SQLQuery::Close()
+SQLQuery::Close(bool p_throw /*= true*/)
 {
+  CString error;
+
   // Statement reset
   if (m_hstmt)
   {
@@ -124,6 +126,7 @@ SQLQuery::Close()
       if(!SQL_SUCCEEDED(m_retCode))
       {
         GetLastError("Closing the cursor: ");
+        error += m_lastError;
 
         // Some databases give a SQLSTATE = 24000 if the cursor was at the end
         // This is documented behavior of SQLCloseCursor
@@ -144,7 +147,7 @@ SQLQuery::Close()
     if(!SQL_SUCCEEDED(m_retCode))
     {
       GetLastError("Freeing the cursor: ");
-      throw StdException(m_lastError);
+      error += m_lastError;
     }
   }
   // Clear number map
@@ -172,6 +175,10 @@ SQLQuery::Close()
   // m_database
   // m_connection
   // m_parameters
+  if(p_throw && !error.IsEmpty())
+  {
+    throw StdException(error);
+  }
 }
 
 void
@@ -1917,7 +1924,7 @@ SQLQuery::DescribeColumn(int           p_col
 SQLVariant*
 SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,const int p_param1)
 {
-  SQLVariant* var = new SQLVariant((int)p_param1);
+  SQLVariant* var = new SQLVariant((long)p_param1);
   InternalSetParameter(1,var,P_SQL_PARAM_INPUT);
   return DoSQLCall(p_schema,p_procedure,true);
 }
@@ -1952,7 +1959,7 @@ SQLQuery::DoSQLCall(CString p_schema,CString p_procedure,bool p_hasReturn /*=fal
   // OTHERWISE, YOU HAVE TO PROVIDE IT YOURSELF!
   if(p_hasReturn && m_parameters.find(0) == m_parameters.end() && m_nameMap.empty())
   {
-    SQLVariant* var = new SQLVariant(0);
+    SQLVariant* var = new SQLVariant((long)0L);
     InternalSetParameter(0,var,P_SQL_PARAM_OUTPUT);
   }
 

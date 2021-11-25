@@ -738,7 +738,7 @@ BasicXmlExcel::LoadStyles()
         }
       }
       //voor alle cellformats de bijbehorende code zoeken.
-      for (int i = 0; i < styleFormats.size(); i++)
+      for (int i = 0; i < (int)styleFormats.size(); i++)
       {
         //Er zijn een aantal standaardwaarden die niet apart in een code worden opgenomen, voor deze zelf een formatcode aanmaken
         if (styleFormats[i] == "14" || styleFormats[i] == "15"||styleFormats[i] == "16"||styleFormats[i] == "17" )

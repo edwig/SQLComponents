@@ -800,7 +800,7 @@ SQLInfo::SupportedFunction(unsigned int api_function)
 int
 SQLInfo::GetAttributeInteger(LPCTSTR description,SQLINTEGER attrib)
 {
-  SQLUINTEGER value = 0;
+  SQLULEN    value = 0;
   SQLINTEGER cbMax = 0;
   
   SQLRETURN nRetCode = SQLGetConnectAttr(m_hdbc
@@ -831,7 +831,7 @@ SQLInfo::GetAttributeInteger(LPCTSTR description,SQLINTEGER attrib)
     return 0;
   }
   ATLTRACE("Database connection attribute \"%s\" was: %d\n",description,value);
-  return value;
+  return (int) (value & 0xFFFF);
 }
 
 // Getting a general STRING connection attribute
@@ -1237,8 +1237,6 @@ SQLInfo::CloseStatement()
     SqlFreeStmt(m_hstmt,SQL_DROP);
     m_hstmt   = NULL;
     m_retCode = SQL_SUCCESS;
-
-    ATLTRACE("DBInfo::CloseStatement\n");
   }
 }
 

@@ -72,7 +72,7 @@ public:
 
   void Init(SQLDatabase* p_database);
   void Init(HDBC p_connection);
-  void Close();
+  void Close(bool p_throw = true);
   void Open();
   void ResetParameters();
 
