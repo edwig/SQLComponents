@@ -2,7 +2,7 @@
 //
 // SourceFile: XMLParser.cpp
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 2014-2021 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -98,52 +98,6 @@ XMLParser::PrintXmlString(const CString& p_string,bool p_utf8 /*=false*/)
   return result;
 }
 
-CString
-XMLParser::PrintJsonString(const CString& p_string,bool p_utf8 /*=false*/)
-{
-  CString result("\"");
-  unsigned char buffer[3];
-  buffer[2] = 0;
-
-  for(int ind = 0; ind < p_string.GetLength(); ++ind)
-  {
-    char ch = p_string.GetAt(ind);
-
-    if(ch < 0x80)
-    {
-      switch(ch = p_string.GetAt(ind))
-      {
-        case '\"': result += "\\\"";   break;
-        case '\\': result += "\\\\";   break;
-        case '/':  result += "\\/";    break;
-        case '\b': result += "\\b";    break;
-        case '\f': result += "\\f";    break;
-        case '\n': result += "\\n";    break;
-        case '\r': result += "\\r";    break;
-        case '\t': result += "\\t";    break;
-        default:   result += ch;       break;
-      }
-    }
-    else
-    {
-      // Plainly add the character
-      // Windows-1252 encoding or UTF-8 encoding
-      result += ch;
-    }
-  }
-  // Closing
-  result += "\"";
-
-  if(p_utf8)
-  {
-    // Convert to UTF-8
-    result = EncodeStringForTheWire(result,"utf-8");
-  }
-
-  return result;
-}
-
-
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -216,7 +170,10 @@ XMLParser::ParseMessage(CString& p_message,WhiteSpace p_whiteSpace /*=PRESERVE_W
   catch(StdException& ex)
   {
     m_message->m_internalError = XmlError::XE_NotAnXMLMessage;
-    m_message->m_internalErrorString = ex.GetErrorMessage();
+    if(m_message->m_internalErrorString.IsEmpty())
+    {
+      m_message->m_internalErrorString = ex.GetErrorMessage();
+    }
   }
 
   // Conclusion of condensed level
@@ -267,6 +224,11 @@ XMLParser::ParseLevel()
     else if(strncmp((const char*)m_pointer,"<![CDATA[",9) == 0)
     {
       ParseCDATA();
+      // Scan for recursively restartable CDATA sections
+      while(strncmp((const char*)m_pointer,"<![CDATA[",9) == 0)
+      {
+        ParseCDATA(true);
+      }
       return;
     }
     else if(strncmp((const char*)m_pointer,"<!",2) == 0)
@@ -478,8 +440,8 @@ XMLParser::ParseComment()
   SkipWhiteSpace();
 }
 
-void 
-XMLParser::ParseCDATA()
+void
+XMLParser::ParseCDATA(bool p_append /*= false*/)
 {
   CString value;
 
@@ -498,8 +460,15 @@ XMLParser::ParseCDATA()
   // Add to current element
   if(m_lastElement)
   {
-    m_lastElement->SetValue(value);
-    m_lastElement->SetType(XDT_CDATA);
+    if(p_append)
+    {
+      m_lastElement->SetValue(m_lastElement->GetValue() + value);
+    }
+    else
+    {
+      m_lastElement->SetValue(value);
+      m_lastElement->SetType(XDT_CDATA);
+    }
   }
   SkipWhiteSpace();
 }
@@ -857,4 +826,3 @@ XMLParser::MakeElement(CString& p_namespace,CString& p_name)
   }
   m_lastElement->SetNamespace(p_namespace);
 }
-

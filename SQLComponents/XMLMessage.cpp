@@ -2,7 +2,7 @@
 //
 // SourceFile: XMLMessage.cpp
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 2014-2021 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -175,6 +175,7 @@ XMLMessage::XMLMessage()
 {
   m_root = new XMLElement();
   m_root->SetType(XDT_String);
+  AddReference();
 }
 
 // XTOR from another message
@@ -191,6 +192,8 @@ XMLMessage::XMLMessage(XMLMessage* p_orig)
   m_sendBOM             = p_orig->m_sendBOM;
   m_internalError       = p_orig->m_internalError;
   m_internalErrorString = p_orig->m_internalErrorString;
+
+  AddReference();
 }
 
 XMLMessage::~XMLMessage()
@@ -557,7 +560,7 @@ XMLMessage::PrintElements(XMLElement* p_element
   {
     message += newline;
     // call recursively
-    for(auto element : p_element->GetChildren())
+    for(auto& element : p_element->GetChildren())
     {
       message += PrintElements(element,p_utf8,p_level + 1);
     }
@@ -591,97 +594,6 @@ XMLMessage::PrintWSDLComment(XMLElement* p_element)
   comment += ":-->";
 
   return comment;
-}
-
-CString 
-XMLMessage::PrintJson(bool p_attributes)
-{
-  bool utf8 = (m_encoding == XMLEncoding::ENC_UTF8);
-
-  CString message = PrintElementsJson(m_root,p_attributes,utf8);
-  if(m_condensed)
-  {
-    message += "\n";
-  }
-  return message;
-}
-
-// Print the elements stack
-CString
-XMLMessage::PrintElementsJson(XMLElement* p_element
-                             ,bool        p_attributes
-                             ,bool        p_utf8  /*=true*/
-                             ,int         p_level /*=0*/)
-{
-  CString temp;
-  CString spaces;
-  CString newline;
-  CString message;
-
-  // Find indentation
-  if(m_condensed == false)
-  {
-    newline = "\n";
-    for(int ind = 0; ind < p_level; ++ind)
-    {
-      spaces += "  ";
-    }
-  }
-
-  CString name  = p_element->GetName();
-  CString value = p_element->GetValue();
-
-  if(!name.IsEmpty())
-  {
-    message = spaces + "\""+ name + "\": ";
-  }
-
-  // Optional attributes group
-  if(p_attributes && !p_element->GetAttributes().empty())
-  {
-    message += "{" + newline;
-
-    for(auto& attrib : p_element->GetAttributes())
-    {
-      CString attrName  = attrib.m_name;
-      CString attrValue = attrib.m_value;
-      temp.Format("\"@%s\": \"%s'\"",attrName.GetString(),attrValue.GetString());
-      message = spaces + temp + newline;
-    }
-    message += spaces + "\"#text\": ";
-  }
-
-  // print element value
-  switch(p_element->GetType() & XDT_Mask & ~XDT_Type)
-  {
-    default:                    temp.Format("%s",value.GetString());
-                                break;
-    case XDT_CDATA:             [[fallthrough]];
-    case XDT_String:            [[fallthrough]];
-    case XDT_AnyURI:            [[fallthrough]];
-    case XDT_NormalizedString:  temp = XMLParser::PrintJsonString(value,p_utf8);
-                                break;
-  }
-  message += temp + newline;
-
-  // Closing of the attributes group
-  if(p_attributes && !p_element->GetAttributes().empty())
-  {
-    message += spaces + "}" + newline;
-  }
-
-  // Print all child elements of this one by recursing
-  if(!p_element->GetChildren().empty())
-  {
-    message += spaces + "{" + newline;
-    for(auto& elem : p_element->GetChildren())
-    {
-      PrintElementsJson(elem,p_attributes,p_utf8,p_level + 1);
-    }
-    message += spaces + "}" + newline;
-  }
-
-  return message;
 }
 
 // Encrypt the whole message: yielding a new message
@@ -822,7 +734,7 @@ XMLElement*
 XMLMessage::SetElement(XMLElement* p_base,CString p_name,bool p_value)
 {
   CString value;
-  value.Format("%s",p_value ? "yes" : "no");
+  value.Format("%s",p_value ? "true" : "false");
   return SetElement(p_base,p_name,XDT_Boolean,value);
 }
 
@@ -984,7 +896,8 @@ bool
 XMLMessage::GetElementBoolean(XMLElement* p_elem,CString p_name)
 {
   CString value = GetElement(p_elem,p_name);
-  if(value.CompareNoCase("true") == 0)
+  if((value.CompareNoCase("true") == 0) ||
+     (value.CompareNoCase("yes") == 0))
   {
     return true;
   }

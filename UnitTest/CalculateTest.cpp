@@ -124,7 +124,10 @@ namespace OperatorUnitTest
           }
           else
           {
-            Assert::AreEqual("47",res);   // Adding values
+            if(res.Compare("47") && res.Compare("47.00"))
+            {
+              Assert::Fail();
+            }
           }
           number_of_tests++;
         }
@@ -167,7 +170,11 @@ namespace OperatorUnitTest
             CString res;
             result.GetAsString(res);
 
-            Assert::AreEqual("37",res);   // Adding values
+            if (res.Compare("37") && res.Compare("37.00"))
+            {
+              Assert::Fail();
+            }
+
             number_of_tests++;
           }
         }
@@ -213,7 +220,10 @@ namespace OperatorUnitTest
             CString res;
             result.GetAsString(res);
 
-            Assert::AreEqual("210",res);   // Adding values
+            if(res.Compare("210") && res.Compare("210.00"))
+            {
+              Assert::Fail();
+            }
             number_of_tests++;
           }
         }

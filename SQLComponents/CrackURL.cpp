@@ -2,7 +2,9 @@
 //
 // SourceFile: CrackURL.cpp
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Marlin Server: Internet server/client
+// 
+// Copyright (c) 2014-2021 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -29,21 +31,21 @@
 // CRACK / SPLIT A HTTP URI (URL in HTTP) IN IT'S COMPOSING PARTS
 //
 //
-//  foo://username:password@example.com:8042/over/there/index.dtb?type=animal&name=white%20narwhal#nose
-//  \_/   \_______________/ \_________/ \__/            \___/ \_/ \______________________________/ \__/
-//   |           |               |       |                |    |            |                       |
-//   |       userinfo         hostname  port              |    |          query                   anchor
-//   |    \________________________________/\_____________|____|/ \__/       \__/
-//   |                    |                          |    |    |    |          |
-//scheme              authority                    path   |    |    interpretable as keys
-// name   \_______________________________________________|____|/     \____/     \_____/
-//   |                         |                          |    |         |           |
-//   |                 hierarchical part                  |    |    interpretable as values
-//   |                                                    |    |
-//   |            path               interpretable as filename |
-//   |   ___________|____________                              |
-//  / \ /                        \                             |
-//  urn:example:animal:ferret:nose               interpretable as extension
+//  foo://example.com:8042/over/there/index.dtb?type=animal&name=white%20narwhal#nose
+//  \_/   \_________/ \__/            \___/ \_/ \______________________________/ \__/
+//   |         |       |                |    |            |                       |
+//   |      hostname  port              |    |          query                   anchor
+//   |    \______________/\_____________|____|/ \__/       \___/
+//   |            |                |    |    |    |          |
+//scheme      authority          path   |    |    interpretable as keys
+// name   \_____________________________|____|/     \_____/     \______________/
+//   |          |                       |    |         |             |
+//   |       hierarchical part          |    |    interpretable as values
+//   |                                  |    |
+//   |            path               interpretable as filename 
+//   |   ___________|____________            |
+//  / \ /                        \           |
+//  urn:example:animal:ferret:nose           interpretable as extension
 //
 // HTTP EXAMPLE
 //
@@ -65,8 +67,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-LPCTSTR CrackedURL::m_unsafeString   = " \"<>#{}|\\^~[]`";
-LPCTSTR CrackedURL::m_reservedString = "$&/;?@-!*()'"; // ".,+_:="
+LPCTSTR CrackedURL::m_unsafeString = " \"@<>#{}|\\^~[]`";
+LPCTSTR CrackedURL::m_reservedString = "$&/;?-!*()'"; // ".,+_:="
 
 CrackedURL::CrackedURL()
 {
@@ -94,8 +96,6 @@ CrackedURL::Reset()
   // Reset the answering structure
   m_scheme = "http";
   m_secure = false;
-  m_userName.Empty();
-  m_password.Empty();
   m_host.Empty();
   m_port = INTERNET_DEFAULT_HTTP_PORT;
   m_path.Empty();
@@ -105,8 +105,6 @@ CrackedURL::Reset()
   // reset the found-statuses
   m_foundScheme     = false;
   m_foundSecure     = false;
-  m_foundUsername   = false;
-  m_foundPassword   = false;
   m_foundHost       = false;
   m_foundPort       = false;
   m_foundPath       = false;
@@ -149,28 +147,6 @@ CrackedURL::CrackURL(CString p_url)
   }
   // Remove '//'
   p_url = p_url.Mid(2);
-  
-  // Check for username/password
-  pos = p_url.Find('@');
-  if(pos > 0)
-  {
-    m_foundUsername = true;
-    CString authent = p_url.Left(pos);
-    p_url = p_url.Mid(pos + 1);
-    
-    // Find password
-    pos = authent.Find(':');
-    if(pos < 0)
-    {
-      m_userName = authent;
-    }
-    else
-    {
-      m_foundPassword = true;
-      m_userName = authent.Left(pos);
-      m_password = authent.Mid(pos + 1);
-    }
-  }
   
   // Check for server:port
   CString server;
@@ -299,6 +275,19 @@ CrackedURL::CrackURL(CString p_url)
 
   // Now a valid URL
   return (m_valid = true);
+}
+
+
+void
+CrackedURL::SetPath(CString p_path)
+{
+  // Strip parameters and anchors
+  int pos = p_path.FindOneOf("#?");
+  if (pos >= 0)
+  {
+    p_path = p_path.Left(pos);
+  }
+  m_path = p_path;
 }
 
 // Convert string to URL encoding, using UTF-8 chars
@@ -433,26 +422,45 @@ CrackedURL::URL()
   // Separator
   url += "://";
 
-  // Username
-  if(!m_userName.IsEmpty())
-  {
-    url += EncodeURLChars(m_userName);
-
-    if(!m_password.IsEmpty())
-    {
-      url += ":";
-      url += EncodeURLChars(m_password);
-    }
-    // Separating the user
-    url += "@";
-  }
- 
   // Add hostname
   url += m_host;
 
   // Possibly add a port
   if( (m_secure == false && m_port != INTERNET_DEFAULT_HTTP_PORT) ||
       (m_secure == true  && m_port != INTERNET_DEFAULT_HTTPS_PORT) )
+  {
+    CString portnum;
+    portnum.Format(":%d",m_port);
+    url += portnum;
+  }
+
+  // Now add absolute path and possibly parameters and anchor
+  url += AbsolutePath();
+
+  // This is the result
+  return url;
+}
+
+// Safe URL (without the userinfo)
+CString
+CrackedURL::SafeURL()
+{
+  CString url(m_scheme);
+
+  // Secure HTTP 
+  if(m_secure && m_scheme.CompareNoCase("https") != 0)
+  {
+    url += "s";
+  }
+  // Separator
+  url += "://";
+
+  // Add hostname
+  url += m_host;
+
+  // Possibly add a port
+  if((m_secure == false && m_port != INTERNET_DEFAULT_HTTP_PORT) ||
+     (m_secure == true  && m_port != INTERNET_DEFAULT_HTTPS_PORT))
   {
     CString portnum;
     portnum.Format(":%d",m_port);
@@ -550,8 +558,6 @@ CrackedURL::operator=(CrackedURL* p_orig)
   m_valid    = p_orig->m_valid;
   m_scheme   = p_orig->m_scheme;
   m_secure   = p_orig->m_secure;
-  m_userName = p_orig->m_userName;
-  m_password = p_orig->m_password;
   m_host     = p_orig->m_host;
   m_port     = p_orig->m_port;
   m_path     = p_orig->m_path;
@@ -560,8 +566,6 @@ CrackedURL::operator=(CrackedURL* p_orig)
   // Copy status info
   m_foundScheme     = p_orig->m_foundScheme;
   m_foundSecure     = p_orig->m_foundSecure;
-  m_foundUsername   = p_orig->m_foundUsername;
-  m_foundPassword   = p_orig->m_foundPassword;
   m_foundHost       = p_orig->m_foundHost;
   m_foundPort       = p_orig->m_foundPort;
   m_foundPath       = p_orig->m_foundPath;
@@ -642,4 +646,18 @@ CrackedURL::GetParameter(unsigned p_parameter)
     return &m_parameters[p_parameter];
   }
   return nullptr;
+}
+
+bool
+CrackedURL::DelParameter(CString p_parameter)
+{
+  for(UriParams::iterator it = m_parameters.begin(); it != m_parameters.end();++it)
+  {
+    if(it->m_key.CompareNoCase(p_parameter) == 0)
+    {
+      m_parameters.erase(it);
+      return true;
+    }
+  }
+  return false;
 }

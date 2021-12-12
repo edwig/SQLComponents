@@ -112,6 +112,7 @@ public:
    bool    IsNULL();
    bool    IsEmpty();
    bool    IsNumericType();
+   bool    IsDecimalType();
    bool    IsIntervalType();
    bool    IsDateTimeType();
 

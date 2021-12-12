@@ -571,6 +571,21 @@ SQLVariant::IsNumericType()
 }
 
 bool
+SQLVariant::IsDecimalType()
+{
+  if(m_datatype == SQL_C_NUMERIC)
+  {
+    return true;
+  }
+  if(m_sqlDatatype == SQL_NUMERIC || m_sqlDatatype == SQL_DECIMAL)
+  {
+    return true;
+  }
+  return false;
+}
+
+
+bool
 SQLVariant::IsIntervalType()
 {
   switch(m_datatype)

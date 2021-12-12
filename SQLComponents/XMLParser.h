@@ -2,7 +2,7 @@
 //
 // SourceFile: XMLParser.h
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 2014-2021 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,7 +34,7 @@ class Entity
 public:
   const char* m_entity;
   int         m_length;
-  char        m_char;
+  const char  m_char;
 };
 
 // Pointer type for processing
@@ -47,6 +47,7 @@ constexpr auto NUM_ENTITY = 5;
 class XMLParser
 {
 public:
+  XMLParser() = default;
   XMLParser(XMLMessage* p_message);
 
   // Parse a complete XML message string
@@ -58,7 +59,6 @@ public:
 
   // Print string with entities and optionally as UTF8 again
   static CString PrintXmlString (const CString& p_string, bool p_utf8 = false);
-  static CString PrintJsonString(const CString& p_string, bool p_utf8 = false);
 
 protected:
   // Set the internal error
@@ -73,7 +73,7 @@ protected:
   void          ParseStylesheet();
   void          ParseComment();
   void          ParseDTD();
-  void          ParseCDATA();
+  void          ParseCDATA(bool p_append = false);
   void          ParseText();
   bool          ParseElement();
   virtual void  ParseAfterElement();

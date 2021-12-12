@@ -3,6 +3,17 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.7
 ===== Released since: 16-08-2020 =====
 ======================================
 
+Version 1.7.4 of 12-12-2021
+---------------------------
+1) Upgraded to Visual Studio 2022
+2) Dropped 32 bits support. 64-Bits is now the only supported version
+3) Corrections for the binary-coded-decimal class (bcd)
+   It is now possible to determine beforehand the number of decimals in a "GetString"
+   operation to accomodate bookkeeping programs. 2 (two) being the new default.
+4) Added 'IsDecimalType()' method to the SQLVariant class.
+5) Further maintenance on the 'bcd' class. Fixed enums to 'enum class'
+   More control over printing of a bcd to a string.
+
 Version 1.7.3 of 21-07-2021
 ---------------------------
 1) Added a global function to preset session global statements. This function is:

@@ -172,7 +172,7 @@ namespace DatabaseUnitTest
       }
       count3.Stop();
       Logger::WriteMessage("PI       Calc   0.000000 +3,1415926535897932384626433832795");
-      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_pi.AsString(bcd::Bookkeeping,true));
+      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_pi.AsString(bcd::Format::Bookkeeping,true));
       Logger::WriteMessage(msg);
 
       // BEREKEN LN(10)
@@ -183,7 +183,7 @@ namespace DatabaseUnitTest
       }
       count3.Stop();
       Logger::WriteMessage("LN10     calc   0.000000 +2,3025850929940456840179914546844");
-      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_ln10.AsString(bcd::Bookkeeping,true));
+      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_ln10.AsString(bcd::Format::Bookkeeping,true));
       Logger::WriteMessage(msg);
 
       // BEREKEN LN(2)
@@ -194,7 +194,7 @@ namespace DatabaseUnitTest
       }
       count3.Stop();
       Logger::WriteMessage("LN2      calc   0.000000 +0,69314718055994530941723212145818");
-      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_ln2.AsString(bcd::Bookkeeping,true));
+      msg.Format          ("         bcd    %0.6f %s",count3.GetCounter(),c_ln2.AsString(bcd::Format::Bookkeeping,true));
       Logger::WriteMessage(msg);
       Logger::WriteMessage("");
 
@@ -277,7 +277,7 @@ namespace DatabaseUnitTest
         number_of_tests++;
       }
       counter5.Stop();
-      msg.Format("bcd    %10.6f %s",counter5.GetCounter(),c_result.AsString(bcd::Bookkeeping,true));
+      msg.Format("bcd    %10.6f %s",counter5.GetCounter(),c_result.AsString(bcd::Format::Bookkeeping,true));
       Logger::WriteMessage(msg);
     }
 
@@ -462,7 +462,7 @@ namespace DatabaseUnitTest
         number_of_tests++;
       }
       counter4.Stop();
-      msg.Format("bcd    %10.6f %s",counter4.GetCounter(),c_result.AsString(bcd::Bookkeeping,true));
+      msg.Format("bcd    %10.6f %s",counter4.GetCounter(),c_result.AsString(bcd::Format::Bookkeeping,true));
       Logger::WriteMessage(msg);
       if(extraInteger)
       {
@@ -471,7 +471,7 @@ namespace DatabaseUnitTest
       }
       if(extraFloat)
       {
-        msg.Format("                  %s",c_number2.AsString(bcd::Bookkeeping,true));
+        msg.Format("                  %s",c_number2.AsString(bcd::Format::Bookkeeping,true));
         Logger::WriteMessage(msg);
       }
     }

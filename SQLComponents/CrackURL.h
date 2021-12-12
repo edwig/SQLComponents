@@ -2,7 +2,7 @@
 //
 // SourceFile: CrackURL.h
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 2014-2021 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,12 +52,15 @@ public:
   CrackedURL(CString p_url);
  ~CrackedURL();
 
+  void      SetPath(CString p_path);
   bool      CrackURL(CString p_url);
   bool      Valid();
   void      Reset();
 
   // Resulting URL
   CString   URL();
+  // Safe URL (without the userinfo)
+  CString   SafeURL();
   // Resulting absolute path, including parameters & anchor
   CString   AbsolutePath();
   // Resulting absolute designated resource
@@ -72,6 +75,7 @@ public:
   CString   GetParameter(CString p_parameter);
   bool      HasParameter(CString p_parameter);
   void      SetParameter(CString p_parameter,CString p_value);
+  bool      DelParameter(CString p_parameter);
 
   static    CString   EncodeURLChars(CString p_text,bool p_queryValue = false);
   static    CString   DecodeURLChars(CString p_text,bool p_queryValue = false);
@@ -84,8 +88,6 @@ public:
   // Cracked down parts of the URL
   CString 	m_scheme;
   bool      m_secure  { false };
-  CString   m_userName;
-  CString   m_password;
   CString   m_host;
   int       m_port    { INTERNET_DEFAULT_HTTP_PORT };
   CString   m_path;
@@ -96,8 +98,6 @@ public:
   // Parts found in the url (otherwise empty)
   bool      m_foundScheme;
   bool      m_foundSecure;
-  bool      m_foundUsername;
-  bool      m_foundPassword;
   bool      m_foundHost;
   bool      m_foundPort;
   bool      m_foundPath;

@@ -50,8 +50,19 @@ bool
 static SQL_OperVarEqualsChar(SQLVariant& p_left,SQLVariant& p_right)
 {
   CString leftString,rightString;
-  p_left.GetAsString(leftString);
+  p_left .GetAsString(leftString);
   p_right.GetAsString(rightString);
+
+  if(p_left.IsDecimalType())
+  {
+    leftString = leftString.TrimRight('0');
+    leftString = leftString.TrimRight('.');
+  }
+  if(p_right.IsDecimalType())
+  {
+    rightString = rightString.TrimRight('0');
+    rightString = rightString.TrimRight('.');
+  }
 
   return leftString.Compare(rightString) == 0;
 }

@@ -2,7 +2,7 @@
 //
 // SourceFile: bcd.h
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 2014-2021 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,6 +32,7 @@
 // Numbers are stored in 1E8 based mantissa with a digital . implied at the second position
 // The mantissa array exists of a series of integers with 8 functional digits each
 //
+// Copyright (c) 2012-2021 ir W. E. Huisman
 // Version 1.2 of 18-12-2019
 //
 #pragma once
@@ -119,9 +120,9 @@ extern int  g_locale_strCurrencyLen;
 class bcd
 {
 public:
-  typedef enum _sign    { Positive,    Negative    } Sign;
-  typedef enum _format  { Engineering, Bookkeeping } Format;
-  typedef enum _operator{ Addition,    Subtraction } Operator;
+  enum class Sign     { Positive,    Negative    };
+  enum class Format   { Engineering, Bookkeeping };
+  enum class Operator { Addition,    Subtraction };
 
   // CONSTRUCTORS/DESTRUCTORS
 
@@ -172,10 +173,7 @@ public:
 
   // BCD from a SQL_NUMERIC_STRUCT
   bcd(const SQL_NUMERIC_STRUCT* p_numeric);
-
-  // Destructor of class bcd.
-  ~bcd();
-
+  
   // CONSTANTS
 
   static bcd PI();     // Circumference/Radius ratio of a circle
@@ -185,11 +183,11 @@ public:
   // OPERATORS
 
   // Standard mathematical operators
-  const bcd  operator+(const bcd& p_value) const;
-  const bcd  operator-(const bcd& p_value) const;
-  const bcd  operator*(const bcd& p_value) const;
-  const bcd  operator/(const bcd& p_value) const;
-  const bcd  operator%(const bcd& p_value) const;
+  const bcd  operator+(const bcd&   p_value) const;
+  const bcd  operator-(const bcd&   p_value) const;
+  const bcd  operator*(const bcd&   p_value) const;
+  const bcd  operator/(const bcd&   p_value) const;
+  const bcd  operator%(const bcd&   p_value) const;
 
   const bcd  operator+(const int    p_value) const;
   const bcd  operator-(const int    p_value) const;
@@ -244,19 +242,19 @@ public:
   bcd& operator--();     // Prefix  decrement
 
   // Assignment operators
-  bcd& operator=(const bcd&     p_value);
-  bcd& operator=(const int    p_value);
-  bcd& operator=(const double   p_value);
-  bcd& operator=(const char*  p_value);
+  bcd& operator=(const bcd&    p_value);
+  bcd& operator=(const int     p_value);
+  bcd& operator=(const double  p_value);
+  bcd& operator=(const char*   p_value);
   bcd& operator=(const __int64 p_value);
 
   // comparison operators
-  bool operator==(const bcd& p_value) const;
-  bool operator!=(const bcd& p_value) const;
-  bool operator< (const bcd& p_value) const;
-  bool operator> (const bcd& p_value) const;
-  bool operator<=(const bcd& p_value) const;
-  bool operator>=(const bcd& p_value) const;
+  bool operator==(const bcd&   p_value) const;
+  bool operator!=(const bcd&   p_value) const;
+  bool operator< (const bcd&   p_value) const;
+  bool operator> (const bcd&   p_value) const;
+  bool operator<=(const bcd&   p_value) const;
+  bool operator>=(const bcd&   p_value) const;
 
   bool operator==(const int    p_value) const;
   bool operator!=(const int    p_value) const;
@@ -349,7 +347,7 @@ public:
   // Get as an unsigned 64 bits long
   uint64  AsUInt64() const;
   // Get as a mathematical string
-  CString AsString(bcd::Format p_format = Bookkeeping,bool p_printPositive = false) const;
+  CString AsString(bcd::Format p_format = Format::Bookkeeping,bool p_printPositive = false,int p_decimals = 2) const;
   // Get as a display string (by desktop locale)
   CString AsDisplayString(int p_decimals = 2) const;
   // Get as an ODBC SQL NUMERIC(p,s)

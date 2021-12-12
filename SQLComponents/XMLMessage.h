@@ -2,7 +2,7 @@
 //
 // SourceFile: XMLMessage.h
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 2014-2021 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -30,6 +30,7 @@
 #include <deque>
 
 // XML coding of the message
+// BEWARE: Values must be the same as JsonEncoding
 enum class XMLEncoding
 {
    ENC_Plain     = 0  // No action taken, use GetACP(): windows-1252 in "The Netherlands"
@@ -181,13 +182,6 @@ public:
   virtual CString PrintElements(XMLElement* p_element
                                ,bool        p_utf8  = true
                                ,int         p_level = 0);
-  // Print the XML as a JSON object
-  virtual CString PrintJson(bool p_attributes);
-  // Print the elements stack as a JSON string
-  virtual CString PrintElementsJson(XMLElement* p_element
-                                   ,bool        p_attributes
-                                   ,bool        p_utf8  = true
-                                   ,int         p_level = 0);
 
   // FILE OPERATIONS
 
@@ -302,7 +296,6 @@ protected:
   virtual void    EncryptMessage(CString& p_message);
   // Print the WSDL Comments in the message
   CString         PrintWSDLComment(XMLElement* p_element);
-
   // Parser for the XML texts
   friend          XMLParser;
   friend          XMLParserImport;
@@ -322,7 +315,7 @@ protected:
   // Status and other info
   XmlError        m_internalError   { XmlError::XE_NoError }; // Internal error status
   CString         m_internalErrorString;                      // Human readable form of the error
-  long            m_references      { 0 };                    // Externally referenced
+  long            m_references      { 1 };                    // Externally referenced
 };
 
 //////////////////////////////////////////////////////////////////////////
