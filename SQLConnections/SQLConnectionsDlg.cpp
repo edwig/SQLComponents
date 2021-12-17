@@ -2,7 +2,7 @@
 //
 // File: SQLConnectionsDlg.cpp
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 1998-2020 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -34,12 +34,12 @@
 #define new DEBUG_NEW
 #endif
 
-// AboutDlg dialog used for App About
+// CAboutDlg dialog used for App About
 
-class AboutDlg : public CDialog
+class CAboutDlg : public CDialog
 {
 public:
-	AboutDlg();
+	CAboutDlg();
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -48,55 +48,72 @@ public:
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	CButton m_buttonOK;
 
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
 };
 
-AboutDlg::AboutDlg() : CDialog(IDD_ABOUTBOX)
+CAboutDlg::CAboutDlg() : CDialog(IDD_ABOUTBOX)
 {
 }
 
-void AboutDlg::DoDataExchange(CDataExchange* pDX)
+void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+
+	DDX_Control(pDX, IDOK, m_buttonOK);
 }
 
-BEGIN_MESSAGE_MAP(AboutDlg, CDialog)
+BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 // CSQLConnectionsDlg dialog
 
 SQLConnectionsDlg::SQLConnectionsDlg(CWnd* pParent /*=nullptr*/)
-	                 :CDialog(IDD_SQLCONNECTIONS_DIALOG, pParent)
+	                :CDialog(IDD_SQLCONNECTIONS_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 void SQLConnectionsDlg::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+  CDialog::DoDataExchange(pDX);
 
-  DDX_Control(pDX, IDC_LIST,      m_list);
-  DDX_Text   (pDX, IDC_NAME,      m_connectionName);
-  DDX_Control(pDX, IDC_DATASOURCE,m_comboDatasource);
-  DDX_Text   (pDX, IDC_USER,      m_username);
-  DDX_Text   (pDX, IDC_PASSWORD1, m_password1);
-  DDX_Text   (pDX, IDC_PASSWORD2, m_password2);
-  DDX_Text   (pDX, IDC_OPTIONS,   m_options);
-  DDX_Control(pDX, IDC_TEST,      m_test);
-  DDX_Control(pDX, IDC_NEW,       m_new);
-  DDX_Control(pDX, IDC_SAVE,      m_save);
-  DDX_Control(pDX, IDC_DELETE,    m_delete);
+  DDX_Control(pDX, IDC_DATASOURCE, m_comboDatasource);
+  DDX_Control(pDX, IDC_LIST,       m_list);
+  DDX_Control(pDX, IDC_NAME,       m_editConnectionName);
+  DDX_Control(pDX, IDC_USER,       m_editUsername);
+  DDX_Control(pDX, IDC_PASSWORD1,  m_editPassword1);
+  DDX_Control(pDX, IDC_PASSWORD2,  m_editPassword2);
+  DDX_Control(pDX, IDC_OPTIONS,    m_editOptions);
+  DDX_Control(pDX, IDC_TEST,       m_test);
+  DDX_Control(pDX, IDC_NEW,        m_new);
+  DDX_Control(pDX, IDC_VALIDATE,   m_validate);
+  DDX_Control(pDX, IDC_DELETE,     m_delete);
+  DDX_Control(pDX, IDOK,           m_buttonOK);
+  DDX_Control(pDX, IDCANCEL,       m_buttonCancel);
 
   if(pDX->m_bSaveAndValidate == FALSE)
   {
-    SQLConnection* conn = m_connections.GetConnection(m_connectionName);
+    m_editConnectionName.SetWindowText(m_connectionName);
+    m_editUsername. SetWindowText(m_username);
+    m_editPassword1.SetWindowText(m_password1);
+    m_editPassword2.SetWindowText(m_password2);
+    m_editOptions  .SetWindowText(m_options);
 
-    m_new   .EnableWindow(conn == nullptr);
-    m_save  .EnableWindow(conn != nullptr);
-    m_delete.EnableWindow(conn != nullptr);
+    // Enable buttons
+    m_validate.EnableWindow(m_selection >= 0);
+    m_delete  .EnableWindow(m_selection >= 0);
+  }
+  else
+  {
+    m_editConnectionName.GetWindowText(m_connectionName);
+    m_editUsername. GetWindowText(m_username);
+    m_editPassword1.GetWindowText(m_password1);
+    m_editPassword2.GetWindowText(m_password2);
+    m_editOptions  .GetWindowText(m_options);
   }
 }
 
@@ -114,7 +131,7 @@ BEGIN_MESSAGE_MAP(SQLConnectionsDlg, CDialog)
   ON_EN_CHANGE(IDC_OPTIONS,             &SQLConnectionsDlg::OnEnChangeOptions)
   ON_BN_CLICKED(IDC_TEST,               &SQLConnectionsDlg::OnBnClickedTest)
   ON_BN_CLICKED(IDC_NEW,                &SQLConnectionsDlg::OnBnClickedNew)
-  ON_BN_CLICKED(IDC_SAVE,               &SQLConnectionsDlg::OnBnClickedSave)
+	ON_BN_CLICKED(IDC_VALIDATE,           &SQLConnectionsDlg::OnBnClickedValidate)
   ON_BN_CLICKED(IDC_DELETE,             &SQLConnectionsDlg::OnBnClickedDelete)
   ON_BN_CLICKED(IDCANCEL,               &SQLConnectionsDlg::OnBnClickedCancel)
   ON_BN_CLICKED(IDOK,                   &SQLConnectionsDlg::OnBnClickedOk)
@@ -126,7 +143,9 @@ BOOL SQLConnectionsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// Add "About..." menu item to system menu.
+	SetWindowText("SQL Connections");
+
+  // Add "About..." menu item to system menu.
 
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
@@ -163,7 +182,38 @@ BOOL SQLConnectionsDlg::OnInitDialog()
 
   // Set focus to the list, don't automatically set the focus
   m_list.SetFocus();
+	UpdateData(FALSE);
   return FALSE;
+}
+
+void SQLConnectionsDlg::Cleanup()
+{
+	// Cleanup itemdata
+	for (int i = 0; i < m_list.GetItemCount(); ++i)
+	{
+		SQLConnection* conn = (SQLConnection*)m_list.GetItemData(i);
+		delete conn;
+	}
+}
+
+// Triggered by SetCanResize
+void
+SQLConnectionsDlg::SetupDynamicLayout()
+{
+  auto manager = GetDynamicLayout();
+  if(manager == nullptr)
+  {
+    EnableDynamicLayout();
+    manager = GetDynamicLayout();
+  }
+  if(manager != nullptr)
+  {
+    manager->Create(this);
+    LoadDynamicLayoutResource(m_lpszTemplateName);
+
+    manager->AddItem(IDCANCEL,CMFCDynamicLayout::MoveHorizontal(100), CMFCDynamicLayout::SizeNone());
+		manager->AddItem(IDOK,    CMFCDynamicLayout::MoveHorizontal(100), CMFCDynamicLayout::SizeNone());
+	}
 }
 
 void
@@ -205,33 +255,69 @@ SQLConnectionsDlg::LoadConnections()
   m_connections.LoadConnectionsFile();
   unsigned index = 0;
 
+	m_selectUpdate = false;
   SQLConnection* conn = m_connections.GetConnection(index);
   while(conn)
   {
-    m_list.InsertItem(LVIF_TEXT|LVIF_STATE,index+1,conn->m_name,0,0,0,0);
+		int item = m_list.InsertItem(LVIF_TEXT | LVIF_STATE, index++, conn->m_name, 0, 0, 0, 0);
+		if (item >= 0)
+		{
+			SQLConnection* data = new SQLConnection;
+			data->m_datasource = conn->m_datasource;
+			data->m_name       = conn->m_name;
+			data->m_options    = conn->m_options;
+			data->m_password   = conn->m_password;
+			data->m_username   = conn->m_username;
+			m_list.SetItemData(item, (DWORD_PTR)data);
+		}
 
     // Next connection
-    conn = m_connections.GetConnection(++index);
+		conn = m_connections.GetConnection(index);
   }
-
-  if(index)
+	m_selectUpdate = true;
+	if (index > 0)
   {
+		// Display all fields
+		LoadConnection(0);
+
     // Set focus on first line of the list
     m_list.SetSelectionMark(0);
     m_list.SetItemState(0,LVIS_SELECTED|LVIS_FOCUSED,LVIS_SELECTED|LVIS_FOCUSED);
-
-    // Display all fields
-    LoadCurrentConnection();
   }
 }
 
 bool
 SQLConnectionsDlg::SaveConnections()
 {
-  SaveCurrentConnection();
+	SaveConnection(m_selection);
+	
+	// Validate all connections
+	for (int i = 0; i < m_list.GetItemCount(); ++i)
+	{
+		// Display all fields
+		LoadConnection(i);
+
+		if (!SanityChecks(i))
+		{
+			// Set focus on first line of the list
+			m_list.SetSelectionMark(i);
+			m_list.SetItemState(i, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+			return false;
+		}
+	}
+	
+	// Refill m_connections
+	m_connections.Reset();
+	for (int i = 0; i < m_list.GetItemCount(); ++i)
+	{
+		SQLConnection* conn = (SQLConnection*)m_list.GetItemData(i);
+		m_connections.AddConnection(conn->m_name, conn->m_datasource, conn->m_username, conn->m_password, conn->m_options);
+	}
+
+	// Save m_connections
   if(!m_connections.SaveConnectionsFile())
   {
-    AfxMessageBox("Could **NOT** save the 'database.xml' file",MB_OK|MB_ICONERROR);
+		::MessageBox(GetSafeHwnd(),"Could **NOT** save the 'database.xml' file","Error",MB_OK | MB_ICONERROR);
     return false;
   }
   m_changed = false;
@@ -239,17 +325,10 @@ SQLConnectionsDlg::SaveConnections()
 }
 
 void 
-SQLConnectionsDlg::LoadCurrentConnection(int p_index /*=-1*/)
+SQLConnectionsDlg::LoadConnection(int p_index)
 {
-  if(p_index < 0)
-  {
-    p_index = m_list.GetSelectionMark();
-  }
-  CString name = m_list.GetItemText(p_index,0);
+	SQLConnection* conn = (SQLConnection*)m_list.GetItemData(p_index);
 
-  SQLConnection* conn = m_connections.GetConnection(name);
-  if (conn)
-  {
     m_connectionName  = conn->m_name;
     m_datasource      = conn->m_datasource;
     m_username        = conn->m_username;
@@ -263,15 +342,20 @@ SQLConnectionsDlg::LoadCurrentConnection(int p_index /*=-1*/)
       m_comboDatasource.SetCurSel(source);
     }
     UpdateData(FALSE);
-  }
+	m_selection = p_index;
 }
 
 void
-SQLConnectionsDlg::SaveCurrentConnection()
+SQLConnectionsDlg::SaveConnection(int p_index)
 {
-  SQLConnection* conn = m_connections.GetConnection(m_connectionName);
-  if(conn)
+	if (p_index >= 0 && p_index < m_list.GetItemCount())
   {
+		m_selectUpdate = false;
+		m_list.SetItemText(p_index, 0, m_connectionName);
+		m_selectUpdate = true;
+		SQLConnection* conn = (SQLConnection*)m_list.GetItemData(p_index);
+
+		conn->m_name       = m_connectionName;
     conn->m_datasource = m_datasource;
     conn->m_username   = m_username;
     conn->m_password   = m_password1;
@@ -282,26 +366,14 @@ SQLConnectionsDlg::SaveCurrentConnection()
 bool
 SQLConnectionsDlg::DropCurrentConnection()
 {
-  SQLConnection* conn = m_connections.GetConnection(m_connectionName);
-  if(conn)
+	if (m_selection >= 0)
   {
-    // Remove from the connections registration
-    m_connections.DelConnection(conn->m_name);
-
-    // Remove from the list;
-    for(int index = 0; index < m_list.GetItemCount(); ++index)
-    {
-      CString name = m_list.GetItemText(index,0);
-      if(name == m_connectionName)
-      {
-        m_list.DeleteItem(index);
-        break;
-      }
-    }
+		m_selectUpdate = false;
+	  SQLConnection* conn = (SQLConnection*)m_list.GetItemData(m_selection);
+		delete conn;
 
     // Clean up all the fields
     m_connectionName.Empty();
-    m_datasource.Empty();
     m_username.Empty();
     m_password1.Empty();
     m_password2.Empty();
@@ -309,37 +381,75 @@ SQLConnectionsDlg::DropCurrentConnection()
 
     // Tell it the dialog
     UpdateData(FALSE);
+
+		// Remove from the list;
+		m_list.DeleteItem(m_selection);
+		if (m_list.GetItemCount() > 0)
+		{
+			m_list.SetSelectionMark(0);
+			m_list.SetItemState(0, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+			LoadConnection(0);
+		}
+		else
+		{
+			m_selection = -1;
+		}
+		m_selectUpdate = true;
     return true;
   }
   return false;
 }
 
-bool
+void
 SQLConnectionsDlg::MakeCurrentConnection()
 {
-  bool result = m_connections.AddConnection(m_connectionName,m_datasource,m_username,m_password1,m_options);
-  if(result)
-  {
-    int index = m_list.GetItemCount();
-    m_list.InsertItem(LVIF_TEXT|LVIF_STATE,index,m_connectionName,0,0,0,0);
+	m_selectUpdate = false;
+	int index = m_list.InsertItem(LVIF_TEXT | LVIF_STATE, m_list.GetItemCount(), m_connectionName, 0, 0, 0, 0);
+	if (index >= 0)
+	{
+		SQLConnection* data = new SQLConnection;
+		data->m_datasource = m_datasource;
+		data->m_name = m_connectionName;
+		data->m_options = m_options;
+		data->m_password = m_password1;
+		data->m_username = m_username;
+		m_list.SetItemData(index, (DWORD_PTR)data);
+		m_changed = true;
     m_list.SetSelectionMark(index);
+		m_list.SetItemState(index, LVIS_SELECTED | LVIS_FOCUSED, LVIS_SELECTED | LVIS_FOCUSED);
+		m_selection = index;
   }
-  return result;
+	UpdateData(FALSE);
+	m_selectUpdate = true;
 }
 
 bool
-SQLConnectionsDlg::SanityChecks()
+SQLConnectionsDlg::SanityChecks(int p_index)
 {
   CString errors;
 
-  if(m_datasource.IsEmpty()) errors += "You must provide a datasource name.\n";
-  if(m_username  .IsEmpty()) errors += "You must provide a user name.\n";
-  if(m_password1.IsEmpty())  errors += "You must provide a password.\n";
-  if(m_password1.Compare(m_password2)) errors += "The passwords do **NOT** match.\n";
+	for (int i = 0; i < m_list.GetItemCount(); ++i)
+	{
+		if (i != p_index)
+		{
+			SQLConnection* conn = (SQLConnection*)m_list.GetItemData(i);
+			if (m_connectionName.CompareNoCase(conn->m_name) == 0)
+			{
+				errors += m_connectionName + " already exists.\n";
+				break;
+			}
+		}
+	}
+
+	if(m_connectionName.IsEmpty()) errors += "You must provide a connection name.\n";
+  if(m_datasource.IsEmpty())     errors += "You must provide a datasource name.\n";
+  if(m_username  .IsEmpty())     errors += "You must provide a user name.\n";
+  if(m_password1.IsEmpty())      errors += "You must provide a password.\n";
+	if(m_password1.Compare(m_password2)) errors += "The passwords do **NOT** match.\n";
 
   if(!errors.IsEmpty())
   {
-    AfxMessageBox(errors,MB_OK|MB_ICONERROR);
+		::MessageBox(GetSafeHwnd(),errors,"Error", MB_OK | MB_ICONERROR);
     return false;
   }
   return true;
@@ -366,12 +476,12 @@ SQLConnectionsDlg::TestTheConnection()
                     ,database.GetDBVendorName()
                     ,database.GetDBVendorVersion()
                     ,database.GetDBVendorDriverVersion());
-      AfxMessageBox(message, MB_OK|MB_ICONINFORMATION);
+			::MessageBox(GetSafeHwnd(),message,"Melding",MB_OK);
       database.Close();
     }
     else
     {
-      AfxMessageBox("We are sorry: **NO** connection made!!",MB_OK|MB_ICONERROR);
+			::MessageBox(GetSafeHwnd(),"We are sorry: **NO** connection made!!","No Connection", MB_OK | MB_ICONERROR);
     }
   }
   catch(StdException& ex)
@@ -386,7 +496,7 @@ SQLConnectionsDlg::TestTheConnection()
   // Error handling needed?
   if(!error.IsEmpty())
   {
-    AfxMessageBox("ERROR while opening database: " + error,MB_OK|MB_ICONERROR);
+    ::MessageBox(GetSafeHwnd(),"ERROR while opening database: " + error,"Error", MB_OK | MB_ICONERROR);
   }
 }
 
@@ -395,7 +505,7 @@ SQLConnectionsDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
-		AboutDlg dlgAbout;
+		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
 	}
 	else
@@ -443,12 +553,21 @@ HCURSOR SQLConnectionsDlg::OnQueryDragIcon()
 void 
 SQLConnectionsDlg::OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	if (m_selectUpdate)
+	{
   LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-
-  SaveCurrentConnection();
-  if(pNMLV->iItem >= 0 && pNMLV->uNewState == 3)
+		if (pNMLV->iItem >= 0)
+		{
+			//if (pNMLV->uNewState == 0 && pNMLV->uOldState == LVIS_SELECTED)
+			//{
+			//	SaveConnection(pNMLV->iItem);
+			//}
+			if (pNMLV->uNewState == (LVIS_FOCUSED | LVIS_SELECTED))
   {
-    LoadCurrentConnection(pNMLV->iItem);
+				SaveConnection(m_selection);
+				LoadConnection(pNMLV->iItem);
+			}
+		}
   }
   *pResult = 0;
 }
@@ -528,7 +647,7 @@ SQLConnectionsDlg::OnEnChangeOptions()
 void
 SQLConnectionsDlg::OnBnClickedTest()
 {
-  if(SanityChecks())
+	if (SanityChecks(m_selection))
   {
     TestTheConnection();
   }
@@ -537,20 +656,24 @@ SQLConnectionsDlg::OnBnClickedTest()
 void 
 SQLConnectionsDlg::OnBnClickedNew()
 {
-  if(SanityChecks() && MakeCurrentConnection())
-  {
-    m_changed = true;
-  }
+	SaveConnection(m_selection);
+
+	// Clean up all the fields
+	m_connectionName = "New connection";
+	m_username.Empty();
+	m_password1.Empty();
+	m_password2.Empty();
+	m_options.Empty();
+	MakeCurrentConnection();
+
+	// Tell it the dialog
+	UpdateData(FALSE);
 }
 
 void 
-SQLConnectionsDlg::OnBnClickedSave()
-{
-  if(SanityChecks())
+SQLConnectionsDlg::OnBnClickedValidate()
   {
-    SaveCurrentConnection();
-    m_changed = true;
-  }
+	SanityChecks(m_selection);
 }
 
 void 
@@ -565,11 +688,12 @@ SQLConnectionsDlg::OnBnClickedDelete()
 void 
 SQLConnectionsDlg::OnBnClickedCancel()
 {
-  if(m_changed && AfxMessageBox("CANCEL: Changes where made. Are you sure?", MB_YESNO | MB_DEFBUTTON2) == IDNO)
+	if (m_changed && ::MessageBox(GetSafeHwnd(),"CANCEL: Changes where made. Are you sure?","Changes were made", MB_YESNO | MB_DEFBUTTON2) == IDNO)
   {
     return;
   }
-  CDialog::OnCancel();
+	Cleanup();
+	CDialog::OnCancel();
 }
 
 void 
@@ -579,5 +703,6 @@ SQLConnectionsDlg::OnBnClickedOk()
   {
     return;
   }
-  CDialog::OnOK();
+	Cleanup();
+	CDialog::OnOK();
 }

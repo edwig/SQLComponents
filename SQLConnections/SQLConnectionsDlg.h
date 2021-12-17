@@ -2,7 +2,7 @@
 //
 // File: SQLConnectionsDlg.h
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 1998-2020 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -40,28 +40,33 @@ public:
 #endif
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-          void LoadDataSources();
-          void LoadConnections();
-          bool SaveConnections();
-          bool MakeCurrentConnection();
-          void LoadCurrentConnection(int p_index = -1);
-          void SaveCurrentConnection();
-          bool DropCurrentConnection();
-          bool SanityChecks();
-          void TestTheConnection();
-          void FillDatasources(DataSources& sources);
+	virtual void DoDataExchange(CDataExchange* pDX);
+	void SetupDynamicLayout();
+	// DDX/DDV support
+  void LoadDataSources();
+  void LoadConnections();
+  bool SaveConnections();
+  void MakeCurrentConnection();
+  void LoadConnection(int p_index);
+  void SaveConnection(int p_index);
+  bool DropCurrentConnection();
+  bool SanityChecks(int p_index);
+  void TestTheConnection();
+  void FillDatasources(DataSources& sources);
 
 // Implementation
 protected:
 	HICON     m_hIcon;
-  CListCtrl m_list;
-  CComboBox m_comboDatasource;
-  CButton   m_test;
-  CButton   m_new;
-  CButton   m_save;
-  CButton   m_delete;
 
+  CListCtrl  m_list;
+  CComboBox  m_comboDatasource;
+  CButton    m_test;
+  CButton    m_new;
+  CButton    m_validate;
+  CButton    m_delete;
+
+  CButton    m_buttonOK;
+  CButton    m_buttonCancel;
 
   CString   m_connectionName;
   CString   m_datasource;
@@ -70,11 +75,20 @@ protected:
   CString   m_password2;
   CString   m_options;
 
+  CEdit      m_editConnectionName;
+  CEdit      m_editUsername;
+  CEdit      m_editPassword1;
+  CEdit      m_editPassword2;
+  CEdit      m_editOptions;
+
   SQLConnections m_connections;
   bool           m_changed { false };
+  bool           m_selectUpdate  { true };
+  int            m_selection { -1 };
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
+  virtual void Cleanup();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
@@ -91,7 +105,7 @@ public:
   afx_msg void OnEnChangeOptions();
   afx_msg void OnBnClickedTest();
   afx_msg void OnBnClickedNew();
-  afx_msg void OnBnClickedSave();
+  afx_msg void OnBnClickedValidate();
   afx_msg void OnBnClickedDelete();
   afx_msg void OnBnClickedCancel();
   afx_msg void OnBnClickedOk();
