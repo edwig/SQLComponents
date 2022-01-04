@@ -2007,6 +2007,7 @@ bcd::AsShort() const
     {
       throw new StdException("BCD: Underflow in conversion to short number.");
     }
+    result = -result;
   }
   return (short) result;
 }
@@ -2761,35 +2762,36 @@ bcd::SetValueLong(const long p_value, const long p_restValue)
     m_sign = (p_value < 0) ? Sign::Negative : Sign::Positive;
   }
   // Fill in mantissa. restValue first
+  int norm = 0;
+
   if(p_restValue)
   {
-    m_mantissa[0] = long_abs(p_restValue);
-    Normalize();
-    // Reset exponent. Mantissa is part behind decimal point!
-    m_exponent = -1;
+    m_mantissa[0] = long_abs(p_restValue % bcdBase);
+    norm = bcdDigits - 1;
+
+    if(p_restValue / bcdBase)
+    {
+      ShiftRight();
+      m_mantissa[0] = long_abs(p_restValue / bcdBase);
+      norm = 2 * bcdDigits -1;
+    }
+    Normalize(norm);
+    norm = 0;
   }
-  if(p_value)
+
+  if(p_value % bcdBase)
   {
-    int exp = bcdDigits - 1;
-    if(p_restValue)
-    {
-      ShiftRight();
-    }
-    long value = abs(p_value);
-    if(value < bcdBase)
-    {
-      m_mantissa[0] = long_abs(p_value);
-    }
-    else
-    {
-      ShiftRight();
-      exp += bcdDigits;
-      m_mantissa[1] = value % bcdBase;
-      m_mantissa[0] = value / bcdBase;
-    }
-    // Normalize with exponent set
-    Normalize(exp);
+    ShiftRight();
+    m_mantissa[0] = long_abs(p_value % bcdBase);
+    norm = bcdDigits - 1;
   }
+  if(p_value / bcdBase)
+  {
+    ShiftRight();
+    m_mantissa[0] = long_abs(p_value / bcdBase);
+    norm = 2 * bcdDigits - 1;
+  }
+  Normalize(norm);
 }
 
 // bcd::SetValueint64
@@ -2883,11 +2885,13 @@ bcd::SetValueUInt64(const uint64 p_value,const int64 p_restValue)
   {
     extra  = true;
     value -= LONGLONG_MAX;
+    value -= 1;
   }
   SetValueInt64(value,p_restValue);
   if(extra)
   {
     *this += bcd(LONGLONG_MAX);
+    *this += bcd(1);
   }
   Normalize();
 }
