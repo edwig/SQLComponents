@@ -47,7 +47,7 @@ public:
   SQLConnections();
 
   // File interface
-  bool        LoadConnectionsFile(CString p_filename = "");
+  bool        LoadConnectionsFile(CString p_filename = "",bool p_reset = false);
   bool        SaveConnectionsFile(CString p_filename = "");
 
   // GETTERS

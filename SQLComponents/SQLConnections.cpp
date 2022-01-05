@@ -138,7 +138,7 @@ SQLConnections::DelConnection(CString p_name)
 }
 
 bool
-SQLConnections::LoadConnectionsFile(CString p_filename /*=""*/)
+SQLConnections::LoadConnectionsFile(CString p_filename /*=""*/,bool p_reset /*=false*/)
 {
   if(p_filename.IsEmpty())
   {
@@ -155,6 +155,14 @@ SQLConnections::LoadConnectionsFile(CString p_filename /*=""*/)
   {
     return false;
   }
+
+  // Optionally completely reset the databases
+  if(p_reset)
+  {
+    m_connections.clear();
+  }
+
+  // Read all connections
   XMLElement* conn = msg.FindElement("Connect");
   while(conn)
   {
@@ -167,6 +175,11 @@ SQLConnections::LoadConnectionsFile(CString p_filename /*=""*/)
 
     CString name(connect.m_name);
     name.MakeLower();
+    ConnMap::iterator it = m_connections.find(name);
+    if(it != m_connections.end())
+    {
+      m_connections.erase(it);
+    }
     m_connections.insert(std::make_pair(name,connect));
 
     // Get next connection

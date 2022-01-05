@@ -149,12 +149,12 @@ SQLDatabasePool::CloseAll()
 
 // Read all database definitions from 'database.xml'
 bool
-SQLDatabasePool::ReadConnections(CString p_filename /*=""*/)
+SQLDatabasePool::ReadConnections(CString p_filename /*=""*/,bool p_reset /*=false*/)
 {
   // Lock the pool
   AutoCritSec lock(&m_lock);
 
-  return m_connections.LoadConnectionsFile(p_filename);
+  return m_connections.LoadConnectionsFile(p_filename,p_reset);
 }
 
 // Set current max databases allowed

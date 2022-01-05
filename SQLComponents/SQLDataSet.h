@@ -217,14 +217,12 @@ public:
   CString      GetGroupBy();
   CString      GetOrderBy();
   SQLFilterSet* GetHavings();
-  // Options
-  bool         GetBindPrimary();
 
   // XML Saving and loading
   bool         XMLSave(CString p_filename,CString p_name,XMLEncoding p_encoding = XMLEncoding::ENC_UTF8);
   bool         XMLLoad(CString p_filename);
   void         XMLSave(XMLMessage* p_msg,XMLElement* p_dataset);
-  void         XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset);
+  void         XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset,LONG* p_abort = nullptr);
 
 protected:
   // Set parameters in the query
