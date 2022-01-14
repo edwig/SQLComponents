@@ -876,8 +876,8 @@ SQLVariantFormat::FormatNumber(CString p_format,bool p_currency)
     }
   }
   // Converting number variants. Also "123,4500000" to "123.45"
-  double waarde = StringDoubleValue();
-  number.Format("%f",waarde);
+  double value = StringDoubleValue();
+  number.Format("%.6f",value);
 
   if(p_format.IsEmpty())
   {
