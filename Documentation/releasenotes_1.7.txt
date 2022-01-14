@@ -3,6 +3,11 @@ RELEASENOTES SQLCOMPONENTS VERSION 1.7
 ===== Released since: 16-08-2020 =====
 ======================================
 
+Version 1.7.5 of 14-01-2022
+---------------------------
+1) Updated the copyright notice to 2022. Celebrating 20 years of SQLComponents.
+2) Bugfix for converting decimal numbers back to MS-Windows system format.
+
 Version 1.7.4 of 12-12-2021
 ---------------------------
 1) Upgraded to Visual Studio 2022

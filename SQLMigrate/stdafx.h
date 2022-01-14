@@ -3,7 +3,7 @@
 // Bestand:      $Archive: /Tools/ExportDB_20/ExportDB_20/stdafx.h $
 // Auteurs:      Edwig Huisman [EH]
 //
-// Copyright (c) 1998-2021 ir. W.E. Huisman
+// Copyright (c) 1998-2022 ir. W.E. Huisman
 //
 // stdafx.h : include file for standard system include files,
 // or project specific include files that are used frequently,
