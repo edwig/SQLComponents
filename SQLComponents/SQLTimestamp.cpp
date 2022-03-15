@@ -1208,9 +1208,9 @@ SQLTimestamp
 SQLTimestamp::operator+ (const SQLTime& p_time) const
 {
   SQLTimestamp stamp(*this);
-  stamp.AddHours  (p_time.Hour());
-  stamp.AddMinutes(p_time.Minute());
-  stamp.AddSeconds(p_time.Second());
+  stamp = stamp.AddHours  (p_time.Hour());
+  stamp = stamp.AddMinutes(p_time.Minute());
+  stamp = stamp.AddSeconds(p_time.Second());
 
   return stamp;
 }
@@ -1219,9 +1219,9 @@ SQLTimestamp
 SQLTimestamp::operator-(const SQLTime& p_time) const
 {
   SQLTimestamp stamp(*this);
-  stamp.AddHours  (- p_time.Hour());
-  stamp.AddMinutes(- p_time.Minute());
-  stamp.AddSeconds(- p_time.Second());
+  stamp = stamp.AddHours  (- p_time.Hour());
+  stamp = stamp.AddMinutes(- p_time.Minute());
+  stamp = stamp.AddSeconds(- p_time.Second());
 
   return stamp;
 }
