@@ -31,7 +31,7 @@
 
 void InsertWithNULL(SQLDatabase* p_dbs)
 {
-  CString sql = "INSERT INTO k2b_def_sleutel\n"
+  XString sql = "INSERT INTO k2b_def_sleutel\n"
                 "(organisatie_id,pakket_id,sl_id,sl_naam,sl_oms)\n"
                 "VALUES (? ,? ,? ,? ,? )";
 
@@ -60,7 +60,7 @@ void InsertWithNULL(SQLDatabase* p_dbs)
 int
 SelectNULL(SQLDatabase* p_dbs)
 {
-  CString sql = "SELECT organisatie_id\n"
+  XString sql = "SELECT organisatie_id\n"
                 "      ,sl_id\n"
                 "      ,sl_oms\n"
                 "  FROM k2b_def_sleutel\n"
@@ -75,7 +75,7 @@ SelectNULL(SQLDatabase* p_dbs)
     {
       int orgID = query.GetColumn(1)->GetAsSLong();
       int slID  = query.GetColumn(2)->GetAsSLong();
-      CString oms = query.GetColumn(3)->GetAsChar();
+      XString oms = query.GetColumn(3)->GetAsChar();
       SQLVariant* var = query.GetColumn(3);
 
       printf("Description: %s\n",oms.GetString());

@@ -91,9 +91,9 @@ void TestEqual()
       SQLVariant* left  = &variants[x];
       SQLVariant* right = &variants[y];
 
-      CString leftType  = left ->FindDatatype(left ->GetDataType());
-      CString rightType = right->FindDatatype(right->GetDataType());
-      CString message;
+      XString leftType  = left ->FindDatatype(left ->GetDataType());
+      XString rightType = right->FindDatatype(right->GetDataType());
+      XString message;
       message.Format("Equality test %s == %s ",leftType,rightType);
       printf(message);
 
@@ -146,14 +146,14 @@ TestAdd()
       SQLVariant* left  = &variants[x];
       SQLVariant* right = &others[y];
 
-      CString leftType  = left ->FindDatatype(left ->GetDataType());
-      CString rightType = right->FindDatatype(right->GetDataType());
-      CString message;
+      XString leftType  = left ->FindDatatype(left ->GetDataType());
+      XString rightType = right->FindDatatype(right->GetDataType());
+      XString message;
       message.Format("Add test %s + %s ",leftType,rightType);
       printf(message);
 
       SQLVariant result(*left + *right); // TEST
-      CString res;
+      XString res;
       result.GetAsString(res);
 
       if(x == CT_CHAR && y == CT_CHAR)
@@ -177,7 +177,7 @@ TestAdd()
 
 void TestMul()
 {
-  CString numString("42");
+  XString numString("42");
   bcd num(5);
 
   SQLVariant var1(numString);

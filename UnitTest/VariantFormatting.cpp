@@ -41,7 +41,7 @@ namespace DatabaseUnitTest
 
       var number(1);
       SQLVariantFormat form(number);
-      CString input("THIS is A LONG and TireSome TesT");
+      XString input("THIS is A LONG and TireSome TesT");
 
       form.SetFormat(input);
       form.StringInitCapital();
@@ -86,7 +86,7 @@ namespace DatabaseUnitTest
 
       var number(1);
       SQLVariantFormat form(number);
-      CString str;
+      XString str;
 
       str = "EUR. 45";  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
       str = "45 EUR.";  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
@@ -113,7 +113,7 @@ namespace DatabaseUnitTest
 
       var number(1);
       SQLVariantFormat form(number);
-      CString str;
+      XString str;
 
       form.SetFormat("1234.5678");      Assert::AreEqual(1234.5678,form.StringDoubleValue());
       form.SetFormat("1234,5678");      Assert::AreEqual(1234.5678,form.StringDoubleValue());
@@ -133,8 +133,8 @@ namespace DatabaseUnitTest
       SQLTimestamp today = SQLTimestamp::CurrentTimestamp();
       form.SetCurrentDate();
 
-      CString format1 = form.GetFormat();
-      CString format2 = today.AsXMLString();
+      XString format1 = form.GetFormat();
+      XString format2 = today.AsXMLString();
       format2.Replace("T"," ");
 
       Logger::WriteMessage("TODAY1 : " + format1);
@@ -156,7 +156,7 @@ namespace DatabaseUnitTest
 
       InitSQLComponents();
 
-      CString dateString("15-10-1959");
+      XString dateString("15-10-1959");
       SQLDate date(dateString);
       var dateVar(&date);
       SQLVariantFormat form(dateVar);
@@ -170,7 +170,7 @@ namespace DatabaseUnitTest
       Assert::AreEqual("do 15 okt 1959",form.GetFormat());
       number_of_tests++;
 
-      CString stampString("1959-10-15 15:50:20");
+      XString stampString("1959-10-15 15:50:20");
       SQLTimestamp stamp(stampString);
       var stampVar(&stamp);
       SQLVariantFormat st(stampVar);
@@ -192,7 +192,7 @@ namespace DatabaseUnitTest
       st.ResetValue();
 
       // timestamp formatting on a string
-      CString  theDate("15-10-1959 15:50:20");
+      XString  theDate("15-10-1959 15:50:20");
       var date2(theDate);
       SQLVariantFormat fdate(date2);
       // Forcing the string to a timestamp
@@ -369,14 +369,14 @@ namespace DatabaseUnitTest
 
       // From other than a date
 
-      CString date11("25-12-2012");
+      XString date11("25-12-2012");
       var vdat11(date11);
       SQLVariantFormat fdat11(vdat11);
       fdat11.DateCalculate('+',"9d");
       Assert::AreEqual("03-01-2013",fdat11.GetFormat());
       number_of_tests++;
 
-      CString date12("");
+      XString date12("");
       var vdat12(date12);
       SQLVariantFormat fdat12(vdat12);
       fdat12.SetFormat("25-12-2012");

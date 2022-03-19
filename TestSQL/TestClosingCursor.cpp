@@ -57,7 +57,7 @@ void TestClosingCursor()
       for(unsigned ind = 1;ind <= 1500; ++ind)
       {
         SQLQuery query(&dbs);
-        CString sql("SELECT COUNT(*) FROM $SCHEMA$.DUAL");
+        XString sql("SELECT COUNT(*) FROM $SCHEMA$.DUAL");
         query.DoSQLStatement(sql);
         printf(".");
         if(ind % 50 == 0)

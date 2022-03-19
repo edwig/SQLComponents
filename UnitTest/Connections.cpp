@@ -109,12 +109,12 @@ public:
       SQLAutoDBS dbs(m_pool,"MyConn");
       Assert::IsNotNull(dbs.get());
 
-      CString sql("SELECT description FROM DETAIL where ID = 7");
+      XString sql("SELECT description FROM DETAIL where ID = 7");
       SQLQuery query(dbs);
       query.DoSQLStatement(sql);
       if(query.GetRecord())
       {
-        CString description = query[1];
+        XString description = query[1];
         Assert::AreEqual(description, "Fourth line of second invoice");
       }
     }

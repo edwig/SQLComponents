@@ -1,0 +1,16 @@
+RELEASENOTES SQLCOMPONENTS VERSION 2.0
+======================================
+===== Released since: 20-03-2022 =====
+======================================
+
+Version 2.0.0 of 20-03-2022
+---------------------------
+1)  Now inlcuded the "BaseLibrary" (https://github.com/edwig/BaseLibrary) into the
+    SQLComponents library. This moves out all the duplicated classes like XMLMessage
+    and all other dependencies. So that the need not resynced over-and-over.
+2)  All projects in the Visual Studio solution explorer now have a 'Configuraiton' filter
+    containing the windows-sdk-version and MFC inclusions.
+3)  All use of CString has been converted to XString
+4)  These actions clear the way to be using SQLComponents in the future free of MFC in
+    server-only environments where COW (Copy-On-Write) behaviour of CStrings is in the way
+    of clear multi-threaded program use and performance.

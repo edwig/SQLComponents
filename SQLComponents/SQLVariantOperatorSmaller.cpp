@@ -49,7 +49,7 @@ namespace SQLComponents
 bool
 static SQL_OperVarSmallerChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  CString leftString,rightString;
+  XString leftString,rightString;
   p_left .GetAsString(leftString);
   p_right.GetAsString(rightString);
 
@@ -73,7 +73,7 @@ static SQL_OperVarSmallerChar(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperGuidSmallerChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  CString leftString,rightString;
+  XString leftString,rightString;
   p_left .GetAsString(leftString);
   p_right.GetAsString(rightString);
 
@@ -1116,9 +1116,9 @@ SQLVariant::operator<(SQLVariant& p_right)
   }
   // No compare function found
   // Data types are not comparable
-  CString leftType  = FindDatatype(m_datatype);
-  CString rightType = FindDatatype(p_right.m_datatype);
-  CString error;
+  XString leftType  = FindDatatype(m_datatype);
+  XString rightType = FindDatatype(p_right.m_datatype);
+  XString error;
   error.Format("Cannot do the Smaller operator on (%s < %s)",leftType.GetString(),rightType.GetString());
   throw StdException(error);
 }

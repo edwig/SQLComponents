@@ -6,11 +6,13 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSQL", "TestSQL\TestSQL.vcxproj", "{F4A1FB0F-473A-4F77-B489-16F1D3CB37D7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968} = {0E56E030-9CDD-47A7-B580-DCD4E103F968}
+		{2364C44B-2E4D-4631-A050-B47509AFBC82} = {2364C44B-2E4D-4631-A050-B47509AFBC82}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{949635B6-421F-42B2-B9AB-A56CE0B371E7}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\DesignRules.txt = Documentation\DesignRules.txt
+		framework.h = framework.h
 		Planning.txt = Planning.txt
 		Readme.md = Readme.md
 		Documentation\releasenotes_1.3.txt = Documentation\releasenotes_1.3.txt
@@ -18,24 +20,34 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{9496
 		Documentation\releasenotes_1.5.txt = Documentation\releasenotes_1.5.txt
 		Documentation\releasenotes_1.6.txt = Documentation\releasenotes_1.6.txt
 		Documentation\releasenotes_1.7.txt = Documentation\releasenotes_1.7.txt
+		Documentation\releasenotes_2.0.txt = Documentation\releasenotes_2.0.txt
+		sourceclean.cmd = sourceclean.cmd
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTest", "UnitTest\UnitTest.vcxproj", "{D63FD0EA-3CA0-4D96-9E95-B5D72E1248C7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968} = {0E56E030-9CDD-47A7-B580-DCD4E103F968}
+		{2364C44B-2E4D-4631-A050-B47509AFBC82} = {2364C44B-2E4D-4631-A050-B47509AFBC82}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLComponents", "SQLComponents\SQLComponents.vcxproj", "{0E56E030-9CDD-47A7-B580-DCD4E103F968}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2364C44B-2E4D-4631-A050-B47509AFBC82} = {2364C44B-2E4D-4631-A050-B47509AFBC82}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLConnections", "SQLConnections\SQLConnections.vcxproj", "{09647FC9-DE27-4058-919C-72CB033517DA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968} = {0E56E030-9CDD-47A7-B580-DCD4E103F968}
+		{2364C44B-2E4D-4631-A050-B47509AFBC82} = {2364C44B-2E4D-4631-A050-B47509AFBC82}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLMigrate", "SQLMigrate\SQLMigrate.vcxproj", "{5F16ED87-9E0C-4980-80D0-79D39A94D8C3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0E56E030-9CDD-47A7-B580-DCD4E103F968} = {0E56E030-9CDD-47A7-B580-DCD4E103F968}
+		{2364C44B-2E4D-4631-A050-B47509AFBC82} = {2364C44B-2E4D-4631-A050-B47509AFBC82}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseLibrary", "BaseLibrary\BaseLibrary.vcxproj", "{2364C44B-2E4D-4631-A050-B47509AFBC82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +74,10 @@ Global
 		{5F16ED87-9E0C-4980-80D0-79D39A94D8C3}.Debug|x64.ActiveCfg = Debug|x64
 		{5F16ED87-9E0C-4980-80D0-79D39A94D8C3}.Debug|x64.Build.0 = Debug|x64
 		{5F16ED87-9E0C-4980-80D0-79D39A94D8C3}.Release|x64.ActiveCfg = Release|x64
+		{2364C44B-2E4D-4631-A050-B47509AFBC82}.Debug|x64.ActiveCfg = Debug|x64
+		{2364C44B-2E4D-4631-A050-B47509AFBC82}.Debug|x64.Build.0 = Debug|x64
+		{2364C44B-2E4D-4631-A050-B47509AFBC82}.Release|x64.ActiveCfg = Release|x64
+		{2364C44B-2E4D-4631-A050-B47509AFBC82}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -88,9 +88,9 @@ SQLMigrate::Migrate()
   if(!m_databaseSource)  m_databaseSource = new SQLDatabase();
   if(!m_databaseTarget)  m_databaseTarget = new SQLDatabase();
 
-  CString error;
-  CString connectSource;
-  CString connectTarget;
+  XString error;
+  XString connectSource;
+  XString connectTarget;
   connectSource.Format("DSN=%s;UID=%s;PWD=%s;", m_params.v_source_dsn, m_params.v_source_user, m_params.v_source_password);
   connectTarget.Format("DSN=%s;UID=%s;PWD=%s;", m_params.v_target_dsn, m_params.v_target_user, m_params.v_target_password);
 
@@ -124,7 +124,7 @@ SQLMigrate::Migrate()
 
     // Try to use the target schema
     bool defschema = m_databaseTarget->SetDefaultSchema(m_params.v_target_schema);
-    m_log.WriteLog(CString("Connect to schema   : ") + (defschema ? m_params.v_target_schema : CString("NO SCHEMA!!")));
+    m_log.WriteLog(XString("Connect to schema   : ") + (defschema ? m_params.v_target_schema : XString("NO SCHEMA!!")));
 
     m_log.SetDBType(false,m_databaseTarget->GetDatabaseTypeName());
     m_params.v_targetType  = m_databaseTarget->GetDatabaseType();
@@ -133,7 +133,7 @@ SQLMigrate::Migrate()
     // Find the number of tables to migrate (and which tables)
     m_log.WriteLog("Tables to migrate   : " + m_params.v_table);
     m_totalTables = ReadTableStructures(m_params.v_source_user,m_params.v_table,m_databaseSource);
-    CString num;
+    XString num;
     num.Format("%d",m_totalTables);
     m_log.WriteLog("Tables to migrate   : " + num);
 
@@ -217,7 +217,7 @@ SQLMigrate::Migrate()
     m_log.WriteOut ("-- End of script");
   }
 
-  CString resultline;
+  XString resultline;
   resultline.Format("Result of the migration: %d Errors.",m_params.v_errors);
   m_log.WriteLog("");
   m_log.WriteLog(resultline);
@@ -238,9 +238,9 @@ SQLMigrate::Migrate()
 void
 SQLMigrate::CheckMigrateParameters()
 {
-  CString create   = m_params.v_directory + "\\" + m_params.v_createscript;
-  CString dropping = m_params.v_directory + "\\" + m_params.v_dropscript;
-  CString logging  = m_params.v_directory + "\\" + FILENAME_LOGFILE;
+  XString create   = m_params.v_directory + "\\" + m_params.v_createscript;
+  XString dropping = m_params.v_directory + "\\" + m_params.v_dropscript;
+  XString logging  = m_params.v_directory + "\\" + FILENAME_LOGFILE;
 
   m_log.SetScript(create);
   m_log.SetDropScript(dropping);
@@ -402,7 +402,7 @@ SQLMigrate::WriteMigrateParameters()
   else
   {
     // Ruler               "------------------- : "
-    m_log.WriteLog(CString("Direct migration    : ") + ((m_params.v_direct == 0) ? "Datapump" : "SELECT/INSERT"));
+    m_log.WriteLog(XString("Direct migration    : ") + ((m_params.v_direct == 0) ? "Datapump" : "SELECT/INSERT"));
   }
   if(!(m_params.v_allObjects == 0 && m_params.v_table == ""))
   {
@@ -436,17 +436,17 @@ SQLMigrate::WriteMigrateParameters()
 
   // Logging of all migration options
   // Ruler               "------------------- : "
-  m_log.WriteLog(CString("Create new tables   : ") + (m_params.v_do_tables ? "yes" : "no"));
-  m_log.WriteLog(CString("Delete  table data  : ") + (m_params.v_deletes   ? "yes" : "no"));
-  m_log.WriteLog(CString("Convert table data  : ") + (m_params.v_do_data   ? "yes" : "no"));
-  m_log.WriteLog(CString("Convert views       : ") + (m_params.v_do_views  ? "yes" : "no"));
-  m_log.WriteLog(CString("Truncate char fields: ") + (m_params.v_truncate  ? "yes" : "no"));
-  m_log.WriteLog(CString("Create new indices  : ") + (m_params.v_indices   ? "yes" : "no"));
-  m_log.WriteLog(CString("Create primary keys : ") + (m_params.v_primarys  ? "yes" : "no"));
-  m_log.WriteLog(CString("Create foreign keys : ") + (m_params.v_foreigns  ? "yes" : "no"));
-  m_log.WriteLog(CString("Create sequences    : ") + (m_params.v_sequences ? "yes" : "no"));
-  m_log.WriteLog(CString("Create triggers     : ") + (m_params.v_triggers  ? "yes" : "no"));
-  m_log.WriteLog(CString("Grant access rights : ") + (m_params.v_access    ? "yes" : "no"));
+  m_log.WriteLog(XString("Create new tables   : ") + (m_params.v_do_tables ? "yes" : "no"));
+  m_log.WriteLog(XString("Delete  table data  : ") + (m_params.v_deletes   ? "yes" : "no"));
+  m_log.WriteLog(XString("Convert table data  : ") + (m_params.v_do_data   ? "yes" : "no"));
+  m_log.WriteLog(XString("Convert views       : ") + (m_params.v_do_views  ? "yes" : "no"));
+  m_log.WriteLog(XString("Truncate char fields: ") + (m_params.v_truncate  ? "yes" : "no"));
+  m_log.WriteLog(XString("Create new indices  : ") + (m_params.v_indices   ? "yes" : "no"));
+  m_log.WriteLog(XString("Create primary keys : ") + (m_params.v_primarys  ? "yes" : "no"));
+  m_log.WriteLog(XString("Create foreign keys : ") + (m_params.v_foreigns  ? "yes" : "no"));
+  m_log.WriteLog(XString("Create sequences    : ") + (m_params.v_sequences ? "yes" : "no"));
+  m_log.WriteLog(XString("Create triggers     : ") + (m_params.v_triggers  ? "yes" : "no"));
+  m_log.WriteLog(XString("Grant access rights : ") + (m_params.v_access    ? "yes" : "no"));
   m_log.WriteLog("");
 }
 
@@ -457,9 +457,9 @@ SQLMigrate::WriteMigrateParameters()
 //////////////////////////////////////////////////////////////////////////
 
 int
-SQLMigrate::ReadTableStructures(CString p_owner,CString p_pattern,SQLDatabase* p_database)
+SQLMigrate::ReadTableStructures(XString p_owner,XString p_pattern,SQLDatabase* p_database)
 {
-  CString errors;
+  XString errors;
 
   // Set status line of current step
   m_log.SetStatus("Read source object structures");
@@ -512,7 +512,7 @@ SQLMigrate::ReadTableStructures(CString p_owner,CString p_pattern,SQLDatabase* p
 }
 
 void
-SQLMigrate::ReadTablesFromFile(CString& p_file)
+SQLMigrate::ReadTablesFromFile(XString& p_file)
 {
   char buffer[101];
   FILE* file = nullptr;
@@ -534,7 +534,7 @@ SQLMigrate::ReadTablesFromFile(CString& p_file)
   }
   else
   {
-    CString msg;
+    XString msg;
     msg.Format("Cannot open the text file with table names: %s",p_file);
     AfxMessageBox(msg,MB_OK|MB_ICONERROR);
   }
@@ -557,7 +557,7 @@ SQLMigrate::RemoveTemporaries()
   {
     if(it->m_temporary)
     {
-      m_log.WriteLog(CString("Temporary not done  : ") + it->m_table);
+      m_log.WriteLog(XString("Temporary not done  : ") + it->m_table);
       it = m_tables.erase(it);
       continue;
     }
@@ -576,13 +576,13 @@ SQLMigrate::RemoveTemporaries()
 void
 SQLMigrate::DropTables()
 {
-  CString name("drop tabel");
+  XString name("drop tabel");
   int numTables = 0;
-  CString vendor = m_databaseTarget->GetDatabaseTypeName();
+  XString vendor = m_databaseTarget->GetDatabaseTypeName();
 
-  CString comment("-- ");
-  CString header1("DROPPING THE TABLES IN THE TARGET DATABASE");
-  CString header2("==========================================");
+  XString comment("-- ");
+  XString header1("DROPPING THE TABLES IN THE TARGET DATABASE");
+  XString header2("==========================================");
 
   m_log.WriteLog("");
   m_log.WriteLog(header1);
@@ -600,8 +600,8 @@ SQLMigrate::DropTables()
 
   for(unsigned int ind = 0; ind < m_tables.size(); ++ind)
   {
-    CString table     = m_tables[ind].m_table;
-    CString statement = m_databaseTarget->GetSQLInfoDB()->GetCATALOGTableDrop(m_params.v_target_schema,table,true,true,false);
+    XString table     = m_tables[ind].m_table;
+    XString statement = m_databaseTarget->GetSQLInfoDB()->GetCATALOGTableDrop(m_params.v_target_schema,table,true,true,false);
 
     // Process the statement
     m_log.WriteLog(statement);
@@ -634,13 +634,13 @@ SQLMigrate::DropTables()
 void
 SQLMigrate::CreateTables()
 {
-  CString name("Create table");
+  XString name("Create table");
   int  numTables = 0;
-  CString vendor = m_databaseTarget->GetDatabaseTypeName();
+  XString vendor = m_databaseTarget->GetDatabaseTypeName();
 
-  CString comment("-- ");
-  CString header1("CREATING TABLES IN THE TARGET DATABASE");
-  CString header2("======================================");
+  XString comment("-- ");
+  XString header1("CREATING TABLES IN THE TARGET DATABASE");
+  XString header2("======================================");
 
   m_log.WriteLog("");
   m_log.WriteLog(header1);
@@ -667,7 +667,7 @@ SQLMigrate::CreateTables()
     DDLCreateTable create(source);
 
     // Getting the table to migrate
-    CString tablename = m_tables[ind].m_table;
+    XString tablename = m_tables[ind].m_table;
     if (!m_params.v_source_schema.IsEmpty() && source->GetRDBMSUnderstandsSchemas())
     {
       tablename = m_params.v_source_schema + "." + tablename;
@@ -695,7 +695,7 @@ SQLMigrate::CreateTables()
     create.SetInfoDB(target);
 
     // Create target database table name
-    CString targettable = m_tables[ind].m_table;
+    XString targettable = m_tables[ind].m_table;
     if(!m_params.v_target_schema.IsEmpty() && target->GetRDBMSUnderstandsSchemas())
     {
       targettable = m_params.v_target_schema + "." + targettable;
@@ -833,7 +833,7 @@ SQLMigrate::FixupTableColumns(DDLCreateTable& p_create)
       {
         // HACK: Functions cannot be converted
         // Incompatible: Make empty, but WARN the user
-        CString warning;
+        XString warning;
         warning.Format("-- WARNING: Default on column [%s] removed: %s",column.m_column.GetString(),column.m_default.GetString());
         m_log.WriteLog(warning);
 
@@ -863,11 +863,11 @@ SQLMigrate::FixupTableIndices(DDLCreateTable& p_create)
         int pos2 = index.m_filter.Find(')');
         if(pos1 >= 0 && pos2 >= 0 && pos2 > pos1)
         {
-          CString naam = index.m_filter.Mid(pos1+1,(pos2 - pos1 - 1));
+          XString naam = index.m_filter.Mid(pos1+1,(pos2 - pos1 - 1));
           naam = naam.Trim(source->GetIdentifierQuoteCharacter());
           index.m_columnName = naam;
 
-          CString warning;
+          XString warning;
           warning.Format("-- WARNING: Functional index removed from index [%s] : %s", index.m_indexName.GetString(),index.m_filter.GetString());
           m_log.WriteLog(warning);
 
@@ -880,7 +880,7 @@ SQLMigrate::FixupTableIndices(DDLCreateTable& p_create)
 }
 
 int
-SQLMigrate::FindColumn(MColumnMap& p_columns,CString p_name)
+SQLMigrate::FindColumn(MColumnMap& p_columns,XString p_name)
 {
   int index = 0;
   for(auto& column : p_columns)
@@ -899,10 +899,10 @@ SQLMigrate::CreateViews()
 {
   int numViews = 0;
 
-  CString text;
-  CString comment("-- ");
-  CString header1("CREATING VIEWS IN THE TARGET DATABASE");
-  CString header2("=====================================");
+  XString text;
+  XString comment("-- ");
+  XString header1("CREATING VIEWS IN THE TARGET DATABASE");
+  XString header2("=====================================");
 
   m_log.WriteLog("");
   m_log.WriteLog(header1);
@@ -922,7 +922,7 @@ SQLMigrate::CreateViews()
     DDLCreateTable create(source);
 
     // Getting the table to migrate
-    CString viewName = m_tables[ind].m_table;
+    XString viewName = m_tables[ind].m_table;
     if(!m_params.v_source_schema.IsEmpty() && source->GetRDBMSUnderstandsSchemas())
     {
       viewName = m_params.v_source_schema + "." + viewName;
@@ -991,13 +991,13 @@ SQLMigrate::CreateViews()
 void
 SQLMigrate::TruncateTables()
 {
-  CString name("delete from table");
+  XString name("delete from table");
   int numTables = 0;
 
-  CString text;
-  CString comment("-- ");
-  CString header1("EMPTY THE TABLES IN THE TARGET DATABASE");
-  CString header2("=======================================");
+  XString text;
+  XString comment("-- ");
+  XString header1("EMPTY THE TABLES IN THE TARGET DATABASE");
+  XString header2("=======================================");
 
   m_log.WriteLog("");
   m_log.WriteLog(header1);
@@ -1015,13 +1015,13 @@ SQLMigrate::TruncateTables()
 
   for(unsigned int ind = 0; ind < m_tables.size(); ++ind)
   {
-    CString table = m_tables[ind].m_table;
+    XString table = m_tables[ind].m_table;
     if(!m_params.v_target_schema.IsEmpty() && m_databaseTarget->GetSQLInfoDB()->GetRDBMSUnderstandsSchemas())
     {
       table = m_params.v_target_schema + "." + table;
     }
 
-    CString statement = "DELETE FROM " + table;
+    XString statement = "DELETE FROM " + table;
     // Process result
     m_log.WriteLog(statement);
     if(m_directMigration < 2)
@@ -1063,7 +1063,7 @@ void
 SQLMigrate::FillTablesViaPump()
 {
   int  numTables = 0;
-  CString text;
+  XString text;
 
   m_log.WriteLog("");
   m_log.WriteLog("MIGRATING TABLE CONTENT TO TARGET DATABASE");
@@ -1078,8 +1078,8 @@ SQLMigrate::FillTablesViaPump()
 
   for(unsigned int ind = 0; ind < m_tables.size(); ++ind)
   {
-    CString table  = m_tables[ind].m_table;
-    CString schema = m_params.v_target_schema;
+    XString table  = m_tables[ind].m_table;
+    XString schema = m_params.v_target_schema;
 
     long rows    = 0;
     long totrows = 0;
@@ -1091,7 +1091,7 @@ SQLMigrate::FillTablesViaPump()
 
     try
     {
-      CString text;
+      XString text;
       text.Format("Migrating table     : %s", table);
       m_log.WriteLog(text);
 
@@ -1105,8 +1105,8 @@ SQLMigrate::FillTablesViaPump()
         SQLQuery query2(m_databaseTarget);
 
         // Source->Target database datatype migration
-        CString select = MakeSelectStatement(table,m_params.v_source_schema);
-        CString insert = MakeInsertStatement(table,m_params.v_source_schema,m_params.v_target_schema);
+        XString select = MakeSelectStatement(table,m_params.v_source_schema);
+        XString insert = MakeInsertStatement(table,m_params.v_source_schema,m_params.v_target_schema);
 
         SQLTransaction trans(m_databaseTarget,"Migration");
 
@@ -1160,7 +1160,7 @@ SQLMigrate::FillTablesViaPump()
             // Show missing records for first 100 rows
             if(++missing < 100)
             {
-              CString error = ex.GetErrorMessage();
+              XString error = ex.GetErrorMessage();
               LogMissingRecord(query1,error);
             }
             else if(missing == 100)
@@ -1195,7 +1195,7 @@ SQLMigrate::FillTablesViaPump()
 
     // Show tables
     m_log.SetTablesGauge(++numTables);
-    CString overgezet;
+    XString overgezet;
     overgezet.Format("Table [%s.%s] migrated with [%ld of %ld] rows",m_params.v_source_user,table,rows,totrows);
     m_log.WriteLog(overgezet);
     // Extra missing records log
@@ -1211,13 +1211,13 @@ SQLMigrate::FillTablesViaPump()
   }
 }
 
-CString
-SQLMigrate::MakeSelectStatement(CString& p_tabel,CString& p_user)
+XString
+SQLMigrate::MakeSelectStatement(XString& p_tabel,XString& p_user)
 {
-  CString    statement("SELECT ");
+  XString    statement("SELECT ");
   MColumnMap columns;
-  CString    schema;
-  CString    errors;
+  XString    schema;
+  XString    errors;
 
   m_databaseSource->GetSQLInfoDB()->MakeInfoTableColumns(columns,errors,p_user,p_tabel);
   for(unsigned int regel = 0; regel < columns.size(); ++regel)
@@ -1233,7 +1233,7 @@ SQLMigrate::MakeSelectStatement(CString& p_tabel,CString& p_user)
     //     bool interval = _strnicmp(info->m_typename,"INTERVAL",8) == 0;
     //     if(interval)
     //     {
-    //       statement += CString("TRIM(") + info->m_column + "||\'\') as ";
+    //       statement += XString("TRIM(") + info->m_column + "||\'\') as ";
     //     }
     statement += info->m_column;
   }
@@ -1253,14 +1253,14 @@ SQLMigrate::MakeSelectStatement(CString& p_tabel,CString& p_user)
   return statement;
 }
 
-CString
-SQLMigrate::MakeInsertStatement(CString& p_tabel,CString& p_user,CString& p_doel_user)
+XString
+SQLMigrate::MakeInsertStatement(XString& p_tabel,XString& p_user,XString& p_doel_user)
 {
-  CString    data;
-  CString    statement("INSERT INTO ");
+  XString    data;
+  XString    statement("INSERT INTO ");
   MColumnMap columns;
-  CString    schema;
-  CString    errors;
+  XString    schema;
+  XString    errors;
 
   statement += p_doel_user + ".";
   statement += p_tabel + " (";
@@ -1282,11 +1282,11 @@ SQLMigrate::MakeInsertStatement(CString& p_tabel,CString& p_user,CString& p_doel
 }
 
 long
-SQLMigrate::CountTableContents(CString p_owner,CString& tabel)
+SQLMigrate::CountTableContents(XString p_owner,XString& tabel)
 {
-  CString  name("count");
+  XString  name("count");
   SQLQuery query(m_databaseSource);
-  CString  statement = "SELECT COUNT(*) FROM ";
+  XString  statement = "SELECT COUNT(*) FROM ";
 
   if(m_databaseTarget->GetSQLInfoDB()->GetRDBMSUnderstandsSchemas())
   {
@@ -1309,9 +1309,9 @@ SQLMigrate::CountTableContents(CString p_owner,CString& tabel)
 }
 
 void
-SQLMigrate::LogMissingRecord(SQLQuery& p_query,CString& p_error)
+SQLMigrate::LogMissingRecord(SQLQuery& p_query,XString& p_error)
 {
-  CString text;
+  XString text;
   m_log.WriteLog("MISSING RECORD");
   // Reason for the error
   text.Format("ERROR: %s",p_error);
@@ -1320,8 +1320,8 @@ SQLMigrate::LogMissingRecord(SQLQuery& p_query,CString& p_error)
   int aantal = p_query.GetNumberOfColumns();
   for(int ind = 1; ind <= aantal; ++ind)
   {
-    CString naam;
-    CString waarde;
+    XString naam;
+    XString waarde;
     SQLVariant* var = p_query.GetColumn(ind);
     var->GetAsString(waarde);
     p_query.GetColumnName(ind,naam);
@@ -1336,8 +1336,8 @@ SQLMigrate::CommitDDL(SQLQuery& p_query,SQLInfoDB* p_info)
 {
   if(p_info->GetRDBMSMustCommitDDL())
   {
-    CString statement("COMMIT");
-    CString name("Commit DDL");
+    XString statement("COMMIT");
+    XString name("Commit DDL");
     p_query.DoSQLStatement(statement);
   }
 }
@@ -1352,10 +1352,10 @@ void
 SQLMigrate::FillTablesViaData(bool p_process)
 {
   int numTables = 0;
-  CString name("Select");
-  CString comment("-- ");
-  CString header1("TABLE CONTENTS MIGRATION TO INSERT SCRIPTS");
-  CString header2("==========================================");
+  XString name("Select");
+  XString comment("-- ");
+  XString header1("TABLE CONTENTS MIGRATION TO INSERT SCRIPTS");
+  XString header2("==========================================");
 
   m_log.WriteLog("");
   m_log.WriteLog(header1);
@@ -1375,7 +1375,7 @@ SQLMigrate::FillTablesViaData(bool p_process)
 
     // Get pattern from source database
     // TABLE: catalog:schema.table 
-    CString table = m_tables[ind].m_table;
+    XString table = m_tables[ind].m_table;
 
     // Process
     clock_t start = clock(), einde;
@@ -1386,8 +1386,8 @@ SQLMigrate::FillTablesViaData(bool p_process)
       m_log.WriteOut("");
 
       // Get the columns
-      CString    errors;
-      CString    schema;
+      XString    errors;
+      XString    schema;
       MColumnMap columns;
 
       m_databaseSource->GetSQLInfoDB()->MakeInfoTableColumns(columns,errors,m_params.v_source_schema,table);
@@ -1395,7 +1395,7 @@ SQLMigrate::FillTablesViaData(bool p_process)
       totalrows = CountTableContents(m_params.v_source_user,table);
       if(totalrows)
       {
-        CString meld;
+        XString meld;
         meld.Format("Migrating table    : %s",table);
         m_log.WriteLog(meld);
         meld.Format("Number of records  : %ld",totalrows);
@@ -1405,12 +1405,12 @@ SQLMigrate::FillTablesViaData(bool p_process)
         SQLQuery query2(m_databaseTarget);
         SQLTransaction trans(m_databaseSource,"Migration");
 
-        CString select = MakeSelectStatement(table,m_params.v_source_schema);
+        XString select = MakeSelectStatement(table,m_params.v_source_schema);
         query1.DoSQLStatement(select);
 
         while(query1.GetRecord())
         {
-          CString insert;
+          XString insert;
           int extra = 0;
 
           try
@@ -1428,7 +1428,7 @@ SQLMigrate::FillTablesViaData(bool p_process)
           }
           catch(StdException& ex)
           {
-            CString error = ex.GetErrorMessage();
+            XString error = ex.GetErrorMessage();
             LogMissingRecord(query1,error);
             m_log.WriteLog(insert);
             ++m_params.v_errors;
@@ -1441,7 +1441,7 @@ SQLMigrate::FillTablesViaData(bool p_process)
           m_log.SetTableGauge(rows,totalrows);
           if(rows % m_params.v_logLines == 0)
           {
-            CString text;
+            XString text;
             text.Format("Table: %s Rows: %ld [%5.2f %%]",table,rows,((double) rows / (double)totalrows * 100.0));
             m_log.WriteLog(text);
           }
@@ -1461,7 +1461,7 @@ SQLMigrate::FillTablesViaData(bool p_process)
     }
     // Show tables
     m_log.SetTablesGauge(++numTables);
-    CString processed;
+    XString processed;
     processed.Format("Table [%s.%s] processed with [%ld of %ld] rows",m_params.v_source_user,table,rows,totalrows);
     m_log.WriteLog(processed);
     // Extra missing rows in logfile
@@ -1477,11 +1477,11 @@ SQLMigrate::FillTablesViaData(bool p_process)
   }
 }
 
-CString
-SQLMigrate::MakeInsertDataStatement(CString& p_table,CString& p_target_schema,SQLQuery& p_input,MColumnMap& columns)
+XString
+SQLMigrate::MakeInsertDataStatement(XString& p_table,XString& p_target_schema,SQLQuery& p_input,MColumnMap& columns)
 {
-  CString data;
-  CString statement("INSERT INTO ");
+  XString data;
+  XString statement("INSERT INTO ");
   bool seperator = false;
 
   if(!p_target_schema.IsEmpty())
@@ -1494,7 +1494,7 @@ SQLMigrate::MakeInsertDataStatement(CString& p_table,CString& p_target_schema,SQ
   {
     MetaColumn* info = &(columns[row]);
     SQLVariant* var  = p_input.GetColumn(row + 1);
-    CString datum    = VariantToInsertString(var,info->m_datatype);
+    XString datum    = VariantToInsertString(var,info->m_datatype);
   
     if(!datum.IsEmpty() && datum != "\'\'")
     {
@@ -1513,10 +1513,10 @@ SQLMigrate::MakeInsertDataStatement(CString& p_table,CString& p_target_schema,SQ
   return statement;
 }
 
-CString
+XString
 SQLMigrate::VariantToInsertString(SQLVariant* p_var,int p_datatype)
 {
-  CString result;
+  XString result;
   TIMESTAMP_STRUCT* stamp;
   DATE_STRUCT*      date;
   TIME_STRUCT*      time;
@@ -1582,10 +1582,10 @@ SQLMigrate::VariantToInsertString(SQLVariant* p_var,int p_datatype)
   return result;
 }
 
-CString
-SQLMigrate::MakeIdentityStatement(CString p_vendor,CString p_user,CString p_tabel)
+XString
+SQLMigrate::MakeIdentityStatement(XString p_vendor,XString p_user,XString p_tabel)
 {
-  CString identity;
+  XString identity;
   if(m_databaseTarget->GetDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
   {
     identity = "SET IDENTITY_INSERT " + p_user + "." + p_tabel + " ON;";

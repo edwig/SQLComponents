@@ -49,7 +49,7 @@ namespace SQLComponents
 bool
 static SQL_OperVarEqualsChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  CString leftString,rightString;
+  XString leftString,rightString;
   p_left .GetAsString(leftString);
   p_right.GetAsString(rightString);
 
@@ -81,7 +81,7 @@ static SQL_OperBitEqualsChar(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperGuidEqualsChar(SQLVariant& p_left,SQLVariant& p_right)
 {
-  CString leftString,rightString;
+  XString leftString,rightString;
   p_left .GetAsString(leftString);
   p_right.GetAsString(rightString);
 
@@ -699,7 +699,7 @@ static SQL_OperUBigEqualsBit(SQLVariant& p_left,SQLVariant& p_right)
 bool
 static SQL_OperNumEqualsBit(SQLVariant& p_left,SQLVariant& p_right)
 {
-  CString left;
+  XString left;
   p_left.GetAsString(left);
   int lf = atoi(left);
  
@@ -1247,9 +1247,9 @@ SQLVariant::operator==(SQLVariant& p_right)
   }
   // No compare function found
   // Data types are not comparable
-  CString leftType  = FindDatatype(m_datatype);
-  CString rightType = FindDatatype(p_right.m_datatype);
-  CString error;
+  XString leftType  = FindDatatype(m_datatype);
+  XString rightType = FindDatatype(p_right.m_datatype);
+  XString error;
   error.Format("Cannot do the equality operator on (%s == %s)",leftType.GetString(),rightType.GetString());
   throw StdException(error);
 }
@@ -1284,9 +1284,9 @@ SQLVariant::operator!=(SQLVariant& p_right)
   }
   // No compare function found
   // Data types are not comparable
-  CString leftType  = FindDatatype(m_datatype);
-  CString rightType = FindDatatype(p_right.m_datatype);
-  CString error;
+  XString leftType  = FindDatatype(m_datatype);
+  XString rightType = FindDatatype(p_right.m_datatype);
+  XString error;
   error.Format("Cannot do the inequality operator on (%s != %s)",leftType.GetString(),rightType.GetString());
   throw StdException(error);
 }

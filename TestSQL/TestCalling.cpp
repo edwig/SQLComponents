@@ -86,7 +86,7 @@ void TestCalling()
       // Call with 1 input parameter and return value AND return parameter
       beginTime = clock();
       var txt(SQL_C_CHAR,5000);
-      CString line;
+      XString line;
       for(unsigned ind = 0; ind < 202; ++ind) line += "-";
 
       q2.ResetParameters();
@@ -100,7 +100,7 @@ void TestCalling()
 
       int status = 0;
       bcd number = q2.GetParameter(0)->GetAsBCD();
-      CString text = q2.GetParameter(2)->GetAsChar();
+      XString text = q2.GetParameter(2)->GetAsChar();
       printf("Result of MULTINOUT = status:%d [%s] [%s]\n",status,number.AsString().GetString(),text.GetString());
 
       trans.Commit();

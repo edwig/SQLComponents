@@ -131,7 +131,7 @@ SQLVariant::operator=(const char* p_data)
 }
 
 SQLVariant& 
-SQLVariant::operator=(CString& p_data)
+SQLVariant::operator=(XString& p_data)
 {
   SetData(SQL_C_CHAR,p_data.GetString());
   return *this;
@@ -570,9 +570,9 @@ SQLVariant::operator SQLGuid()
   return GetAsSQLGuid();
 }
 
-SQLVariant::operator CString()
+SQLVariant::operator XString()
 {
-  return CString(GetAsChar());
+  return XString(GetAsChar());
 }
 
 SQLVariant::operator bcd()
@@ -589,7 +589,7 @@ SQLVariant::operator bcd()
 void
 SQLVariant::ThrowErrorOperator(SQLVarOperator p_operator)
 {
-  CString error;
+  XString error;
   const char* type = FindDatatype(m_datatype);
   const char* oper = nullptr;
   switch (p_operator)

@@ -91,7 +91,7 @@ ReadDetailSet(SQLDatabase* p_dbs,int p_master)
   details.SetSelection("*"); // Select all columns
 
   // Alternatively to "SetSelection", we may specify a complete query
-//   CString sql("SELECT id\n"
+//   XString sql("SELECT id\n"
 //               "      ,mast_id\n"
 //               "      ,line\n"
 //               "      ,description\n"
@@ -130,7 +130,7 @@ ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
   master.SetPrimaryTable("","master");
   master.SetPrimaryKeyColumn("id");
   master.SetParameter("key",SQLVariant(p_master));
-  CString sql ("SELECT id\n"
+  XString sql ("SELECT id\n"
                "      ,invoice\n"
                "      ,description\n"
                "      ,total\n"

@@ -41,7 +41,7 @@ namespace SQLComponents
 
 // Message in the foreground or to the WMI Event log
 INT_PTR
-SQLMessage(HWND p_wnd,CString p_message,CString p_title,int p_buttons)
+SQLMessage(HWND p_wnd,XString p_message,XString p_title,int p_buttons)
 {
   if(g_SQLComponentsInServer)
   {

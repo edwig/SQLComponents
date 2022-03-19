@@ -40,13 +40,13 @@ namespace SQLComponents
 
 //////////////////////////////////////////////////////////////////////////
 //
-// GENERAL ERRORS - THROWING A CString
+// GENERAL ERRORS - THROWING A XString
 //
 //////////////////////////////////////////////////////////////////////////
 
 void SQL_ThrowErrorTruncate(int p_from,int p_to)
 {
-  CString error;
+  XString error;
   const char* from = SQLVariant::FindDatatype(p_from);
   const char* to   = SQLVariant::FindDatatype(p_to);
   error.Format("Cannot truncate %s to %s",from,to);

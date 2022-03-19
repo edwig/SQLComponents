@@ -34,9 +34,9 @@ namespace DatabaseUnitTest
 {
   void CALLBACK LogPrint(void* p_context,const char* p_text);
   int  CALLBACK LogLevel(void* p_context);
-  extern CString g_dsn;
-  extern CString g_user;
-  extern CString g_password;
+  extern XString g_dsn;
+  extern XString g_user;
+  extern XString g_password;
 
   TEST_CLASS(TransactionTest)
   {
@@ -84,7 +84,7 @@ namespace DatabaseUnitTest
     void UpdateRecord(int p_recno,bcd p_value)
     {
       SQLQuery query(m_database);
-      CString sql("UPDATE test_number\n"
+      XString sql("UPDATE test_number\n"
                   "   SET field3 = ?\n"
                   " WHERE id     = ?");
       query.SetParameter(1,p_value);
@@ -97,7 +97,7 @@ namespace DatabaseUnitTest
     void CheckRecord(int p_recno,bcd p_value)
     {
       SQLQuery query(m_database);
-      CString sql("SELECT field3\n"
+      XString sql("SELECT field3\n"
                   "  FROM test_number\n"
                   " WHERE id = ?");
       query.DoSQLStatement(sql,p_recno);

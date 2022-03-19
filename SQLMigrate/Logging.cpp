@@ -67,19 +67,19 @@ Logging::SetLogStatus(LogType status)
 }
 
 void 
-Logging::SetScript(CString p_script)
+Logging::SetScript(XString p_script)
 {
   m_script = p_script;
 }
 
 void 
-Logging::SetDropScript(CString p_script)
+Logging::SetDropScript(XString p_script)
 {
   m_dropscript = p_script;
 }
 
 void
-Logging::SetLogfile(CString p_logfile)
+Logging::SetLogfile(XString p_logfile)
 {
   m_logfile = p_logfile;
 }
@@ -131,7 +131,7 @@ Logging::Close()
 }
 
 void 
-Logging::SetDBType(bool p_source, CString p_type)
+Logging::SetDBType(bool p_source, XString p_type)
 {
   SQLMigrateApp* appl = (SQLMigrateApp*)AfxGetApp();
   SQLMigrateDialog* dlg = (SQLMigrateDialog*)(appl->m_pMainWnd);
@@ -144,12 +144,12 @@ Logging::SetDBType(bool p_source, CString p_type)
   {
     dlg->SetTargetType(p_type);
   }
-  CString text = "Database type       : " + p_type;
+  XString text = "Database type       : " + p_type;
   WriteLog(text);
 }
 
 void
-Logging::WriteLog(CString message)
+Logging::WriteLog(XString message)
 {
 #ifdef DEBUG
 #if    DEBUG_DUMPING
@@ -192,7 +192,7 @@ Logging::WriteLog(CString message)
 }
 
 void 
-Logging::WriteOut(CString statement,bool p_delim /* = false*/)
+Logging::WriteOut(XString statement,bool p_delim /* = false*/)
 {
 #ifdef DEBUG
 #if    DEBUG_DUMPING
@@ -215,7 +215,7 @@ Logging::WriteOut(CString statement,bool p_delim /* = false*/)
 }
 
 void
-Logging::WriteDrop(CString statement,bool p_delim /*=false*/)
+Logging::WriteDrop(XString statement,bool p_delim /*=false*/)
 {
 #ifdef DEBUG
 #if    DEBUG_DUMPING
@@ -256,7 +256,7 @@ Logging::SetTablesGauge(int num)
 }
 
 void
-Logging::SetStatus(CString status)
+Logging::SetStatus(XString status)
 {
   SQLMigrateApp*   appl = (SQLMigrateApp *)AfxGetApp();
   SQLMigrateDialog* dlg = (SQLMigrateDialog *)(appl->m_pMainWnd);

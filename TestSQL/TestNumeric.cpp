@@ -53,7 +53,7 @@ void TestNumeric()
     {
       printf("Database opened.\n");
 
-      CString sql = "SELECT field2,field3 FROM test_number";
+      XString sql = "SELECT field2,field3 FROM test_number";
       SQLQuery query(&dbs);
 
       query.DoSQLStatement(sql);

@@ -147,7 +147,7 @@ namespace DatabaseUnitTest
       count.Stop();
       delta = count.GetCounter();
 
-      CString msg;
+      XString msg;
       msg.Format("Calibrating delta = %.6f",delta);
       Logger::WriteMessage(msg);
     }
@@ -157,7 +157,7 @@ namespace DatabaseUnitTest
       bcd  c_pi;
       bcd  c_ln10;
       bcd  c_ln2;
-      CString msg;
+      XString msg;
 
       msg.Format("Floating point constants in [%d] iterations are:",p_count);
       Logger::WriteMessage(msg);
@@ -226,7 +226,7 @@ namespace DatabaseUnitTest
 
     void DoOperatorTest(TestOperator p_operator,const char* p_een,const char* p_two,const char* p_expect,int p_count)
     {
-      CString msg;
+      XString msg;
       const char* name = operators[p_operator];
 
       msg.Format("Testing [%s] for a total of [%d] iterations:",name,p_count);
@@ -346,7 +346,7 @@ namespace DatabaseUnitTest
                        ,const char*  p_extra
                        ,int          p_count)
     {
-      CString msg;
+      XString msg;
       bool extraFloat   = p_function == Func_modf  ? true : false;
       bool extraInteger = p_function == Func_frexp ? true : false;
 
@@ -478,7 +478,7 @@ namespace DatabaseUnitTest
 
     int TestNumeric(int p_count)
     {
-      CString msg;
+      XString msg;
       // Header
       msg.Format("Testing SQL_NUMERIC_STRUCT for a total of [%d] iterations",p_count);
       Logger::WriteMessage(msg);
@@ -537,13 +537,13 @@ namespace DatabaseUnitTest
       return 0;
     }
 
-    void PrecisionTest(CString p_input,int p_precision,int p_scale)
+    void PrecisionTest(XString p_input,int p_precision,int p_scale)
     {
       SQL_NUMERIC_STRUCT numeric;
       bcd num(p_input);
       num.AsNumeric(&numeric);
 
-      CString text;
+      XString text;
       text.Format("BCD Precision/Scale [%d:%d] for: %s",(int)numeric.precision,(int)numeric.scale,p_input);
       Logger::WriteMessage(text);
 
@@ -591,7 +591,7 @@ namespace DatabaseUnitTest
       // BEWARE: I'am testing in "The Netherlands", so my locale settings are:
       // Thousand seperator: .
       // Decimal  seperator: ,
-      CString test;
+      XString test;
       test = TestDisplay(basenum,0);   Assert::AreEqual("123.456",         test.GetString());
       test = TestDisplay(basenum,1);   Assert::AreEqual("123.456,1",       test.GetString());
       test = TestDisplay(basenum,2);   Assert::AreEqual("123.456,12",      test.GetString());
@@ -609,10 +609,10 @@ namespace DatabaseUnitTest
       test = TestDisplay(basenum,3);   Assert::AreEqual("123,000",test.GetString());
     }
 
-    CString TestDisplay(bcd p_num,int precision)
+    XString TestDisplay(bcd p_num,int precision)
     {
       bcd number(p_num);
-      CString str = number.AsDisplayString(precision);
+      XString str = number.AsDisplayString(precision);
       Logger::WriteMessage(str);
       return str;
     }

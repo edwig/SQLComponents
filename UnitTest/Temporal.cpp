@@ -39,10 +39,10 @@ namespace DatabaseUnitTest
 
       SQLDate birth("15-10-1959");
 
-      CString in_english = birth.WeekDayName();
-      CString in_dutch   = birth.WeekDayName(LN_DUTCH);
-      CString in_german  = birth.WeekDayName(LN_GERMAN);
-      CString in_french  = birth.WeekDayName(LN_FRENCH);
+      XString in_english = birth.WeekDayName();
+      XString in_dutch   = birth.WeekDayName(LN_DUTCH);
+      XString in_german  = birth.WeekDayName(LN_GERMAN);
+      XString in_french  = birth.WeekDayName(LN_FRENCH);
 
       Logger::WriteMessage("English: " + in_english);
       Logger::WriteMessage("Dutch  : " + in_dutch);
@@ -63,10 +63,10 @@ namespace DatabaseUnitTest
       SetDefaultSQLLanguage(LN_ENGLISH);
       SQLDate birth("15-10-1959");
 
-      CString in_english = birth.MonthName();
-      CString in_dutch   = birth.MonthName(LN_DUTCH);
-      CString in_german  = birth.MonthName(LN_GERMAN);
-      CString in_french  = birth.MonthName(LN_FRENCH);
+      XString in_english = birth.MonthName();
+      XString in_dutch   = birth.MonthName(LN_DUTCH);
+      XString in_german  = birth.MonthName(LN_GERMAN);
+      XString in_french  = birth.MonthName(LN_FRENCH);
 
       Logger::WriteMessage("English: " + in_english);
       Logger::WriteMessage("Dutch  : " + in_dutch);
@@ -89,10 +89,10 @@ namespace DatabaseUnitTest
 
       SQLDate birth("15-10-1959");
 
-      CString in_english = birth.FullDate();
-      CString in_dutch   = birth.FullDate(LN_DUTCH);
-      CString in_german  = birth.FullDate(LN_GERMAN);
-      CString in_french  = birth.FullDate(LN_FRENCH);
+      XString in_english = birth.FullDate();
+      XString in_dutch   = birth.FullDate(LN_DUTCH);
+      XString in_german  = birth.FullDate(LN_GERMAN);
+      XString in_french  = birth.FullDate(LN_FRENCH);
 
       Logger::WriteMessage("English: " + in_english);
       Logger::WriteMessage("Dutch  : " + in_dutch);
@@ -137,14 +137,14 @@ namespace DatabaseUnitTest
       birth = birth.AddMonths(2);
       birth = birth.AddDays(2);
 
-      CString result = birth.AsString();
+      XString result = birth.AsString();
       Logger::WriteMessage("Added 2-2-2 to day of birth: " + result);
       Assert::AreEqual("17-12-1961",result);
 
       SQLDate other(17,12,1961);
       birth.SetDate("15101959");
       SQLInterval val = other - birth;
-      CString diff = val.AsString();
+      XString diff = val.AsString();
 
       Logger::WriteMessage("Difference in dates: " + diff);
       Assert::AreEqual("794",diff);
@@ -189,7 +189,7 @@ namespace DatabaseUnitTest
         }
       }
 
-      CString result;
+      XString result;
       result.Format("Difference in days : %d",difference);
       Logger::WriteMessage(result);
       Assert::AreEqual(5794,difference);
@@ -213,7 +213,7 @@ namespace DatabaseUnitTest
       SQLDate otherToday("00-00-00");
       
       // Roundtrip for full date
-      CString full = today.FullDate();
+      XString full = today.FullDate();
       // Strip day of the week name
       int pos = full.Find(' ');
       if(pos > 0)
@@ -223,7 +223,7 @@ namespace DatabaseUnitTest
       SQLDate todayFull(full);
 
       // Test for short strings
-      CString date4,date6;
+      XString date4,date6;
       date4.Format("%2.2d%2.2d",today.Day(),today.Month());
       date6.Format("%2.2d%2.2d%2.2d",today.Day(),today.Month(),today.Year() - 2000);
       SQLDate today4(date4);
@@ -249,14 +249,14 @@ namespace DatabaseUnitTest
       // Try a wrong date
       try
       {
-        CString wrong("Not a date");
+        XString wrong("Not a date");
         SQLDate testing(wrong);
 
         Assert::Fail(L"Should not come here");
       }
       catch (StdException& er)
       {
-        CString message = er.GetErrorMessage();
+        XString message = er.GetErrorMessage();
         int pos = message.Find("wrong");
         Assert::IsTrue(pos > 0);
       }
@@ -270,8 +270,8 @@ namespace DatabaseUnitTest
       InitSQLComponents();
 
       SQLDate day("1959-10-15");
-      CString display = day.AsString();
-      CString expect  = "15-10-1959";
+      XString display = day.AsString();
+      XString expect  = "15-10-1959";
       Assert::AreEqual(expect.GetString(),display.GetString());
     }
 
@@ -282,19 +282,19 @@ namespace DatabaseUnitTest
       InitSQLComponents();
 
       // Interval to Period (Day-second)
-      SQLInterval intval1(SQL_IS_DAY_TO_SECOND,CString("10 18:11:44"));
-      CString display = intval1.AsXMLDuration();
-      CString expect = "P10DT18H11M44S";
+      SQLInterval intval1(SQL_IS_DAY_TO_SECOND,XString("10 18:11:44"));
+      XString display = intval1.AsXMLDuration();
+      XString expect = "P10DT18H11M44S";
       Assert::AreEqual(expect.GetString(), display.GetString());
 
       // Interval to Period (Year-Month)
-      SQLInterval intval2(SQL_IS_YEAR_TO_MONTH, CString("12 7"));
+      SQLInterval intval2(SQL_IS_YEAR_TO_MONTH, XString("12 7"));
       display = intval2.AsXMLDuration();
       expect = "P12Y7M";
       Assert::AreEqual(expect.GetString(), display.GetString());
 
       // Period to interval Duration to Day-second interval
-      SQLInterval intval3(CString("P3DT6H7M12S"));
+      SQLInterval intval3(XString("P3DT6H7M12S"));
       Assert::AreEqual((int)0,     intval3.GetYears());
       Assert::AreEqual((int)0,     intval3.GetMonths());
       Assert::AreEqual((int)3,     intval3.GetDays());
@@ -315,10 +315,10 @@ namespace DatabaseUnitTest
 
       try
       {
-        CString now   ("NOW");
-  //    CString name  ("NOW - 1000000 MIN");     // Works OK
-        CString name  ("NOW - 1000000 MINUTE");  // Works OK
-        CString plural("NOW - 1000000 MINUTES"); // Works OK
+        XString now   ("NOW");
+  //    XString name  ("NOW - 1000000 MIN");     // Works OK
+        XString name  ("NOW - 1000000 MINUTE");  // Works OK
+        XString plural("NOW - 1000000 MINUTES"); // Works OK
         SQLTimestamp stamp1(now);
         SQLTimestamp stamp2(name);
         SQLTimestamp stamp3(plural);
@@ -326,7 +326,7 @@ namespace DatabaseUnitTest
         Logger::WriteMessage(stamp2.AsString());
         Logger::WriteMessage(stamp3.AsString());
 
-        CString years("NOW - 2 YEAR");
+        XString years("NOW - 2 YEAR");
         SQLTimestamp backthen(years);
         Logger::WriteMessage(backthen.AsString());
 

@@ -38,22 +38,22 @@ public:
   DatabaseType  v_targetType  { DatabaseType::RDBMS_UNKNOWN };
 
   // String parameters
-  CString v_source_dsn;     // Source database ODBC DataSourceName
-  CString v_source_user;    // Source database user to log in
-  CString v_source_password;// Source database user password
-  CString v_source_schema;  // Source schema of tables to migrate
+  XString v_source_dsn;     // Source database ODBC DataSourceName
+  XString v_source_user;    // Source database user to log in
+  XString v_source_password;// Source database user password
+  XString v_source_schema;  // Source schema of tables to migrate
 
-  CString v_target_dsn;     // Target database ODBC DataSourceName
-  CString v_target_user;    // Target database user to login in
-  CString v_target_password;// Target database user password
-  CString v_target_schema;  // Target schema of tables to migrate
+  XString v_target_dsn;     // Target database ODBC DataSourceName
+  XString v_target_user;    // Target database user to login in
+  XString v_target_password;// Target database user password
+  XString v_target_schema;  // Target schema of tables to migrate
 
-  CString v_tablespace;     // Optional tablespace when creating a table
-  CString v_table;          // Optional table to convert, all if empty
+  XString v_tablespace;     // Optional tablespace when creating a table
+  XString v_table;          // Optional table to convert, all if empty
 
-  CString v_directory;      // Directory for the scripts
-  CString v_dropscript;     // Script with all DROP statements
-  CString v_createscript;   // Script with all CREATE and INSERT statements
+  XString v_directory;      // Directory for the scripts
+  XString v_dropscript;     // Script with all DROP statements
+  XString v_createscript;   // Script with all CREATE and INSERT statements
 
   // Options
   int     v_allObjects      {    0 };    // Explicitly convert all tables/views/indexes/synonyms etc

@@ -56,14 +56,14 @@ namespace DatabaseUnitTest
       TestXMLWorksheet(excel,3,"Third");
     }
 
-    void TestXMLWorksheet(BasicXmlExcel& p_excel,int p_sheet,CString p_name)
+    void TestXMLWorksheet(BasicXmlExcel& p_excel,int p_sheet,XString p_name)
     {
       Logger::WriteMessage("Testing worksheet: " + p_name);
 
       // Get worksheet (zero based)
       BasicXmlWorksheet* sheet = p_excel.GetWorksheet(p_sheet - 1);
       Assert::IsNotNull(sheet);
-      CString name = sheet->GetSheetName();
+      XString name = sheet->GetSheetName();
       number_of_tests++;
 
       Assert::IsTrue(p_name == name);
@@ -73,8 +73,8 @@ namespace DatabaseUnitTest
       {
         for(int col = 1; col < 4; ++col)
         {
-          CString expect;
-          CString value = sheet->GetCellValue(row,col);
+          XString expect;
+          XString value = sheet->GetCellValue(row,col);
           expect.Format("%d%d%d",p_sheet,row,col);
 
           Logger::WriteMessage(value);
@@ -90,7 +90,7 @@ namespace DatabaseUnitTest
       InitSQLComponents();
 
       BasicExcel excel("..\\UnitTest\\BasicExcel.xls");
-      CString error = excel.GetError();
+      XString error = excel.GetError();
       Assert::IsTrue(error.IsEmpty());
       number_of_tests++;
 
@@ -99,14 +99,14 @@ namespace DatabaseUnitTest
       TestWorksheet(excel,3,"Third");
     }
 
-    void TestWorksheet(BasicExcel& p_excel,int p_sheet,CString p_name)
+    void TestWorksheet(BasicExcel& p_excel,int p_sheet,XString p_name)
     {
       Logger::WriteMessage("Testing worksheet: " + p_name);
 
       // Get worksheet (zero based)
       BasicExcelWorksheet* sheet = p_excel.GetWorksheet(p_sheet - 1);
       Assert::IsNotNull(sheet);
-      CString name = sheet->GetAnsiSheetName();
+      XString name = sheet->GetAnsiSheetName();
       number_of_tests++;
 
       Assert::IsTrue(p_name == name);
@@ -116,8 +116,8 @@ namespace DatabaseUnitTest
         for(int col = 1; col < 4; ++col)
         {
           char buffer[200];
-          CString expect;
-          CString value = sheet->CellValue(row - 1,col - 1,buffer,200);
+          XString expect;
+          XString value = sheet->CellValue(row - 1,col - 1,buffer,200);
           expect.Format("%d%d%d",p_sheet,row,col);
 
           Logger::WriteMessage(value);

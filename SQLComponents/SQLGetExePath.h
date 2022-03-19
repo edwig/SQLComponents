@@ -28,9 +28,9 @@
 namespace SQLComponents
 {
 
-CString SQLGetExePath();
-CString SQLGetExeFile();
+XString SQLGetExePath();
+XString SQLGetExeFile();
 HMODULE SQLGetModuleHandle();
-void    SQLCheckExePath(CString p_runtimer);
+void    SQLCheckExePath(XString p_runtimer);
 
 }

@@ -45,6 +45,6 @@ protected:
 protected:
   DECLARE_MESSAGE_MAP()
 
-  CString m_version;
-  CString m_copyright;
+  XString m_version;
+  XString m_copyright;
 };

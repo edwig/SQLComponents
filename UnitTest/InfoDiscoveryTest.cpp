@@ -34,10 +34,10 @@ namespace DatabaseUnitTest
 {
   void CALLBACK LogPrint(void* p_context,const char* p_text);
   int  CALLBACK LogLevel(void* p_context);
-  extern CString g_dsn;
-  extern CString g_user;
-  extern CString g_password;
-  extern CString g_schema;
+  extern XString g_dsn;
+  extern XString g_user;
+  extern XString g_password;
+  extern XString g_schema;
 
   TEST_CLASS(DiscoveryInfo)
   {
@@ -73,11 +73,11 @@ namespace DatabaseUnitTest
       MetaType(META_TABLES,  "tables");
     }
 
-    void MetaType(int p_type,CString p_name)
+    void MetaType(int p_type,XString p_name)
     {
       SQLInfoDB* info = m_database->GetSQLInfoDB();
       MMetaMap objects;
-      CString  errors;
+      XString  errors;
 
       if(info->MakeInfoMetaTypes(objects,errors,p_type))
       {
@@ -97,13 +97,13 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TableDiscovery(CString p_table)
+    void TableDiscovery(XString p_table)
     {
       Logger::WriteMessage("\nDO TABLE DISCOVERY: " + p_table);
 
       SQLInfoDB* info = m_database->GetSQLInfoDB();
       MTableMap tables;
-      CString   errors;
+      XString   errors;
 
       if(info->MakeInfoTableTable(tables,errors,"",p_table))
       {
@@ -111,8 +111,8 @@ namespace DatabaseUnitTest
 
         for(auto& table : tables)
         {
-          CString schema  = table.m_schema;
-          CString tabname = table.m_table;
+          XString schema  = table.m_schema;
+          XString tabname = table.m_table;
 
           Logger::WriteMessage("Table found: " + table.m_fullName);
 
@@ -132,9 +132,9 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ColumnsDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
+    void ColumnsDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
-      CString    errors;
+      XString    errors;
       MColumnMap columns;
 
       if(p_info->MakeInfoTableColumns(columns,errors,p_schema,p_table))
@@ -154,10 +154,10 @@ namespace DatabaseUnitTest
       }
     }
 
-    void PrimaryDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
+    void PrimaryDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
       MPrimaryMap primaries;
-      CString     errors;
+      XString     errors;
 
       if(p_info->MakeInfoTablePrimary(primaries,errors,p_schema,p_table))
       {
@@ -167,7 +167,7 @@ namespace DatabaseUnitTest
         {
           Logger::WriteMessage("Primary key constraint: " + primary.m_constraintName);
 
-          CString text;
+          XString text;
           text.Format("Primary key %d: %s"
                       ,primary.m_columnPosition
                       ,primary.m_columnName);
@@ -182,10 +182,10 @@ namespace DatabaseUnitTest
       }
     }
     
-    void ForeignDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
+    void ForeignDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
       MForeignMap references;
-      CString     errors;
+      XString     errors;
 
       if(p_info->MakeInfoTableForeign(references,errors,p_schema,p_table))
       {
@@ -202,10 +202,10 @@ namespace DatabaseUnitTest
       }
     }
 
-    void IndicesDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
+    void IndicesDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
       MIndicesMap statistics;
-      CString        errors;
+      XString        errors;
 
       if(p_info->MakeInfoTableStatistics(statistics,errors,p_schema,p_table,nullptr))
       {
@@ -223,10 +223,10 @@ namespace DatabaseUnitTest
       }
     }
 
-    void SpecialDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
+    void SpecialDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
       MSpecialsMap specials;
-      CString errors;
+      XString errors;
       if(p_info->MakeInfoTableSpecials(specials,errors,p_schema,p_table))
       {
         number_of_tests++;
@@ -243,14 +243,14 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TriggerDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
+    void TriggerDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
       MTriggerMap triggers;
-      CString errors;
+      XString errors;
 
       if(p_info->MakeInfoTableTriggers(triggers,errors,p_schema,p_table))
       {
-        CString line;
+        XString line;
 
         number_of_tests++;
         for(auto& trigger : triggers)
@@ -282,10 +282,10 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TabPrivDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_table)
+    void TabPrivDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
       MPrivilegeMap privileges;
-      CString errors;
+      XString errors;
 
       if(p_info->MakeInfoTablePrivileges(privileges,errors,p_schema,p_table))
       {
@@ -293,7 +293,7 @@ namespace DatabaseUnitTest
         number_of_tests++;
         for(auto& priv : privileges)
         {
-          CString line;
+          XString line;
           line.Format("Table privilege: %s was granted %s by %s"
                      ,priv.m_grantee
                      ,priv.m_privilege
@@ -308,14 +308,14 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ProcedureDiscovery(CString p_procedure)
+    void ProcedureDiscovery(XString p_procedure)
     {
       Logger::WriteMessage("\nDO PROCEDURE DISCOVERY: " + p_procedure);
 
       SQLInfoDB* info = m_database->GetSQLInfoDB();
 
       MProcedureMap procedures;
-      CString errors;
+      XString errors;
       if(info->MakeInfoPSMProcedures(procedures,errors,"",p_procedure))
       {
         number_of_tests++;
@@ -332,10 +332,10 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ParametersDiscovery(SQLInfoDB* p_info,CString p_schema,CString p_procedure)
+    void ParametersDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_procedure)
     {
       MParameterMap params;
-      CString errors;
+      XString errors;
 
       if(p_info->MakeInfoPSMParameters(params,errors,p_schema,p_procedure))
       {
@@ -352,10 +352,10 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TranslateSQLtoNative(CString p_sql)
+    void TranslateSQLtoNative(XString p_sql)
     {
       SQLInfoDB* info = m_database->GetSQLInfoDB();
-      CString translated = info->NativeSQL(NULL,p_sql);
+      XString translated = info->NativeSQL(NULL,p_sql);
 
       Logger::WriteMessage("TRANSLATE : " + p_sql);
       Logger::WriteMessage("Translated: " + translated);

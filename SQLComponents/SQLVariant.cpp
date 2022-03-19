@@ -157,8 +157,8 @@ SQLVariant::SQLVariant(const char* p_data)
   SetData(SQL_C_CHAR,p_data);
 }
 
-// XTOR SQL_C_CHAR FROM MFC CString
-SQLVariant::SQLVariant(CString& p_data)
+// XTOR SQL_C_CHAR FROM MFC XString
+SQLVariant::SQLVariant(XString& p_data)
 {
   Init();
   SetData(SQL_C_CHAR,(const char*)p_data);
@@ -875,7 +875,7 @@ SQLVariant::SetFromBinaryStreamData(int   p_type
 //////////////////////////////////////////////////////////////////////////
 
 void
-SQLVariant::GetAsString(CString& result)
+SQLVariant::GetAsString(XString& result)
 {
   if(m_indicator == SQL_NULL_DATA)
   {
@@ -957,7 +957,7 @@ SQLVariant::GetAsString(CString& result)
                                           if(m_data.m_dataTIMESTAMP.fraction)
                                           {
                                             // Fractions are in NANO-Second resolution
-                                            CString frac;
+                                            XString frac;
                                             frac.Format("%0.6f",(double)m_data.m_dataTIMESTAMP.fraction / 1000000000.0);
                                             result += frac.Mid(1);
                                           }
@@ -1154,7 +1154,7 @@ SQLVariant::GetAsChar()
   }
   // Should be: ThrowErrorDatatype(SQL_C_CHAR);
   // Sometimes we come her unexpectedly in various programs
-  CString waarde;
+  XString waarde;
   GetAsString(waarde);
   strncpy_s(g_waarde,waarde.GetString(),2 * sizeof(SQL_NUMERIC_STRUCT));
   return g_waarde;
@@ -2011,10 +2011,10 @@ SQLVariant::GetAsTimestamp()
 
 // European timestamp has the day-month-year order
 // instead of the standard 'year-month-day' order of a timestamp
-CString
+XString
 SQLVariant::GetAsEuropeanTimestamp()
 {
-  CString result;
+  XString result;
   if(m_datatype == SQL_C_TIMESTAMP ||
      m_datatype == SQL_C_TYPE_TIMESTAMP)
   {
@@ -2028,7 +2028,7 @@ SQLVariant::GetAsEuropeanTimestamp()
     if(m_data.m_dataTIMESTAMP.fraction)
     {
       // Nano-second resulution
-      CString frac;
+      XString frac;
       frac.Format("%0.6f",(double)m_data.m_dataTIMESTAMP.fraction / 1000000000.0);
       result += frac.Mid(1);
     }
@@ -2217,10 +2217,10 @@ SQLVariant::GetAsBCD()
 
 // Get the data as an string for a SQL expression or condition
 // So quotes and ODBC escapes matter
-CString
+XString
 SQLVariant::GetAsSQLString()
 {
-  CString value;
+  XString value;
   GetAsString(value);
 
   switch(m_datatype)
@@ -2845,14 +2845,14 @@ SQLVariant::StringToBinary(const char* p_data)
 
 //////////////////////////////////////////////////////////////////////////
 //
-// GENERAL ERRORS - THROWING A CString
+// GENERAL ERRORS - THROWING A XString
 //
 //////////////////////////////////////////////////////////////////////////
 
 void*
 SQLVariant::ThrowErrorDatatype(int p_getas)
 {
-  CString error;
+  XString error;
   const char* type  = SQLVariant::FindDatatype(m_datatype);
   const char* getas = SQLVariant::FindDatatype(p_getas);
   error.Format("Cannot get a %s as a %s datatype.",type,getas);

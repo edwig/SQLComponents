@@ -126,7 +126,7 @@ SQLTimestamp::SQLTimestamp(StampValue p_value,int p_fraction /*=0*/)
 
 // Construct from a string (e.g. from a user interface)
 //
-SQLTimestamp::SQLTimestamp(const CString& p_string)
+SQLTimestamp::SQLTimestamp(const XString& p_string)
 {
   SetTimestamp(p_string);
 }
@@ -153,13 +153,13 @@ SQLTimestamp::~SQLTimestamp()
 }
 
 void
-SQLTimestamp::Init(const CString& p_string)
+SQLTimestamp::Init(const XString& p_string)
 {
   ParseMoment(p_string);
 }
 
 void
-SQLTimestamp::SetTimestamp(const CString& p_string)
+SQLTimestamp::SetTimestamp(const XString& p_string)
 {
   ParseMoment(p_string);
 }
@@ -228,7 +228,7 @@ SQLTimestamp::RecalculateValue()
   if (day <= 0 || day > daysInMonth)
   {
     SetNull();
-    CString error;
+    XString error;
     error.Format("Day of the month must be between 1 and %ld inclusive.",daysInMonth);
     throw StdException(error);
   }
@@ -442,7 +442,7 @@ SQLTimestamp::WeekDay() const
 
 // Name of the day of the week in a language by your choice
 // Returns an empty string for a NULL timestamp
-CString
+XString
 SQLTimestamp::WeekDayName(Language p_lang /*=LN_DEFAULT*/) const
 {
   if(Valid())
@@ -461,7 +461,7 @@ SQLTimestamp::WeekDayName(Language p_lang /*=LN_DEFAULT*/) const
 
 // Name of the month in a language by your choice
 // Returns an emtpy string for a NULL timestamp
-CString
+XString
 SQLTimestamp::MonthName(Language p_lang /*=LN_DEFAULT*/) const
 {
   if(Valid())
@@ -676,13 +676,13 @@ SQLTimestamp::SecondsBetween(const SQLTimestamp& p_stamp) const
 }
 
 void
-SQLTimestamp::ParseMoment(const CString& p_string)
+SQLTimestamp::ParseMoment(const XString& p_string)
 {
-  CString string(p_string);
+  XString string(p_string);
   StampStorage temp;
-  CString currentDate = "";
-  CString sign		    = "";
-  CString extraTime   = "";
+  XString currentDate = "";
+  XString sign		    = "";
+  XString extraTime   = "";
   int     interval    = 0;
 
   // Trim spaces from string
@@ -713,7 +713,7 @@ SQLTimestamp::ParseMoment(const CString& p_string)
       if(interval || !extraTime.IsEmpty())
       {
         // Extra time definition not recognized
-        CString error;
+        XString error;
         error.Format("Extra timestamp not recognized: %d %s",interval,extraTime.GetString());
         throw StdException(error);
       }
@@ -730,7 +730,7 @@ SQLTimestamp::ParseMoment(const CString& p_string)
       if(interval || !extraTime.IsEmpty())
       {
         // Extra time definition not recognized
-        CString error;
+        XString error;
         error.Format("Extra timestamp not recognized: %d %s",interval,extraTime.GetString());
         throw StdException(error);
       }
@@ -794,8 +794,8 @@ SQLTimestamp::ParseMoment(const CString& p_string)
     {
       pos1 = pos2;
     }
-    CString dateString = p_string.Left(pos1);
-    CString timeString = p_string.Mid(pos1 + 1);
+    XString dateString = p_string.Left(pos1);
+    XString timeString = p_string.Mid(pos1 + 1);
 
     SQLDate date(dateString);
     SQLTime time(timeString); 
@@ -822,7 +822,7 @@ SQLTimestamp::ParseMoment(const CString& p_string)
 
 // Named timestamp with short or long monthnames
 bool
-SQLTimestamp::ParseNamedDate(const CString& p_string)
+SQLTimestamp::ParseNamedDate(const XString& p_string)
 {
   bool result = false;
   bool alpha  = false;
@@ -848,8 +848,8 @@ SQLTimestamp::ParseNamedDate(const CString& p_string)
     {
       timepos = pos - 1;
     }
-    CString timeString = p_string.Mid(timepos);
-    CString dateString = p_string.Left(timepos - 1);
+    XString timeString = p_string.Mid(timepos);
+    XString dateString = p_string.Left(timepos - 1);
 
     int year  = 0;
     int month = 0;
@@ -878,10 +878,10 @@ SQLTimestamp::ParseNamedDate(const CString& p_string)
 }
 
 // Returns eg. for all databases: 13-06-1966 19:00:05
-CString
+XString
 SQLTimestamp::AsString(int p_precision /*=0*/) const
 {
-  CString theStamp;
+  XString theStamp;
   if(IsNull() == false)
   {
     theStamp.Format("%02d-%02d-%04d %02d:%02d:%02d"
@@ -895,10 +895,10 @@ SQLTimestamp::AsString(int p_precision /*=0*/) const
   return theStamp;
 }
 
-CString
+XString
 SQLTimestamp::AsXMLString(int p_precision /*=0*/) const
 {
-  CString theStamp;
+  XString theStamp;
   if(IsNull() == false)
   {
     theStamp.Format("%04d-%02d-%02dT%02d:%02d:%02d"
@@ -912,10 +912,10 @@ SQLTimestamp::AsXMLString(int p_precision /*=0*/) const
   return theStamp;
 }
 
-CString  
+XString  
 SQLTimestamp::AsXMLStringUTC(int p_precision /*=0*/) const
 {
-  CString theStamp;
+  XString theStamp;
   if(IsNull() == false)
   {
     SQLTimestamp stamp(*this);
@@ -942,10 +942,10 @@ SQLTimestamp::AsXMLStringUTC(int p_precision /*=0*/) const
   return theStamp;
 }
 
-CString
+XString
 SQLTimestamp::AsReadString(int p_precision /*=0*/) const
 {
-  CString theStamp;
+  XString theStamp;
   if(IsNull() == false)
   {
     theStamp.Format("%02d-%02d-%04d %02d:%02d:%02d"
@@ -959,7 +959,7 @@ SQLTimestamp::AsReadString(int p_precision /*=0*/) const
   return theStamp;
 }
 
-CString 
+XString 
 SQLTimestamp::AsSQLString(SQLDatabase* p_database) const
 {
   if(p_database)
@@ -994,8 +994,8 @@ SQLTimestamp::AsTimeStampStruct(TIMESTAMP_STRUCT* p_struct) const
 }
 
 bool 
-SQLTimestamp::GetVirtualMoment(CString        p_sign
-                              ,CString        p_extraTime
+SQLTimestamp::GetVirtualMoment(XString        p_sign
+                              ,XString        p_extraTime
                               ,int            p_interval
                               ,StampStorage&  p_temp
                               ,bool           p_doTimes /*=true*/)
@@ -1068,10 +1068,10 @@ SQLTimestamp::GetVirtualMoment(CString        p_sign
 // Print the fraction to a string
 // Maximum resolution by W3C definition is nanoseconds (precision = 9)
 // Maximum resolution on a MS-Windows OS is 100 nanoseconds (precision = 7)
-CString
+XString
 SQLTimestamp::PrintFraction(int p_precision) const
 {
-  CString fract;
+  XString fract;
   if(m_fraction && p_precision)
   {
     // Standard precision = 3 decimal places

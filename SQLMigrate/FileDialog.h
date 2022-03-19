@@ -222,16 +222,16 @@ class DocFileDialog
 {
 public:
   DocFileDialog(bool    p_open              // true = open, false = SaveAs
-               ,CString p_title             // Title of the dialog
-               ,CString p_defext   = ""     // Default extension
-               ,CString p_filename = ""     // Default first file
+               ,XString p_title             // Title of the dialog
+               ,XString p_defext   = ""     // Default extension
+               ,XString p_filename = ""     // Default first file
                ,int     p_flags    = 0      // Default flags
-               ,CString p_filter  = ""      // Filter for extensions
-               ,CString p_direct  = "");    // Default directory to start in
+               ,XString p_filter  = ""      // Filter for extensions
+               ,XString p_direct  = "");    // Default directory to start in
   ~DocFileDialog();
 
   int     DoModal();
-  CString GetChosenFile();
+  XString GetChosenFile();
 
 private:
   void FilterString(char *filter);

@@ -3,16 +3,20 @@
 // This also affects IntelliSense performance, including code completion and many code browsing features.
 // However, files listed here are ALL re-compiled if any one of them is updated between builds.
 // Do not add files here that you will be updating frequently as this negates the performance advantage.
+#pragma once
 
-#ifndef PCH_H
-#define PCH_H
+#ifndef VC_EXTRALEAN
+#define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
+#endif
 
-// add headers that you want to pre-compile here
+#include "targetver.h"
 #include "framework.h"
 
-// Include our library
-#include "SQLComponents.h"
+// Include our libraries
+#include <BaseLibrary.h>
+#include <SQLComponents.h>
 
+// Using SQLComponents throughout this program
 using namespace SQLComponents;
 
 #if defined _M_IX86
@@ -24,5 +28,3 @@ using namespace SQLComponents;
 #else
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #endif
-
-#endif //PCH_H

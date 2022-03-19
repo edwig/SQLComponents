@@ -67,11 +67,11 @@ TestXMLPeriods()
   printf("Testing XML duriation period to SQL Interval\n");
   printf("============================================\n");
 
-  CString period("P20578DT14H22M8S");
+  XString period("P20578DT14H22M8S");
 
   SQLInterval intval(period);
   SQLVariant one(&intval);
-  CString oneString;
+  XString oneString;
   one.GetAsString(oneString);
 
   printf("XML Duration period is: %s\n",period.GetString());
@@ -85,7 +85,7 @@ TestGUIDs()
   printf("Testing SQLGUID strings in SQLVariants\n");
   printf("======================================\n");
 
-  CString guidString = "{AABBCCDD-0899-6677-1122-030455667788}";
+  XString guidString = "{AABBCCDD-0899-6677-1122-030455667788}";
   SQLGUID guid;
   guid.Data1 = 0xAABBCCDD;
   guid.Data2 = 0x0899;    // Check that this 0 comes through
@@ -101,7 +101,7 @@ TestGUIDs()
 
   // Testing SQLGUID to SQLVariant
   SQLVariant one(&guid);
-  CString oneString;
+  XString oneString;
   one.GetAsString(oneString);
 
   printf("String to be converted to GUID : %s\n",guidString.GetString());
@@ -117,10 +117,10 @@ TestGUIDs()
   two.SetData(SQL_C_GUID,guidString);
   two.GetAsString(oneString);
 
-  printf("SQLVariant GUID from CString   : %s\n",oneString.GetString());
+  printf("SQLVariant GUID from XString   : %s\n",oneString.GetString());
   if(guidString.CompareNoCase(oneString))
   {
-    printf("ERROR: Conversion CString -> SQLVariant\n");
+    printf("ERROR: Conversion XString -> SQLVariant\n");
   }
 }
 
@@ -234,12 +234,12 @@ TestNamedDates()
   
   g_defaultLanguage = LN_DUTCH;
  
-  CString string1("20 jan 2001");    SQLDate date1(string1);
-  CString string2("jan 5 01");       SQLDate date2(string2);
-  CString string3("16 februari");    SQLDate date3(string3);
-  CString string4("18 maart 2017");  SQLDate date4(string4);
-  CString string5("september 16");   SQLDate date5(string5);
-  CString string6("5-11");           SQLDate date6(string6);
+  XString string1("20 jan 2001");    SQLDate date1(string1);
+  XString string2("jan 5 01");       SQLDate date2(string2);
+  XString string3("16 februari");    SQLDate date3(string3);
+  XString string4("18 maart 2017");  SQLDate date4(string4);
+  XString string5("september 16");   SQLDate date5(string5);
+  XString string6("5-11");           SQLDate date6(string6);
   
   printf("Input [%-20s] Datum: %s\n",string1.GetString(),date1.AsString().GetString());
   printf("Input [%-20s] Datum: %s\n",string2.GetString(),date2.AsString().GetString());
@@ -253,12 +253,12 @@ TestNamedDates()
   printf("============================\n");
   
                                             SQLTimestamp stamp1(string1);
-  CString string7("22 mei 1961 11:20:33");  SQLTimestamp stamp7(string7);
-  CString string8("jan 5 01 22:18:01");     SQLTimestamp stamp8(string8);
-  CString string9("16 februari 15:17:45");  SQLTimestamp stamp9(string9);
-  CString strng10("18 maart 2017 23:22");   SQLTimestamp stmp10(strng10);
-  CString strng11("september 16 6:7:12");   SQLTimestamp stmp11(strng11);
-  CString strng12("5-11 3:2:6");            SQLTimestamp stmp12(strng12);
+  XString string7("22 mei 1961 11:20:33");  SQLTimestamp stamp7(string7);
+  XString string8("jan 5 01 22:18:01");     SQLTimestamp stamp8(string8);
+  XString string9("16 februari 15:17:45");  SQLTimestamp stamp9(string9);
+  XString strng10("18 maart 2017 23:22");   SQLTimestamp stmp10(strng10);
+  XString strng11("september 16 6:7:12");   SQLTimestamp stmp11(strng11);
+  XString strng12("5-11 3:2:6");            SQLTimestamp stmp12(strng12);
   
   printf("Input [%-30s] Timestamp: %s\n",string1.GetString(),stamp1.AsString().GetString());
   printf("Input [%-30s] Timestamp: %s\n",string7.GetString(),stamp7.AsString().GetString());

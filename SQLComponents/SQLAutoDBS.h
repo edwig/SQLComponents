@@ -35,7 +35,7 @@ namespace SQLComponents
 class SQLAutoDBS
 {
 public:
-  SQLAutoDBS(SQLDatabasePool& p_pool,CString p_connection)
+  SQLAutoDBS(SQLDatabasePool& p_pool,XString p_connection)
             :m_pool(p_pool)
   {
     m_database = m_pool.GetDatabase(p_connection);

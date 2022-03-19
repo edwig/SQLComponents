@@ -155,7 +155,7 @@ BOOL SQLConnectionsDlg::OnInitDialog()
 	if (pSysMenu != nullptr)
 	{
 		BOOL bNameValid;
-		CString strAboutMenu;
+		XString strAboutMenu;
 		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
 		ASSERT(bNameValid);
 		if (!strAboutMenu.IsEmpty())
@@ -426,7 +426,7 @@ SQLConnectionsDlg::MakeCurrentConnection()
 bool
 SQLConnectionsDlg::SanityChecks(int p_index)
 {
-  CString errors;
+  XString errors;
 
 	for (int i = 0; i < m_list.GetItemCount(); ++i)
 	{
@@ -458,14 +458,14 @@ SQLConnectionsDlg::SanityChecks(int p_index)
 void
 SQLConnectionsDlg::TestTheConnection()
 {
-  CString error;
+  XString error;
 
   try
   {
     SQLDatabase database;
     if(database.Open(m_datasource,m_username,m_password1))
     {
-      CString message;
+      XString message;
       message.Format("The connection with [%s] as user [%s] has succeeded!\n\n"
                      "The 'true' database name is: %s\n"
                      "This database is a [%s:%s] database\n"
@@ -488,7 +488,7 @@ SQLConnectionsDlg::TestTheConnection()
   {
     error = ex.GetErrorMessage();
   }
-  catch(CString& err)
+  catch(XString& err)
   {
     error = err;
   }
@@ -575,7 +575,7 @@ SQLConnectionsDlg::OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 void 
 SQLConnectionsDlg::OnEnChangeName()
 {
-  CString name = m_connectionName;
+  XString name = m_connectionName;
   UpdateData();
   if(name.Compare(m_connectionName))
   {
@@ -589,7 +589,7 @@ SQLConnectionsDlg::OnCbnCloseupDatasource()
   int ind = m_comboDatasource.GetCurSel();
   if(ind >= 0)
   {
-    CString datasource;
+    XString datasource;
     m_comboDatasource.GetLBText(ind,datasource);
     if(datasource.Compare(m_datasource))
     {
@@ -603,7 +603,7 @@ SQLConnectionsDlg::OnCbnCloseupDatasource()
 void 
 SQLConnectionsDlg::OnEnChangeUser()
 {
-  CString user = m_username;
+  XString user = m_username;
   UpdateData();
   if(user.Compare(m_username))
   {
@@ -614,7 +614,7 @@ SQLConnectionsDlg::OnEnChangeUser()
 void 
 SQLConnectionsDlg::OnEnChangePassword1()
 {
-  CString password = m_password1;
+  XString password = m_password1;
   UpdateData();
   if (password.Compare(m_password1))
   {
@@ -625,7 +625,7 @@ SQLConnectionsDlg::OnEnChangePassword1()
 void 
 SQLConnectionsDlg::OnEnChangePassword2()
 {
-  CString password = m_password2;
+  XString password = m_password2;
   UpdateData();
   if (password.Compare(m_password2))
   {
@@ -636,7 +636,7 @@ SQLConnectionsDlg::OnEnChangePassword2()
 void 
 SQLConnectionsDlg::OnEnChangeOptions()
 {
-  CString options = m_options;
+  XString options = m_options;
   UpdateData();
   if (options.Compare(m_options))
   {

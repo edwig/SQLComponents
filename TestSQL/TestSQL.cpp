@@ -35,10 +35,10 @@
 // in the project root folder
 //
 // TESTING 
-CString g_dsn("testing");
-CString g_user("sysdba");
-CString g_password("altijd");
-CString g_schema("sysdba");
+XString g_dsn("testing");
+XString g_user("sysdba");
+XString g_password("altijd");
+XString g_schema("sysdba");
 
 void CALLBACK LogPrint(void* p_context,const char* p_text)
 {

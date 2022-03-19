@@ -40,14 +40,14 @@ namespace DatabaseUnitTest
   // DSN "testing" points to the "testing.fdb" database
   // in the project root folder
   //
-  CString g_dsn("testing");
-  CString g_user("sysdba");
-  CString g_password("altijd");
-  CString g_schema("");
+  XString g_dsn("testing");
+  XString g_user("sysdba");
+  XString g_password("altijd");
+  XString g_schema("");
 
   void CALLBACK LogPrint(void* p_context,const char* p_text)
   {
-    CString message((const char*)p_context);
+    XString message((const char*)p_context);
     message += p_text;
     Logger::WriteMessage(message);
   }
@@ -93,7 +93,7 @@ namespace DatabaseUnitTest
         Assert::Fail(L"Database ***NOT*** opened. Reason:");
       }
       long endTime = clock();
-      CString performance;
+      XString performance;
       performance.Format("Open  test performed in: %.6f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(performance);
       //////////////////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("In unit test Database query function");
 
       double grandTotal = 0.0;
-      CString sql("SELECT id\n"
+      XString sql("SELECT id\n"
                   "      ,invoice\n"
                   "      ,description\n" 
                   "      ,total\n" 
@@ -143,7 +143,7 @@ namespace DatabaseUnitTest
           {
             long    id       = query[1];
             long    invoice  = query[2];
-            CString descript = query[3];
+            XString descript = query[3];
             double  total    = query[4];
 
             grandTotal += total;
@@ -171,7 +171,7 @@ namespace DatabaseUnitTest
     // For DATASET tests
     double TestAppend(SQLDatabase* p_dbs,int p_master)
     {
-      CString msg;
+      XString msg;
       Logger::WriteMessage("Testing the DataSet append function:");
       Logger::WriteMessage("====================================");
 
@@ -237,7 +237,7 @@ namespace DatabaseUnitTest
 
     double ReadDetailSet(SQLDatabase* p_dbs,int p_master)
     {
-      CString msg;
+      XString msg;
       SQLDataSet details("detail",p_dbs);
       details.SetPrimaryTable(g_schema,"detail");
       details.SetPrimaryKeyColumn("id");
@@ -246,7 +246,7 @@ namespace DatabaseUnitTest
       number_of_tests += 4;
 
       // Alternatively to "SetSelection", we may specify a complete query
-      //   CString sql("SELECT id\n"
+      //   XString sql("SELECT id\n"
       //               "      ,mast_id\n"
       //               "      ,line\n"
       //               "      ,description\n"
@@ -286,12 +286,12 @@ namespace DatabaseUnitTest
 
     double ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
     {
-      CString msg;
+      XString msg;
       SQLDataSet master("master",p_dbs);
       master.SetPrimaryTable(g_schema,"master");
       master.SetPrimaryKeyColumn("id");
       master.SetParameter("key",SQLVariant(p_master));
-      CString sql("SELECT id\n"
+      XString sql("SELECT id\n"
                   "      ,invoice\n"
                   "      ,description\n"
                   "      ,total\n"
@@ -384,7 +384,7 @@ namespace DatabaseUnitTest
       long endTime = clock();
       number_of_tests++;
 
-      CString msg;
+      XString msg;
       msg.Format("DATASET test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(msg);
     }
@@ -415,7 +415,7 @@ namespace DatabaseUnitTest
         {
           Logger::WriteMessage("Database opened.");
 
-          CString sql = "SELECT field2,field3 FROM test_number";
+          XString sql = "SELECT field2,field3 FROM test_number";
           SQLQuery query(&dbs);
 
           query.DoSQLStatement(sql);
@@ -424,7 +424,7 @@ namespace DatabaseUnitTest
             double field1 = query[1];
             bcd    field2 = query[2];
 
-            CString msg;
+            XString msg;
             msg.Format("Field 1 [%.4f] Field 2 [%s]",field1,field2.AsString());
             Logger::WriteMessage(msg);
           }
@@ -432,7 +432,7 @@ namespace DatabaseUnitTest
 
           // Change value
           SQLTransaction trans(&dbs,"UpdNum");
-          CString sql2 = "UPDATE test_number\n"
+          XString sql2 = "UPDATE test_number\n"
                          "   SET field3 = ?\n"
                          " WHERE id     = 1";
           bcd num(3034.6);
@@ -476,7 +476,7 @@ namespace DatabaseUnitTest
       long endTime = clock();
       number_of_tests++;
 
-      CString msg;
+      XString msg;
       msg.Format("NUMERIC test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(msg);
     }
@@ -496,7 +496,7 @@ namespace DatabaseUnitTest
       if(masterRecord)
       {
         SQLVariant* desc = masterRecord->GetField("description");
-        CString name;
+        XString name;
         desc->GetAsString(name);
         Logger::WriteMessage("Master record: " + name);
       }
@@ -550,8 +550,8 @@ namespace DatabaseUnitTest
           // Set up the datasets
           SQLDataSet master("master",&dbs);
           SQLDataSet detail("detail",&dbs);
-          CString    masterQuery = "SELECT * FROM master";
-          CString    detailQuery = "SELECT * FROM detail";
+          XString    masterQuery = "SELECT * FROM master";
+          XString    detailQuery = "SELECT * FROM detail";
 
           master.SetQuery(masterQuery);
           detail.SetQuery(detailQuery);
@@ -595,28 +595,28 @@ namespace DatabaseUnitTest
     //
     //////////////////////////////////////////////////////////////////////////
 
-    void ReportString(CString p_prompt,CString p_info)
+    void ReportString(XString p_prompt,XString p_info)
     {
-      CString text;
+      XString text;
       text.Format("%s %s",p_prompt,p_info);
       Logger::WriteMessage(text);
     }
 
-    void ReportBoolean(CString p_prompt,bool p_info)
+    void ReportBoolean(XString p_prompt,bool p_info)
     {
-      CString text;
+      XString text;
       text.Format("%s %s",p_prompt,p_info ? "true" : "false");
       Logger::WriteMessage(text);
     }
 
-    void ReportLong(CString p_prompt,long p_info)
+    void ReportLong(XString p_prompt,long p_info)
     {
-      CString text;
+      XString text;
       text.Format("%s %d",p_prompt,p_info);
       Logger::WriteMessage(text);
     }
 
-    void ReportSQL(CString p_prompt,CString p_sql)
+    void ReportSQL(XString p_prompt,XString p_sql)
     {
       Logger::WriteMessage(p_prompt);
       if(p_sql.IsEmpty())
@@ -631,28 +631,28 @@ namespace DatabaseUnitTest
 
     void ReportDBInfo(SQLInfoDB* p_info)
     {
-      CString schema ("dbo");
-      CString table  ("master");
-      CString column ("id");
-      CString type   ("integer");
-      CString select ("SELECT id FROM master\n");
-      CString columns("oid,description,amount");
-      CString procedure("procedure");
-      CString mode("auto");
-      CString destiny("variable");
-      CString source("\'Test'\"");
-      CString indexname("01_master_id");
-      CString condition("variable IS NOT NULL");
-      CString foreign("fk_master_one");
-      CString triggername("master_check");
-      CString viewname("myview");
-      CString procedurename("calculate");
-      CString tabledef("(ID INTEGER,NAME VARCHAR(200),NUMBER DECIMAL(14,2));");
-      CString precursor;
-      CString cursorname("selcursor");
-      CString splParam1("CHAR");
-      CString splParam2("NUMERIC");
-      CString quoteString("This is 'a' string");
+      XString schema ("dbo");
+      XString table  ("master");
+      XString column ("id");
+      XString type   ("integer");
+      XString select ("SELECT id FROM master\n");
+      XString columns("oid,description,amount");
+      XString procedure("procedure");
+      XString mode("auto");
+      XString destiny("variable");
+      XString source("\'Test'\"");
+      XString indexname("01_master_id");
+      XString condition("variable IS NOT NULL");
+      XString foreign("fk_master_one");
+      XString triggername("master_check");
+      XString viewname("myview");
+      XString procedurename("calculate");
+      XString tabledef("(ID INTEGER,NAME VARCHAR(200),NUMBER DECIMAL(14,2));");
+      XString precursor;
+      XString cursorname("selcursor");
+      XString splParam1("CHAR");
+      XString splParam2("NUMERIC");
+      XString quoteString("This is 'a' string");
       int     statements = 0;
       bool    notnull    = true;
 
@@ -673,8 +673,8 @@ namespace DatabaseUnitTest
       MetaSequence sequence;
       MetaProcedure metaproc;
       MParameterMap parameters;
-      std::vector<CString> cursorcolumns;    // Cursor fetch
-      std::vector<CString> cursorparameters; // Fetch into
+      std::vector<XString> cursorcolumns;    // Cursor fetch
+      std::vector<XString> cursorparameters; // Fetch into
 
       // RDBMS
       ReportLong   ("Database type                      :",p_info->GetRDBMSDatabaseType());

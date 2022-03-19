@@ -359,7 +359,7 @@ SQLError::~SQLError()
 }
 
 SQLState*
-SQLError::GetSQLState(CString p_sqlState)
+SQLError::GetSQLState(XString p_sqlState)
 {
   int size = sizeof(sql_states) / sizeof(SQLState);
   
@@ -373,10 +373,10 @@ SQLError::GetSQLState(CString p_sqlState)
   return NULL;
 }
 
-CString   
-SQLError::GetSQLStateFormatted(CString p_sqlState)
+XString   
+SQLError::GetSQLStateFormatted(XString p_sqlState)
 {
-  CString error;
+  XString error;
   SQLState* state = GetSQLState(p_sqlState);
   if(state == NULL)
   {

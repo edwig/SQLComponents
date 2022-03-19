@@ -96,40 +96,40 @@ namespace OperatorUnitTest
       TestNegate("fieldname",OP_LikeMiddle,valText,"NOT fieldname LIKE '%Text%' : Text");
     }
 
-    void TestFilter(CString p_field,SQLOperator p_oper,SQLVariant& p_variant,CString p_expect)
+    void TestFilter(XString p_field,SQLOperator p_oper,SQLVariant& p_variant,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
-      CString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
 
-    void TestNegate(CString p_field,SQLOperator p_oper,SQLVariant& p_variant,CString p_expect)
+    void TestNegate(XString p_field,SQLOperator p_oper,SQLVariant& p_variant,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
       filter.Negate();
-      CString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
 
-    void TestBetween(CString     p_field
+    void TestBetween(XString     p_field
                     ,SQLOperator p_oper
                     ,SQLVariant& p_variant1
                     ,SQLVariant& p_variant2
-                    ,CString     p_expect)
+                    ,XString     p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant1);
       filter.AddValue(&p_variant2);
-      CString condition = filter.GetSQLFilter(query) + " : " + p_variant1.GetAsChar();
-      condition += CString(" : ") + p_variant2.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + " : " + p_variant1.GetAsChar();
+      condition += XString(" : ") + p_variant2.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -141,36 +141,36 @@ namespace OperatorUnitTest
       number_of_tests++;
     }
 
-    void TestIN(CString     p_field
+    void TestIN(XString     p_field
                ,SQLOperator p_oper
                ,SQLVariant& p_variant1
                ,SQLVariant& p_variant2
                ,SQLVariant& p_variant3
                ,SQLVariant& p_variant4
-               ,CString     p_expect)
+               ,XString     p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant1);
       filter.AddValue(&p_variant2);
       filter.AddValue(&p_variant3);
       filter.AddValue(&p_variant4);
-      CString condition = filter.GetSQLFilter(query);
-      condition += CString(" : ") + p_variant1.GetAsChar();
-      condition += CString(" : ") + p_variant2.GetAsChar();
-      condition += CString(" : ") + p_variant3.GetAsChar();
-      condition += CString(" : ") + p_variant4.GetAsChar();
+      XString condition = filter.GetSQLFilter(query);
+      condition += XString(" : ") + p_variant1.GetAsChar();
+      condition += XString(" : ") + p_variant2.GetAsChar();
+      condition += XString(" : ") + p_variant3.GetAsChar();
+      condition += XString(" : ") + p_variant4.GetAsChar();
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
 
-    void TestExpression(CString p_field,SQLOperator p_oper,CString p_expression,CString p_expect)
+    void TestExpression(XString p_field,SQLOperator p_oper,XString p_expression,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
       filter.AddExpression(p_expression);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("Filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -292,33 +292,33 @@ namespace OperatorUnitTest
       TestFunctionString2 ("fieldname",OP_Equal,FN_IFNULL,          "other", "other", "{fn IFNULL(fieldname,?)} = ?");
     }
 
-    void TestFunctionConstant(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_expect)
+    void TestFunctionConstant(XString p_field,SQLOperator p_oper,SQLFunction p_function,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
       filter.SetFunction(p_function);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("Filter with constant: " + condition);
       Assert::AreEqual(p_expect.GetString(), condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionString1(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_value,CString p_expect)
+    void TestFunctionString1(XString p_field,SQLOperator p_oper,SQLFunction p_function,XString p_value,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
       SQLVariant val(p_value);
       filter.SetFunction(p_function);
       filter.AddValue(&val);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("String function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionString2(CString p_field,SQLOperator p_oper,SQLFunction p_function,CString p_value1,CString p_value2,CString p_expect)
+    void TestFunctionString2(XString p_field,SQLOperator p_oper,SQLFunction p_function,XString p_value1,XString p_value2,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -327,16 +327,16 @@ namespace OperatorUnitTest
       filter.SetFunction(p_function);
       filter.AddValue(&val1);
       filter.AddValue(&val2);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("String function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionString3(CString p_field,SQLOperator p_oper,SQLFunction p_function
-                            ,CString p_value1,CString p_value2,CString p_value3
-                            ,CString p_expect)
+    void TestFunctionString3(XString p_field,SQLOperator p_oper,SQLFunction p_function
+                            ,XString p_value1,XString p_value2,XString p_value3
+                            ,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -347,16 +347,16 @@ namespace OperatorUnitTest
       filter.AddValue(&val1);
       filter.AddValue(&val2);
       filter.AddValue(&val3);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("String function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionString4(CString p_field,SQLOperator p_oper,SQLFunction p_function
-                            ,CString p_value1,CString p_value2,CString p_value3,CString p_value4
-                            ,CString p_expect)
+    void TestFunctionString4(XString p_field,SQLOperator p_oper,SQLFunction p_function
+                            ,XString p_value1,XString p_value2,XString p_value3,XString p_value4
+                            ,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -369,28 +369,28 @@ namespace OperatorUnitTest
       filter.AddValue(&val2);
       filter.AddValue(&val3);
       filter.AddValue(&val4);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("String function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionNumber1(CString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number,CString p_expect)
+    void TestFunctionNumber1(XString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
       SQLVariant val1(&p_number);
       filter.SetFunction(p_function);
       filter.AddValue(&val1);
-      CString  condition = filter.GetSQLFilter(query);
+      XString  condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("Number function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionNumber2(CString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number1,bcd p_number2,CString p_expect)
+    void TestFunctionNumber2(XString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number1,bcd p_number2,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -399,14 +399,14 @@ namespace OperatorUnitTest
       filter.SetFunction(p_function);
       filter.AddValue(&val1);
       filter.AddValue(&val2);
-      CString  condition = filter.GetSQLFilter(query);
+      XString  condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("Number function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionExtract(CString p_field,SQLOperator p_oper,SQLFunction p_function,SQLExtractPart p_part,CString p_value,CString p_expect)
+    void TestFunctionExtract(XString p_field,SQLOperator p_oper,SQLFunction p_function,SQLExtractPart p_part,XString p_value,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -414,14 +414,14 @@ namespace OperatorUnitTest
       filter.SetFunction(p_function);
       filter.SetExtractPart(p_part);
       filter.AddValue(&val1);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("EXTRACT function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(), condition.GetString());
       ++number_of_tests;
     }
 
-    void TestFunctionTSCalc(CString p_field,SQLOperator p_oper,SQLFunction p_function,SQLTimestampCalcPart p_part,int p_add,CString p_value,CString p_expect)
+    void TestFunctionTSCalc(XString p_field,SQLOperator p_oper,SQLFunction p_function,SQLTimestampCalcPart p_part,int p_add,XString p_value,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field, p_oper);
@@ -431,7 +431,7 @@ namespace OperatorUnitTest
       filter.SetTimestampPart(p_part);
       filter.AddValue(&val1);
       filter.AddValue(&val2);
-      CString condition = filter.GetSQLFilter(query);
+      XString condition = filter.GetSQLFilter(query);
 
       Logger::WriteMessage("TIMSTAMP ADD/DIFF function filter: " + condition);
       Assert::AreEqual(p_expect.GetString(), condition.GetString());

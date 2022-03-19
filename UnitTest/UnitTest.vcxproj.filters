@@ -13,19 +13,22 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Configuration">
+      <UniqueIdentifier>{123e5452-87cf-4de7-a086-22ae08f662f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HPFCounter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UnitTest.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Configuration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -51,9 +54,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TestBCD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HPFCounter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VariantFormatting.cpp">

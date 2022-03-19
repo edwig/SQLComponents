@@ -108,14 +108,14 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          CString leftType  = left ->FindDatatype(left ->GetDataType());
-          CString rightType = right->FindDatatype(right->GetDataType());
-          CString message;
+          XString leftType  = left ->FindDatatype(left ->GetDataType());
+          XString rightType = right->FindDatatype(right->GetDataType());
+          XString message;
           message.Format("Add test %s + %s",leftType,rightType);
           Logger::WriteMessage(message);
 
           SQLVariant result = *left + *right; // TEST
-          CString res;
+          XString res;
           result.GetAsString(res);
 
           if(x == CT_CHAR && y == CT_CHAR)
@@ -153,9 +153,9 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          CString leftType  = left->FindDatatype(left->GetDataType());
-          CString rightType = right->FindDatatype(right->GetDataType());
-          CString message;
+          XString leftType  = left->FindDatatype(left->GetDataType());
+          XString rightType = right->FindDatatype(right->GetDataType());
+          XString message;
           message.Format("Subtraction test %s - %s",leftType,rightType);
           Logger::WriteMessage(message);
 
@@ -167,7 +167,7 @@ namespace OperatorUnitTest
           {
             ++numtests;
             SQLVariant result = *left - *right; // TEST
-            CString res;
+            XString res;
             result.GetAsString(res);
 
             if (res.Compare("37") && res.Compare("37.00"))
@@ -181,7 +181,7 @@ namespace OperatorUnitTest
       }
       FreeArrays();
 
-      CString msg;
+      XString msg;
       msg.Format("Number of subtraction tests: %d",numtests);
       Logger::WriteMessage(msg);
     }
@@ -203,9 +203,9 @@ namespace OperatorUnitTest
           SQLVariant* left = &variants[x];
           SQLVariant* right = &other[y];
 
-          CString leftType  = left->FindDatatype(left->GetDataType());
-          CString rightType = right->FindDatatype(right->GetDataType());
-          CString message;
+          XString leftType  = left->FindDatatype(left->GetDataType());
+          XString rightType = right->FindDatatype(right->GetDataType());
+          XString message;
           message.Format("Multiplication test %s * %s",leftType,rightType);
           Logger::WriteMessage(message);
 
@@ -217,7 +217,7 @@ namespace OperatorUnitTest
           else
           {
             SQLVariant result = *left * *right; // TEST
-            CString res;
+            XString res;
             result.GetAsString(res);
 
             if(res.Compare("210") && res.Compare("210.00"))
@@ -248,9 +248,9 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          CString leftType  = left ->FindDatatype(left ->GetDataType());
-          CString rightType = right->FindDatatype(right->GetDataType());
-          CString message;
+          XString leftType  = left ->FindDatatype(left ->GetDataType());
+          XString rightType = right->FindDatatype(right->GetDataType());
+          XString message;
           message.Format("Division test %s / %s",leftType,rightType);
           Logger::WriteMessage(message);
 
@@ -261,7 +261,7 @@ namespace OperatorUnitTest
           else
           {
             SQLVariant result = *left / *right; // TEST
-            CString res;
+            XString res;
             result.GetAsString(res);
             res.TrimRight('0');
 
@@ -293,9 +293,9 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          CString leftType  = left ->FindDatatype(left ->GetDataType());
-          CString rightType = right->FindDatatype(right->GetDataType());
-          CString message;
+          XString leftType  = left ->FindDatatype(left ->GetDataType());
+          XString rightType = right->FindDatatype(right->GetDataType());
+          XString message;
           message.Format("Modulo test %s %% %s",leftType,rightType);
           Logger::WriteMessage(message);
 
@@ -306,7 +306,7 @@ namespace OperatorUnitTest
           else
           {
             SQLVariant result = *left % *right; // TEST
-            CString res;
+            XString res;
             result.GetAsString(res);
             res.TrimRight('0');
             res.TrimRight('.');

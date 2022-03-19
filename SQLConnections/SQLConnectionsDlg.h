@@ -68,12 +68,12 @@ protected:
   CButton    m_buttonOK;
   CButton    m_buttonCancel;
 
-  CString   m_connectionName;
-  CString   m_datasource;
-  CString   m_username;
-  CString   m_password1;
-  CString   m_password2;
-  CString   m_options;
+  XString   m_connectionName;
+  XString   m_datasource;
+  XString   m_username;
+  XString   m_password1;
+  XString   m_password2;
+  XString   m_options;
 
   CEdit      m_editConnectionName;
   CEdit      m_editUsername;

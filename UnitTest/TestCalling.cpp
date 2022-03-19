@@ -34,10 +34,10 @@ namespace DatabaseUnitTest
 {
   void CALLBACK LogPrint(void* p_context,const char* p_text);
   int  CALLBACK LogLevel(void* p_context);
-  extern CString g_dsn;
-  extern CString g_user;
-  extern CString g_password;
-  extern CString g_schema;
+  extern XString g_dsn;
+  extern XString g_user;
+  extern XString g_password;
+  extern XString g_schema;
 
   TEST_CLASS(TestCallingFunctions)
   {
@@ -97,7 +97,7 @@ namespace DatabaseUnitTest
     {
       SQLQuery query(m_database);
       SQLTransaction trans(m_database,"DelSet");
-      CString sql = "DELETE FROM test_record";
+      XString sql = "DELETE FROM test_record";
       query.DoSQLStatementNonQuery(sql);
       trans.Commit();
       number_of_tests++;
@@ -108,15 +108,15 @@ namespace DatabaseUnitTest
       int programCount  = 0;
       int duplicatCount = 0;
 
-      CString dup = m_duplicate + m_duplicate;
+      XString dup = m_duplicate + m_duplicate;
 
       SQLQuery query(m_database);
       SQLTransaction trans(m_database,"DelSet");
-      CString sql = "SELECT * FROM test_record";
+      XString sql = "SELECT * FROM test_record";
       query.DoSQLStatement(sql);
       while(query.GetRecord())
       {
-        CString name = query[1];
+        XString name = query[1];
 
         if(name.Compare(m_program) == 0) ++programCount;
         if(name.Compare(dup)       == 0) ++duplicatCount;
@@ -132,7 +132,7 @@ namespace DatabaseUnitTest
 
     void TestCalling()
     {
-      CString text;
+      XString text;
       Logger::WriteMessage("Testing FUNCTION CALL interface...");
 
       // Call with 1 input and 1 output parameter
@@ -174,12 +174,12 @@ namespace DatabaseUnitTest
       res = q2.DoSQLCall(g_schema,"multinout",true);
 
       bcd number = res->GetAsBCD();
-      CString restext = q2.GetParameter(2)->GetAsChar();
+      XString restext = q2.GetParameter(2)->GetAsChar();
       text.Format("Result of MULTINOUT: [%s] [%s]\n",number.AsString(),restext.GetString());
       Logger::WriteMessage(text);
 
       Assert::AreEqual(77.88,number.AsDouble());
-      CString dub = m_duplicate + m_duplicate;
+      XString dub = m_duplicate + m_duplicate;
       Assert::AreEqual(dub.GetString(),restext.GetString());
       number_of_tests++;
 
@@ -189,8 +189,8 @@ namespace DatabaseUnitTest
 
   private:
     SQLDatabase* m_database  = nullptr;
-    CString      m_program   = "Testing from within a program." ;
-    CString      m_duplicate = "Multiple duplicate testing.";
+    XString      m_program   = "Testing from within a program." ;
+    XString      m_duplicate = "Multiple duplicate testing.";
   };
 }
 

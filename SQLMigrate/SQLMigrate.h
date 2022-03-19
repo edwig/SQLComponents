@@ -50,8 +50,8 @@ private:
   void     CheckMigrateParameters();
   void     WriteMigrateParameters();
 
-  int      ReadTableStructures(CString p_owner,CString p_patroon,SQLDatabase* p_database);
-  void     ReadTablesFromFile (CString& p_bestand);
+  int      ReadTableStructures(XString p_owner,XString p_patroon,SQLDatabase* p_database);
+  void     ReadTablesFromFile (XString& p_bestand);
   void     RemoveTemporaries();
   // Processing
   void     DropTables();
@@ -60,27 +60,27 @@ private:
   void     FillTablesViaPump();
   void     FillTablesViaData(bool p_process);
   void     TruncateTables();
-  int      FindColumn(MColumnMap& p_columns,CString p_name);
+  int      FindColumn(MColumnMap& p_columns,XString p_name);
 
   void     OrderTableColumns(DDLCreateTable& p_create);
   void     FixupTableColumns(DDLCreateTable& p_create);
   void     FixupTableIndices(DDLCreateTable& p_create);
 
   // Statements
-  CString  MakeSelectStatement    (CString& p_tabel,CString& p_user);
-  CString  MakeInsertStatement    (CString& p_tabel,CString& p_user,CString& p_doel_user);
-  CString  MakeInsertDataStatement(CString& p_tabel,CString& p_target_schema,SQLQuery& p_input,MColumnMap& kolommen);
-  CString  MakeIdentityStatement  (CString p_vendor,CString p_user,CString p_tabel);
+  XString  MakeSelectStatement    (XString& p_tabel,XString& p_user);
+  XString  MakeInsertStatement    (XString& p_tabel,XString& p_user,XString& p_doel_user);
+  XString  MakeInsertDataStatement(XString& p_tabel,XString& p_target_schema,SQLQuery& p_input,MColumnMap& kolommen);
+  XString  MakeIdentityStatement  (XString p_vendor,XString p_user,XString p_tabel);
 
-  CString  VariantToInsertString  (SQLVariant* p_var,int p_datatype);
-  long     CountTableContents     (CString  p_owner,CString& tabel);
+  XString  VariantToInsertString  (SQLVariant* p_var,int p_datatype);
+  long     CountTableContents     (XString  p_owner,XString& tabel);
   void     CommitDDL(SQLQuery& p_query,SQLInfoDB* p_info);
   void     DatatypeExceptions(RebindMap& p_map);
 
   // Record missing records
-  void     LogMissingRecord(SQLQuery& p_query,CString& p_error);
+  void     LogMissingRecord(SQLQuery& p_query,XString& p_error);
 
-  typedef std::vector<CString> TablesMap;
+  typedef std::vector<XString> TablesMap;
 
   // DATA
   MigrateParameters m_params;

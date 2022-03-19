@@ -23,7 +23,6 @@
 //
 #pragma once
 #include "SQLLanguage.h"
-#include "StdException.h"
 #include "SQLComponentsVersion.h"
 
 // Everything in this library is part of this namespace

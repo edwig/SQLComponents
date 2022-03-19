@@ -145,7 +145,7 @@ SQLMigrateDialog::OnInitDialog()
   if (pSysMenu != NULL)
   {
     BOOL bNameValid;
-    CString strAboutMenu;
+    XString strAboutMenu;
     bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
     ASSERT(bNameValid);
     if (!strAboutMenu.IsEmpty())
@@ -187,7 +187,7 @@ SQLMigrateDialog::OnInitDialog()
   LPWSTR* argv;
   int argc;
   argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-  CString ini_file = "SQLMigrate.ini";
+  XString ini_file = "SQLMigrate.ini";
   if (argc == 2)
   {
     m_commandLineMode = true;
@@ -271,33 +271,33 @@ SQLMigrateDialog::OnSysCommand(UINT nID, LPARAM lParam)
 }
 
 void
-SQLMigrateDialog::LoadProfile(CString initFile)
+SQLMigrateDialog::LoadProfile(XString initFile)
 {
   char buffer[MAX_PATH+1];
-  CString source_database;
-  CString source_user;
-  CString source_password;
-  CString source_schema;
-  CString target_database;
-  CString target_user;
-  CString target_password;
-  CString target_schema;
-  CString type_migration;
-  CString type_level;
-  CString type_space;
-  CString file_create;
-  CString file_drop;
-  CString table_table;
-  CString table_min;
-  CString log_loglines;
-  CString directory;
+  XString source_database;
+  XString source_user;
+  XString source_password;
+  XString source_schema;
+  XString target_database;
+  XString target_user;
+  XString target_password;
+  XString target_schema;
+  XString type_migration;
+  XString type_level;
+  XString type_space;
+  XString file_create;
+  XString file_drop;
+  XString table_table;
+  XString table_min;
+  XString log_loglines;
+  XString directory;
   int     file_direct;
   int     table_all;
   int     table_minoid;
   int     log_logging;
   int     log_log;
 
-  CString workingDir("");
+  XString workingDir("");
   if (initFile.Left(2).Right(1) == ":" || initFile.Left(1) == "\\")
   {
     // absolute pathname
@@ -307,8 +307,8 @@ SQLMigrateDialog::LoadProfile(CString initFile)
     char fname[_MAX_FNAME];
     char ext  [_MAX_EXT];
     _splitpath_s(path, drive, _MAX_DRIVE,dir, _MAX_DIR, fname, _MAX_FNAME, ext, _MAX_EXT);
-    workingDir  = (CString)drive + (CString)dir;
-    initFile = (CString)fname + (CString)ext;
+    workingDir  = (XString)drive + (XString)dir;
+    initFile = (XString)fname + (XString)ext;
   }
   else
   {
@@ -414,29 +414,29 @@ SQLMigrateDialog::LoadProfile(CString initFile)
 }
 
 void
-SQLMigrateDialog::SaveProfile(CString initFile)
+SQLMigrateDialog::SaveProfile(XString initFile)
 {
-  CString source_database;
-  CString source_user;
-  CString source_password;
-  CString source_schema;
-  CString target_database;
-  CString target_user;
-  CString target_password;
-  CString target_schema;
-  CString type_migration;
-  CString type_level;
-  CString type_space;
-  CString type_directstring;
-  CString file_create;
-  CString file_drop;
-  CString file_directstring;
-  CString table_table;
-  CString table_min;
-  CString table_allestr;
-  CString log_loglines;
-  CString log_logstr;
-  CString directory;
+  XString source_database;
+  XString source_user;
+  XString source_password;
+  XString source_schema;
+  XString target_database;
+  XString target_user;
+  XString target_password;
+  XString target_schema;
+  XString type_migration;
+  XString type_level;
+  XString type_space;
+  XString type_directstring;
+  XString file_create;
+  XString file_drop;
+  XString file_directstring;
+  XString table_table;
+  XString table_min;
+  XString table_allestr;
+  XString log_loglines;
+  XString log_logstr;
+  XString directory;
   int     file_direct;
   int     table_all;
   int     log_logging;
@@ -622,7 +622,7 @@ SQLMigrateDialog::PerformMigration()
   }
   catch(...)
   {
-    CString text("Migration is stopped with an error");
+    XString text("Migration is stopped with an error");
     if(m_commandLineMode)
     {
       m_logfile.WriteLog("");
@@ -655,7 +655,7 @@ SQLMigrateDialog::PostMigration()
 
   if(m_exportResult)
   {
-    CString text("The migration is complete");
+    XString text("The migration is complete");
     if (m_commandLineMode)
     {
       m_logfile.WriteLog("");
@@ -725,7 +725,7 @@ SQLMigrateDialog::OnDirectory()
   MapDialog dlg;
   if (dlg.Browse(GetSafeHwnd(),"Find working directory"))
   {
-    CString directory = dlg.GetPath();
+    XString directory = dlg.GetPath();
     SetDlgItemText(IDC_DIRECTORY,directory);
   }
 }
@@ -734,7 +734,7 @@ SQLMigrateDialog::OnDirectory()
 void 
 SQLMigrateDialog::OnEnKillfocusSourceUser()
 {
-  CString user;
+  XString user;
   GetDlgItemText(IDC_SOURCE_USER,  user);
   SetDlgItemText(IDC_SOURCE_SCHEMA,user);
 }
@@ -743,7 +743,7 @@ SQLMigrateDialog::OnEnKillfocusSourceUser()
 void
 SQLMigrateDialog::OnEnKillfocusTargetUser()
 {
-  CString user;
+  XString user;
   GetDlgItemText(IDC_TARGET_USER,  user);
   SetDlgItemText(IDC_TARGET_SCHEMA,user);
 }
@@ -811,7 +811,7 @@ SQLMigrateDialog::OnAllTables()
     GetDlgItem(IDC_TABLE )->EnableWindow(TRUE);
     GetDlgItem(IDC_MINOID)->EnableWindow(TRUE);
     GetDlgItemText(IDC_TABLE, m_parameters.v_table); 
-    CString getal;
+    XString getal;
     GetDlgItemText(IDC_MINOID,getal);
     m_parameters.v_minOid = atoi(getal);
   }  
@@ -853,19 +853,19 @@ SQLMigrateDialog::SetTablesGauge(int num,int maxnum)
 }
 
 void  
-SQLMigrateDialog::SetSourceType(CString p_type)
+SQLMigrateDialog::SetSourceType(XString p_type)
 {
   SetDlgItemText(IDC_SOURCE_TYPE,p_type);
 }
 
 void
-SQLMigrateDialog::SetTargetType(CString p_type)
+SQLMigrateDialog::SetTargetType(XString p_type)
 {
   SetDlgItemText(IDC_TARGET_TYPE,p_type);
 }
 
 void
-SQLMigrateDialog::SetStatus(CString status)
+SQLMigrateDialog::SetStatus(XString status)
 {
   GetDlgItem(IDC_STATUS)->EnableWindow(status != "");
   m_status.SetWindowText(status); 
@@ -880,7 +880,7 @@ SQLMigrateDialog::OnMigrate()
 }
 
 BOOL
-SQLMigrateDialog::AddLogLine(CString msg)
+SQLMigrateDialog::AddLogLine(XString msg)
 {
   m_log.SetRedraw(FALSE);
 

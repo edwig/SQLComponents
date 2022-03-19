@@ -35,14 +35,14 @@ class SQLMigrateDialog : public CDialog
 public:
   SQLMigrateDialog(CWnd* pParent = NULL);
  ~SQLMigrateDialog();
-  BOOL  AddLogLine(CString msg);
+  BOOL  AddLogLine(XString msg);
   void  SetTableGauge (int num,int maxnum);
   void  SetTablesGauge(int num,int maxnum);
-  void  SetSourceType(CString p_type);
-  void  SetTargetType(CString p_type);
-  void  SetStatus(CString status);
-  void  LoadProfile(CString initFile);
-  void  SaveProfile(CString initFile);
+  void  SetSourceType(XString p_type);
+  void  SetTargetType(XString p_type);
+  void  SetStatus(XString status);
+  void  LoadProfile(XString initFile);
+  void  SaveProfile(XString initFile);
   void  Closing(bool p_success);
 
   enum { IDD = IDD_MIGRATE_WIZARD};
@@ -68,7 +68,7 @@ public:
   CProgressCtrl m_tables_gauge;
 
   clock_t m_start;
-  CString m_estimated;
+  XString m_estimated;
 
   BOOL m_toLogfile;
   BOOL m_allTables;        //
@@ -129,7 +129,7 @@ protected:
 
 private:
   CFont*  m_font;
-  CString m_profile;
+  XString m_profile;
 
   bool    m_exportRunning;
   bool    m_commandLineMode;

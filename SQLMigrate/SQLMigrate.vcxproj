@@ -135,7 +135,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SQLComponents\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SQLComponents\;$(SolutionDir)BaseLibrary\</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -202,7 +202,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SQLComponents\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SQLComponents\;$(SolutionDir)BaseLibrary\</AdditionalIncludeDirectories>
       <ExceptionHandling>Async</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -239,6 +239,7 @@
   <ItemGroup>
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="FileDialog.h" />
+    <ClInclude Include="framework.h" />
     <ClInclude Include="MapDialog.h" />
     <ClInclude Include="SQLMigrateApp.h" />
     <ClInclude Include="SQLMigrateDialog.h" />

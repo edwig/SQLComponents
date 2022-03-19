@@ -46,25 +46,25 @@ public:
  ~Logging();
   int  Open();
   void Close();
-  void WriteLog (CString boodschap);
-  void WriteOut (CString statement,bool p_delim = false);
-  void WriteDrop(CString statement,bool p_delim = false);
+  void WriteLog (XString boodschap);
+  void WriteOut (XString statement,bool p_delim = false);
+  void WriteDrop(XString statement,bool p_delim = false);
   void SetLogStatus(LogType status);
   void SetTables(int num);
   void SetTableGauge(int num,int maxnum);
   void SetTablesGauge(int num);
-  void SetStatus(CString status);
-  void SetScript(CString p_script);
-  void SetDropScript(CString p_script);
-  void SetLogfile(CString p_logfile);
-  void SetDBType(bool p_source, CString p_type);
+  void SetStatus(XString status);
+  void SetScript(XString p_script);
+  void SetDropScript(XString p_script);
+  void SetLogfile(XString p_logfile);
+  void SetDBType(bool p_source, XString p_type);
 private:
   int     m_tables;
   LogType m_status;
 
-  CString m_logfile;
-  CString m_script;
-  CString m_dropscript;
+  XString m_logfile;
+  XString m_script;
+  XString m_dropscript;
 
   FILE* m_flog;
   FILE* m_fout;

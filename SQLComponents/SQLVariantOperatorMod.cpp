@@ -1458,7 +1458,7 @@ SQLVariant
 static SQL_OperCharModNum(SQLVariant& p_left,SQLVariant& p_right)
 {
   double num = ::fmod(p_left.GetAsDouble(),p_right.GetAsBCD().AsDouble());
-  CString str;
+  XString str;
   str.Format("%lf",num);
   SQLVariant var(str);
   return var;
@@ -1635,9 +1635,9 @@ SQLVariant::operator%(SQLVariant& p_right)
   }
   // No compare function found
   // Data types are not comparable
-  CString leftType  = FindDatatype(m_datatype);
-  CString rightType = FindDatatype(p_right.m_datatype);
-  CString error;
+  XString leftType  = FindDatatype(m_datatype);
+  XString rightType = FindDatatype(p_right.m_datatype);
+  XString error;
   error.Format("Cannot do the modulo operator on (%s % %s)",leftType.GetString(),rightType.GetString());
   throw StdException(error);
 }
@@ -1671,9 +1671,9 @@ SQLVariant::operator%=(SQLVariant& p_right)
   }
   // No compare function found
   // Data types are not comparable
-  CString leftType  = FindDatatype(m_datatype);
-  CString rightType = FindDatatype(p_right.m_datatype);
-  CString error;
+  XString leftType  = FindDatatype(m_datatype);
+  XString rightType = FindDatatype(p_right.m_datatype);
+  XString error;
   error.Format("Cannot do the %= operator on (%s + %s)",leftType.GetString(),rightType.GetString());
   throw StdException(error);
 }
