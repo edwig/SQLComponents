@@ -23,7 +23,7 @@
 //
 // Version number: See SQLComponents.h
 //
-#include "StdAfx.h"
+#include "pch.h"
 #include "MapDialog.h"
 #include <direct.h>
 #include <SHLOBJ.H>
@@ -122,7 +122,6 @@ bool MapDialog::Browse(HWND            hwndParent,
                        bool            showFiles,
                        bool            showStatus)
 {
-  hwndParent = AfxGetApp()->GetMainWnd()->GetSafeHwnd();
   //  Store initial settings
   m_root = rootdir;
   m_init = initdir;

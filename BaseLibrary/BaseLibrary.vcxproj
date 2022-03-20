@@ -178,6 +178,7 @@
     <ClInclude Include="EventLogRegistration.h" />
     <ClInclude Include="ExecuteProcess.h" />
     <ClInclude Include="FileBuffer.h" />
+    <ClInclude Include="FileDialog.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GenerateGUID.h" />
     <ClInclude Include="GetExePath.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="JSONPath.h" />
     <ClInclude Include="JSONPointer.h" />
     <ClInclude Include="LogAnalysis.h" />
+    <ClInclude Include="MapDialog.h" />
     <ClInclude Include="MultiPartBuffer.h" />
     <ClInclude Include="Namespace.h" />
     <ClInclude Include="pch.h" />
@@ -252,6 +254,7 @@
     <ClCompile Include="EventLogRegistration.cpp" />
     <ClCompile Include="ExecuteProcess.cpp" />
     <ClCompile Include="FileBuffer.cpp" />
+    <ClCompile Include="FileDialog.cpp" />
     <ClCompile Include="GenerateGUID.cpp" />
     <ClCompile Include="GetExePath.cpp" />
     <ClCompile Include="GetLastErrorAsString.cpp" />
@@ -265,6 +268,7 @@
     <ClCompile Include="JSONPath.cpp" />
     <ClCompile Include="JSONPointer.cpp" />
     <ClCompile Include="LogAnalysis.cpp" />
+    <ClCompile Include="MapDialog.cpp" />
     <ClCompile Include="MultiPartBuffer.cpp" />
     <ClCompile Include="Namespace.cpp" />
     <ClCompile Include="pch.cpp">

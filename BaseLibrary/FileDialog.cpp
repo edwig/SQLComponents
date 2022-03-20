@@ -23,7 +23,7 @@
 //
 // Version number: See SQLComponents.h
 //
-#include "StdAfx.h"
+#include "pch.h"
 #include "FileDialog.h"
 #include <dlgs.h>
 

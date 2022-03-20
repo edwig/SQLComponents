@@ -24,7 +24,6 @@
 // Version number: See SQLComponents.h
 //
 #pragma once
-#include "StdAfx.h"
 #include <afxdlgs.h>
 
 /* VLAGGEN
