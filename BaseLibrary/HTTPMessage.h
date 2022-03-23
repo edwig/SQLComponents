@@ -153,6 +153,7 @@ public:
   void SetConnectionID(HTTP_CONNECTION_ID p_id) { m_connectID          = p_id;        }
   void SetSystemTime(SYSTEMTIME p_time)         { m_systemtime         = p_time;      }
   void SetHasBeenAnswered()                     { m_request            = NULL;        }
+  void SetChunkNumber(int p_chunk)              { m_chunkNumber        = p_chunk;     }
   void SetReadBuffer(bool p_read,size_t p_length = 0);
   void SetSender  (PSOCKADDR_IN6 p_address);
   void SetReceiver(PSOCKADDR_IN6 p_address);
@@ -290,13 +291,6 @@ inline void
 HTTPMessage::SetBody(void* p_body,unsigned p_length)
 {
   m_buffer.SetBuffer((uchar*)p_body,p_length);
-}
-
-inline void
-HTTPMessage::SetURL(XString& p_url)
-{
-  m_url = p_url;
-  ParseURL(p_url);
 }
 
 inline size_t

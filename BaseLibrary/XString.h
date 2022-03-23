@@ -39,7 +39,7 @@ using std::wstring;
 typedef CString XString;
 #pragma message("XString is now defined as MFC::CString")
 #else
-#pragma message("XString is now defined as std::string in the form of MSX_String")
+#pragma message("XString is now defined as std::string::MSX_String")
 
 class SMX_String : public std::string
 {

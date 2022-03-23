@@ -403,10 +403,17 @@ CrackedURL::GetHexcodedChar(XString& p_text,int& p_index,bool& p_queryValue)
 
 // Resulting URL
 // Reconstruct the URL parts to a complete URL
-// foo://username:password@example.com:8042/over/there/index.dtb?type=animal&name=white%20narwhal#nose
+// foo://example.com:8042/over/there/index.dtb?type=animal&name=white%20narwhal#nose
 XString
 CrackedURL::URL() const
 {
+  // Check if we have an empty URL in effect
+  if(m_host.IsEmpty())
+  {
+    return "";
+  }
+
+  // Reconstruct the URL from here
   XString url(m_scheme);
 
   // Secure HTTP 
@@ -450,7 +457,7 @@ CrackedURL::SafeURL() const
   // Separator
   url += "://";
 
-  // Add hostname
+  // Add host name
   url += m_host;
 
   // Possibly add a port

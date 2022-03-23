@@ -30,9 +30,14 @@
 // Product_display_name cannot be longer than this
 #define SERVICE_NAME_LENGTH   50
 
-#define SVC_SUCCESS   0
-#define SVC_INFO      1
-#define SVC_ERROR     2
+#define SVC_ERROR   ((DWORD)0xC0020001L)
+#define SVC_INFO    ((DWORD)0x40020002L)
+#define SVC_SUCCESS ((DWORD)0x00020003L)
+// BEWARE: To use, you must define
+// MessageId=0x1 as SymbolicName=SVC_ERROR
+// MessageId=0x2 as SymbolicName=SVC_INFO
+// MessageId=0x3 as SymbolicName=SVC_SUCCESS
+// in the *.MC file of your server application
 
 // Products service name is in this global variable
 extern char  g_svcname[];

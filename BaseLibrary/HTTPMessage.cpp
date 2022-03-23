@@ -511,6 +511,13 @@ HTTPMessage::GetRawBody(uchar** p_body,size_t& p_length)
 }
 
 void
+HTTPMessage::SetURL(XString& p_url)
+{
+  m_url = p_url;
+  ParseURL(p_url);
+}
+
+void
 HTTPMessage::SetBody(XString p_body,XString p_encoding /*=""*/)
 {
   if(!p_encoding.IsEmpty())
