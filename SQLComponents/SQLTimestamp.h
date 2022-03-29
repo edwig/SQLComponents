@@ -144,12 +144,11 @@ public:
   SQLTimestamp AddSeconds (__int64 p_number) const;
   SQLTimestamp AddFraction(int p_fraction) const;
 
-  XString  AsString      (int p_precision = 0) const;
-  XString  AsReadString  (int p_precision = 0) const;
-  XString  AsXMLString   (int p_precision = 0) const;
-  XString  AsXMLStringUTC(int p_precision = 0) const;
-
-  XString  AsSQLString(SQLDatabase* p_database) const;
+  XString  AsString      (int p_precision = 0) const;   // DD-MM-YYYY HH:MM:SS[.ffff]
+  XString  AsXMLString   (int p_precision = 0) const;   // YYYY-MM-DDTHH:MM:SS[.ffff]             LocalTime
+  XString  AsXMLStringTZ (int p_precision = 0) const;   // YYYY-MM-DDTHH:MM_SS[.ffff]{+/-}HH.MM   LocalTime + UTC offset
+  XString  AsXMLStringUTC(int p_precision = 0) const;   // YYYY-MM-DDTHH:MM:SS[.ffff]Z            UTC-Time  + Zulu
+  XString  AsSQLString(SQLDatabase* p_database) const;  // In current database default format
   SQLDate  AsSQLDate() const;
   SQLTime  AsSQLTime() const;
   void     AsTimeStampStruct(TIMESTAMP_STRUCT* p_struct) const;
