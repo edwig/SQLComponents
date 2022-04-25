@@ -3,6 +3,14 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.0
 ===== Released since: 20-03-2022 =====
 ======================================
 
+Version 2.0.2 of 25-04-2022
+---------------------------
+1)  When creating an SQLTimestamp from a scanned string, this class wil now recognize 
+    a string with an UTC time ending in 'Z'. Correcting the time from UTC to the current
+    local time.
+2)  AutoDBS has an extra option to pass on an already existing SQLDatabase connection,
+    or requesting a new one from the database pool.
+
 Version 2.0.1 of 29-03-2022
 ---------------------------
 1)  Fixed an ISO8601 bug in SQLTimestamp::AsString<XXX> methods.
