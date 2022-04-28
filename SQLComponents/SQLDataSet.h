@@ -224,7 +224,7 @@ public:
   bool         XMLSave(XString p_filename,XString p_name,StringEncoding p_encoding = StringEncoding::ENC_UTF8);
   bool         XMLLoad(XString p_filename);
   void         XMLSave(XMLMessage* p_msg,XMLElement* p_dataset);
-  void         XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset);
+  void         XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset,LONG* p_abort = nullptr);
 
 protected:
   // Set parameters in the query

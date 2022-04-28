@@ -1746,7 +1746,7 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
 }
 
 void
-SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset)
+SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset,LONG* p_abort)
 {
   XMLElement* structur = p_msg->FindElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_STRUCTURE],false);
   XMLElement* records  = p_msg->FindElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_RECORDS],  false);
@@ -1757,6 +1757,10 @@ SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset)
   XMLElement* field = p_msg->GetElementFirstChild(structur);
   while(field)
   {
+    if(p_abort != nullptr && *p_abort > 0)
+    {
+      return;
+    }
     // Remember the name of the field
     XString name = field->GetValue();
     m_names.push_back(name);
@@ -1771,6 +1775,10 @@ SQLDataSet::XMLLoad(XMLMessage* p_msg,XMLElement* p_dataset)
   XMLElement* record = p_msg->GetElementFirstChild(records);
   while(record)
   {
+    if(p_abort != nullptr && *p_abort > 0)
+    {
+      return;
+    }
     SQLRecord* rec = InsertRecord();
     rec->XMLLoad(p_msg,record);
     // Next record
