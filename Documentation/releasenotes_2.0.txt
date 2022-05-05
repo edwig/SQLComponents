@@ -3,6 +3,12 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.0
 ===== Released since: 20-03-2022 =====
 ======================================
 
+Version 2.0.3 of ..........
+---------------------------
+1)  Added a new class: SQLPrimaryKey
+    Names of the columns and values of the columns are retained
+    Create a search (where) condition of the primary key and retains a database status.
+
 Version 2.0.2 of 25-04-2022
 ---------------------------
 1)  When creating an SQLTimestamp from a scanned string, this class wil now recognize 
