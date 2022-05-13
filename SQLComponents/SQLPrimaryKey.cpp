@@ -216,6 +216,7 @@ SQLPrimaryKey::AddValue(SQLVariant* p_val,bool p_replace /*=false*/)
       delete val;
     }
     m_values.clear();
+    m_object = 0;
   }
   m_values.push_back(p_val);
   m_status = PKStatus::PK_Created;
