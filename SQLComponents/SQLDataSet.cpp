@@ -193,8 +193,12 @@ SQLDataSet::Close()
   m_name.Empty();
   m_query.Empty();
   m_selection.Empty();
+  m_fromTables.Empty();
   m_primaryTableName.Empty();
   m_primaryAlias.Empty();
+
+  // Forget the cancellation
+  m_cancelFunction = nullptr;
 
   // Reset the open status
   m_open = false;
@@ -367,6 +371,7 @@ SQLDataSet::SetQuery(XString& p_query)
 {
   // Setting the total query supersedes these
   m_selection.Empty();
+  m_fromTables.Empty();
   m_whereCondition.Empty();
   m_groupby.Empty();
   m_orderby.Empty();
@@ -382,6 +387,13 @@ SQLDataSet::SetSelection(XString p_selection)
 {
   m_query.Empty();
   m_selection = p_selection;
+}
+
+void
+SQLDataSet::SetFromTables(XString p_from)
+{
+  m_query.Empty();
+  m_fromTables = p_from;
 }
 
 void
@@ -498,15 +510,22 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
   sql += m_selection.IsEmpty() ? XString("*") : m_selection;
   sql += "\n  FROM ";
 
-  if(!m_primarySchema.IsEmpty())
+  if(!m_fromTables.IsEmpty())
   {
-    sql += m_primarySchema + ".";
+    sql += m_fromTables;
   }
-  sql += m_primaryTableName;
-  if(!m_primaryAlias.IsEmpty())
+  else
   {
-    sql += " ";
-    sql += m_primaryAlias;
+    if(!m_primarySchema.IsEmpty())
+    {
+      sql += m_primarySchema + ".";
+    }
+    sql += m_primaryTableName;
+    if(!m_primaryAlias.IsEmpty())
+    {
+      sql += " ";
+      sql += m_primaryAlias;
+    }
   }
 
   int count = 0;
@@ -631,6 +650,12 @@ SQLDataSet::Open(bool p_stopIfNoColumns /*=false*/)
   {
     SQLQuery qry(m_database);
     SQLTransaction trans(m_database,m_name);
+
+    // Set a trap to stop an action that will take too much time...
+    if(m_cancelFunction)
+    {
+      (*m_cancelFunction)(qry.GetStatementHandle());
+    }
 
     // Get the select query
     query = GetSelectionSQL(qry);
