@@ -155,6 +155,8 @@ public:
   virtual void SetWhereCondition(XString p_condition);
   // Set WHERE filters for a query
   virtual void SetFilters(SQLFilterSet* p_filters);
+  // Add filter to current SQLFilterSet
+  virtual void SetFilter(SQLFilter p_filter);
   // Set GROUP BY 
   virtual void SetGroupBy(XString p_groupby);
   virtual void AddGroupby(XString p_property);
@@ -316,7 +318,7 @@ protected:
   int          m_queryTime { 0 };
   ULONG64      m_frequency { 0 };
   // For canceling the select operation
-  LPFN_CALLBACK m_cancelFunction{ nullptr };
+  LPFN_CALLBACK m_cancelFunction { nullptr };
 };
 
 inline void 

@@ -314,6 +314,22 @@ SQLDataSet::SetFilters(SQLFilterSet* p_filters)
   m_filters = p_filters;
 }
 
+// Add filter to current set of filters
+void
+SQLDataSet::SetFilter(SQLFilter p_filter)
+{
+  if(m_filters)
+  {
+    m_filters->AddFilter(p_filter);
+  }
+  else
+  {
+    SQLFilterSet* filters;
+    filters->AddFilter(p_filter);
+    SetFilters(filters);
+  }
+}
+
 // Set top <n> records selection
 void
 SQLDataSet::SetTopNRecords(int p_top,int p_skip /*=0*/)
@@ -527,7 +543,6 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
       sql += m_primaryAlias;
     }
   }
-
   int count = 0;
   int number = 0;
   ParameterSet::iterator it;
