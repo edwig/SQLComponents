@@ -58,6 +58,7 @@ OperatorName operatornames[] =
 
 // XTOR: Create empty
 SQLFilter::SQLFilter()
+          :m_operator(OP_NOP)
 {
 }
 
@@ -173,6 +174,9 @@ SQLFilter::operator=(const SQLFilter& p_other)
   m_closeParenthesis = p_other.m_closeParenthesis;
   m_extract          = p_other.m_extract;
   m_field2           = p_other.m_field2;
+  m_castType         = p_other.m_castType;
+  m_castScale        = p_other.m_castScale;
+  m_castPrecision    = p_other.m_castPrecision;
 
   for(auto& variant : p_other.m_values)
   {
@@ -232,9 +236,17 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
     sql += ConstructFunctionSQL(p_query);
   }
   // Add the field without a function
-  else if(!m_field.IsEmpty())
+  else if(!m_field.IsEmpty() && m_operator != OP_Exists)
   {
-    sql += m_field;
+    if(!m_castType.IsEmpty())
+    {
+      sql += ConstructCastAs();
+    }
+    else
+    {
+      // Simply add the field
+      sql += m_field;
+    }
   }
 
   // Test for special ISNULL case
@@ -284,6 +296,10 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
   else if(m_operator == OP_Between)
   {
     ConstructBetween(sql,p_query);
+  }
+  else if(m_operator == OP_Exists)
+  {
+    ConstructExists(sql,p_query);
   }
   else if(m_operator != OP_IsNULL && m_operator != OP_IsNotNULL && m_operator != OP_NOP)
   {
@@ -346,6 +362,15 @@ SQLFilter::MatchRecord(SQLRecord* p_record)
   }
   // Return the correct result
   return m_negate ? !result : result;
+}
+
+// Record the CAST AS information
+void
+SQLFilter::SetCastAs(XString p_datatype,int p_scale /*= 0*/,int p_precision /*= 0*/)
+{
+  m_castType      = p_datatype;
+  m_castScale     = p_scale;
+  m_castPrecision = p_precision;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -646,6 +671,56 @@ SQLFilter::ConstructTimestampCalcPart()
     default:                  throw XString("Unknown or unset calculation part for TIMESTAMPADD/TIMESTAMPDIFF function");
   }
   return part;
+}
+
+// Constructing the EXISTS clause
+// m_field        -> contains the table we subquery from
+// m_field2       -> contains a possibly "as alias"
+// m_subfileters  -> contains the extra where clause
+void
+SQLFilter::ConstructExists(XString& p_sql,SQLQuery& p_query)
+{
+  p_sql += "\n  (SELECT 1\n"
+             "     FROM ";
+  p_sql += m_field;
+  if(!m_field2.IsEmpty())
+  {
+    p_sql += " ";
+    p_sql += m_field2;
+  }
+
+  if(m_subfilters)
+  {
+    p_sql += "\n   WHERE ";
+    p_sql += m_subfilters->ParseFiltersToCondition(p_query);
+  }
+  p_sql += ")";
+}
+
+// Construct a "CAST(field AS <datatype>)"
+XString
+SQLFilter::ConstructCastAs()
+{
+  XString sql("CAST(");
+
+  // Add field
+  sql += m_field;
+  sql += " AS ";
+
+  // Adding the datatype
+  sql += m_castType;
+  if(m_castScale > 0)
+  {
+    sql.AppendFormat("(%d",m_castScale);
+    if(m_castPrecision > 0)
+    {
+      sql.AppendFormat(",%d",m_castPrecision);
+    }
+    sql += ")";
+  }
+  sql += ")";
+
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////

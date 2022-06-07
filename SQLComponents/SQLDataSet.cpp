@@ -324,7 +324,7 @@ SQLDataSet::SetFilter(SQLFilter p_filter)
   }
   else
   {
-    SQLFilterSet* filters;
+    SQLFilterSet* filters = new SQLFilterSet();
     filters->AddFilter(p_filter);
     SetFilters(filters);
   }
