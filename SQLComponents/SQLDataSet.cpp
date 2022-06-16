@@ -1776,6 +1776,21 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],var->FindDatatype(type));
     }
   }
+  else if(m_types.size() > 0)
+  {
+    for(unsigned int ind = 0;ind < m_names.size(); ++ind)
+    {
+      XString fieldname = GetFieldName(ind);
+      int type = m_types[ind];
+      SQLVariant var;
+
+      XMLElement* field = p_msg->AddElement(structure,nameField,XDT_String,fieldname);
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_ID],(int)ind);
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPE],type);
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],var.FindDatatype(type));
+    }
+  }
+
 
   // Add records of the dataset
   XMLElement* records = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_RECORDS],XDT_String,"");

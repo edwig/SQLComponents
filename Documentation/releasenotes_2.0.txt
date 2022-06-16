@@ -3,13 +3,16 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.0
 ===== Released since: 20-03-2022 =====
 ======================================
 
-Version 2.0.3 of ..........
+Version 2.0.3 of 16-06-2022
 ---------------------------
 1)  Added a new class: SQLPrimaryKey
     Names of the columns and values of the columns are retained
     Create a search (where) condition of the primary key and retains a database status.
 2)  Added the capability to register a cancellation function on the DataSet, so a 
     program's thread can call ::SQLCancel() on the statement handle
+3)  Added a '=' operator to the SQLPrimaryKey
+4)  Added a CAST operator to the SQLFilter
+5)  Added the storage of datatypes in XML for a DataSet if no records found
 
 Version 2.0.2 of 25-04-2022
 ---------------------------

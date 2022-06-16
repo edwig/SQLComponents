@@ -69,6 +69,8 @@ public:
 
   // Functions
   void        AddValue(SQLVariant* p_val,bool p_replace = false);
+  // Operators
+  SQLPrimaryKey& operator=(SQLPrimaryKey& p_other);
 
 private:
   WordList   m_fields;
