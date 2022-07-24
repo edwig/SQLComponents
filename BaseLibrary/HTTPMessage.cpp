@@ -38,6 +38,12 @@
 #include <xutility>
 #include <string>
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 using std::wstring;
 
 // All headers. Must be in sequence with HTTPCommand
@@ -626,6 +632,32 @@ HTTPMessage::SetCookie(XString p_name
 {
   Cookie monster;
   monster.SetCookie(p_name,p_value,p_metadata,p_secure,p_httpOnly);
+  m_cookies.AddCookie(monster);
+}
+
+void 
+HTTPMessage::SetCookie(XString        p_name
+                      ,XString        p_value
+                      ,XString        p_metadata
+                      ,XString        p_path
+                      ,XString        p_domain
+                      ,bool           p_secure   /*= false*/
+                      ,bool           p_httpOnly /*= false*/
+                      ,CookieSameSite p_samesite /*= CookieSameSite::NoSameSite*/
+                      ,int            p_maxAge   /*= 0*/
+                      ,SYSTEMTIME*    p_expires  /*= nullptr*/)
+{
+  Cookie monster;
+  monster.SetCookie(p_name,p_value,p_metadata,p_secure,p_httpOnly);
+
+  if(!p_path.IsEmpty())     monster.SetPath(p_path);
+  if(!p_domain.IsEmpty())   monster.SetDomain(p_domain);
+  if( p_expires)            monster.SetExpires(p_expires);
+  if(!p_maxAge)             monster.SetMaxAge(p_maxAge);
+  if(p_samesite != CookieSameSite::NoSameSite)
+  {
+    monster.SetSameSite(p_samesite);
+  }
   m_cookies.AddCookie(monster);
 }
 

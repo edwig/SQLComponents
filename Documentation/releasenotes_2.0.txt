@@ -3,6 +3,10 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.0
 ===== Released since: 20-03-2022 =====
 ======================================
 
+Version 2.0.4 of 24-07-2022
+---------------------------
+1)  Upgraded to version 1.0.4 of the BaseLibrary
+
 Version 2.0.3 of 16-06-2022
 ---------------------------
 1)  Added a new class: SQLPrimaryKey

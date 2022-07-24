@@ -37,6 +37,12 @@
 #include "HTTPMessage.h"
 #include "ConvertWideString.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 //////////////////////////////////////////////////////////////////////////
 //
 // MULTIPART
@@ -192,7 +198,17 @@ MultiPart::CreateHeader(XString p_boundary,bool p_extensions /*=false*/)
     header += m_charset;
     header += "\"";
   }
-  header += "\r\n\r\n";
+  header += "\r\n";
+  // Add variable headers
+  for(auto& head : m_headers)
+  {
+    header += head.first;
+    header += ": ";
+    header += head.second;
+    header += "\r\n";
+  }
+  // Empty line for the body
+  header += "\r\n";
   return header;
 }
 

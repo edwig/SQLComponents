@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-// SourceFile: GenerateGUID.cpp
+// SourceFile: ExecuteShell.h
 //
 // BaseLibrary: Indispensable general objects and functions
 // 
@@ -25,38 +25,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-#include "pch.h"
-#include "GenerateGUID.h"
-#include <combaseapi.h>
+#pragma once
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
+// Maximum length of a command line in MS-Windows OS
+// See: https://support.microsoft.com/nl-nl/help/830473/command-prompt-cmd-exe-command-line-string-limitation
+#define MAX_COMMANDLINE 8191
 
-// Caller **MUST** do the COM+ (un)initialize with
-// CoInitialize
-// CoUninitialize
-
-_Check_return_ WINOLEAPI CoCreateGuid(_Out_ GUID* pguid);
-
-XString GenerateGUID()
-{
-  _TUCHAR *guidStr = 0x00;
-  GUID    *pguid   = 0x00;
-  XString result;
-  
-  pguid = new GUID; 
-  // COM+ Initialize is already done
-  if(SUCCEEDED(CoCreateGuid(pguid)))
-  {
-    // Convert the GUID to a string
-    if(UuidToString(pguid,&guidStr) == RPC_S_OK)
-    {
-      result = guidStr;
-    }
-  }
-  delete pguid;
-  return result;
-}
+bool
+ExecuteShell(XString  p_command
+            ,XString  p_program
+            ,XString  p_arguments
+            ,HWND     p_parent
+            ,int      p_show
+            ,XString* p_error = nullptr);

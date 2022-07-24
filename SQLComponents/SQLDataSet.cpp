@@ -318,16 +318,11 @@ SQLDataSet::SetFilters(SQLFilterSet* p_filters)
 void
 SQLDataSet::SetFilter(SQLFilter p_filter)
 {
-  if(m_filters)
+  if(!m_filters)
   {
-    m_filters->AddFilter(p_filter);
+    m_filters = new SQLFilterSet();
   }
-  else
-  {
-    SQLFilterSet* filters = new SQLFilterSet();
-    filters->AddFilter(p_filter);
-    SetFilters(filters);
-  }
+  m_filters->AddFilter(p_filter);
 }
 
 // Set top <n> records selection
