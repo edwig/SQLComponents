@@ -6,6 +6,8 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.0
 Version 2.0.4 of 24-07-2022
 ---------------------------
 1)  Upgraded to version 1.0.4 of the BaseLibrary
+2)  Added the possibility to have an empty SQLFilter() with just one AddExpression(expression)
+    to be parsed to SQL in the SQLDataSet.
 
 Version 2.0.3 of 16-06-2022
 ---------------------------

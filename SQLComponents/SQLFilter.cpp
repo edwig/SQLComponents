@@ -230,6 +230,12 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
     sql = "(";
   }
 
+  // See if our own homebrewn expression on a filter without operators
+  if(m_operator == OP_NOP && m_function == FN_NOP && !m_expression.IsEmpty())
+  {
+    sql += m_expression;
+  }
+
   // See if extra function is pending
   if(m_function != FN_NOP)
   {
@@ -918,7 +924,4 @@ SQLFilterSet::ParseFiltersToCondition(SQLQuery& p_query)
   return query;
 }
 
-
-
 }
-

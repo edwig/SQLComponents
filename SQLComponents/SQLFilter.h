@@ -38,6 +38,7 @@ namespace SQLComponents
 class SQLRecord;
 class SQLQuery;
 class SQLFilterSet;
+
 // Mapping typedefs
 typedef std::vector<SQLVariant*> VariantSet;
 
