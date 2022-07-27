@@ -686,6 +686,17 @@ SQLFilter::ConstructTimestampCalcPart()
 void
 SQLFilter::ConstructExists(XString& p_sql,SQLQuery& p_query)
 {
+  if(!m_expression.IsEmpty())
+  {
+    p_sql += "(" + m_expression;
+    if(m_subfilters)
+    {
+      p_sql += m_subfilters->ParseFiltersToCondition(p_query);
+    }
+    p_sql += ")";
+    return;
+  }
+
   p_sql += "\n  (SELECT 1\n"
              "     FROM ";
   p_sql += m_field;
