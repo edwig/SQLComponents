@@ -199,17 +199,21 @@ SQLAssociation::FollowToDetails()
   }
 
   // Create filterset and add to the detail
-  SQLFilterSet filters;
+  SQLFilterSet* filters = new SQLFilterSet();
   for(unsigned ind = 0;ind < m_assocs.size();++ind)
   {
     SQLFilter filter(m_assocs[ind]->m_foreign,OP_Equal,m_assocs[ind]->m_value);
-    m_detail->SetFilter(filter);
+    filters->AddFilter(filter);
   }
+
+  // Begin a new filter set
+  m_detail->ResetFilters();
+  m_detail->SetFilters(filters);
 
   bool result = m_detail->IsOpen() ? m_detail->Append() : m_detail->Open();
   if(result)
   {
-    return m_detail->FindRecordSet(filters);
+    return m_detail->FindRecordSet(*filters);
   }
   return nullptr;
 }

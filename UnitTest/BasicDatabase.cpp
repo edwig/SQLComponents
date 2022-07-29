@@ -534,7 +534,7 @@ namespace DatabaseUnitTest
       InitSQLComponents();
 
       SQLDatabase dbs;
-      dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+      // dbs.ReagisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
 
       try
       {
