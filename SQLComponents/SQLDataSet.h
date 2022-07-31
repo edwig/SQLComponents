@@ -225,6 +225,7 @@ public:
   // Getting info about the primary key
   XString      GetPrimarySchema();
   XString      GetPrimaryTableName();
+  XString      GetPrimaryAlias();
   // Getting the sequence name
   XString      GetSequenceName();
   // Getting the query settings
@@ -405,6 +406,12 @@ inline XString
 SQLDataSet::GetPrimaryTableName()
 {
   return m_primaryTableName;
+}
+
+inline XString
+SQLDataSet::GetPrimaryAlias()
+{
+  return m_primaryAlias;
 }
 
 inline void

@@ -583,7 +583,7 @@ namespace DatabaseUnitTest
       }
       catch(StdException& er)
       {
-        Logger::WriteMessage("Database error. Reason:");
+        Logger::WriteMessage("Association error. Reason:");
         Logger::WriteMessage(er.GetErrorMessage());
         Assert::Fail(L"Database error");
       }

@@ -73,10 +73,10 @@ public:
   SQLPrimaryKey& operator=(SQLPrimaryKey& p_other);
 
 private:
-  WordList   m_fields;
-  VariantSet m_values;
-  int        m_object { 0 };
-  PKStatus   m_status { PKStatus::PK_Empty };
+  WordList   m_fields;        // Names of the primary key fields
+  VariantSet m_values;        // Values of the primary key for an instance
+  int        m_object { 0 };  // Optimization if the primary key is one (1) integer field
+  PKStatus   m_status { PKStatus::PK_Empty };   // Current status
 };
 
 }
