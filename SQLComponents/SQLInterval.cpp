@@ -243,7 +243,7 @@ SQLInterval::SetFromDatabaseDouble(SQLINTERVAL p_type,double p_number)
   }
   else
   {
-    m_value = static_cast<InterValue>(p_number * SECONDS_PER_DAY * NANOSECONDS_PER_SEC);
+    m_value = static_cast<InterValue>((size_t)p_number * SECONDS_PER_DAY * NANOSECONDS_PER_SEC);
   }
   Normalise();
   RecalculateInterval();
@@ -481,8 +481,8 @@ SQLInterval::AsDatabaseDouble() const
 
   // Return a decimal day value
   double value = static_cast<double>(m_value);
-  value /= NANOSECONDS_PER_SEC;
-  value /= SECONDS_PER_DAY;
+  value /= (double) NANOSECONDS_PER_SEC;
+  value /= (double) SECONDS_PER_DAY;
 
   return value;
 }

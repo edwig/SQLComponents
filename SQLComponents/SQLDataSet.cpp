@@ -1078,7 +1078,7 @@ SQLDataSet::CheckNames(SQLQuery& p_query)
   for(int ind = 1; ind <= num; ++ind)
   {
     p_query.GetColumnName(ind,name);
-    if(m_names[ind-1].CompareNoCase(name))
+    if(m_names[(size_t)ind-1].CompareNoCase(name))
     {
       throw StdException("Append needs exactly the same query column names");
     }
@@ -1093,7 +1093,7 @@ SQLDataSet::CheckTypes(SQLQuery& p_query)
   for(int ind = 1; ind <= num; ++ind)
   {
     int type = p_query.GetColumnType(ind);
-    if(m_types[ind-1] != type)
+    if(m_types[(size_t)ind-1] != type)
     {
       throw StdException("Append needs exactly the same datatypes for the query columns.");
     }

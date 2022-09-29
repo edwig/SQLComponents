@@ -1527,7 +1527,7 @@ SQLQuery::RetrieveAtExecData()
                                  ,(SQLUSMALLINT) col
                                  ,(SQLUSMALLINT) var->GetDataType()
                                  ,(SQLPOINTER)   pointer
-                                 ,(SQLINTEGER)   size + extra
+                                 ,(SQLINTEGER)  ((size_t)size + extra)
                                  ,(SQLLEN*)      var->GetIndicatorPointer());
             if(SQL_SUCCEEDED(m_retCode))
             {

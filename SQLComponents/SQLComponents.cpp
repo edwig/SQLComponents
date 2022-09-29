@@ -26,6 +26,7 @@
 #include "stdafx.h"
 #include "SQLComponents.h"
 #include "ConvertWideString.h"
+#include "SQLMessage.h"
 
 namespace SQLComponents
 {
@@ -59,7 +60,10 @@ namespace SQLComponents
     InitCodePageNames();
 
     // Initialize the COM subsystem
-    CoInitialize(nullptr);
+    if(CoInitialize(nullptr) == FALSE)
+    {
+      SQLMessage(nullptr,"COM subsystem not initialized!","Error",MB_OK);
+    };
 
     // We are now officially 'in business' :-)
     g_SQLComponentsInitialized = true;

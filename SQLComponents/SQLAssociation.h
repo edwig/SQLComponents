@@ -36,7 +36,7 @@ typedef struct _primaryForeign
 {
   XString     m_primary;
   XString     m_foreign;
-  SQLVariant* m_value;
+  SQLVariant* m_value { nullptr };
 }
 PrimaryForeign;
 
