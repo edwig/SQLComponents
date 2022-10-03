@@ -172,7 +172,7 @@ Cookie::GetSetCookieText()
     }
     if(!value.IsEmpty())
     {
-    cookie.AppendFormat("; SameSite=%s",value.GetString());
+      cookie.AppendFormat("; SameSite=%s", value.GetString());
   }
   }
   // Optional flags
