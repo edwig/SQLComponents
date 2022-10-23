@@ -423,15 +423,19 @@ SQLMigrate::WriteMigrateParameters()
 
   if(m_params.v_minOid > 0)
   {
+    XString num;
+    num.Format("%d",m_params.v_minOid);
     // Ruler       "------------------- : "
-    m_log.WriteLog("Start with identity : " + m_params.v_minOid);
+    m_log.WriteLog("Start with identity : " + num);
   }
 
   // Logging per number of rows converted
   if(m_params.v_logLines > 0)
   {
+    XString num;
+    num.Format("%d",m_params.v_logLines);
     // Ruler       "------------------- : "
-    m_log.WriteLog("Log line after rows : " + m_params.v_logLines);
+    m_log.WriteLog("Log line after rows : " + num);
   }
 
   // Logging of all migration options
@@ -659,12 +663,12 @@ SQLMigrate::CreateTables()
   // Try to get the optimal result
   SQLInfoDB* source = m_databaseSource->GetSQLInfoDB();
   SQLInfoDB* target = m_databaseTarget->GetSQLInfoDB();
-  source->SetPreferODBC(false);
-  target->SetPreferODBC(false);
+  source->SetPreferODBC(true);
+  target->SetPreferODBC(true);
 
   for(unsigned int ind = 0; ind < m_tables.size(); ++ind)
   {
-    DDLCreateTable create(source);
+    DDLCreateTable create(source,target);
 
     // Getting the table to migrate
     XString tablename = m_tables[ind].m_table;
@@ -1613,6 +1617,7 @@ SQLMigrate::DatatypeExceptions(RebindMap& p_map)
      m_params.v_targetType == DatabaseType::RDBMS_SQLSERVER)
   {
     p_map.insert(std::make_pair(SQL_TYPE_TIMESTAMP, SQL_VARCHAR));
+    p_map.insert(std::make_pair(SQL_FLOAT,          SQL_DOUBLE));
   }
 }
 

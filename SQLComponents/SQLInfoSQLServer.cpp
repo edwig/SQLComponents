@@ -164,7 +164,7 @@ SQLInfoSQLServer::GetRDBMSMaxStatementLength() const
 bool
 SQLInfoSQLServer::GetRDBMSMustCommitDDL() const
 {
-  return true;
+  return false;
 }
 
 // Correct maximum precision,scale for a NUMERIC datatype
@@ -243,7 +243,7 @@ SQLInfoSQLServer::GetKEYWORDNetworkPrimaryKeyType() const
 XString
 SQLInfoSQLServer::GetKEYWORDTypeTimestamp() const
 {
-  return "DATETIME";
+  return "DATETIME2";
 }
 
 // Prefix for a parameter in a stored procedure
@@ -293,23 +293,34 @@ SQLInfoSQLServer::GetKEYWORDDataType(MetaColumn* p_column)
     case SQL_VARCHAR:                   // fall through
     case SQL_WCHAR:                     // fall through
     case SQL_WVARCHAR:                  type = "VARCHAR";  break;
-    case SQL_LONGVARCHAR:               // fall through
-    case SQL_WLONGVARCHAR:              type = "VARBINARY";break;
+    case SQL_LONGVARCHAR:               type = "VARCHAR(max)";
+                                        p_column->m_columnSize = 0;
+                                        break;
+    case SQL_WLONGVARCHAR:              type = "NVARCHAR(max)";
+                                        p_column->m_columnSize = 0;
+                                        break;
     case SQL_NUMERIC:                   type = "NUMERIC";  break;
-    case SQL_DECIMAL:                   type = "DECIMAL";  break;
+    case SQL_DECIMAL:                   type = "DECIMAL";  
+                                        if(p_column->m_decimalDigits == 0 &&
+                                           p_column->m_columnSize    == 38)
+                                        {
+                                          p_column->m_columnSize = 18;
+                                        }
+                                        break;
     case SQL_INTEGER:                   type = "INT";      break;
     case SQL_SMALLINT:                  type = "SMALLINT"; break;
-    case SQL_FLOAT:                     if(p_column->m_columnSize == 38)
-										                    {
-											                    type = "INT";
-											                    p_column->m_columnSize    = 0;
-											                    p_column->m_decimalDigits = 0;
-										                    }
-										                    else
-										                    {
-											                    type = "FLOAT";
-										                    }
-										                    break;
+    case SQL_FLOAT:                     if(p_column->m_columnSize == 38 ||
+                                           p_column->m_columnSize == 18)
+                                        {
+                                          type = "NUMERIC";
+                                          p_column->m_columnSize = 18;
+//                                        p_column->m_decimalDigits = 0;
+                                        }
+                                        else
+                                        {
+                                          type = "FLOAT";
+                                        }
+                                        break;
     case SQL_REAL:                      // fall through
     case SQL_DOUBLE:                    type = "REAL";     break;
     case SQL_BIGINT:                    type = "BIGINT";   break;
@@ -322,7 +333,7 @@ SQLInfoSQLServer::GetKEYWORDDataType(MetaColumn* p_column)
     case SQL_DATETIME:                  // fall through
     case SQL_TYPE_DATE:                 // fall through
     case SQL_TIMESTAMP:                 // fall through
-    case SQL_TYPE_TIMESTAMP:            type = "DATETIME";
+    case SQL_TYPE_TIMESTAMP:            type = "DATETIME2";
                                         p_column->m_columnSize    = 0;
                                         p_column->m_decimalDigits = 0;
                                         break;
@@ -1370,16 +1381,16 @@ SQLInfoSQLServer::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
     sql += p_sequence.m_schemaName + ".";
   }
   sql += p_sequence.m_sequenceName;
-  sql.AppendFormat("\n START WITH %-12.0f", p_sequence.m_currentValue);
+  sql.AppendFormat("\n START WITH %d INCREMENT BY 1", (int) p_sequence.m_currentValue);
 
-  sql += p_sequence.m_cycle ? "\n CYCLE" : "\n NOCYCLE";
+  sql += p_sequence.m_cycle ? "\n CYCLE" : "\n NO CYCLE";
   if (p_sequence.m_cache > 0)
   {
     sql.AppendFormat("\n CACHE %d",p_sequence.m_cache);
   }
   else
   {
-    sql += "\n NOCACHE";
+    sql += "\n NO CACHE";
   }
   return sql;
 }
@@ -1387,7 +1398,7 @@ SQLInfoSQLServer::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
 XString
 SQLInfoSQLServer::GetCATALOGSequenceDrop(XString p_schema, XString p_sequence) const
 {
-  XString sql("DROP SEQUENCE " + p_schema + "." + p_sequence);
+  XString sql("DROP SEQUENCE IF EXISTS " + p_schema + "." + p_sequence);
   return  sql;
 }
 
@@ -1481,6 +1492,15 @@ XString
 SQLInfoSQLServer::GetCatalogGrantPrivilege(XString p_schema,XString p_objectname,XString p_privilege,XString p_grantee,bool p_grantable)
 {
   XString sql;
+
+  // Filter out unwanted/not-supported privileges
+  if((p_privilege.CompareNoCase("create") == 0) ||
+     (p_privilege.CompareNoCase("index")  == 0))
+  {
+    return sql;
+  }
+
+  // Create grant
   sql.Format("GRANT %s ON %s.%s TO %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
   if(p_grantable)
   {

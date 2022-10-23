@@ -1003,7 +1003,7 @@ SQLQuery::BindParameters()
     // Ugly hack!!
     if(m_database && m_database->GetDatabaseType() == RDBMS_SQLSERVER)
     {
-      if(sqlDatatype == SQL_CHAR && columnSize > 8000)
+      if((sqlDatatype == SQL_CHAR ||sqlDatatype == SQL_VARCHAR ) && columnSize > 8000)
       {
         columnSize = 8000;
       }

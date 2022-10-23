@@ -60,9 +60,9 @@ namespace SQLComponents
     InitCodePageNames();
 
     // Initialize the COM subsystem
-    if(CoInitialize(nullptr) == FALSE)
+    if(CoInitialize(nullptr) == RPC_E_CHANGED_MODE)
     {
-      SQLMessage(nullptr,"COM subsystem not initialized!","Error",MB_OK);
+      SQLMessage(nullptr,"COM subsystem incorrectly reset to single-threaded!","Error",MB_OK);
     };
 
     // We are now officially 'in business' :-)

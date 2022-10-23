@@ -1590,14 +1590,39 @@ SQLInfo::MakeInfoTableColumns(MColumnMap& p_columns
     p_errors = "SQLColumns unsupported. Get a better ODBC driver!";
     return false;
   }
+
+  CloseStatement();
+  bool meta = GetStatement(false);
+
+  if(m_METADATA_ID_unsupported || !meta)
+  {
+    // Oops: Cannot search directly on table name!
+    switch(m_identifierCase)
+    {
+      case SQL_IC_UPPER:     p_schema.MakeUpper();   // E.g. Oracle/Firebird
+                             p_tablename.MakeUpper();
+                             p_columnname.MakeUpper();
+                             break;
+      case SQL_IC_LOWER:     p_schema.MakeLower();   // E.g. Informix/PostgreSQL
+                             p_tablename.MakeLower();
+                             p_columnname.MakeLower();
+                             break;
+      case SQL_IC_SENSITIVE: // Nothing to be done, Catalog is treated case-insensitive
+      case SQL_IC_MIXED:     // but is physically stored case-sensitive only
+                             // e.g. MS-SQLServer / MS-Access / mySQL
+      default:               if(m_METADATA_ID_unsupported && (m_METADATA_ID_errorseen == false))
+                             {
+                               m_METADATA_ID_errorseen = true;
+                             }
+                             break;
+    }
+  }
+
   //strcpy_s((char*)szCatalogName,SQL_MAX_IDENTIFIER,m_searchCatalogName.GetString());
   szCatalogName[0] = 0;
   strcpy_s((char*)szSchemaName,SQL_MAX_BUFFER,p_schema.GetString());
   strcpy_s((char*)szTableName, SQL_MAX_BUFFER,p_tablename.GetString());
   strcpy_s((char*)szColumnName,SQL_MAX_BUFFER,p_columnname.GetString());
-
-  CloseStatement();
-  bool meta = GetStatement(false);
 
   // - If the driver cannot search on this type of META-object the pointer MUST be NULL
   unsigned char* catalog = GetMetaPointer(szCatalogName,meta);
