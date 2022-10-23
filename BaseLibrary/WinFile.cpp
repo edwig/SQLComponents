@@ -948,7 +948,7 @@ WinFile::FormatV(LPCSTR p_format, va_list p_list)
   // Formatting the parameters
   vsprintf_s(buffer, len, p_format, p_list);
   // Adding to the string
-  bool result = Write(buffer,(size_t)len - 1);
+  bool result = Write(buffer);
   delete[] buffer;
   return result;
 }
