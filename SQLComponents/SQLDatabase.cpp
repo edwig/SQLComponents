@@ -620,9 +620,9 @@ SQLDatabase::GetSQLInfoDB()
 
 // Setting the default database schema after login
 bool
-SQLDatabase::SetDefaultSchema(XString p_schema)
+SQLDatabase::SetDefaultSchema(XString p_user,XString p_schema)
 {
-  XString sql = GetSQLInfoDB()->GetSQLDefaultSchema(p_schema);
+  XString sql = GetSQLInfoDB()->GetSQLDefaultSchema(p_user,p_schema);
   if(!sql.IsEmpty())
   {
     try

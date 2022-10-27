@@ -142,7 +142,7 @@ public:
   // Add a general ODBC option for use in the connection string
   void           AddConnectOption(XString p_keyword,XString p_value);
   // Setting the default database schema after login
-  bool           SetDefaultSchema(XString p_schema);
+  bool           SetDefaultSchema(XString p_user,XString p_schema);
 
   // GETTING/CONSTRUCTING the SQLInfo object
   SQLInfoDB*     GetSQLInfoDB();

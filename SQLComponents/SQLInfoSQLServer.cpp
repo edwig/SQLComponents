@@ -380,9 +380,9 @@ SQLInfoSQLServer::GetKEYWORDCurrentUser() const
 
 // Connects to a default schema in the database/instance
 XString
-SQLInfoSQLServer::GetSQLDefaultSchema(XString p_schema) const
+SQLInfoSQLServer::GetSQLDefaultSchema(XString p_user,XString p_schema) const
 {
-  return "EXECUTE AS " + p_schema;
+  return "ALTER USER " + p_user + " WITH DEFAULT_SCHEMA = " + p_schema;
 }
 
 // Gets the construction for inline generating a key within an INSERT statement
