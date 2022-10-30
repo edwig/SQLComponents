@@ -598,6 +598,9 @@ SQLMigrateDialog::PerformMigration()
   XString error;
   SQLMigrate migrate(m_parameters,m_logfile);
 
+  // Needed for the estimated time on the dialog
+  m_start = clock();
+
   try
   {
     // block all buttons

@@ -557,8 +557,9 @@ SQLMigrate::RemoveTemporaries()
 {
   // If target database supports global temporary tables
   // then we leave the temporaries in the data set
-  if(m_params.v_targetType == DatabaseType::RDBMS_ORACLE ||
-     m_params.v_targetType == DatabaseType::RDBMS_FIREBIRD)
+  if(m_params.v_targetType == DatabaseType::RDBMS_ORACLE   ||
+     m_params.v_targetType == DatabaseType::RDBMS_FIREBIRD ||
+     m_params.v_targetType == DatabaseType::RDBMS_SQLSERVER )
   {
     return;
   }
@@ -1247,7 +1248,16 @@ SQLMigrate::MakeSelectStatement(XString& p_tabel,XString& p_user)
     //     {
     //       statement += XString("TRIM(") + info->m_column + "||\'\') as ";
     //     }
-    statement += info->m_column;
+    XString column = info->m_column;
+    if(m_databaseSource->GetSQLInfoDB()->GetRDBMSDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
+    {
+      column.MakeLower();
+      statement.AppendFormat("[%s]",column.GetString());
+    }
+    else
+    {
+      statement += column;
+    }
   }
   statement += " FROM ";
   if(!p_user.IsEmpty())
@@ -1286,7 +1296,16 @@ SQLMigrate::MakeInsertStatement(XString& p_tabel,XString& p_user,XString& p_doel
       statement += ",";
       data      += ",";
     }
-    statement += info->m_column;
+    XString column = info->m_column;
+    if(m_databaseTarget->GetSQLInfoDB()->GetRDBMSDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
+    {
+      column.MakeLower();
+      statement.AppendFormat("[%s]",column.GetString());
+    }
+    else
+    {
+      statement += column;
+    }
     data      += "?";
   }
   statement += ") VALUES (" + data + ")";
