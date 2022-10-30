@@ -600,9 +600,6 @@ SQLMigrateDialog::PerformMigration()
 
   try
   {
-    // Record starting time;
-    m_start = clock();
-
     // block all buttons
     m_exportRunning = true;
     m_exportResult  = migrate.Migrate();
@@ -622,15 +619,6 @@ SQLMigrateDialog::PerformMigration()
 
   // NOW READY!
   m_exportRunning = false;
-
-  // Report the running time
-  XString timing;
-  long miliseconds = clock() - m_start;
-  timing.Format("Total running time = %d:%d.%03d"
-                ,(miliseconds / CLOCKS_PER_SEC) / 60
-                ,(miliseconds / CLOCKS_PER_SEC) % 60
-                ,(miliseconds % CLOCKS_PER_SEC));
-  m_logfile.WriteLog(timing);
 
   // Show errors (if any)
   if(!error.IsEmpty())
@@ -956,7 +944,7 @@ SQLMigrateDialog::HandleMessages()
   // so we limit the loop to a certain time frame
   MSG msg;
   UINT ticks = GetTickCount();
-  while (GetTickCount() - ticks < 100 && (PeekMessage(&msg,NULL,WM_MOVE,WM_USER,PM_REMOVE)))
+  while(GetTickCount() - ticks < 200 && (PeekMessage(&msg,NULL,WM_MOVE,WM_USER,PM_REMOVE)))
   {
     try
     {

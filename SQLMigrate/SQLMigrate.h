@@ -86,10 +86,11 @@ private:
   MigrateParameters m_params;
   Logging&          m_log;
 
-  int          m_directMigration;
-  int          m_totalTables;
-  SQLDatabase* m_databaseSource;
-  SQLDatabase* m_databaseTarget;
+  int          m_directMigration { 0 };
+  int          m_totalTables     { 0 };
+  clock_t      m_start           { 0 };
+  SQLDatabase* m_databaseSource  { nullptr };
+  SQLDatabase* m_databaseTarget  { nullptr };
   MTableMap    m_tables;
   RebindMap    m_rebinds;
 };

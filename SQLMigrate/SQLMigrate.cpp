@@ -44,11 +44,7 @@ namespace SQLComponents
 SQLMigrate::SQLMigrate(MigrateParameters& p_params,Logging& m_log)
            :m_params(p_params)
            ,m_log(m_log)
-           ,m_databaseSource(nullptr)
-           ,m_databaseTarget(nullptr)
 {
-  m_directMigration = 0;
-  m_totalTables     = 0;
 }
 
 SQLMigrate::~SQLMigrate()
@@ -68,7 +64,11 @@ SQLMigrate::~SQLMigrate()
 bool 
 SQLMigrate::Migrate()
 {
+  XString text;
   bool result = false;
+
+  // Getting the starting moment
+  m_start = clock();
 
   // Check the input parameters first.
   // Will throw StdException if parameters are incorrect and/or non-conforming
@@ -88,11 +88,10 @@ SQLMigrate::Migrate()
   if(!m_databaseSource)  m_databaseSource = new SQLDatabase();
   if(!m_databaseTarget)  m_databaseTarget = new SQLDatabase();
 
-  XString error;
   XString connectSource;
   XString connectTarget;
-  connectSource.Format("DSN=%s;UID=%s;PWD=%s;", m_params.v_source_dsn, m_params.v_source_user, m_params.v_source_password);
-  connectTarget.Format("DSN=%s;UID=%s;PWD=%s;", m_params.v_target_dsn, m_params.v_target_user, m_params.v_target_password);
+  connectSource.Format("DSN=%s;UID=%s;PWD=%s;",m_params.v_source_dsn.GetString(),m_params.v_source_user.GetString(),m_params.v_source_password.GetString());
+  connectTarget.Format("DSN=%s;UID=%s;PWD=%s;",m_params.v_target_dsn.GetString(),m_params.v_target_user.GetString(),m_params.v_target_password.GetString());
 
   try
   {
@@ -102,9 +101,9 @@ SQLMigrate::Migrate()
     m_log.WriteLog("Logged in user      : " + m_params.v_source_user);
     if(m_databaseSource->Open(connectSource,true) == false)  // Read-only connect
     {
-      error.Format("Cannot make connection with: " + m_params.v_source_dsn);
-      m_log.WriteLog(error);
-      AfxMessageBox (error,MB_OK|MB_ICONERROR);
+      text.Format("Cannot make connection with: " + m_params.v_source_dsn);
+      m_log.WriteLog(text);
+      AfxMessageBox (text,MB_OK|MB_ICONERROR);
       return false;
     }
     m_log.SetDBType(true,m_databaseSource->GetDatabaseTypeName());
@@ -116,9 +115,9 @@ SQLMigrate::Migrate()
     m_log.WriteLog("Logged in user      : " + m_params.v_target_user);
     if(m_databaseTarget->Open(connectTarget) == false)
     {
-      error.Format("Cannot make connection with: " + m_params.v_target_dsn);
-      m_log.WriteLog(error);
-      AfxMessageBox (error,MB_OK|MB_ICONERROR);
+      text.Format("Cannot make connection with: " + m_params.v_target_dsn);
+      m_log.WriteLog(text);
+      AfxMessageBox (text,MB_OK|MB_ICONERROR);
       return false;
     }
 
@@ -143,9 +142,9 @@ SQLMigrate::Migrate()
     if(m_totalTables == 0)
     {
       // Check if nothing to do
-      error = "No tables to migrate";
-      m_log.WriteLog(error);
-      AfxMessageBox(error,MB_OK|MB_ICONERROR);
+      text = "No tables to migrate";
+      m_log.WriteLog(text);
+      AfxMessageBox(text,MB_OK|MB_ICONERROR);
     }
     else
     {
@@ -217,12 +216,21 @@ SQLMigrate::Migrate()
     m_log.WriteOut ("-- End of script");
   }
 
-  XString resultline;
-  resultline.Format("Result of the migration: %d Errors.",m_params.v_errors);
+  // Result of the migration
+  text.Format("Result of the migration: %d Errors.",m_params.v_errors);
   m_log.WriteLog("");
-  m_log.WriteLog(resultline);
-  m_log.WriteLog("*** End of migration. ***");
+  m_log.WriteLog(text);
 
+  // Report the running time
+  long miliseconds = clock() - m_start;
+  text.Format("Total running time = %d:%d.%03d"
+             ,(miliseconds / CLOCKS_PER_SEC) / 60
+             ,(miliseconds / CLOCKS_PER_SEC) % 60
+             ,(miliseconds % CLOCKS_PER_SEC));
+  m_log.WriteLog(text);
+
+  // THE END!
+  m_log.WriteLog("*** End of migration. ***");
   return result;
 }
 

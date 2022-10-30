@@ -74,9 +74,7 @@ SQLInfoSQLServer::GetRDBMSVendorName() const
 XString
 SQLInfoSQLServer::GetRDBMSPhysicalDatabaseName() const
 {
-  XString query = "SELECT name\n"
-                  "  FROM master.dbo.sysdatabases\n"
-                  " WHERE dbid = db_id()";
+  XString query = "SELECT DB_NAME()";
   SQLQuery qry(m_database);
   qry.DoSQLStatement(query);
   if(qry.GetRecord())
@@ -156,8 +154,8 @@ SQLInfoSQLServer::GetRDBMSSupportsFunctionalIndexes() const
 unsigned long
 SQLInfoSQLServer::GetRDBMSMaxStatementLength() const
 {
-  // No Limit
-  return 0;
+  // Current limit = 1 MB
+  return 1048576; // (1024 * 1024);
 }
 
 // Database must commit DDL commands in a transaction
@@ -272,7 +270,7 @@ SQLInfoSQLServer::GetKEYWORDUpper(XString& p_expression) const
 XString
 SQLInfoSQLServer::GetKEYWORDInterval1MinuteAgo() const
 {
-  return "dateadd(minute,-1,current_timestamp)";
+  return "DATEADD(minute,-1,current_timestamp)";
 }
 
 // Gets the Not-NULL-Value statement of the database
@@ -300,11 +298,11 @@ SQLInfoSQLServer::GetKEYWORDDataType(MetaColumn* p_column)
                                         p_column->m_columnSize = 0;
                                         break;
     case SQL_NUMERIC:                   type = "NUMERIC";  break;
-    case SQL_DECIMAL:                   type = "DECIMAL";  
+    case SQL_DECIMAL:                   type = "NUMERIC";  
                                         if(p_column->m_decimalDigits == 0 &&
                                            p_column->m_columnSize    == 38)
                                         {
-                                          p_column->m_columnSize = 18;
+                                          p_column->m_columnSize = 0;
                                         }
                                         break;
     case SQL_INTEGER:                   type = "INT";      break;
@@ -670,12 +668,17 @@ SQLInfoSQLServer::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_colum
     sql += "TEMPORARY ";
   }
   sql += "TABLE ";
-  if (!p_table.m_schema.IsEmpty())
+  XString schema = p_table.m_schema;
+  XString table  = p_table.m_table;
+
+  schema.MakeLower();
+  table.MakeLower();
+
+  if (!schema.IsEmpty())
   {
-    sql += p_table.m_schema;
-    sql += ".";
+    sql.AppendFormat("[%s].",schema.GetString());
   }
-  sql += p_table.m_table;
+  sql.AppendFormat("[%s]",table.GetString());
   return sql;
 }
 
@@ -701,11 +704,14 @@ SQLInfoSQLServer::GetCATALOGTableDrop(XString p_schema,XString p_tablename,bool 
   {
     sql += "IF EXISTS ";
   }
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+
   if(!p_schema.IsEmpty())
   {
-    sql += p_schema + ".";
+    sql.AppendFormat("[%s].",p_schema.GetString());
   }
-  sql += p_tablename;
+  sql.AppendFormat("[%s]",p_tablename.GetString());
   return sql;
 }
 
@@ -871,27 +877,34 @@ SQLInfoSQLServer::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
   {
     if(index.m_position == 1)
     {
+      XString schema = index.m_schemaName;
+      XString idname = index.m_indexName;
+      XString tablen = index.m_tableName;
+      schema.MakeLower();
+      idname.MakeLower();
+      tablen.MakeLower();
+
       // New index
       query = "CREATE ";
       if(index.m_nonunique == false)
       {
         query += "UNIQUE ";
       }
-      query += "INDEX ";
-      query += index.m_indexName;
-      query += " ON ";
-      if(!index.m_schemaName.IsEmpty())
+      query.AppendFormat("INDEX [%s] ON ",idname.GetString());
+
+      if(!schema.IsEmpty())
       {
-        query += index.m_schemaName + ".";
+        query.AppendFormat("[%s].",schema.GetString());
       }
-      query += index.m_tableName;
-      query += "(";
+      query.AppendFormat("[%s](",tablen.GetString());
     }
     else
     {
       query += ",";
     }
-    query += index.m_columnName;
+    XString column = index.m_columnName;
+    column.MakeLower();
+    query.AppendFormat("[%s]",column.GetString());
     if(index.m_ascending != "A")
     {
       query += " DESC";
@@ -904,7 +917,10 @@ SQLInfoSQLServer::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
 XString
 SQLInfoSQLServer::GetCATALOGIndexDrop(XString p_schema,XString /*p_tablename*/,XString p_indexname) const
 {
-  XString sql = "DROP INDEX " + p_schema + "." + p_indexname;
+  p_schema.MakeLower();
+  p_indexname.MakeLower();
+
+  XString sql = "DROP INDEX [" + p_schema + "].[" + p_indexname + "]";
   return sql;
 }
 
@@ -953,12 +969,20 @@ SQLInfoSQLServer::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
   {
     if(prim.m_columnPosition == 1)
     {
-      if(!prim.m_schema.IsEmpty())
+      XString schema = prim.m_schema;
+      XString table  = prim.m_table;
+      XString constr = prim.m_constraintName;
+
+      schema.MakeLower();
+      table .MakeLower();
+      constr.MakeLower();
+
+      if(!schema.IsEmpty())
       {
-        query += prim.m_schema + ".";
+        query.AppendFormat("[%s].",schema.GetString());
       }
-      query += prim.m_table + "\n";
-      query += "  ADD CONSTRAINT " + prim.m_constraintName + "\n";
+      query.AppendFormat("[%s]\n",table.GetString());
+      query.AppendFormat("  ADD CONSTRAINT [%s]\n",constr.GetString());
       query += "      PRIMARY KEY (";
 
     }
@@ -966,7 +990,9 @@ SQLInfoSQLServer::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
     {
       query += ",";
     }
-    query += prim.m_columnName;
+    XString column = prim.m_columnName;
+    column.MakeLower();
+    query.AppendFormat("[%s]",column.GetString());
   }
   query += ")";
   return query;
@@ -975,8 +1001,12 @@ SQLInfoSQLServer::GetCATALOGPrimaryCreate(MPrimaryMap& p_primaries) const
 XString
 SQLInfoSQLServer::GetCATALOGPrimaryDrop(XString p_schema,XString p_tablename,XString p_constraintname) const
 {
-  XString sql("ALTER TABLE " + p_schema + "." + p_tablename + "\n"
-              " DROP CONSTRAINT " + p_constraintname);
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  p_constraintname.MakeLower();
+
+  XString sql("ALTER TABLE [" + p_schema + "].[" + p_tablename + "]\n"
+              " DROP CONSTRAINT [" + p_constraintname + "]");
   return sql;
 }
 
@@ -1102,18 +1132,28 @@ SQLInfoSQLServer::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
   // Construct the correct tablename
   XString table(foreign.m_fkTableName);
   XString primary(foreign.m_pkTableName);
+  XString fkschema(foreign.m_fkSchemaName);
+  XString pkschema(foreign.m_pkSchemaName);
+  XString constraint(foreign.m_foreignConstraint);
+
+  table.MakeLower();
+  primary.MakeLower();
+  fkschema.MakeLower();
+  pkschema.MakeLower();
+  constraint.MakeLower();
+
   if(!foreign.m_fkSchemaName.IsEmpty())
   {
-    table = foreign.m_fkSchemaName + "." + table;
+    table = fkschema + "].[" + table;
   }
   if(!foreign.m_pkSchemaName.IsEmpty())
   {
-    primary = foreign.m_pkSchemaName + "." + primary;
+    primary = pkschema + "].[" + primary;
   }
 
   // The base foreign key command
-  XString query = "ALTER TABLE " + table + "\n"
-                  "  ADD CONSTRAINT " + foreign.m_foreignConstraint + "\n"
+  XString query = "ALTER TABLE [" + table + "]\n"
+                  "  ADD CONSTRAINT [" + constraint + "]\n"
                   "      FOREIGN KEY (";
 
   // Add the foreign key columns
@@ -1121,19 +1161,23 @@ SQLInfoSQLServer::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
   for(auto& key : p_foreigns)
   {
     if(extra) query += ",";
-    query += key.m_fkColumnName;
+    XString column = key.m_fkColumnName;
+    column.MakeLower();
+    query.AppendFormat("[%s]",column.GetString());
     extra  = true;
   }
 
   // Add references primary table
-  query += ")\n      REFERENCES " + primary + "(";
+  query += ")\n      REFERENCES [" + primary + "] (";
 
   // Add the primary key columns
   extra = false;
   for(auto& key : p_foreigns)
   {
     if(extra) query += ",";
-    query += key.m_pkColumnName;
+    XString column = key.m_pkColumnName;
+    column.MakeLower();
+    query.AppendFormat("[%s]",column.GetString());
     extra  = true;
   }
   query += ")";
@@ -1178,8 +1222,12 @@ SQLInfoSQLServer::GetCATALOGForeignAlter(MForeignMap& /*p_original*/, MForeignMa
 XString
 SQLInfoSQLServer::GetCATALOGForeignDrop(XString p_schema,XString p_tablename,XString p_constraintname) const
 {
-  XString sql("ALTER TABLE " + p_schema + "." + p_tablename + "\n"
-              " DROP CONSTRAINT " + p_constraintname);
+  p_schema.MakeLower();
+  p_tablename.MakeLower();
+  p_constraintname.MakeLower();
+
+  XString sql("ALTER TABLE [" + p_schema + "].[" + p_tablename + "]\n"
+              " DROP CONSTRAINT [" + p_constraintname + "]");
   return sql;
 }
 
@@ -1284,12 +1332,15 @@ SQLInfoSQLServer::GetCATALOGTriggerCreate(MetaTrigger& p_trigger) const
 XString
 SQLInfoSQLServer::GetCATALOGTriggerDrop(XString p_schema, XString /*p_tablename*/, XString p_triggername) const
 {
+  p_schema.MakeLower();
+  p_triggername.MakeLower();
+
   XString sql("DROP TRIGGER ");
   if(!p_schema.IsEmpty())
   {
-    sql += p_schema + ".";
+    sql.AppendFormat("[%s].",p_schema.GetString());
   }
-  sql += p_triggername;
+  sql.AppendFormat("[%s]",p_triggername.GetString());
   return sql;
 }
 
@@ -1375,12 +1426,16 @@ XString
 SQLInfoSQLServer::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
 {
   XString sql("CREATE SEQUENCE ");
+  XString schemanm = p_sequence.m_schemaName;
+  XString sequence = p_sequence.m_sequenceName;
+  schemanm.MakeLower();
+  sequence.MakeLower();
 
-  if (!p_sequence.m_schemaName.IsEmpty())
+  if(!schemanm.IsEmpty())
   {
-    sql += p_sequence.m_schemaName + ".";
+    sql.AppendFormat("[%s].",schemanm.GetString());
   }
-  sql += p_sequence.m_sequenceName;
+  sql.AppendFormat("[%s]",sequence.GetString());
   sql.AppendFormat("\n START WITH %d INCREMENT BY 1", (int) p_sequence.m_currentValue);
 
   sql += p_sequence.m_cycle ? "\n CYCLE" : "\n NO CYCLE";
@@ -1398,7 +1453,11 @@ SQLInfoSQLServer::GetCATALOGSequenceCreate(MetaSequence& p_sequence) const
 XString
 SQLInfoSQLServer::GetCATALOGSequenceDrop(XString p_schema, XString p_sequence) const
 {
-  XString sql("DROP SEQUENCE IF EXISTS " + p_schema + "." + p_sequence);
+  p_schema.MakeLower();
+  p_sequence.MakeLower();
+
+  XString sql;
+  sql.Format("DROP SEQUENCE IF EXISTS [%s].[%s]",p_schema.GetString(),p_sequence.GetString());
   return  sql;
 }
 
@@ -1459,7 +1518,10 @@ SQLInfoSQLServer::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewname
 XString
 SQLInfoSQLServer::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString p_contents) const
 {
-  return "CREATE VIEW " + p_schema + "." + p_viewname + "\n" + p_contents;
+  p_schema.MakeLower();
+  p_viewname.MakeLower();
+
+  return "CREATE VIEW [" + p_schema + "].[" + p_viewname + "]\n" + p_contents;
 }
 
 XString 
@@ -1472,7 +1534,10 @@ XString
 SQLInfoSQLServer::GetCATALOGViewDrop(XString p_schema,XString p_viewname,XString& p_precursor) const
 {
   p_precursor.Empty();
-  return "DROP VIEW " + p_schema + "." + p_viewname;
+  p_schema.MakeLower();
+  p_viewname.MakeLower();
+
+  return "DROP VIEW [" + p_schema + "].[" + p_viewname + "]";
 }
 
 // All Privilege functions
@@ -1500,8 +1565,12 @@ SQLInfoSQLServer::GetCatalogGrantPrivilege(XString p_schema,XString p_objectname
     return sql;
   }
 
+  p_schema.MakeLower();
+  p_grantee.MakeLower();
+  p_objectname.MakeLower();
+
   // Create grant
-  sql.Format("GRANT %s ON %s.%s TO %s",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
+  sql.Format("GRANT %s ON [%s].[%s] TO [%s]",p_privilege.GetString(),p_schema.GetString(),p_objectname.GetString(),p_grantee.GetString());
   if(p_grantable)
   {
     sql += " WITH GRANT OPTION";

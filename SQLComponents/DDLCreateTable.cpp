@@ -728,9 +728,15 @@ DDLCreateTable::ReplaceLengthPrecScale(XString p_template
 
   // Format as strings
   XString length,precision,scale;
+  if(p_length > 0)
+  {
   length.Format("%d",p_length);
+  }
+  if(p_precision > 0 || p_scale > 0)
+  {
   precision.Format("%d",p_precision);
   scale.Format("%d",p_scale);
+  }
 
   // Replace as strings
   p_template.Replace("max length",length);    // ORACLE DOES THIS!!
@@ -739,11 +745,15 @@ DDLCreateTable::ReplaceLengthPrecScale(XString p_template
   p_template.Replace("scale",     scale);
 
   // Make sure we have parenthesis
-  if(!p_template.IsEmpty() && p_template.Left(1) != "(")
+  if(!p_template.IsEmpty() && p_template.Left(1) != "(" && p_template != ",")
   {
     p_template = "(" + p_template + ")";
   }
+  if(p_template != ",")
+  {
   return p_template;
+}
+  return "";
 }
 
 XString
@@ -760,13 +770,18 @@ DDLCreateTable::FormatColumnName(XString p_column,int p_length)
   }
 
   // Circumvent locally reserved words
-  if(!m_info->IsCorrectName(p_column))
+  if(m_target->GetRDBMSDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
+  {
+    p_column = "[" + p_column + "]";
+    p_length += 2;
+  }
+  else if(!m_info->IsCorrectName(p_column))
   {
     XString quote = m_info->GetKEYWORDReservedWordQuote();
     p_column = quote + p_column + quote;
   }
 
-  // Pretty-print adjust datatypes
+  // Pretty-print adjust datatype
   while (p_column.GetLength() < p_length)
   {
     p_column += " ";
