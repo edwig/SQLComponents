@@ -243,7 +243,7 @@ SQLInfoSQLServer::GetKEYWORDNetworkPrimaryKeyType() const
 XString
 SQLInfoSQLServer::GetKEYWORDTypeTimestamp() const
 {
-  return "DATETIME2";
+  return "DATETIME";
 }
 
 // Prefix for a parameter in a stored procedure
@@ -333,7 +333,7 @@ SQLInfoSQLServer::GetKEYWORDDataType(MetaColumn* p_column)
     case SQL_DATETIME:                  // fall through
     case SQL_TYPE_DATE:                 // fall through
     case SQL_TIMESTAMP:                 // fall through
-    case SQL_TYPE_TIMESTAMP:            type = "DATETIME2";
+    case SQL_TYPE_TIMESTAMP:            type = "DATETIME";
                                         p_column->m_columnSize    = 0;
                                         p_column->m_decimalDigits = 0;
                                         break;

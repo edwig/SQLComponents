@@ -948,7 +948,7 @@ SQLMigrateDialog::HandleMessages()
   // so we limit the loop to a certain time frame
   MSG msg;
   UINT ticks = GetTickCount();
-  while (GetTickCount() - ticks < 50 && (PeekMessage(&msg,NULL,WM_MOVE,WM_USER,PM_REMOVE)))
+  while (GetTickCount() - ticks < 100 && (PeekMessage(&msg,NULL,WM_MOVE,WM_USER,PM_REMOVE)))
   {
     try
     {
