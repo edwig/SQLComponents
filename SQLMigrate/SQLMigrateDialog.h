@@ -94,7 +94,6 @@ public:
   // Working objects
   MigrateParameters m_parameters;
   Logging           m_logfile;
-  SQLMigrate*       m_migrate;
 
   void HandleMessages();
 

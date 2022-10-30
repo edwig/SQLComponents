@@ -123,7 +123,7 @@ SQLMigrate::Migrate()
     }
 
     // Try to use the target schema
-    bool defschema = m_databaseTarget->SetDefaultSchema(m_params.v_target_schema);
+    bool defschema = m_databaseTarget->SetDefaultSchema(m_params.v_target_user,m_params.v_target_schema);
     m_log.WriteLog(XString("Connect to schema   : ") + (defschema ? m_params.v_target_schema : XString("NO SCHEMA!!")));
 
     m_log.SetDBType(false,m_databaseTarget->GetDatabaseTypeName());
@@ -240,7 +240,7 @@ SQLMigrate::CheckMigrateParameters()
 {
   XString create   = m_params.v_directory + "\\" + m_params.v_createscript;
   XString dropping = m_params.v_directory + "\\" + m_params.v_dropscript;
-  XString logging  = m_params.v_directory + "\\" + FILENAME_LOGFILE;
+  XString logging  = m_params.v_directory + "\\" + "Logfile_" + m_params.v_target_schema + ".txt";
 
   m_log.SetScript(create);
   m_log.SetDropScript(dropping);

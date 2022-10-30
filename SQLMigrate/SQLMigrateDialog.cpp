@@ -39,7 +39,6 @@ static char THIS_FILE[] = __FILE__;
 
 SQLMigrateDialog::SQLMigrateDialog(CWnd* pParent)
                  :CDialog(SQLMigrateDialog::IDD, pParent)
-                 ,m_migrate(nullptr)
                  ,m_font(nullptr)
                  ,m_start(0L)
 {
@@ -596,7 +595,8 @@ SQLMigrateDialog::GetMigrationParameters()
 void
 SQLMigrateDialog::PerformMigration()
 {
-  m_migrate = new SQLMigrate(m_parameters, m_logfile);
+  XString error;
+  SQLMigrate migrate(m_parameters,m_logfile);
 
   try
   {
@@ -605,37 +605,45 @@ SQLMigrateDialog::PerformMigration()
 
     // block all buttons
     m_exportRunning = true;
-    m_exportResult  = m_migrate->Migrate();
+    m_exportResult  = migrate.Migrate();
   }
   catch(StdException& ex)
   {
-    if(m_commandLineMode)
-    {
-      m_logfile.WriteLog("");
-      m_logfile.WriteLog("STOPPED WITH ERROR!");
-      m_logfile.WriteLog(ex.GetErrorMessage());
-    }
-    else
-    {
-      MessageBox(ex.GetErrorMessage(),SQL_MIGRATE,MB_OK|MB_ICONERROR);
-    }
+    error = ex.GetErrorMessage();
+  }
+  catch(XString& ex)
+  {
+    error = ex;
   }
   catch(...)
   {
-    XString text("Migration is stopped with an error");
-    if(m_commandLineMode)
+    error = "Migration is stopped with an error";
+  }
+
+  // NOW READY!
+  m_exportRunning = false;
+
+  // Report the running time
+  XString timing;
+  long miliseconds = clock() - m_start;
+  timing.Format("Total running time = %d:%d.%03d"
+                ,(miliseconds / CLOCKS_PER_SEC) / 60
+                ,(miliseconds / CLOCKS_PER_SEC) % 60
+                ,(miliseconds % CLOCKS_PER_SEC));
+  m_logfile.WriteLog(timing);
+
+  // Show errors (if any)
+  if(!error.IsEmpty())
+  {
+    m_logfile.WriteLog("");
+    m_logfile.WriteLog("STOPPED WITH ERROR!");
+    m_logfile.WriteLog(error);
+
+    if(m_commandLineMode == false)
     {
-      m_logfile.WriteLog("");
-      m_logfile.WriteLog(text);
-    }
-    else
-    {
-      MessageBox(text,SQL_MIGRATE,MB_OK|MB_ICONERROR);
+      MessageBox(error,SQL_MIGRATE,MB_OK | MB_ICONERROR);
     }
   }
-  m_exportRunning = false;
-  delete m_migrate;
-  m_migrate = nullptr;
 }
 
 // POST MIGRATION: CLEAN-UP
