@@ -583,6 +583,13 @@ SQLInfoMariaDB::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,in
   return string;
 }
 
+// Makes an catalog identifier string (possibly quoted on both sides)
+XString
+SQLInfoMariaDB::GetSQLDDLIdentifier(XString p_identifier) const
+{
+  return p_identifier;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CATALOG

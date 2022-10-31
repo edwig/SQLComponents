@@ -554,6 +554,13 @@ SQLInfoOracle::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int
   return string;
 }
 
+// Makes an catalog identifier string (possibly quoted on both sides)
+XString
+SQLInfoOracle::GetSQLDDLIdentifier(XString p_identifier) const
+{
+  return p_identifier;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CATALOG

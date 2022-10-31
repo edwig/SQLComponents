@@ -471,6 +471,13 @@ SQLInfoInformix::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,i
   return string;
 }
 
+// Makes an catalog identifier string (possibly quoted on both sides)
+XString
+SQLInfoInformix::GetSQLDDLIdentifier(XString p_identifier) const
+{
+  return p_identifier;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CATALOG

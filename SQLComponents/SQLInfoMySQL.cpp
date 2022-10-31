@@ -456,6 +456,13 @@ SQLInfoMySQL::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int 
   return string;
 }
 
+// Makes an catalog identifier string (possibly quoted on both sides)
+XString
+SQLInfoMySQL::GetSQLDDLIdentifier(XString p_identifier) const
+{
+  return p_identifier;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CATALOG

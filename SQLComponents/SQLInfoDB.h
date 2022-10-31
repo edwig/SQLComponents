@@ -257,6 +257,9 @@ public:
   // Stripped data for the parameter binding
   virtual XString GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,int p_hour,int p_minute,int p_second) const = 0;
 
+  // Makes an catalog identifier string (possibly quoted on both sides)
+  virtual XString GetSQLDDLIdentifier(XString p_identifier) const = 0;
+
   //////////////////////////////////////////////////////////////////////////
   //
   // CATALOG

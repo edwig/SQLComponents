@@ -535,6 +535,16 @@ SQLInfoSQLServer::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day,
   return retval;
 }
 
+// Makes an catalog identifier string (possibly quoted on both sides)
+XString
+SQLInfoSQLServer::GetSQLDDLIdentifier(XString p_identifier) const
+{
+  XString ident;
+  p_identifier.MakeLower();
+  ident.Format("[%s]",p_identifier.GetString());
+  return ident;;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CATALOG
@@ -1185,7 +1195,7 @@ SQLInfoSQLServer::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
   // Add all relevant options
   switch(foreign.m_updateRule)
   {
-    case SQL_CASCADE :    query += "\n      ON UPDATE CASCADE";     break;
+    case SQL_CASCADE :    query += "\n      ON UPDATE NO ACTION";   break; // CASCADE is unreliable
     case SQL_SET_NULL:    query += "\n      ON UPDATE SET NULL";    break;
     case SQL_SET_DEFAULT: query += "\n      ON UPDATE SET DEFAULT"; break;
     case SQL_NO_ACTION:   query += "\n      ON UPDATE NO ACTION";   break;

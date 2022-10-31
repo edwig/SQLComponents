@@ -444,6 +444,13 @@ SQLInfoGenericODBC::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_da
   return string;
 }
 
+// Makes an catalog identifier string (possibly quoted on both sides)
+XString
+SQLInfoGenericODBC::GetSQLDDLIdentifier(XString p_identifier) const
+{
+  return p_identifier;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CATALOG

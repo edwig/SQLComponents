@@ -453,6 +453,13 @@ SQLInfoPostgreSQL::GetSQLDateTimeStrippedString(int p_year,int p_month,int p_day
   return retval;
 }
 
+// Makes an catalog identifier string (possibly quoted on both sides)
+XString
+SQLInfoPostgreSQL::GetSQLDDLIdentifier(XString p_identifier) const
+{
+  return p_identifier;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // CATALOG

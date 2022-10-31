@@ -1283,9 +1283,10 @@ SQLMigrate::MakeInsertStatement(XString& p_tabel,XString& p_user,XString& p_doel
   MColumnMap columns;
   XString    schema;
   XString    errors;
+  SQLInfoDB* target = m_databaseTarget->GetSQLInfoDB();
 
-  statement += p_doel_user + ".";
-  statement += p_tabel + " (";
+  statement += target->GetSQLDDLIdentifier(p_doel_user) + ".";
+  statement += target->GetSQLDDLIdentifier(p_tabel) + " (";
 
   m_databaseSource->GetSQLInfoDB()->MakeInfoTableColumns(columns,errors,p_user,p_tabel);
   for(unsigned int regel = 0; regel < columns.size(); ++regel)
@@ -1297,15 +1298,7 @@ SQLMigrate::MakeInsertStatement(XString& p_tabel,XString& p_user,XString& p_doel
       data      += ",";
     }
     XString column = info->m_column;
-    if(m_databaseTarget->GetSQLInfoDB()->GetRDBMSDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
-    {
-      column.MakeLower();
-      statement.AppendFormat("[%s]",column.GetString());
-    }
-    else
-    {
-      statement += column;
-    }
+    statement += target->GetSQLDDLIdentifier(column);
     data      += "?";
   }
   statement += ") VALUES (" + data + ")";
@@ -1514,12 +1507,13 @@ SQLMigrate::MakeInsertDataStatement(XString& p_table,XString& p_target_schema,SQ
   XString data;
   XString statement("INSERT INTO ");
   bool seperator = false;
+  SQLInfoDB* target = m_databaseTarget->GetSQLInfoDB();
 
   if(!p_target_schema.IsEmpty())
   {
-    statement += p_target_schema + ".";
+    statement += target->GetSQLDDLIdentifier(p_target_schema) + ".";
   }
-  statement += p_table + " (";
+  statement += target->GetSQLDDLIdentifier(p_table) + " (";
 
   for(unsigned int row = 0; row < columns.size(); ++row)
   {
@@ -1535,7 +1529,7 @@ SQLMigrate::MakeInsertDataStatement(XString& p_table,XString& p_target_schema,SQ
         statement += ",";
       }
       data      += datum;
-      statement += info->m_column;
+      statement += target->GetSQLDDLIdentifier(info->m_column);
       seperator  = true;
     }
   }

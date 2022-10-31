@@ -914,7 +914,7 @@ SQLMigrateDialog::EstimateRemainingTime(int p_num,int p_maxnum)
 {
   // Check if we have something to do
   m_estimated.Empty();
-  if(m_start)
+  if(m_start && p_num > 0)
   {
     clock_t now = clock();
 
