@@ -3,11 +3,14 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.0
 ===== Released since: 20-03-2022 =====
 ======================================
 
-Version 2.0.6 of .......
---------------------------
+Version 2.0.6 of 31-10-2022
+---------------------------
 1) Tested Oracle to MS-SQLServer conversion in the Migrate program
    Added various enhancements to be able to convert tables, index, primary and foreign keys
    and convert data at least in the tradtional select/insert cycle.
+2) Added JSONPath filters
+3) Added XStringBuilder
+4) Fixes for EventLogRegistration and ServiceReporting
 
 Version 2.0.5 of 29-9-2022
 --------------------------

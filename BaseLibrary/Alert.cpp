@@ -101,7 +101,7 @@ XString GetAlertlogPath(int p_module)
 {
   AutoCritSec lock(&g_alertCritical);
 
-  if(g_alertPath && p_module >= 0 && p_module < g_alertModules)
+  if(g_alertPath && p_module >= 0 && p_module <= g_alertModules)
   {
     AlertPaths::iterator it = g_alertPath->find(p_module);
     if(it != g_alertPath->end())
