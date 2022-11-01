@@ -547,7 +547,7 @@ SQLMigrate::ReadTablesFromFile(XString& p_file)
   else
   {
     XString msg;
-    msg.Format("Cannot open the text file with table names: %s",p_file);
+    msg.Format("Cannot open the text file with table names: %s",p_file.GetString());
     AfxMessageBox(msg,MB_OK|MB_ICONERROR);
   }
 }
@@ -1105,7 +1105,7 @@ SQLMigrate::FillTablesViaPump()
     try
     {
       XString text;
-      text.Format("Migrating table     : %s", table);
+      text.Format("Migrating table     : %s", table.GetString());
       m_log.WriteLog(text);
 
       totrows = CountTableContents(schema,table);
@@ -1158,7 +1158,7 @@ SQLMigrate::FillTablesViaPump()
               m_log.SetTableGauge(++rows,totrows);
               if(rows % m_params.v_logLines == 0)
               {
-                text.Format("Table: %s Rows: %ld [%6.2f %%]",table,rows,((double) rows / (double)totrows * 100.0));
+                text.Format("Table: %s Rows: %ld [%6.2f %%]",table.GetString(),rows,((double) rows / (double)totrows * 100.0));
                 m_log.WriteLog(text);
               }
             }
@@ -1190,7 +1190,7 @@ SQLMigrate::FillTablesViaPump()
 
         // End
         m_log.SetTableGauge(rows,totrows);
-        text.Format("Table: %s Rows: %ld [%6.2f %%]",table,rows,((double)rows / (double)totrows * 100.0));
+        text.Format("Table: %s Rows: %ld [%6.2f %%]",table.GetString(),rows,((double)rows / (double)totrows * 100.0));
         m_log.WriteLog(text);
       }
     }
@@ -1209,17 +1209,17 @@ SQLMigrate::FillTablesViaPump()
     // Show tables
     m_log.SetTablesGauge(++numTables);
     XString overgezet;
-    overgezet.Format("Table [%s.%s] migrated with [%ld of %ld] rows",m_params.v_source_user,table,rows,totrows);
+    overgezet.Format("Table [%s.%s] migrated with [%ld of %ld] rows",m_params.v_source_user.GetString(),table.GetString(),rows,totrows);
     m_log.WriteLog(overgezet);
     // Extra missing records log
     if(rows < totrows)
     {
-      overgezet.Format("MISSING: Table [%s.%s] missing rows: %d",m_params.v_source_user,table,(totrows - rows));
+      overgezet.Format("MISSING: Table [%s.%s] missing rows: %d",m_params.v_source_user.GetString(),table.GetString(),(totrows - rows));
       m_log.WriteLog(overgezet);
     }
     // End in the logfile
     einde = clock();
-    overgezet.Format("Table [%s.%s] Total processing time: %.2f seconds",m_params.v_source_user,table,(double)(einde - start) / CLOCKS_PER_SEC);
+    overgezet.Format("Table [%s.%s] Total processing time: %.2f seconds",m_params.v_source_user.GetString(),table.GetString(),(double)(einde - start) / CLOCKS_PER_SEC);
     m_log.WriteLog(overgezet);
   }
 }
@@ -1335,10 +1335,10 @@ SQLMigrate::CountTableContents(XString p_owner,XString& tabel)
 void
 SQLMigrate::LogMissingRecord(SQLQuery& p_query,XString& p_error)
 {
-  XString text;
+  XString text("ERROR: ");
   m_log.WriteLog("MISSING RECORD");
   // Reason for the error
-  text.Format("ERROR: %s",p_error);
+  text += p_error;
   m_log.WriteLog(text);
 
   int aantal = p_query.GetNumberOfColumns();
@@ -1350,7 +1350,7 @@ SQLMigrate::LogMissingRecord(SQLQuery& p_query,XString& p_error)
     var->GetAsString(waarde);
     p_query.GetColumnName(ind,naam);
 
-    text.Format("%d: %s [%s]",ind,naam,waarde);
+    text.Format("%d: %s [%s]",ind,naam.GetString(),waarde.GetString());
     m_log.WriteLog(text);
   }
 }
@@ -1420,7 +1420,7 @@ SQLMigrate::FillTablesViaData(bool p_process)
       if(totalrows)
       {
         XString meld;
-        meld.Format("Migrating table    : %s",table);
+        meld.Format("Migrating table    : %s",table.GetString());
         m_log.WriteLog(meld);
         meld.Format("Number of records  : %ld",totalrows);
         m_log.WriteLog(meld);
@@ -1466,7 +1466,7 @@ SQLMigrate::FillTablesViaData(bool p_process)
           if(rows % m_params.v_logLines == 0)
           {
             XString text;
-            text.Format("Table: %s Rows: %ld [%5.2f %%]",table,rows,((double) rows / (double)totalrows * 100.0));
+            text.Format("Table: %s Rows: %ld [%5.2f %%]",table.GetString(),rows,((double)rows / (double)totalrows * 100.0));
             m_log.WriteLog(text);
           }
         }
@@ -1486,17 +1486,17 @@ SQLMigrate::FillTablesViaData(bool p_process)
     // Show tables
     m_log.SetTablesGauge(++numTables);
     XString processed;
-    processed.Format("Table [%s.%s] processed with [%ld of %ld] rows",m_params.v_source_user,table,rows,totalrows);
+    processed.Format("Table [%s.%s] processed with [%ld of %ld] rows",m_params.v_source_user.GetString(),table.GetString(),rows,totalrows);
     m_log.WriteLog(processed);
     // Extra missing rows in logfile
     if(rows < totalrows)
     {
-      processed.Format("MISSING ROWS: Table [%s.%s] total missing rows: %d",m_params.v_source_user,table,(totalrows - rows));
+      processed.Format("MISSING ROWS: Table [%s.%s] total missing rows: %d",m_params.v_source_user.GetString(),table.GetString(),(totalrows - rows));
       m_log.WriteLog(processed);
     }
     // End in logfile
     einde = clock();
-    processed.Format("Table [%s.%s] Total running time: %.2f seconds",m_params.v_source_user,table,(double)(einde - start) / CLOCKS_PER_SEC);
+    processed.Format("Table [%s.%s] Total running time: %.2f seconds",m_params.v_source_user.GetString(),table.GetString(),(double)(einde - start) / CLOCKS_PER_SEC);
     m_log.WriteLog(processed);
   }
 }
@@ -1587,7 +1587,7 @@ SQLMigrate::VariantToInsertString(SQLVariant* p_var,int p_datatype)
                           }
                           break;
     case SQL_GUID:        guid = p_var->GetAsGUID();
-                          result.Format("{guid '%8.8X-%4.4X-%X%X%X%X%X%X%X%X'}"
+                          result.Format("{guid '%8.8X-%4.4X-%4.4X-%X%X%X%X%X%X%X%X'}"
                                         ,guid->Data1
                                         ,guid->Data2
                                         ,guid->Data3
@@ -1599,6 +1599,7 @@ SQLMigrate::VariantToInsertString(SQLVariant* p_var,int p_datatype)
                                         ,guid->Data4[5]
                                         ,guid->Data4[6]
                                         ,guid->Data4[7]);
+                          break;
     // Most datatypes (numeric)
     // BEWARE: Intervals not implemented
     default:              p_var->GetAsString(result);

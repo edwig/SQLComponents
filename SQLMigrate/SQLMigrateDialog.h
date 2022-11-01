@@ -122,8 +122,8 @@ protected:
   afx_msg void OnEnKillfocusTargetUser();
   afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
   afx_msg void OnMigrate();
-  //{{AFX_MSG(CExportDBDlg)
-  //}}AFX_MSG
+  afx_msg void OnCancel();
+
   DECLARE_MESSAGE_MAP()
 
 private:

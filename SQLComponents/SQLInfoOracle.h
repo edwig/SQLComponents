@@ -29,16 +29,16 @@
 namespace SQLComponents
 {
 
-#define NUMERIC_MAX_PRECISION      38
-#define NUMERIC_MIN_SCALE           0
-#define NUMERIC_DEFAULT_SCALE      18
-
 class SQLInfoOracle : public SQLInfoDB
 {
 public:
   SQLInfoOracle(SQLDatabase* p_database);
  ~SQLInfoOracle();
  
+  const int         NUMERIC_MAX_PRECISION = 38;
+  const int         NUMERIC_MIN_SCALE     = 0;
+  const SQLSMALLINT NUMERIC_DEFAULT_SCALE = 16;
+
   //////////////////////////////////////////////////////////////////////////
   //
   // GENERALS (Strings & Booleans) 

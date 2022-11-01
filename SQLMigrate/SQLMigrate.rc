@@ -100,7 +100,7 @@ BEGIN
     CONTROL         "Progress2",IDC_PROGRESS2,"msctls_progress32",WS_BORDER,67,203,462,14
     LTEXT           "Current table",IDC_STATIC,15,224,48,8
     CONTROL         "Progress1",IDC_PROGRESS1,"msctls_progress32",WS_BORDER,67,221,462,14
-    CONTROL         "Also write to logfile.txt",IDC_TOLOGFILE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,247,91,11
+    CONTROL         "Also write to the logfile",IDC_TOLOGFILE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,247,91,11
     LTEXT           "Logging per rows",IDC_STATIC,184,248,66,8
     EDITTEXT        IDC_LOGLINES,254,245,76,14,ES_AUTOHSCROLL | WS_DISABLED
     LTEXT           "Estimated time left",IDC_STATIC,374,248,68,8

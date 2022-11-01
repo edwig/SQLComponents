@@ -35,6 +35,10 @@ public:
   SQLInfoSQLServer(SQLDatabase* p_database);
  ~SQLInfoSQLServer();
 
+  const SQLULEN     NUMERIC_MAX_PRECISION = 38;
+  const SQLULEN     NUMERIC_MIN_SCALE     = 0;
+  const SQLSMALLINT NUMERIC_DEFAULT_SCALE = 16;
+
   //////////////////////////////////////////////////////////////////////////
   //
   // GENERALS (Strings & Booleans) 

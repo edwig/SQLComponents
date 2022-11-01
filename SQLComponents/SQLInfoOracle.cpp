@@ -182,10 +182,39 @@ SQLInfoOracle::GetRDBMSMustCommitDDL() const
 void
 SQLInfoOracle::GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& p_scale) const
 {
+  // ORACLE SPECIFIC CHECKS
   if(p_precision == NUMERIC_MAX_PRECISION &&
      p_scale     == NUMERIC_MIN_SCALE)
   {
     p_scale = NUMERIC_DEFAULT_SCALE;
+  }
+
+
+  // GENERAL CHECKS
+
+  // Max precision for numerics is 38
+  if(p_precision > NUMERIC_MAX_PRECISION)
+  {
+    p_precision = NUMERIC_MAX_PRECISION;
+  }
+
+  // Default scale is also the max for parameters (16)
+  if(p_scale > NUMERIC_DEFAULT_SCALE)
+  {
+    p_scale = NUMERIC_DEFAULT_SCALE;
+  }
+
+  // In case of conversion from other databases
+  if(p_precision == 0 && p_scale == 0)
+  {
+    p_precision = NUMERIC_MAX_PRECISION;
+    p_scale     = NUMERIC_DEFAULT_SCALE;
+  }
+
+  // Scale MUST be smaller than the precision
+  if(p_scale >= p_precision)
+  {
+    p_scale = (SQLSMALLINT) (p_precision - 1);
   }
 }
 

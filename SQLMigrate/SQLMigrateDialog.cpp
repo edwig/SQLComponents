@@ -56,6 +56,10 @@ SQLMigrateDialog::SQLMigrateDialog(CWnd* pParent)
   m_do_sequences    = false;
   m_do_triggers     = false;
   m_do_access       = false;
+  m_do_data         = false;
+  m_do_foreigns     = false;
+  m_do_tables       = false;
+  m_do_views        = false;
 }
 
 SQLMigrateDialog::~SQLMigrateDialog()
@@ -258,15 +262,20 @@ SQLMigrateDialog::SetComboBoxes()
 void 
 SQLMigrateDialog::OnSysCommand(UINT nID, LPARAM lParam)
 {
-  if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+  if((nID & 0xFFF0) == IDM_ABOUTBOX)
   {
     AboutDlg dlgAbout;
     dlgAbout.DoModal();
+    return;
   }
-  else
+  if(nID == SC_CLOSE)
   {
-    CDialog::OnSysCommand(nID, lParam);
+    if(MessageBox("Do you want to close the program?","SQLMigrate",MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION) == IDNO)
+    {
+      return;
+    }
   }
+  CDialog::OnSysCommand(nID,lParam);
 }
 
 void
@@ -960,4 +969,14 @@ SQLMigrateDialog::HandleMessages()
       UNREFERENCED_PARAMETER(er);
     }
   }
+}
+
+void
+SQLMigrateDialog::OnCancel()
+{
+  if(MessageBox("Do you want to close the program?","SQLMigrate",MB_YESNO|MB_DEFBUTTON2|MB_ICONQUESTION) == IDNO)
+  {
+    return;
+  }
+  CDialog::OnCancel();
 }

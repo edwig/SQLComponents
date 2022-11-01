@@ -167,9 +167,32 @@ SQLInfoSQLServer::GetRDBMSMustCommitDDL() const
 
 // Correct maximum precision,scale for a NUMERIC datatype
 void
-SQLInfoSQLServer::GetRDBMSNumericPrecisionScale(SQLULEN& /*p_precision*/, SQLSMALLINT& /*p_scale*/) const
+SQLInfoSQLServer::GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& p_scale) const
 {
-  // NO-OP
+  // Max precision for numerics is 38
+  if(p_precision > NUMERIC_MAX_PRECISION)
+  {
+    p_precision = NUMERIC_MAX_PRECISION;
+  }
+
+  // Default scale is also the max for parameters
+  if(p_scale > NUMERIC_DEFAULT_SCALE)
+  {
+    p_scale = NUMERIC_DEFAULT_SCALE;
+  }
+
+  // In case of conversion from other databases
+  if(p_precision == 0 && p_scale == 0)
+  {
+    p_precision = NUMERIC_MAX_PRECISION;
+    p_scale     = NUMERIC_DEFAULT_SCALE;
+  }
+
+  // Scale MUST be smaller than the precision
+  if(p_scale >= p_precision)
+  {
+    p_scale = (SQLSMALLINT) (p_precision - 1);
+  }
 }
 
 // KEYWORDS
@@ -297,22 +320,16 @@ SQLInfoSQLServer::GetKEYWORDDataType(MetaColumn* p_column)
     case SQL_WLONGVARCHAR:              type = "NVARCHAR(max)";
                                         p_column->m_columnSize = 0;
                                         break;
-    case SQL_NUMERIC:                   type = "NUMERIC";  break;
-    case SQL_DECIMAL:                   type = "NUMERIC";  
-                                        if(p_column->m_decimalDigits == 0 &&
-                                           p_column->m_columnSize    == 38)
-                                        {
-                                          p_column->m_columnSize = 0;
-                                        }
-                                        break;
+    case SQL_NUMERIC:                   [[fallthrough]];
+    case SQL_DECIMAL:                   type = "NUMERIC";  break;
     case SQL_INTEGER:                   type = "INT";      break;
     case SQL_SMALLINT:                  type = "SMALLINT"; break;
     case SQL_FLOAT:                     if(p_column->m_columnSize == 38 ||
                                            p_column->m_columnSize == 18)
                                         {
                                           type = "NUMERIC";
-                                          p_column->m_columnSize = 18;
-//                                        p_column->m_decimalDigits = 0;
+                                          p_column->m_columnSize    = 18;
+                                          p_column->m_decimalDigits = 0;
                                         }
                                         else
                                         {
