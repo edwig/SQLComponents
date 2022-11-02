@@ -50,9 +50,12 @@ private:
   void     CheckMigrateParameters();
   void     WriteMigrateParameters();
 
+  bool     MakeDatabaseConnections();
+  int      FindTablesToMigrate();
   int      ReadTableStructures(XString p_owner,XString p_patroon,SQLDatabase* p_database);
   void     ReadTablesFromFile (XString& p_bestand);
   void     RemoveTemporaries();
+  void     CleanUpMigration();
   // Processing
   void     DropTables();
   void     CreateTables();
@@ -70,7 +73,6 @@ private:
   XString  MakeSelectStatement    (XString& p_tabel,XString& p_user);
   XString  MakeInsertStatement    (XString& p_tabel,XString& p_user,XString& p_doel_user);
   XString  MakeInsertDataStatement(XString& p_tabel,XString& p_target_schema,SQLQuery& p_input,MColumnMap& kolommen);
-  XString  MakeIdentityStatement  (XString p_vendor,XString p_user,XString p_tabel);
 
   XString  VariantToInsertString  (SQLVariant* p_var,int p_datatype);
   long     CountTableContents     (XString  p_owner,XString& tabel);

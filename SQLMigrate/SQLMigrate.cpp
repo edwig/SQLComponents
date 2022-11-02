@@ -82,64 +82,16 @@ SQLMigrate::Migrate()
   m_totalTables     = 0;
   m_directMigration = m_params.v_direct;
 
-  m_log.SetScript    (m_params.v_createscript);
-  m_log.SetDropScript(m_params.v_dropscript);
-
-  if(!m_databaseSource)  m_databaseSource = new SQLDatabase();
-  if(!m_databaseTarget)  m_databaseTarget = new SQLDatabase();
-
-  XString connectSource;
-  XString connectTarget;
-  connectSource.Format("DSN=%s;UID=%s;PWD=%s;",m_params.v_source_dsn.GetString(),m_params.v_source_user.GetString(),m_params.v_source_password.GetString());
-  connectTarget.Format("DSN=%s;UID=%s;PWD=%s;",m_params.v_target_dsn.GetString(),m_params.v_target_user.GetString(),m_params.v_target_password.GetString());
-
   try
   {
-    // Always connect to the source as a minimum
-    //             "--------------------: "
-    m_log.WriteLog("Make connection with: " + m_params.v_source_dsn);
-    m_log.WriteLog("Logged in user      : " + m_params.v_source_user);
-    if(m_databaseSource->Open(connectSource,true) == false)  // Read-only connect
+    // Try to connect to both source and target databases
+    if(!MakeDatabaseConnections())
     {
-      text.Format("Cannot make connection with: " + m_params.v_source_dsn);
-      m_log.WriteLog(text);
-      AfxMessageBox (text,MB_OK|MB_ICONERROR);
       return false;
     }
-    m_log.SetDBType(true,m_databaseSource->GetDatabaseTypeName());
-    m_params.v_sourceType = m_databaseSource->GetDatabaseType();
-
-    // And always make connection to the target database (also when not directly converting)
-    // This is necessary to read in the target database capabilities
-    m_log.WriteLog("Make connection with: " + m_params.v_target_dsn);
-    m_log.WriteLog("Logged in user      : " + m_params.v_target_user);
-    if(m_databaseTarget->Open(connectTarget) == false)
-    {
-      text.Format("Cannot make connection with: " + m_params.v_target_dsn);
-      m_log.WriteLog(text);
-      AfxMessageBox (text,MB_OK|MB_ICONERROR);
-      return false;
-    }
-
-    // Try to use the target schema
-    bool defschema = m_databaseTarget->SetDefaultSchema(m_params.v_target_user,m_params.v_target_schema);
-    m_log.WriteLog(XString("Connect to schema   : ") + (defschema ? m_params.v_target_schema : XString("NO SCHEMA!!")));
-
-    m_log.SetDBType(false,m_databaseTarget->GetDatabaseTypeName());
-    m_params.v_targetType  = m_databaseTarget->GetDatabaseType();
-    m_log.WriteLog("");
 
     // Find the number of tables to migrate (and which tables)
-    m_log.WriteLog("Tables to migrate   : " + m_params.v_table);
-    m_totalTables = ReadTableStructures(m_params.v_source_user,m_params.v_table,m_databaseSource);
-    XString num;
-    num.Format("%d",m_totalTables);
-    m_log.WriteLog("Tables to migrate   : " + num);
-
-    // Register the number of tables for the gauges
-    m_log.SetTables(m_totalTables);
-
-    if(m_totalTables == 0)
+    if(FindTablesToMigrate() == 0)
     {
       // Check if nothing to do
       text = "No tables to migrate";
@@ -174,7 +126,6 @@ SQLMigrate::Migrate()
 
       if(m_params.v_do_data)
       {
-
         switch(m_directMigration)
         {
           case 0: // HIGH PERFORMANCE DATAPUMP 
@@ -189,45 +140,24 @@ SQLMigrate::Migrate()
         }
       }
     }
-    // Closing the databases again
-    m_databaseSource->Close();
-    m_databaseTarget->Close();
-
-    // Clear tables list
-    m_tables.clear();
-
     // Reached the end
     result = true;
   }
-  catch (StdException& ex)
+  catch(StdException& ex)
   {
     m_log.WriteLog("ERROR in migration: " + ex.GetErrorMessage());
-    return false;
+  }
+  catch(XString& ex)
+  {
+    m_log.WriteLog("ERROR in migration: " + ex);
   }
   catch(...)
   {
-    m_log.WriteLog("Unknown error in migration");
-    return false;
+    m_log.WriteLog("Unknown ERROR in migration");
   }
 
-  if(m_directMigration == 2)
-  {
-    m_log.WriteDrop("-- End of script");
-    m_log.WriteOut ("-- End of script");
-  }
-
-  // Result of the migration
-  text.Format("Result of the migration: %d Errors.",m_params.v_errors);
-  m_log.WriteLog("");
-  m_log.WriteLog(text);
-
-  // Report the running time
-  long miliseconds = clock() - m_start;
-  text.Format("Total running time = %d:%d.%03d"
-             ,(miliseconds / CLOCKS_PER_SEC) / 60
-             ,(miliseconds / CLOCKS_PER_SEC) % 60
-             ,(miliseconds % CLOCKS_PER_SEC));
-  m_log.WriteLog(text);
+  // Ultimate cleanup
+  CleanUpMigration();
 
   // THE END!
   m_log.WriteLog("*** End of migration. ***");
@@ -464,9 +394,81 @@ SQLMigrate::WriteMigrateParameters()
 
 //////////////////////////////////////////////////////////////////////////
 //
+// MAKING CONNECTIONS TO THE DATABASES
+//
+//////////////////////////////////////////////////////////////////////////
+
+bool
+SQLMigrate::MakeDatabaseConnections()
+{
+  CString text;
+
+  if(!m_databaseSource)  m_databaseSource = new SQLDatabase();
+  if(!m_databaseTarget)  m_databaseTarget = new SQLDatabase();
+
+  XString connectSource;
+  XString connectTarget;
+  connectSource.Format("DSN=%s;UID=%s;PWD=%s;",m_params.v_source_dsn.GetString(),m_params.v_source_user.GetString(),m_params.v_source_password.GetString());
+  connectTarget.Format("DSN=%s;UID=%s;PWD=%s;",m_params.v_target_dsn.GetString(),m_params.v_target_user.GetString(),m_params.v_target_password.GetString());
+
+  // Always connect to the source as a minimum
+  //             "--------------------: "
+  m_log.WriteLog("Make connection with: " + m_params.v_source_dsn);
+  m_log.WriteLog("Logged in user      : " + m_params.v_source_user);
+  if(m_databaseSource->Open(connectSource,true) == false)  // Read-only connect
+  {
+    text.Format("Cannot make connection with: " + m_params.v_source_dsn);
+    m_log.WriteLog(text);
+    AfxMessageBox (text,MB_OK|MB_ICONERROR);
+    return false;
+  }
+  m_log.SetDBType(true,m_databaseSource->GetDatabaseTypeName());
+  m_params.v_sourceType = m_databaseSource->GetDatabaseType();
+
+  // And always make connection to the target database (also when not directly converting)
+  // This is necessary to read in the target database capabilities
+  m_log.WriteLog("Make connection with: " + m_params.v_target_dsn);
+  m_log.WriteLog("Logged in user      : " + m_params.v_target_user);
+  if(m_databaseTarget->Open(connectTarget) == false)
+  {
+    text.Format("Cannot make connection with: " + m_params.v_target_dsn);
+    m_log.WriteLog(text);
+    AfxMessageBox (text,MB_OK|MB_ICONERROR);
+    return false;
+  }
+
+  // Try to use the target schema
+  bool defschema = m_databaseTarget->SetDefaultSchema(m_params.v_target_user,m_params.v_target_schema);
+  m_log.WriteLog(XString("Connect to schema   : ") + (defschema ? m_params.v_target_schema : XString("NO SCHEMA!!")));
+
+  m_log.SetDBType(false,m_databaseTarget->GetDatabaseTypeName());
+  m_params.v_targetType  = m_databaseTarget->GetDatabaseType();
+  m_log.WriteLog("");
+
+  return true;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
 // READING THE TABLES TO CONVERT
 //
 //////////////////////////////////////////////////////////////////////////
+
+int
+SQLMigrate::FindTablesToMigrate()
+{
+  // Find the number of tables to migrate (and which tables)
+  m_log.WriteLog("Tables to migrate   : " + m_params.v_table);
+  m_totalTables = ReadTableStructures(m_params.v_source_user, m_params.v_table, m_databaseSource);
+  XString num;
+  num.Format("%d", m_totalTables);
+  m_log.WriteLog("Tables to migrate   : " + num);
+
+  // Register the number of tables for the gauges
+  m_log.SetTables(m_totalTables);
+
+  return m_totalTables;
+}
 
 int
 SQLMigrate::ReadTableStructures(XString p_owner,XString p_pattern,SQLDatabase* p_database)
@@ -523,6 +525,9 @@ SQLMigrate::ReadTableStructures(XString p_owner,XString p_pattern,SQLDatabase* p
   return (int) m_tables.size();
 }
 
+// Reading the tables to migrate from a file makes it possible to 
+// determine our own order of creation, independent from the sorting
+// order of the ODBC driver
 void
 SQLMigrate::ReadTablesFromFile(XString& p_file)
 {
@@ -579,6 +584,39 @@ SQLMigrate::RemoveTemporaries()
   }
 }
 
+// After all is 'said and done'
+void
+SQLMigrate::CleanUpMigration()
+{
+  // Closing the databases again
+  m_databaseSource->Close();
+  m_databaseTarget->Close();
+
+  // Clear tables list
+  m_tables.clear();
+
+  // Mark end in scripts (so we know we reached the end)
+  if(m_directMigration == 2)
+  {
+    m_log.WriteDrop("-- End of script");
+    m_log.WriteOut ("-- End of script");
+  }
+
+  // Result of the migration
+  XString text;
+  text.Format("Result of the migration: %d Errors.",m_params.v_errors);
+  m_log.WriteLog("");
+  m_log.WriteLog(text);
+
+  // Report the running time
+  long miliseconds = clock() - m_start;
+  text.Format("Total running time = %d:%d.%03d"
+             ,(miliseconds / CLOCKS_PER_SEC) / 60
+             ,(miliseconds / CLOCKS_PER_SEC) % 60
+             ,(miliseconds % CLOCKS_PER_SEC));
+  m_log.WriteLog(text);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // DROP   THE TARGET TABLES in the TARGET DATABASE
@@ -589,9 +627,7 @@ SQLMigrate::RemoveTemporaries()
 void
 SQLMigrate::DropTables()
 {
-  XString name("drop tabel");
   int numTables = 0;
-  XString vendor = m_databaseTarget->GetDatabaseTypeName();
 
   XString comment("-- ");
   XString header1("DROPPING THE TABLES IN THE TARGET DATABASE");
@@ -647,9 +683,7 @@ SQLMigrate::DropTables()
 void
 SQLMigrate::CreateTables()
 {
-  XString name("Create table");
-  int  numTables = 0;
-  XString vendor = m_databaseTarget->GetDatabaseTypeName();
+  int numTables = 0;
 
   XString comment("-- ");
   XString header1("CREATING TABLES IN THE TARGET DATABASE");
@@ -1004,7 +1038,6 @@ SQLMigrate::CreateViews()
 void
 SQLMigrate::TruncateTables()
 {
-  XString name("delete from table");
   int numTables = 0;
 
   XString text;
@@ -1042,7 +1075,7 @@ SQLMigrate::TruncateTables()
       try
       {
         SQLQuery query(m_databaseTarget);
-        SQLTransaction trans(m_databaseTarget,name);
+        SQLTransaction trans(m_databaseTarget,"truncate");
         query.DoSQLStatement(statement);
         int rows = query.GetNumberOfRows();
         trans.Commit();
@@ -1104,7 +1137,6 @@ SQLMigrate::FillTablesViaPump()
 
     try
     {
-      XString text;
       text.Format("Migrating table     : %s", table.GetString());
       m_log.WriteLog(text);
 
@@ -1376,7 +1408,6 @@ void
 SQLMigrate::FillTablesViaData(bool p_process)
 {
   int numTables = 0;
-  XString name("Select");
   XString comment("-- ");
   XString header1("TABLE CONTENTS MIGRATION TO INSERT SCRIPTS");
   XString header2("==========================================");
@@ -1541,7 +1572,7 @@ SQLMigrate::MakeInsertDataStatement(XString& p_table,XString& p_target_schema,SQ
 XString
 SQLMigrate::VariantToInsertString(SQLVariant* p_var,int p_datatype)
 {
-  XString result;
+  XString           result;
   TIMESTAMP_STRUCT* stamp;
   DATE_STRUCT*      date;
   TIME_STRUCT*      time;
@@ -1606,17 +1637,6 @@ SQLMigrate::VariantToInsertString(SQLVariant* p_var,int p_datatype)
                           break;
   }
   return result;
-}
-
-XString
-SQLMigrate::MakeIdentityStatement(XString p_vendor,XString p_user,XString p_tabel)
-{
-  XString identity;
-  if(m_databaseTarget->GetDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
-  {
-    identity = "SET IDENTITY_INSERT " + p_user + "." + p_tabel + " ON;";
-  }
-  return identity;
 }
 
 // These are the exceptions found throughout the years
