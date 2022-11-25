@@ -370,6 +370,14 @@ SQLInfoAccess::GetSQLTopNRows(XString p_sql,int /*p_top*/,int /*p_skip = 0*/) co
   return p_sql;
 }
 
+// Query to perform a keep alive ping
+XString
+SQLInfoAccess::GetPing() const
+{
+  // Not implemented yet
+  return "";
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -662,7 +670,7 @@ SQLInfoAccess::GetCATALOGIndexAttributes(XString& /*p_schema*/,XString& /*p_tabl
 }
 
 XString
-SQLInfoAccess::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
+SQLInfoAccess::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicateNulls /*= false*/) const
 {
   // Get SQL to create an index for a table
   // CREATE [UNIQUE] [ASC|DESC] INDEX [<schema>.]indexname ON [<schema>.]tablename(column [,...]);

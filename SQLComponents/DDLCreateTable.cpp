@@ -254,6 +254,12 @@ DDLCreateTable::SetIndexTablespace(XString p_tablespace)
   m_indexTablespace = p_tablespace;
 }
 
+void
+DDLCreateTable::SetOptionIndexDuplicateNulls(bool p_duplicate)
+{
+  m_indexDuplicateNulls = p_duplicate;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void   
@@ -496,7 +502,7 @@ DDLCreateTable::GetIndexInfo()
         // But only if it's not the already generated primary key
         if(m_primaries.empty() || m_primaries[0].m_constraintName.CompareNoCase(theIndex[0].m_indexName))
         {
-          line = m_info->GetCATALOGIndexCreate(theIndex);
+          line = m_info->GetCATALOGIndexCreate(theIndex,m_indexDuplicateNulls);
           StashTheLine(line);
         }
       }
@@ -511,7 +517,7 @@ DDLCreateTable::GetIndexInfo()
   {
     if(m_primaries.empty() || m_primaries[0].m_constraintName.CompareNoCase(theIndex[0].m_indexName))
     {
-      line = m_info->GetCATALOGIndexCreate(theIndex);
+      line = m_info->GetCATALOGIndexCreate(theIndex,m_indexDuplicateNulls);
       StashTheLine(line);
     }
   }

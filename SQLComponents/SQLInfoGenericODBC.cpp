@@ -381,6 +381,14 @@ SQLInfoGenericODBC::GetSQLTopNRows(XString p_sql,int /*p_top*/,int /*p_skip = 0*
   return p_sql;
 }
 
+// Query to perform a keep alive ping
+XString
+SQLInfoGenericODBC::GetPing() const
+{
+  // Not implemented yet
+  return "";
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -683,7 +691,7 @@ SQLInfoGenericODBC::GetCATALOGIndexAttributes(XString& /*p_schema*/,XString& /*p
 }
 
 XString
-SQLInfoGenericODBC::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
+SQLInfoGenericODBC::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicateNulls /*= false*/) const
 {
   // Get SQL to create an index for a table
   // CREATE [UNIQUE] INDEX [<schema>.]indexname ON [<schema>.]tablename(column [ASC|DESC] [,...]);

@@ -756,6 +756,13 @@ SQLMigrate::CreateTables()
       FixupTableIndices(create);
     }
 
+    // Check for special options
+    if(source->GetRDBMSDatabaseType() == DatabaseType::RDBMS_ORACLE &&
+       target->GetRDBMSDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
+    {
+      create.SetOptionIndexDuplicateNulls(true);
+    }
+
     // Set the schema/tablespace
     create.SetTablesSchema   (m_params.v_target_schema);
     create.SetTableTablespace(m_params.v_tablespace);

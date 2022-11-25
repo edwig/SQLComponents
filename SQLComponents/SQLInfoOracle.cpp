@@ -511,6 +511,14 @@ SQLInfoOracle::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) const
   return p_sql;
 }
 
+// Query to perform a keep alive ping
+XString
+SQLInfoOracle::GetPing() const
+{
+  // Getting the time does a ping
+  return "SELECT current_timestamp FROM DUAL";
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -1209,7 +1217,7 @@ SQLInfoOracle::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablename,
 }
 
 XString
-SQLInfoOracle::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
+SQLInfoOracle::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicateNulls /*= false*/) const
 {
   // Get SQL to create an index for a table
   // CREATE [UNIQUE] INDEX [<schema>.]indexname ON [<schema>.]tablename(column [ASC|DESC] [,...]);

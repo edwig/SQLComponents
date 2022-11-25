@@ -555,7 +555,6 @@ SQLDatabase::SetKnownRebinds()
     m_rebindColumns[SQL_REAL   ] = SQL_C_NUMERIC;
     m_rebindColumns[SQL_FLOAT  ] = SQL_C_NUMERIC;
     m_rebindColumns[SQL_DOUBLE ] = SQL_C_NUMERIC;
-    m_rebindColumns[SQL_DECIMAL] = SQL_C_NUMERIC;
   }
   else if(m_rdbmsType == RDBMS_SQLSERVER)
   {
@@ -795,6 +794,23 @@ SQLDatabase::GetDatabaseTypeName()
     case RDBMS_ODBC_STANDARD: return "Generic ODBC";
   }
   return "";
+}
+
+bool
+SQLDatabase::Ping()
+{
+  if(IsOpen())
+  {
+    // Send a ping query
+    XString ping = GetSQLInfoDB()->GetPing();
+    if(!ping.IsEmpty())
+    {
+      // No transaction here. We could disturb a running one!
+      SQLQuery qry(this);
+      return qry.DoSQLStatementScalar(ping) != nullptr;
+    }
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////////////////////////////

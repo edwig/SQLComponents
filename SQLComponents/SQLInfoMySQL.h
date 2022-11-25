@@ -171,6 +171,9 @@ public:
   // Transform query to select top <n> rows
   XString GetSQLTopNRows(XString p_sql,int p_top,int p_skip = 0) const;
 
+  // Query to perform a keep alive ping
+  XString GetPing() const;
+
   //////////////////////////////////////////////////////////////////////////
   // SQL STRINGS
 
@@ -248,7 +251,7 @@ public:
   XString GetCATALOGIndexExists     (XString  p_schema,XString  p_tablename,XString  p_indexname) const;
   XString GetCATALOGIndexList       (XString& p_schema,XString& p_tablename) const;
   XString GetCATALOGIndexAttributes (XString& p_schema,XString& p_tablename,XString& p_indexname) const;
-  XString GetCATALOGIndexCreate     (MIndicesMap& p_index) const;
+  XString GetCATALOGIndexCreate     (MIndicesMap& p_index,bool p_duplicateNulls = false) const;
   XString GetCATALOGIndexDrop       (XString  p_schema,XString  p_tablename,XString  p_indexname) const;
   XString GetCATALOGIndexFilter     (MetaIndex& p_index) const;
   // All primary key functions

@@ -493,6 +493,14 @@ SQLInfoSQLServer::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) con
   return p_sql;
 }
 
+// Query to perform a keep alive ping
+XString
+SQLInfoSQLServer::GetPing() const
+{
+  // Getting the time does a ping
+  return "SELECT current_timestamp";
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -897,7 +905,7 @@ SQLInfoSQLServer::GetCATALOGIndexAttributes(XString& /*p_schema*/,XString& /*p_t
 // CREATE [UNIQUE] INDEX indexname ON [<schema>.]tablename(column [ASC|DESC] [,...]);
 // Beware: no schema name for indexname. Automatically in the table schema
 XString
-SQLInfoSQLServer::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
+SQLInfoSQLServer::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool p_duplicateNulls /*=false*/) const
 {
   XString query;
   for(auto& index : p_indices)
@@ -916,6 +924,11 @@ SQLInfoSQLServer::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
       if(index.m_nonunique == false)
       {
         query += "UNIQUE ";
+      }
+      // If duplicate nulls allowed, it must be a NON-CLUSTERED index
+      if(p_duplicateNulls)
+      {
+        query += "NONCLUSTERED ";
       }
       query.AppendFormat("INDEX [%s] ON ",idname.GetString());
 
@@ -938,6 +951,22 @@ SQLInfoSQLServer::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
     }
   }
   query += ")";
+
+  // If duplicate nulls allowed, at least one of the columns must be non-null
+  if(p_duplicateNulls)
+  {
+    query += "\n WHERE ";
+    for(auto& index : p_indices)
+    {
+      if(index.m_position != 1)
+      {
+        query += " AND ";
+      }
+      XString column = index.m_columnName;
+      column.MakeLower();
+      query.AppendFormat("[%s] IS NOT NULL", column.GetString());
+    }
+  }
   return query;
 }
 
@@ -1400,9 +1429,9 @@ SQLInfoSQLServer::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern) c
   XString sql = "SELECT ''       AS catalog_name\n"
                 "      ,sch.name AS schema_name\n"
                 "      ,seq.name AS sequence_name\n"
-                "      ,CAST(current_value AS INTEGER) AS current_value\n"
-                "      ,CAST(minimum_value AS INTEGER) AS minimum_value\n"
-                "      ,CAST(increment     AS INTEGER) AS increment_value\n"
+                "      ,CAST(current_value AS BIGINT) AS current_value\n"
+                "      ,CAST(minimum_value AS BIGINT) AS minimum_value\n"
+                "      ,CAST(increment     AS BIGINT) AS increment_value\n"
                 "      ,cache_size AS CACHE\n"
                 "      ,is_cycling\n"
                 "      ,0 ordering\n"

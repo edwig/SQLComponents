@@ -396,6 +396,14 @@ SQLInfoPostgreSQL::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) co
   return p_sql;
 }
 
+// Query to perform a keep alive ping
+XString
+SQLInfoPostgreSQL::GetPing() const
+{
+  // Getting the time does a ping
+  return "SELECT current_timestamp";
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -895,7 +903,7 @@ SQLInfoPostgreSQL::GetCATALOGIndexAttributes(XString& /*p_schema*/,XString& /*p_
 }
 
 XString
-SQLInfoPostgreSQL::GetCATALOGIndexCreate(MIndicesMap& p_indices) const
+SQLInfoPostgreSQL::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicateNulls /*= false*/) const
 {
   // Get SQL to create an index for a table
   // CREATE [UNIQUE] INDEX [<schema>.]indexname ON [<schema>.]tablename(column [ASC|DESC] [,...]);
