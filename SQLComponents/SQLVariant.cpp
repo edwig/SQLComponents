@@ -1152,6 +1152,10 @@ SQLVariant::GetAsChar()
   {
     return (char*)m_data.m_dataBINARY;
   }
+  if(m_indicator == SQL_NULL_DATA)
+  {
+    return "";
+  }
   // Should be: ThrowErrorDatatype(SQL_C_CHAR);
   // Sometimes we come her unexpectedly in various programs
   ASSERT(FALSE);
