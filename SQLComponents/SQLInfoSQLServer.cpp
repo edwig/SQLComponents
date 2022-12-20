@@ -772,7 +772,7 @@ SQLInfoSQLServer::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename)
   }
   if(!p_tablename.IsEmpty())
   {
-    query += "   AND tab.name ";
+    query += "   AND obj.name ";
     query += p_tablename.Find('%') >= 0 ? "LIKE" : "=";
     query += " ?\n";
   }
@@ -1909,7 +1909,7 @@ SQLInfoSQLServer::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname
   }
   if (!p_viewname.IsEmpty())
   {
-    query += "   AND tab.name ";
+    query += "   AND obj.name ";
     query += p_viewname.Find('%') >= 0 ? "LIKE" : "=";
     query += " ?\n";
   }
@@ -2051,10 +2051,10 @@ SQLInfoSQLServer::GetPSMProcedureList(XString& p_schema) const
     "      ,o.name    as procedure_name\n"
     "  FROM sys.objects o\n"
     "       INNER JOIN sys.schemas s ON o.schema_id = s.schema_id\n"
-    " WHERE (type_desc LIKE '%PROCEDURE%' OR type_desc LIKE '%FUNCTION%')\n";
+    " WHERE type IN ('P','FN')\n";
   if(!p_schema.IsEmpty())
   {
-    query += "   AND o.name = ?\n";
+    query += "   AND s.name = ?\n";
   }
   query += " ORDER BY 1,2,3";
   return query;
