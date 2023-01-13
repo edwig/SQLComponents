@@ -102,6 +102,7 @@ protected:
   void SetComboBoxes();
   void SetDirectory();
   void EstimateRemainingTime(int p_num,int p_maxnum);
+  void InitTaskbar();
 
   // Migration
   void GetMigrationParameters();

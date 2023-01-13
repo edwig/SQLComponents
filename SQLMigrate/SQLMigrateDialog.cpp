@@ -30,12 +30,18 @@
 #include "MapDialog.h"
 #include "AboutDlg.h"
 #include <direct.h>
+#include <shobjidl.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+// Windows-shell taskbar list object for progresss
+const IID my_IID_ITaskbarList3 = {0xea1afb91, 0x9e28, 0x4b86, { 0x90, 0xe9, 0x9e, 0x9f, 0x8a, 0x5e, 0xef, 0xaf }};
+const IID my_CLSID_TaskbarList = {0x56fdf344, 0xfd6d, 0x11d0, { 0x95, 0x8a, 0x00, 0x60, 0x97, 0xc9, 0xa0, 0x90 }};
+static ITaskbarList3* ptbl = NULL;
 
 SQLMigrateDialog::SQLMigrateDialog(CWnd* pParent)
                  :CDialog(SQLMigrateDialog::IDD, pParent)
@@ -215,6 +221,9 @@ SQLMigrateDialog::OnInitDialog()
   {
     MessageBox("Wrong number of arguments on the command line");
   }
+
+  InitTaskbar();
+
   // Load standard profile
   LoadProfile(ini_file);
   if (m_commandLineMode)
@@ -230,6 +239,18 @@ SQLMigrateDialog::OnInitDialog()
   SetWindowText(SQL_MIGRATE " " SQL_COMPONENTS_VERSION);
 
   return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+void 
+SQLMigrateDialog::InitTaskbar()
+{
+  CoInitialize(NULL);
+  HRESULT hr = CoCreateInstance(my_CLSID_TaskbarList,NULL,CLSCTX_ALL,my_IID_ITaskbarList3,(LPVOID*) &ptbl);
+  if(hr != S_OK)
+  {
+    // Fail silently
+    ptbl = nullptr;
+  }
 }
 
 void 
@@ -854,9 +875,16 @@ SQLMigrateDialog::SetTableGauge(int num,int maxnum)
 void
 SQLMigrateDialog::SetTablesGauge(int num,int maxnum)
 {
+  // Show total gauge on the dialog
   m_tables_gauge.SetRange(0,(short)maxnum);
   m_tables_gauge.SetPos(num);
 
+  // Show total gauge on the taskbar
+  if(ptbl)
+  {
+    ptbl->SetProgressValue(GetSafeHwnd(),num,maxnum);
+  }
+  // Calculate and show remaining time
   EstimateRemainingTime(num,maxnum);
 }
 
