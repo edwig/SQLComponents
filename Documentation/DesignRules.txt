@@ -5,7 +5,7 @@ DESIGN RULES FOR SQLCOMPONENTS
 2) All throws are of type "StdException". So calling programs **MUST**
    rely on a try...catch cycle that catches "StdException" objects
 3) Everything must work in both 32-bits and 64-bits modes
-4) Platform of choice is MSVC 2019, C++17.0 standard
+4) Platform of choice is MSVC 2022, C++17.0 standard
 5) Coding-guidelines are:
    - 1 tab = 2 spaces
    - Hungarian camelcase naming rules
@@ -14,3 +14,4 @@ DESIGN RULES FOR SQLCOMPONENTS
 6) All ODBC driver datatypes are covered by SQLVariant natively
 7) All ODBC binary data is covered by m_data of SQLVariant
 8) All functionality must be covered by C++ unit tests
+   (More than 8800 and counting...)

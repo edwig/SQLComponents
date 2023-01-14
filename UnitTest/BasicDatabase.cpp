@@ -715,7 +715,7 @@ namespace DatabaseUnitTest
       ReportSQL    ("Commit subtransaction              :",p_info->GetSQLCommitSubTransaction(table));
       ReportSQL    ("Rollback subtransaction            :",p_info->GetSQLRollbackSubTransaction(table));
       ReportString ("FROM part for single row select    :",p_info->GetSQLFromDualClause());
-      ReportSQL    ("SQL lock table                     :",p_info->GetSQLLockTable(schema,table,true));
+      ReportSQL    ("SQL lock table                     :",p_info->GetSQLLockTable(schema,table,true,0));
       ReportSQL    ("SQL Optimize table                 :",p_info->GetSQLOptimizeTable(schema,table));
       ReportString ("SQL string quotes                  :",p_info->GetSQLString(quoteString));
       ReportString ("SQL date string                    :",p_info->GetSQLDateString(1959,15,10));

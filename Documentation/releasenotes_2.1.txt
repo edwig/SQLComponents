@@ -1,0 +1,24 @@
+RELEASENOTES SQLCOMPONENTS VERSION 2.1
+======================================
+===== Released since: 14-01-2023 =====
+======================================
+
+Version 2.1.0 of 14-01-2023
+---------------------------
+1)  Complete re-write of the parameter and column bindings of SQLQuery.
+    For this important part of the library, this is a serious change.
+    Extended testing on MS-SQLServer with data pumping has led to this rewrite.
+2)  ParameterBinding for a query can be corrected throug the SQLInfoDB classes
+3)  ColumnBinding and AtExec data provision has been rewritten for the rule
+    that no columns may be bound after the first at-exec data column.
+    So data is fetched by the SQLFetch up to the first at-exec column.
+    All other columns including the 'normal' columns will be fetched with the 
+    SQLGetData calls.
+4)  The indicator length binding with SQL_LEN_DATA_AT_EXEC is now limited to the
+    binary datatypes only. All character types are changed to NTS (char,varchar)
+    and DATA_AT_EXEC for the wide character types (WCHAR, WVARCHAR).
+5)  The subclass SQLDBinfoSQLServer has been extended with various discovery 
+    queries to support database export and import functions.
+6)  Various smal fixesd in DDLCreateTable class to generate DDL for a table.
+7)  Maximum timeout for the SQLDatabasePool is now 'settable' in SQLDatabase.
+

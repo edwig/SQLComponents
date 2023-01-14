@@ -135,7 +135,7 @@ public:
    void    SetBinaryPieceSize(int p_size);
    void    SetColumnNumber(int p_column);
    void    SetParameterType(SQLParamType p_type);
-   void    SetSizeIndicator(bool p_realSize);
+   void    SetSizeIndicator(bool p_realSize,bool p_binary = false);
    void    SetNumericPrecisionScale(int p_precision,int p_scale);
    void    SetFromBinaryStreamData(int p_type,int p_length,void* p_data,bool p_isnull);
    void    SetNULL();

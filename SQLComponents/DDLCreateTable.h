@@ -88,7 +88,7 @@ private:
 
   bool    FindSchemaName(XString p_tableName);
   void    StashTheLine(XString p_line);
-  XString ReplaceLengthPrecScale(XString p_template,int p_length,int p_precision,int p_scale);
+  XString ReplaceLengthPrecScale(TypeInfo* p_type,int p_length,int p_precision,int p_scale);
   XString FormatColumnName(XString p_column,int p_length);
   int     CalculateColumnLength(MColumnMap& p_columns);
   void    FindIndexFilter(MetaIndex& p_index);

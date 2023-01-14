@@ -350,7 +350,7 @@ DDLCreateTable::GetColumnInfo()
     TypeInfo* type = m_info->GetTypeInfo(column.m_datatype,column.m_typename);
     if(type)
     {
-      line += ReplaceLengthPrecScale(type->m_create_params
+      line += ReplaceLengthPrecScale(type
                                     ,column.m_columnSize
                                     ,column.m_columnSize
                                     ,column.m_decimalDigits);
@@ -674,8 +674,8 @@ DDLCreateTable::GetAccessInfo(bool p_strict /*=false*/)
   {
     if(!strict || IsStrictODBCPrivilege(priv.m_privilege))
     {
-      line = m_target ? m_target->GetCatalogGrantPrivilege(priv.m_schemaName,priv.m_tableName,priv.m_privilege,priv.m_grantee,priv.m_grantable)
-                      :   m_info->GetCatalogGrantPrivilege(priv.m_schemaName,priv.m_tableName,priv.m_privilege,priv.m_grantee,priv.m_grantable);
+      line = m_target ? m_target->GetCATALOGGrantPrivilege(priv.m_schemaName,priv.m_tableName,priv.m_privilege,priv.m_grantee,priv.m_grantable)
+                      :   m_info->GetCATALOGGrantPrivilege(priv.m_schemaName,priv.m_tableName,priv.m_privilege,priv.m_grantee,priv.m_grantable);
       if(!line.IsEmpty())
       {
         StashTheLine(line);
@@ -717,16 +717,18 @@ DDLCreateTable::StashTheLine(XString p_line)
 }
 
 XString
-DDLCreateTable::ReplaceLengthPrecScale(XString p_template
+DDLCreateTable::ReplaceLengthPrecScale(TypeInfo*  p_type
                                        ,int p_length
                                        ,int p_precision
                                        ,int p_scale)
 {
+  XString params = p_type->m_create_params;
+
   // Set in lowercase for replacing
-  p_template.MakeLower();
+  params.MakeLower();
 
   // Confusion in some drivers
-  if(p_length == 0 && p_precision > 0 && p_template.Find("length") >= 0)
+  if(p_length == 0 && p_precision > 0 && params.Find("length") >= 0)
   {
     p_length = p_precision;
     p_precision = 0;
@@ -745,19 +747,30 @@ DDLCreateTable::ReplaceLengthPrecScale(XString p_template
   }
 
   // Replace as strings
-  p_template.Replace("max length",length);    // ORACLE DOES THIS!!
-  p_template.Replace("length",    length);
-  p_template.Replace("precision", precision);
-  p_template.Replace("scale",     scale);
-
-  // Make sure we have parenthesis
-  if(!p_template.IsEmpty() && p_template.Left(1) != "(" && p_template != ",")
+  if(p_length > 0)
   {
-    p_template = "(" + p_template + ")";
+    params.Replace("max length",length);    // ORACLE DOES THIS!!
+    params.Replace("length",    length);
   }
-  if(p_template != ",")
+  else if(p_type->m_type_name.CompareNoCase("varchar") == 0)
   {
-  return p_template;
+    // SQL-Server does this as a replacement for CLOB
+    params.Replace("max length","max");
+  }
+
+  if(p_precision > 0)
+  {
+    params.Replace("precision", precision);
+    params.Replace("scale",     scale);
+  }
+  // Make sure we have parenthesis
+  if(!params.IsEmpty() && params.Left(1) != "(" && params != ",")
+  {
+    params = "(" + params + ")";
+  }
+  if(params != ",")
+  {
+    return params;
 }
   return "";
 }
