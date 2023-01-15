@@ -70,6 +70,7 @@ public:
   void    SetTableTablespace(XString p_tablespace);
   void    SetIndexTablespace(XString p_tablespace);
   void    SetOptionIndexDuplicateNulls(bool p_duplicate);
+  void    SetOptionDropIfExists(bool p_drop);
 
 private:
   // Primary formatting of 'create table' DDL
@@ -104,6 +105,7 @@ private:
   XString    m_createDDL;
   // Various options for generation the tables
   bool       m_indexDuplicateNulls { false };     // Duplicate NULL in indices allowed
+  bool       m_dropIfExists        { true  };     // How we generate a CREATE statement
 
   // Info gotten
   bool m_didTable      { false };

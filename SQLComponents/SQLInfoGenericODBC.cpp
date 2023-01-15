@@ -1169,7 +1169,7 @@ SQLInfoGenericODBC::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewna
 }
 
 XString
-SQLInfoGenericODBC::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString p_contents) const
+SQLInfoGenericODBC::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString p_contents,bool /*p_ifexists = true*/) const
 {
   return "CREATE VIEW " + p_schema + "." + p_viewname + "\n" + p_contents;
 }

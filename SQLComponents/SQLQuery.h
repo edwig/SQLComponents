@@ -87,6 +87,8 @@ public:
   void SetParameterMaxSize(int p_num,unsigned p_maxSize);
   // Setting the scan for native translations (normally off)
   void SetNoScan(bool p_noscan = false);
+  // Setting the fetching policy
+  void SetFetchPolicy(bool p_policy);
 
   // Set parameters for statement
   void SetParameter  (int p_num,SQLVariant*   p_param,SQLParamType p_type = P_SQL_PARAM_INPUT);
@@ -362,6 +364,16 @@ inline bool
 SQLQuery::GetNoScan()
 {
   return m_noscan;
+}
+
+inline void 
+SQLQuery::SetFetchPolicy(bool p_policy)
+{
+  m_hasLongColumns = 0;
+  if(p_policy)
+  {
+    m_hasLongColumns = 1;
+  }
 }
 
 // End of namespace

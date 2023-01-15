@@ -2294,12 +2294,12 @@ SQLVariant::SetSizeIndicator(bool p_realSize,bool p_binary)
       // SQL_LONGVARBINARY
       // SQL_WLONGVARCHAR
     m_indicator = (SQLLEN) SQL_LEN_DATA_AT_EXEC(size);
-  }
-  else
-  {
-    // Simply the AT_EXEC indicator
-    m_indicator = SQL_DATA_AT_EXEC;
-  }
+    }
+    else
+    {
+      // Simply the AT_EXEC indicator
+      m_indicator = SQL_DATA_AT_EXEC;
+    }
   }
   m_useAtExec = true;
 }

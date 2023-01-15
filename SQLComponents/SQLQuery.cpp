@@ -1043,7 +1043,7 @@ SQLQuery::BindParameters()
     }
 
     // Bind NUMERIC/DECIMAL precision and scale
-    if(dataType == SQL_C_NUMERIC)
+    if(dataType == SQL_C_NUMERIC && !var->IsNULL())
     {
       BindColumnNumeric((ushort)icol,var,SQL_PARAM_INPUT);
     }
@@ -1162,7 +1162,7 @@ SQLQuery::BindColumns()
     // Create new variant and reserve space for CHAR and BINARY types
     SQLVariant* var = new SQLVariant(type,(int)precision);
     var->SetColumnNumber(icol);
-    var->SetSQLDataType(dataType);
+    var->SetSQLDataType(type);
     if(atexec)
     {
       // First column to get without binding
@@ -1214,35 +1214,35 @@ SQLQuery::BindColumns()
     {
       break;
     }
-    SQLVariant* var = column.second;
+    SQLVariant*   var = column.second;
     SQLUSMALLINT bcol = (SQLUSMALLINT) var->GetColumnNumber();
     SQLSMALLINT  type = (SQLSMALLINT)  var->GetDataType();
     SQLLEN       size = var->GetDataSize();
 
-      // Rebind the column datatype
-      type = RebindColumn(type);
+    // Rebind the column datatype
+    type = RebindColumn(type);
 
     m_retCode = SQLBindCol(m_hstmt                    // statement handle
-                            ,bcol                       // Column number
-                            ,type                       // Data type
-                            ,var->GetDataPointer()      // Data pointer
+                          ,bcol                       // Column number
+                          ,type                       // Data type
+                          ,var->GetDataPointer()      // Data pointer
                           ,size                       // Buffer length
-                            ,var->GetIndicatorPointer() // Indicator address
-                            );
-      if(!SQL_SUCCEEDED(m_retCode))
-      {
-        GetLastError("Cannot bind to column. Error: ");
-        m_lastError.AppendFormat(" Column number: %d",icol);
-        throw StdException(m_lastError);
-      }
+                          ,var->GetIndicatorPointer() // Indicator address
+                          );
+    if(!SQL_SUCCEEDED(m_retCode))
+    {
+      GetLastError("Cannot bind to column. Error: ");
+      m_lastError.AppendFormat(" Column number: %d",icol);
+      throw StdException(m_lastError);
+    }
 
-      // Now do the SQL_NUMERIC precision/scale binding
-      if(type == SQL_C_NUMERIC)
-      {
-        BindColumnNumeric((SQLSMALLINT)bcol,var,SQL_RESULT_COL);
-      }
+    // Now do the SQL_NUMERIC precision/scale binding
+    if(type == SQL_C_NUMERIC)
+    {
+      BindColumnNumeric((SQLSMALLINT)bcol,var,SQL_RESULT_COL);
     }
   }
+}
 
 // Do the rebind replacement for a column
 short
@@ -1277,15 +1277,22 @@ SQLQuery::BindColumnNumeric(SQLSMALLINT p_column,SQLVariant* p_var,int p_type)
   {
     SQLULEN precision = (SQLULEN)     p_var->GetNumericPrecision();
     SQLSMALLINT scale = (SQLSMALLINT) p_var->GetNumericScale();
+    SQLULEN prec(precision);
 
-    if(m_database)
+    if(m_database && precision > 0)
     {
-      m_database->GetSQLInfoDB()->GetRDBMSNumericPrecisionScale(precision,scale);
-   }
-
+      m_database->GetSQLInfoDB()->GetRDBMSNumericPrecisionScale(prec,scale);
+      if(prec != precision)
+      {
+        // Tinker with the max precision in the variable
+        // Some drivers will crash if we do not do this
+        // e.g. SQL-Server will crash on the TDS (Tabular Data stream)
+        *(&p_var->GetAsNumeric()->precision) = (SQLCHAR) prec;
+      }
+    }
     RETCODE retCode1  = SqlSetDescField(rowdesc,p_column,SQL_DESC_TYPE,     (SQLPOINTER)(DWORD_PTR)SQL_C_NUMERIC,SQL_IS_INTEGER);
-    RETCODE retCode2  = SqlSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)(DWORD_PTR)precision,    SQL_IS_UINTEGER);
-    RETCODE retCode3  = SqlSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)(DWORD_PTR)scale,        SQL_IS_SMALLINT);
+    RETCODE retCode2  = SqlSetDescField(rowdesc,p_column,SQL_DESC_PRECISION,(SQLPOINTER)(DWORD_PTR)prec, SQL_IS_UINTEGER);
+    RETCODE retCode3  = SqlSetDescField(rowdesc,p_column,SQL_DESC_SCALE,    (SQLPOINTER)(DWORD_PTR)scale,SQL_IS_SMALLINT);
 
     if(SQL_SUCCEEDED(retCode1) && SQL_SUCCEEDED(retCode2) && SQL_SUCCEEDED(retCode3))
     {
@@ -1533,9 +1540,6 @@ SQLQuery::RetrieveAtExecData()
     // See how to get the data
     if(var->GetAtExec())
     {
-      // Initially it is a null result
-      var->SetNULL();
-
       // Retrieve actual length of this instance of the column
       m_retCode = SqlGetData(m_hstmt
                             ,(SQLUSMALLINT) col

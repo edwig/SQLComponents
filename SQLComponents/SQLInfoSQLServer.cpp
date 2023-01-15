@@ -756,13 +756,13 @@ SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablena
   }
 
   query += "UNION ALL\n"
-           "SELECT db_name()\n"                             // AS table_catalog
+           "SELECT db_name()\n"             // AS table_catalog
            "      ,'dbo'\n"                 // AS table_schema
            "      ,o.name\n"                // AS table_name
-           "      ,'LOCAL TEMPORARY'\n"                     // AS table_type
-           "      ,null\n"                                  // AS remarks
-           "      ,null\n"                                  // AS tablespace
-           "      ,1\n"                                     // AS temporary
+           "      ,'LOCAL TEMPORARY'\n"     // AS table_type
+           "      ,null\n"                  // AS remarks
+           "      ,null\n"                  // AS tablespace
+           "      ,1\n"                     // AS temporary
            "  FROM tempdb.sys.objects o\n"
            " WHERE o.type      = 'U'\n"
            "   AND o.schema_id = 1\n"
@@ -942,14 +942,14 @@ SQLInfoSQLServer::GetCATALOGColumnExists(XString p_schema,XString p_tablename,XS
   p_tablename.MakeLower();
   p_columnname.MakeLower();
   XString query = "SELECT count(*)\n"
-                 "  FROM sys.sysobjects tab\n"
-                 "      ,sys.schemas    sch\n"
-                 "     , dbo.syscolumns att\n"
-                 " WHERE tab.name  = '" + p_tablename  + "'\n"
-                 "   AND sch.name  = '" + p_schema     + "'"
-                 "   AND att.name  = '" + p_columnname + "'\n"
-                 "   AND tab.id    = att.id\n"
-                 "   AND tab.schema_id = sch.schema_id\n";
+                  "  FROM sys.sysobjects tab\n"
+                  "      ,sys.schemas    sch\n"
+                  "     , dbo.syscolumns att\n"
+                  " WHERE tab.name  = '" + p_tablename  + "'\n"
+                  "   AND sch.name  = '" + p_schema     + "'"
+                  "   AND att.name  = '" + p_columnname + "'\n"
+                  "   AND tab.id    = att.id\n"
+                  "   AND tab.schema_id = sch.schema_id\n";
   return query;
 }
 
@@ -965,9 +965,9 @@ SQLInfoSQLServer::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablen
 {
   // In case of a NON-TEMPORARY table, the standard ODBC driver is better
   if(p_tablename.Left(1).Compare("#"))
-{
-  return "";
-}
+  {
+    return "";
+  }
   // GLOBAL AND LOCAL TEMPORARY TABLES ONLY!!!
 
   // All temporary tables are stored under this schema!
@@ -1178,8 +1178,29 @@ SQLInfoSQLServer::GetCATALOGIndexExists(XString p_schema,XString p_tablename,XSt
 XString
 SQLInfoSQLServer::GetCATALOGIndexList(XString& p_schema,XString& p_tablename) const
 {
-  XString indexname;
-  return GetCATALOGIndexAttributes(p_schema,p_tablename,indexname);
+  p_schema.Empty(); // Do not use
+  p_tablename.MakeLower();
+  XString query = "SELECT idx.name\n"
+                  "      ,col.name\n"
+                  "      ,ixk.keyno\n"
+                  "      ,indexproperty(obj.Id, idx.name, 'IsUnique')\n"
+                  "      ,indexkey_property(obj.Id, idx.indid, ixk.keyno, 'IsDescending')\n"
+                  "      ,'' as index_source"
+                  "  FROM dbo.sysindexes idx\n"
+                  "      ,dbo.sysindexkeys ixk\n"
+                  "      ,dbo.sysobjects obj\n"
+                  "      ,dbo.syscolumns col\n"
+                  " WHERE obj.name = ?\n"  // <== PARAMETER
+                  "   AND obj.Id = idx.id\n"
+                  "   AND obj.Id = ixk.id\n"
+                  "   AND idx.indid = ixk.indid\n"
+                  "   AND ixk.colid = col.colid\n"
+                  "   AND col.id = obj.Id\n"
+                  "   AND NOT idx.name LIKE '\\_WA\\_Sys\\_%\\_%' ESCAPE '\\'\n"
+//                       "   AND idx.first <> 0\n"
+                  " ORDER BY idx.name\n"
+                  "         ,ixk.keyno\n";
+  return query;
 }
 
 XString
@@ -1382,9 +1403,9 @@ SQLInfoSQLServer::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_table
 {
   // In case of a NON-TEMPORARY table, the standard ODBC driver is better
   if(p_tablename.Left(1).Compare("#"))
-{
-  return "";
-}
+  {
+    return "";
+  }
   // GLOBAL AND LOCAL TEMPORARY TABLES ONLY!!!
 
   // All temporary tables are stored under this schema!
@@ -2178,12 +2199,18 @@ SQLInfoSQLServer::GetCATALOGViewText(XString& p_schema,XString& p_viewname) cons
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString p_contents) const
+SQLInfoSQLServer::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString p_contents,bool p_ifexists /*= true*/) const
 {
   p_schema.MakeLower();
   p_viewname.MakeLower();
 
-  return "CREATE VIEW [" + p_schema + "].[" + p_viewname + "]\n" + p_contents;
+  XString sql("CREATE ");
+  if(p_ifexists)
+  {
+    sql += "OR ALTER ";
+  }
+  sql += "VIEW [" + p_schema + "].[" + p_viewname + "]\n" + p_contents;
+  return sql;
 }
 
 XString 
@@ -2471,7 +2498,7 @@ SQLInfoSQLServer::GetPSMProcedureList(XString& p_schema) const
 XString
 SQLInfoSQLServer::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure) const
 {
-  XString sql = 
+  XString sql =
     "SELECT db_name() as catalog_name\n"
     "      ,s.name    as schema_name\n"
     "      ,o.name    as procedure_name\n"

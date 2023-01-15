@@ -301,7 +301,7 @@ public:
   XString GetCATALOGViewList         (XString& p_schema,XString& p_pattern)  const;
   XString GetCATALOGViewAttributes   (XString& p_schema,XString& p_viewname) const;
   XString GetCATALOGViewText         (XString& p_schema,XString& p_viewname) const;
-  XString GetCATALOGViewCreate       (XString  p_schema,XString  p_viewname,XString p_contents)   const;
+  XString GetCATALOGViewCreate       (XString  p_schema,XString  p_viewname,XString p_contents,bool p_ifexists = true) const;
   XString GetCATALOGViewRename       (XString  p_schema,XString  p_viewname,XString p_newname)    const;
   XString GetCATALOGViewDrop         (XString  p_schema,XString  p_viewname,XString& p_precursor) const;
   // All Privilege functions

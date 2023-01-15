@@ -260,6 +260,12 @@ DDLCreateTable::SetOptionIndexDuplicateNulls(bool p_duplicate)
   m_indexDuplicateNulls = p_duplicate;
 }
 
+void
+DDLCreateTable::SetOptionDropIfExists(bool p_drop)
+{
+  m_dropIfExists = p_drop;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 void   
@@ -460,7 +466,7 @@ DDLCreateTable::GetViewInfo()
   if(m_info->MakeInfoViewDefinition(definition,errors,m_schema,m_tableName))
   {
     // Do our DDL part
-    ddl += m_info->GetCATALOGViewCreate(m_schema,table.m_table,definition);
+    ddl += m_info->GetCATALOGViewCreate(m_schema,table.m_table,definition,m_dropIfExists);
     ddl += "\n";
   }
   StashTheLine(ddl);
@@ -718,9 +724,9 @@ DDLCreateTable::StashTheLine(XString p_line)
 
 XString
 DDLCreateTable::ReplaceLengthPrecScale(TypeInfo*  p_type
-                                       ,int p_length
-                                       ,int p_precision
-                                       ,int p_scale)
+                                      ,int p_length
+                                      ,int p_precision
+                                      ,int p_scale)
 {
   XString params = p_type->m_create_params;
 
@@ -738,12 +744,12 @@ DDLCreateTable::ReplaceLengthPrecScale(TypeInfo*  p_type
   XString length,precision,scale;
   if(p_length > 0)
   {
-  length.Format("%d",p_length);
+   length.Format("%d",p_length);
   }
   if(p_precision > 0 || p_scale > 0)
   {
-  precision.Format("%d",p_precision);
-  scale.Format("%d",p_scale);
+    precision.Format("%d",p_precision);
+    scale.Format("%d",p_scale);
   }
 
   // Replace as strings
@@ -763,6 +769,10 @@ DDLCreateTable::ReplaceLengthPrecScale(TypeInfo*  p_type
     params.Replace("precision", precision);
     params.Replace("scale",     scale);
   }
+  else
+  {
+    params.Empty();
+  }
   // Make sure we have parenthesis
   if(!params.IsEmpty() && params.Left(1) != "(" && params != ",")
   {
@@ -771,7 +781,7 @@ DDLCreateTable::ReplaceLengthPrecScale(TypeInfo*  p_type
   if(params != ",")
   {
     return params;
-}
+  }
   return "";
 }
 

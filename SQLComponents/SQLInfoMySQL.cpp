@@ -1260,7 +1260,7 @@ SQLInfoMySQL::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewname*/) 
 }
 
 XString
-SQLInfoMySQL::GetCATALOGViewCreate(XString /*p_schema*/,XString p_viewname,XString p_contents) const
+SQLInfoMySQL::GetCATALOGViewCreate(XString /*p_schema*/,XString p_viewname,XString p_contents,bool /*p_ifexists /*= true*/) const
 {
   return "CREATE VIEW " + p_viewname + "\n" + p_contents;
 }

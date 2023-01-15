@@ -1663,7 +1663,7 @@ SQLInfoPostgreSQL::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewnam
 }
 
 XString
-SQLInfoPostgreSQL::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString p_contents) const
+SQLInfoPostgreSQL::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString p_contents,bool /*p_ifexists = true*/) const
 {
   return "CREATE OR REPLACE VIEW " + p_schema + "." + p_viewname + "\n" + p_contents;
 }

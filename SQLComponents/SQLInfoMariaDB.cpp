@@ -1605,7 +1605,7 @@ SQLInfoMariaDB::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewname*/
 }
 
 XString
-SQLInfoMariaDB::GetCATALOGViewCreate(XString /*p_schema*/,XString p_viewname,XString p_contents) const
+SQLInfoMariaDB::GetCATALOGViewCreate(XString /*p_schema*/,XString p_viewname,XString p_contents,bool /*p_ifexists /*= true*/) const
 {
   return "CREATE VIEW " + p_viewname + "\n" + p_contents;
 }
