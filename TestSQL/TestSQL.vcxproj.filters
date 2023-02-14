@@ -16,6 +16,9 @@
     <Filter Include="Configuration">
       <UniqueIdentifier>{65beffe7-e1cf-4b0e-b1be-8641ae37acfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ICD">
+      <UniqueIdentifier>{42d6d68a-6561-4d74-be80-85f91d5bf9cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -51,6 +54,9 @@
     <ClCompile Include="TestOracleOID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Icd.cpp">
+      <Filter>ICD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -67,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>Configuration</Filter>
+    </ClInclude>
+    <ClInclude Include="Icd.h">
+      <Filter>ICD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

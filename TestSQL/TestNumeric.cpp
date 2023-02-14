@@ -29,6 +29,7 @@
 #include "SQLDatabase.h"
 #include "SQLVariant.h"
 #include "bcd.h"
+#include "icd.h"
 
 void TestNumeric()
 {
@@ -41,8 +42,8 @@ void TestNumeric()
 
   try
   {
-//     g_dsn = "ok2b01";  // twoc09 = oracle / ok2b01 = MS-SQLServer / testing = MS-Access
-//     g_user = "k2b";
+//     g_dsn      = "ok2b01";  // twoc09 = oracle / ok2b01 = MS-SQLServer / testing = MS-Access
+//     g_user     = "k2b";
 //     g_password = "k2b";
 
     // Set options for the database
@@ -63,6 +64,22 @@ void TestNumeric()
         bcd    field2 = query[2];
 
         printf("Field 1 [%.4f] Field 2 [%s]\n",field1,field2.AsString().GetString());
+
+        SQL_NUMERIC_STRUCT num;
+        int size = sizeof(SQL_NUMERIC_STRUCT);
+        memset(&num,0,size);
+        memcpy_s(&num,size,query.GetColumn(1)->GetAsNumeric(),size);
+
+        icd testing(&num);
+        printf("ICD %s\n",testing.AsString().GetString());
+
+        SQL_NUMERIC_STRUCT test;
+        testing.AsNumeric(&test);
+
+        if(memcmp(&num,&test,size) != 0)
+        {
+          printf("Conversion back is invalid!\n");
+        }
       }
 
 
@@ -121,6 +138,47 @@ void TestBcd()
   // Now back again to a SQL_NUMERIC_STRUCT
   ten.AsNumeric(&res);
 
+//   printf("Precision: %d\n",res.precision);
+//   printf("Scale    : %d\n",res.scale);
+//   printf("Sign     : %d\n",res.sign);
+
+  for(char ind = 0;ind <= res.scale; ++ind)
+  {
+    printf("Numeric mantissa [%d:%02.2X]\n",ind,res.val[ind]);
+  }
+
+  bcd check(&res);
+  printf("bcd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString().GetString());
+}
+
+// Test BCD to NUMERIC conversions
+void TestIcd()
+{
+  // Header
+  printf("Testing icd to SQL_NUMERIC_STRUCT\n");
+  printf("---------------------------------\n");
+
+  // num = 10.001 (ten and 1 thousandth)
+  SQL_NUMERIC_STRUCT num;
+  SQL_NUMERIC_STRUCT res;
+  memset(&num,0,sizeof(SQL_NUMERIC_STRUCT));
+  memset(&res,0,sizeof(SQL_NUMERIC_STRUCT));
+  num.sign = 1; // Positive
+  num.precision = 6;
+  num.scale = 4;
+
+  num.val[0] = 0xAA;
+  num.val[1] = 0x86;
+  num.val[2] = 0x01;
+
+  icd ten(&num);
+
+  printf("SQL_NUMERIC_STRUCT -> icd: %s\n",ten.AsString().GetString());
+
+
+  // Now back again to a SQL_NUMERIC_STRUCT
+  ten.AsNumeric(&res);
+
   printf("Precision: %d\n",res.precision);
   printf("Scale    : %d\n",res.scale);
   printf("Sign     : %d\n",res.sign);
@@ -130,6 +188,117 @@ void TestBcd()
     printf("Numeric mantissa [%d:%02.2X]\n",ind,res.val[ind]);
   }
 
-  bcd check(&res);
-  printf("bcd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString().GetString());
+  icd check(&res);
+  printf("icd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString().GetString());
+}
+
+
+void TestBulkICD()
+{
+  // Header
+  printf("Testing numeric(14,2) in bulk\n");
+  printf("-----------------------------\n");
+
+  XString number;
+  SQL_NUMERIC_STRUCT numst1;
+  SQL_NUMERIC_STRUCT numst2;
+  memset(&numst1,0,sizeof(SQL_NUMERIC_STRUCT));
+  memset(&numst2,0,sizeof(SQL_NUMERIC_STRUCT));
+  int errors = 0;
+
+  for(int64 x = 0; x < ((int64)LONG_MAX * (int64)100); ++x)
+  {
+    number.Format("%lld",x);
+    icd num1(number);
+    bcd num2(number);
+
+    num1.SetLengthAndPrecision(14,2);
+    num2.SetLengthAndPrecision(14,2);
+
+    num1.AsNumeric(&numst1);
+    num2.AsNumeric(&numst2);
+
+    if(memcmp(&numst1,&numst2,sizeof(SQL_NUMERIC_STRUCT)) != 0)
+    {
+      printf("Numbers do no compare: %lld\n",x);
+      ++errors;
+    }
+  }
+  printf("Total number of errors: %d\n",errors);
+}
+
+void TestBulkDecimals(bool p_trunc)
+{
+  // Header
+  printf("Testing decimals 0.9999 until 0.0001\n");
+  printf("------------------------------------\n");
+
+  XString number;
+  SQL_NUMERIC_STRUCT numst1;
+  SQL_NUMERIC_STRUCT numst2;
+  memset(&numst1,0,sizeof(SQL_NUMERIC_STRUCT));
+  memset(&numst2,0,sizeof(SQL_NUMERIC_STRUCT));
+  int errors = 0;
+
+  for(long x = 99990000; x >= 9999; x -= 10000)
+  {
+    icd num1(0,x);
+    bcd num2(0,x);
+
+    if(p_trunc)
+    {
+      num1.SetLengthAndPrecision(8,2);
+      num2.SetLengthAndPrecision(8,2);
+    }
+
+//     printf("ICD %d : %s\n",x,num1.AsDisplayString().GetString());
+//     printf("BCD %d : %s\n",x,num2.AsString(bcd::Format::Bookkeeping,false,4).GetString());
+//     printf("\n");
+
+    num1.AsNumeric(&numst1);
+    num2.AsNumeric(&numst2);
+
+    if(memcmp(&numst1,&numst2,sizeof(SQL_NUMERIC_STRUCT)) != 0)
+    {
+      printf("Numbers do no compare: %ld\n",x);
+      ++errors;
+    }
+
+    icd num11(&numst1);
+    bcd num21(&numst2);
+    num11  = num11.Mul(icd(10000L,0));
+    num21 *= 10000;
+
+    int x11 = num11.AsLong() * 10000;
+    int x21 = num21.AsLong() * 10000;
+
+    if(p_trunc)
+    {
+      if(x11 != x21)
+      {
+        printf("Numbers do no compare: %ld\n",x);
+        ++errors;
+      }
+    }
+    else
+    {
+      if(x11 != x || x21 != x)
+      {
+        printf("Numbers do no compare: %ld\n",x);
+        ++errors;
+      }
+    }
+  }
+  printf("Total number of errors: %d\n",errors);
+}
+
+void TestBCDIndividual()
+{
+  long x = 8000000;
+  bcd num2(0,x);
+
+  printf("BCD %d : %s\n",x,num2.AsString(bcd::Format::Bookkeeping,false,4).GetString());
+  num2.SetLengthAndPrecision(8,2);
+  printf("BCD %d : %s\n",x,num2.AsString(bcd::Format::Bookkeeping,false,4).GetString());
+
 }

@@ -105,6 +105,8 @@ bcd::bcd(const bcd& p_arg)
 {
   m_sign      = p_arg.m_sign;
   m_exponent  = p_arg.m_exponent;
+  m_precision = p_arg.m_precision;
+  m_scale     = p_arg.m_scale;
   // Create and copy mantissa
   memcpy(m_mantissa,p_arg.m_mantissa,bcdLength * sizeof(long));
 }
@@ -1137,7 +1139,56 @@ bcd::Negate()
     m_sign = (m_sign == Sign::Positive) ? Sign::Negative : Sign::Positive;
   }
 }
-  
+
+// Change length and precision
+void
+bcd::SetLengthAndPrecision(int p_precision /*= bcdPrecision*/,int p_scale /*= (bcdPrecision / 2)*/)
+{
+  // Record the new precision and scale
+  m_precision = (uchar) p_precision;
+  m_scale     = (uchar) p_scale;
+
+  if(IsNull())
+  {
+    // Optimize for NULL situation
+    return;
+  }
+
+  if(m_exponent > p_precision)
+  {
+    XString error;
+    error.Format("Overflow in BCD at set precision and scale as NUMERIC(%d,%d)",p_precision,p_scale);
+    throw StdException(error);
+  }
+
+  // Calculate the mantissa position to truncate
+  int mantpos = m_exponent + p_scale + 1;
+
+  // Truncating to zero?
+  if(mantpos <= 0)
+  {
+    m_exponent = 0;
+    memset(m_mantissa,0,sizeof(long) * bcdLength);
+    return;
+  }
+  int mant = mantpos / bcdDigits;
+  int mpos = mantpos % bcdDigits;
+
+  // Strip this on mantissa part
+  if(mpos)
+  {
+    static int significations[] = {1,10000000,1000000,100000,10000,1000,100,10,1};
+    int  significant = significations[mpos];
+    int64       accu = m_mantissa[mant] / significant;
+    m_mantissa[mant] = (long) (accu * significant);
+  }
+  // Strip the rest of the mantissa
+  for(int index = mant + 1;index < bcdLength; ++index)
+  {
+    m_mantissa[index] = 0;
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // END OF MAKING AN EXACT NUMERIC
@@ -2372,7 +2423,8 @@ bcd::AsNumeric(SQL_NUMERIC_STRUCT* p_numeric) const
 
   // Setting the sign, precision and scale
   p_numeric->sign      = (m_sign == Sign::Positive) ? 1 : 0;
-  p_numeric->precision = (SQLCHAR)  SQLNUM_MAX_PREC;
+  p_numeric->precision = m_precision;
+  p_numeric->scale     = m_scale;
 
   // Special case for 0.0 or smaller than can be contained (1.0E-38)
   if(IsNull() || m_exponent < -SQLNUM_MAX_PREC)
@@ -2386,21 +2438,6 @@ bcd::AsNumeric(SQL_NUMERIC_STRUCT* p_numeric) const
     throw StdException("BCD: Overflow in converting bcd to SQL NUMERIC/DECIMAL");
   }
 
-  // Calculate the scale of the number
-  int scale     = GetPrecision();
-  int precision = 1 + scale + ((m_exponent >= 0) ? m_exponent : 0);
-
-  // If we become too large, we loose a bit of the scale digits
-  if(precision > SQLNUM_MAX_PREC)
-  {
-    scale    -= (precision - SQLNUM_MAX_PREC);
-    precision = SQLNUM_MAX_PREC;
-  }
-
-  // Register the resulting precision and scale
-  p_numeric->precision = (SQLCHAR)  precision;
-  p_numeric->scale     = (SQLSCHAR) scale;
-
   // Converting the value array
   bcd one(1);
   bcd radix(256);
@@ -2409,7 +2446,7 @@ bcd::AsNumeric(SQL_NUMERIC_STRUCT* p_numeric) const
 
   // Here is the big trick: use the exponent to scale up the number
   // Adjusting m_exponent to positive scaled integer result
-  accu.m_exponent += (short)scale;
+  accu.m_exponent += (short)m_scale;
   accu.m_sign      = Sign::Positive;
 
   while(true)
@@ -2696,6 +2733,8 @@ bcd::Zero()
 {
   m_sign      = Sign::Positive;
   m_exponent  = 0;
+  m_precision = 0;
+  m_scale     = 0;
   memset(m_mantissa,0,bcdLength * sizeof(long));
 }
 
@@ -2718,6 +2757,9 @@ void
 bcd::SetValueInt(const int p_value)
 {
   Zero();
+
+  // Length of LONG_MAX = 2147483647L
+  m_precision = 10; 
 
   // Shortcut if value is zero
   if(p_value == 0)
@@ -2744,6 +2786,9 @@ bcd::SetValueLong(const long p_value, const long p_restValue)
 {
   Zero();
 
+  // Length of LONG_MAX = 2147483647L
+  m_precision = 10;
+
   if(p_value == 0 && p_restValue == 0)
   {
     // Nothing more to do. We are zero
@@ -2763,22 +2808,28 @@ bcd::SetValueLong(const long p_value, const long p_restValue)
 
   if(p_restValue)
   {
+    // Initial size and scale
+    m_precision = 20; // 2 * length of a long
+    m_scale     = 10; // length of a long
+
     m_mantissa[0] = long_abs(p_restValue % bcdBase);
-    norm = bcdDigits - 1;
+    norm = -1;
 
     if(p_restValue / bcdBase)
     {
       ShiftRight();
       m_mantissa[0] = long_abs(p_restValue / bcdBase);
-      norm = 2 * bcdDigits -1;
+      norm -= bcdDigits;
     }
     Normalize(norm);
     norm = 0;
+    if(p_value)
+    {
+      ShiftRight();
+    }
   }
-
   if(p_value % bcdBase)
   {
-    ShiftRight();
     m_mantissa[0] = long_abs(p_value % bcdBase);
     norm = bcdDigits - 1;
   }
@@ -2805,6 +2856,10 @@ void
 bcd::SetValueInt64(const int64 p_value, const int64 p_restValue)
 {
   Zero();
+
+  // Length of LONGLONG_MAX = 9223372036854775807i64
+  m_precision = 19;
+
   int64 dblBcdDigits = (int64)bcdBase * (int64)bcdBase;
 
   if(p_value == 0L && p_restValue == 0L)
@@ -2842,6 +2897,8 @@ bcd::SetValueInt64(const int64 p_value, const int64 p_restValue)
     m_mantissa[0] = long_abs((long)(p_restValue / dblBcdDigits));
     norm = 3 * bcdDigits - 1;
   }
+  m_scale = (unsigned char)norm;
+
   if(p_restValue)
   {
     // Normalize the rest value to be left shifted
@@ -3112,7 +3169,16 @@ bcd::SetValueNumeric(const SQL_NUMERIC_STRUCT* p_numeric)
   m_exponent -= p_numeric->scale;
 
   // Adjust the sign
-  m_sign = (p_numeric->sign == 1) ? Sign::Positive : Sign::Negative;
+  m_sign      = (p_numeric->sign == 1) ? Sign::Positive : Sign::Negative;
+  m_precision = p_numeric->precision;
+  m_scale     = p_numeric->scale;
+
+  int precision = GetPrecision();
+  if(m_scale < precision)
+  {
+    m_scale = (unsigned char)precision;
+  }
+
 }
 
 // bcd::Normalize

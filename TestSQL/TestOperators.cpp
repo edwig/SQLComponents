@@ -62,7 +62,9 @@ void TestSub()
   SQLVariant var2(&date2);
 
   SQLVariant var3 = var2 - var1;
-  printf("Found interval is: %s\n",var3.GetAsChar());
+  CString diff;
+  var3.GetAsString(diff);
+  printf("Found interval is: %s\n",diff.GetString());
 }
 
 void TestEqual()
@@ -184,7 +186,9 @@ void TestMul()
   SQLVariant var2(&num);
 
   SQLVariant var3 = var1 * var2;
-  printf("The result of the char*decimal = %s\n",var3.GetAsChar());
+  XString diff;
+  var3.GetAsString(diff);
+  printf("The result of the char*decimal = %s\n",diff.GetString());
 }
 
 void TestCast()

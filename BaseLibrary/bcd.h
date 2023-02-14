@@ -284,6 +284,8 @@ public:
   void    Round(int p_precision = 0);
   // Truncate to a specified fraction (decimals behind the .)
   void    Truncate(int p_precision = 0);  
+  // Change length and precision
+  void    SetLengthAndPrecision(int p_length = bcdPrecision,int p_precision = (bcdPrecision / 2));
   // Change the sign
   void    Negate();
   
@@ -351,7 +353,7 @@ public:
   XString AsDisplayString(int p_decimals = 2) const;
   // Get as an ODBC SQL NUMERIC(p,s)
   void    AsNumeric(SQL_NUMERIC_STRUCT* p_numeric) const;
-  
+
   // GETTER FUNCTIES
 
   // Is bcd exactly 0.0?
@@ -455,7 +457,9 @@ private:
   bcd  PositiveDivision(bcd& p_arg1,bcd& p_arg2) const;
 
   // STORAGE OF THE NUMBER
-  Sign   m_sign;                // 0 = Positive, 1 = Negative
-  short  m_exponent;            // +/- 10E32767
-  long   m_mantissa[bcdLength]; // Up to (bcdDigits * bcdLength) digits
+  Sign          m_sign;                // 0 = Positive, 1 = Negative
+  short         m_exponent;            // +/- 10E32767
+  long          m_mantissa[bcdLength]; // Up to (bcdDigits * bcdLength) digits
+  unsigned char m_precision;
+  unsigned char m_scale; 
 };

@@ -62,12 +62,22 @@ int main(int argc,char* argv[],char* envp[])
 
   InitSQLComponents(LN_ENGLISH);
 
+  // Simple test
+  TestBCDIndividual();
+  // Bulk test ICD/BCD: Runs for hours!!
+  TestBulkICD();
+
+  // Bulk test for decimals < 1
+  TestBulkDecimals(false);
+  TestBulkDecimals(true);
   // Basic connection test
   TestConnection();
   // Test calling procedure/function
   TestCalling();
   // Test BCD to NUMERIC conversions
   TestBcd();
+  // Test ICD to NUMERIC conversions
+  TestIcd();
   // Testing Numerics
   TestNumeric();
   // Test closing cursors does not leave thrash in RDBMS    
