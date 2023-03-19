@@ -5,6 +5,6 @@ Planning of features for SQLComponents library
 AND STILL MORE UNIT TESTS!
 
 2)
-SQLMigrate will be moved to the Open ODBCQueryTool project soon!!
+SQLMigrate has been moved to the Open ODBCQueryTool project!!
 Take a look at this project to see the latest improvements.
 It is no longer maintained here!

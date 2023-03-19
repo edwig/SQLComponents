@@ -113,14 +113,14 @@ public:
 
 private:
   // Internal procedures
-  void Reset();
-  void PresetStatus();
-  bool ParseLevel(XString& p_parsing);
-  bool FindDelimiterType(XString& p_parsing);
+  void    Reset();
+  void    PresetStatus();
+  bool    ParseLevel(XString& p_parsing);
+  bool    FindDelimiterType(XString& p_parsing);
   bool    GetNextToken(XString& p_parsing,XString& p_token,bool& p_isIndex,bool& p_isFilter);
-  void ProcessWildcard();
-  void ProcessSlice(XString p_token);
-  void ProcessUnion(XString p_token);
+  void    ProcessWildcard();
+  void    ProcessSlice(XString p_token);
+  void    ProcessUnion(XString p_token);
   void    ProcessFilter(XString p_token);
   void    ProcessFilterTokenCharacters(XString p_token);
   int     GetCurrentCharacter(XString p_token,int& p_pos);
@@ -134,20 +134,22 @@ private:
   void    HandleLogicalAnd(XString p_token,int& p_pos);
   void    HandleLogicalOr(XString p_token,int& p_pos);
   void    HandleBrackets(XString p_token,int& p_pos);
+  bool    WithinQuotes(XString p_token,int p_pos,int p_charPos);
+  int     FindMatchingBracket(const CString& p_string,int p_bracketPos);
 
   // DATA
-  XString      m_path;
-  JSONMessage* m_message   { nullptr };
-  int          m_origin    { 0       };
-  JPStatus     m_status    { JPStatus::JP_None };
-  char         m_delimiter { '/'};
-  JSONvalue*   m_searching { nullptr };
-  bool         m_recursive { false   };
-  XString      m_errorInfo;
+  XString           m_path;
+  JSONMessage*      m_message   { nullptr };
+  int               m_origin    { 0       };
+  JPStatus          m_status    { JPStatus::JP_None };
+  char              m_delimiter { '/'};
+  JSONvalue*        m_searching { nullptr };
+  bool              m_recursive { false   };
+  XString           m_errorInfo;
   XString           m_rootWord  { "" };
   std::stack<char>  m_bracketStack;
 
   // RESULT Pointers
-  JPResults    m_results;
+  JPResults         m_results;
 };
 

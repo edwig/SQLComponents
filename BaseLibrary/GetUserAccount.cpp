@@ -35,7 +35,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-XString 
+XString
 GetUserAccount(EXTENDED_NAME_FORMAT p_format /*=NameUnknown*/,bool p_normalized /*=false*/)
 {
   BOOL ret = FALSE;

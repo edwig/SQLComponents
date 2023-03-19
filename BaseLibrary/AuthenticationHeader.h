@@ -1,10 +1,10 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-// SourceFile: MapDialog.h
+// SourceFile: AuthenticationHeader.h
 //
 // BaseLibrary: Indispensable general objects and functions
-// 
-// Copyright (c) 2014-2022 ir. W.E. Huisman
+//
+// // Copyright (c) 2014-2022 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,41 +26,9 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include "XString.h"
 
-class MapDialog 
-{
-public:
+// These functions are meant to be used in conjunction with your own HTTP X-<app>-Authentication header
 
-   MapDialog();
-   virtual ~MapDialog();
-
-  bool Browse(HWND            hwndParent, 
-              XString const&  title, 
-              XString const&  initdir    = "",
-              XString const&  rootdir    = "",
-              bool            showFiles  = false,
-              bool            showStatus = false);
-
-  XString const& GetPath() const { return m_path; }
-protected:
-  //  These functions can only be called from
-  //  within the OnSelChange function, so it
-  //  is reasonable to keep them as protected.
-  void EnableOk(bool bEnable);
-  void SetSelection(XString const& path);
-  void SetStatusText(XString const& text);
-
-private:
-
-  virtual void OnInitialized();
-  virtual void OnSelChange(XString const& path);
-  int CallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam);
-  static int CALLBACK CallbackProcS(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
-
-  HWND      m_hwnd;
-  char      m_originalDir[MAX_PATH+1];
-  XString   m_disp;
-  XString   m_path;
-  XString   m_root;
-  XString   m_init;
-};
+XString CreateAuthentication(XString p_user,XString p_password);
+bool    DecodeAuthentication(XString p_scramble,XString& p_user,XString& p_password);

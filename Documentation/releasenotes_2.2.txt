@@ -1,0 +1,19 @@
+RELEASENOTES SQLCOMPONENTS VERSION 2.2
+======================================
+===== Released since: 19-03-2023 =====
+======================================
+
+Version 2.2.0 of 19-03-2023
+---------------------------
+1)  SQLMigrate has been dropped from the library in favor of the
+    Open-ODBCQuerytool project. This program is now maintained under
+    that project, so to be able to deploy it more easily to customers
+    and to let it take advantage of the StyleFramework.
+2)  ReWrite of the bcd code. It now has a silent failure mode to support
+    IEEE-745 INF (infinity), -INF (negative inifinity) and NaN 
+    (Not a Number) statusses as well as the database NULL status
+3)  ReWrite of the bcd code. It no longer needs the precision and scale
+    These will be calculated automatically when converting a bcd to a 
+    database SQL_NUMERCIC_STRUCT.
+4)  Updated to the last version of the BaseLibrary (1.0.9)
+

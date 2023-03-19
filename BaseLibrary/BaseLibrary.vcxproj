@@ -103,6 +103,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Alert.h" />
+    <ClInclude Include="AuthenticationHeader.h" />
     <ClInclude Include="AutoCritical.h" />
     <ClInclude Include="AutoFont.h" />
     <ClInclude Include="Base64.h" />
@@ -140,10 +141,10 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PrintToken.h" />
     <ClInclude Include="ProcInfo.h" />
+    <ClInclude Include="QueryReWriter.h" />
     <ClInclude Include="Redirect.h" />
     <ClInclude Include="Routing.h" />
     <ClInclude Include="RunRedirect.h" />
-    <ClInclude Include="SchemaReWriter.h" />
     <ClInclude Include="ServiceReporting.h" />
     <ClInclude Include="SOAPMessage.h" />
     <ClInclude Include="SOAPSecurity.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="StackTrace.h" />
     <ClInclude Include="StdException.h" />
     <ClInclude Include="StoreMessage.h" />
+    <ClInclude Include="StringUtilities.h" />
     <ClInclude Include="XStringBuilder.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="unzip.h" />
@@ -183,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Alert.cpp" />
+    <ClCompile Include="AuthenticationHeader.cpp" />
     <ClCompile Include="AutoCritical.cpp" />
     <ClCompile Include="AutoFont.cpp" />
     <ClCompile Include="Base64.cpp" />
@@ -220,15 +223,16 @@
     </ClCompile>
     <ClCompile Include="PrintToken.cpp" />
     <ClCompile Include="ProcInfo.cpp" />
+    <ClCompile Include="QueryReWriter.cpp" />
     <ClCompile Include="Redirect.cpp" />
     <ClCompile Include="RunRedirect.cpp" />
-    <ClCompile Include="SchemaReWriter.cpp" />
     <ClCompile Include="ServiceReporting.cpp" />
     <ClCompile Include="SOAPMessage.cpp" />
     <ClCompile Include="SOAPSecurity.cpp" />
     <ClCompile Include="StackTrace.cpp" />
     <ClCompile Include="StdException.cpp" />
     <ClCompile Include="StoreMessage.cpp" />
+    <ClCompile Include="StringUtilities.cpp" />
     <ClCompile Include="XStringBuilder.cpp" />
     <ClCompile Include="unzip.cpp" />
     <ClCompile Include="WideMessageBox.cpp" />

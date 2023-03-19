@@ -173,7 +173,7 @@ Cookie::GetSetCookieText()
     if(!value.IsEmpty())
     {
       cookie.AppendFormat("; SameSite=%s", value.GetString());
-  }
+    }
   }
   // Optional flags
   if(m_secure)
@@ -210,7 +210,7 @@ Cookie::SetExpires(SYSTEMTIME* p_expires)
 {
   if(p_expires)
   {
-  memcpy(&m_expires,p_expires,sizeof(SYSTEMTIME));
+    memcpy(&m_expires,p_expires,sizeof(SYSTEMTIME));
   }
 }
 

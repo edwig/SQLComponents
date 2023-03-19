@@ -572,6 +572,11 @@ namespace DatabaseUnitTest
       PrecisionTest("111111111.1",10,1);
       PrecisionTest( "1111111111",10,0);
 
+      PrecisionTest(   "10",2,0);
+      PrecisionTest(  "100",3,0);
+      PrecisionTest( "1000",4,0);
+      PrecisionTest("10000",5,0);
+
       PrecisionTest("1",1,0);
       PrecisionTest("0.1",2,1);
       PrecisionTest("0.01",3,2);

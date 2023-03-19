@@ -98,13 +98,13 @@ private:
   friend  Cookies;
 
   // The cookie itself
-  XString m_name;                                       // Optional!
-  XString m_value;                                      // The dough of the cookie 
+  XString m_name;                                         // Optional!
+  XString m_value;                                        // The dough of the cookie 
   // Attributes to the cookie
-  bool           m_secure    { false };                  // Secure attribute of the cookie
-  bool           m_httpOnly  { false };                  // HTTP Only attribute 
-  XString        m_domain;                               // Optional domain
-  XString        m_path;                                 // Optional path
+  bool           m_secure    { false };                   // Secure attribute of the cookie
+  bool           m_httpOnly  { false };                   // HTTP Only attribute 
+  XString        m_domain;                                // Optional domain
+  XString        m_path;                                  // Optional path
   CookieSameSite m_sameSite  { CookieSameSite::NoSameSite }; // SameSite attribute
   // Expiration time
   int            m_maxAge    { 0 };                       // Maximum number of seconds valid

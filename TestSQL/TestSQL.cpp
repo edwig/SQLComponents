@@ -64,12 +64,6 @@ int main(int argc,char* argv[],char* envp[])
 
   // Simple test
   TestBCDIndividual();
-  // Bulk test ICD/BCD: Runs for hours!!
-  TestBulkICD();
-
-  // Bulk test for decimals < 1
-  TestBulkDecimals(false);
-  TestBulkDecimals(true);
   // Basic connection test
   TestConnection();
   // Test calling procedure/function
