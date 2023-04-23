@@ -102,6 +102,7 @@ SQLQuery::Init(SQLDatabase* p_database)
   m_speedThreshold   = QUERY_TOO_LONG;
   m_connection       = NULL;
   m_concurrency      = SQL_CONCUR_READ_ONLY;
+  m_lengthOption     = LOption::LO_LEN_ZERO;
 }
 
 void
@@ -646,8 +647,16 @@ SQLQuery::DoSQLStatement(const XString& p_statement)
   // by a missing NULL-Terminator. By changing the length of the statement
   // _including_ the terminating NUL, it won't crash at all
   // NOTE: This also means we cannot use the SQL_NTS terminator
-  SQLINTEGER lengthStatement = statement.GetLength() + 1;
-
+  SQLINTEGER lengthStatement(SQL_NTS);
+  switch(m_lengthOption)
+  {
+    case LOption::LO_NTS:     lengthStatement = SQL_NTS; 
+                              break;
+    case LOption::LO_LENGTH:  lengthStatement = statement.GetLength();
+                              break;
+    case LOption::LO_LEN_ZERO:lengthStatement = statement.GetLength() + 1;
+                              break;
+  } 
   // GO DO IT RIGHT AWAY
   m_retCode = SqlExecDirect(m_hstmt,(SQLCHAR*)statement.GetString(),lengthStatement);
 
@@ -861,8 +870,16 @@ SQLQuery::DoSQLPrepare(const XString& p_statement)
   // in the processing of the query-strings which crashes it in CharNexW
   // by a missing NUL-Terminator. By changing the length of the statement
   // _including_ the terminating NUL, it won't crash at all
-  SQLINTEGER lengthStatement = statement.GetLength() + 1;
-
+  SQLINTEGER lengthStatement(SQL_NTS);
+  switch(m_lengthOption)
+  {
+    case LOption::LO_NTS:     lengthStatement = SQL_NTS; 
+                              break;
+    case LOption::LO_LENGTH:  lengthStatement = statement.GetLength();
+                              break;
+    case LOption::LO_LEN_ZERO:lengthStatement = statement.GetLength() + 1;
+                              break;
+  } 
   // GO DO THE PREPARE
   m_retCode = SqlPrepare(m_hstmt,(SQLCHAR*)(LPCSTR)statement,lengthStatement);
   if(SQL_SUCCEEDED(m_retCode))
@@ -1209,37 +1226,37 @@ SQLQuery::BindColumns()
 
   for(auto& column : m_numMap)
   {
-    // Bind columns up to the first 'long' column
-    if(m_hasLongColumns && column.first >= m_hasLongColumns)
-    {
-      break;
-    }
-    SQLVariant*   var = column.second;
-    SQLUSMALLINT bcol = (SQLUSMALLINT) var->GetColumnNumber();
-    SQLSMALLINT  type = (SQLSMALLINT)  var->GetDataType();
-    SQLLEN       size = var->GetDataSize();
+    SQLVariant* var = column.second;
 
-    // Rebind the column datatype
-    type = RebindColumn(type);
-
-    m_retCode = SQLBindCol(m_hstmt                    // statement handle
-                          ,bcol                       // Column number
-                          ,type                       // Data type
-                          ,var->GetDataPointer()      // Data pointer
-                          ,size                       // Buffer length
-                          ,var->GetIndicatorPointer() // Indicator address
-                          );
-    if(!SQL_SUCCEEDED(m_retCode))
+    // Bind columns who are not long-get-at-exec
+    // Even if they are behind such a column in ascending order
+    if(!var->GetAtExec())
     {
-      GetLastError("Cannot bind to column. Error: ");
-      m_lastError.AppendFormat(" Column number: %d",icol);
-      throw StdException(m_lastError);
-    }
+      SQLUSMALLINT bcol = (SQLUSMALLINT) var->GetColumnNumber();
+      SQLSMALLINT  type = (SQLSMALLINT) var->GetDataType();
+      SQLLEN       size = var->GetDataSize();
 
-    // Now do the SQL_NUMERIC precision/scale binding
-    if(type == SQL_C_NUMERIC)
-    {
-      BindColumnNumeric((SQLSMALLINT)bcol,var,SQL_RESULT_COL);
+      // Rebind the column datatype
+      type = RebindColumn(type);
+
+      m_retCode = SQLBindCol(m_hstmt                    // statement handle
+                            ,bcol                       // Column number
+                            ,type                       // Data type
+                            ,var->GetDataPointer()      // Data pointer
+                            ,size                       // Buffer length
+                            ,var->GetIndicatorPointer() // Indicator address
+      );
+      if(!SQL_SUCCEEDED(m_retCode))
+      {
+        GetLastError("Cannot bind to column. Error: ");
+        m_lastError.AppendFormat(" Column number: %d",icol);
+        throw StdException(m_lastError);
+      }
+      // Now do the SQL_NUMERIC precision/scale binding
+      if(type == SQL_C_NUMERIC)
+      {
+        BindColumnNumeric((SQLSMALLINT)bcol,var,SQL_RESULT_COL);
+      }
     }
   }
 }
@@ -1587,8 +1604,8 @@ SQLQuery::RetrieveAtExecData()
                           ,(SQLLEN*)      var->GetIndicatorPointer());
     if(!SQL_SUCCEEDED(m_retCode))
     {
-        // SQL_ERROR / SQL_NO_DATA / SQL_STILL_EXECUTING / SQL_INVALID_HANDLE
-        return m_retCode;
+      // SQL_ERROR / SQL_NO_DATA / SQL_STILL_EXECUTING / SQL_INVALID_HANDLE
+      return m_retCode;
     }
   }
   return SQL_SUCCESS;

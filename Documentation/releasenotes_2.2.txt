@@ -17,3 +17,11 @@ Version 2.2.0 of 19-03-2023
     database SQL_NUMERCIC_STRUCT.
 4)  Updated to the last version of the BaseLibrary (1.0.9)
 
+Version 2.2.1 of 23-04-2024
+---------------------------
+1)  Fix for reading of DECIMAL/NUMERIC columns that are in ordinal order
+    behind a large at-exec column like a (C)(B)LOB column.
+2)  Length option for the SQL statement can now be set, instead of being
+    fixed on the Oracle bug as (length(sql-statement) + 1)
+3)  Fix for reading the stored-procedure information in SQL-Server
+
