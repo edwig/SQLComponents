@@ -21,6 +21,9 @@ rmdir /q /s SQLComponents\x64
 rmdir /q /s SQLConnections\Debug
 rmdir /q /s SQLConnections\Release
 rmdir /q /s SQLConnections\x64
+rmdir /q /s SQLXport\Debug
+rmdir /q /s SQLXport\Release
+rmdir /q /s SQLXport\x64
 rmdir /q /s SQLMigrate\x64
 rmdir /q /s SQLMigrate\Debug
 rmdir /q /s SQLMigrate\Release
