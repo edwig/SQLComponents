@@ -1040,6 +1040,8 @@ SQLQuery::BindParameters()
 //     TRACE("Col size  : %d\n", columnSize);
 //     TRACE("Scale     : %d\n", scale);
 //     TRACE("Buffersize: %d\n", bufferSize);
+//     TRACE("Indicator : %d\n", (int)*indicator);
+//     TRACE("DATA      : %s\n", var->GetAsChar());
 
     // Do the bindings
     m_retCode = SqlBindParameter(m_hstmt        // Statement handle
@@ -1471,6 +1473,22 @@ SQLQuery::TruncateCharFields()
     if(var->GetDataType() == SQL_C_CHAR)
     {
       var->TruncateCharacter();
+    }
+  }
+}
+
+// Truncate the char fields in the gotten buffer
+void
+SQLQuery::TruncateCharFieldsReset()
+{
+  for(auto& column : m_numMap)
+  {
+    // Get variable
+    SQLVariant* var = column.second;
+    // We try to truncate the CHAR/VARCHAR fields
+    if(var->GetDataType() == SQL_C_CHAR)
+    {
+      var->TruncateCharacterReset();
     }
   }
 }
