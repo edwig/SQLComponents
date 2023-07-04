@@ -27,6 +27,7 @@
 #include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
+#include "SQLDataType.h"
 #include "SQLDate.h"
 #include "bcd.h"
 
@@ -1884,8 +1885,8 @@ SQLVariant::operator*(SQLVariant& p_right)
   }
   // No compare function found
   // Data types are not comparable
-  XString leftType  = FindDatatype(m_datatype);
-  XString rightType = FindDatatype(p_right.m_datatype);
+  XString leftType  = SQLDataType::FindDatatype(m_datatype);
+  XString rightType = SQLDataType::FindDatatype(p_right.m_datatype);
   XString error;
   error.Format("Cannot do the multiplication operator on (%s * %s)",leftType.GetString(),rightType.GetString());
   throw StdException(error);
@@ -1922,8 +1923,8 @@ SQLVariant::operator*=(SQLVariant& p_right)
   }
   // No compare function found
   // Data types are not comparable
-  XString leftType  = FindDatatype(m_datatype);
-  XString rightType = FindDatatype(p_right.m_datatype);
+  XString leftType  = SQLDataType::FindDatatype(m_datatype);
+  XString rightType = SQLDataType::FindDatatype(p_right.m_datatype);
   XString error;
   error.Format("Cannot do the *= operator on (%s + %s)",leftType.GetString(),rightType.GetString());
   throw StdException(error);

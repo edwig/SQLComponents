@@ -26,6 +26,7 @@
 #include "stdafx.h"
 #include "SQLComponents.h"
 #include "SQLVariantFormat.h"
+#include "SQLDataType.h"
 #include "SQLFormatErrors.h"
 #include "SQLTime.h"
 #include "SQLDate.h"
@@ -960,7 +961,7 @@ SQLVariantFormat::FormatVariantForSQL(SQLDatabase* p_database)
   }
   else
   {
-    XString datatypeString = m_variant->FindDatatype(datatype);
+    XString datatypeString = SQLDataType::FindDatatype(datatype);
     throw StdException("Cannot prepare datatype for query: " + datatypeString);
   }
   return text;

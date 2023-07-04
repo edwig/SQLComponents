@@ -26,6 +26,7 @@
 #pragma  once
 #include <sqlext.h>
 #include "SQLVariantOperator.h"
+#include "SQLParameterType.h"
 #include "bcd.h"
 
 namespace SQLComponents
@@ -47,18 +48,6 @@ class SQLTime;
 class SQLTimestamp;
 class SQLInterval;
 class SQLGuid;
-
-// Type of parameter for queries and persistent-stored-modules
-typedef enum _param_type
-{
-   P_SQL_PARAM_TYPE_UNKNOWN = 0
-  ,P_SQL_PARAM_INPUT        = 1
-  ,P_SQL_PARAM_INPUT_OUTPUT = 2
-  ,P_SQL_RESULT_COL         = 3
-  ,P_SQL_PARAM_OUTPUT       = 4
-  ,P_SQL_RETURN_VALUE       = 5
-}
-SQLParamType;
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -125,7 +114,7 @@ public:
    int     GetBinaryLength() const;
    SQLLEN* GetIndicatorPointer();
    int     GetColumnNumber() const;
-   int     GetParameterType() const;
+   SQLParamType GetParameterType() const;
    int     GetFraction() const;
    int     GetNumericPrecision() const;  // Only for SQL_NUMERIC
    int     GetNumericScale() const;      // Only for SQL_NUMERIC
@@ -157,6 +146,8 @@ public:
    // BLOB Functions
    void    AttachBinary(void* p_pointer,unsigned long p_size = 0);
    void    DetachBinary();
+   // Find special char type
+   int     FindDataTypeFromSQLType();
 
    // Access per type
    const char*          GetAsChar();
@@ -218,15 +209,6 @@ public:
    void                 Set(SQLInterval* p_interval);
    void                 Set(SQLGuid* p_guid);
    void                 SetFromEuropeanTimestamp(XString p_stamp);
-
-   // INFO about type names/values
-   static  int          FindDatatype   (char* p_type);
-   static  const char*  FindDatatype   (int   p_type);
-   static  int          FindParamtype  (char* p_type);
-   static  const char*  FindParamtype  (int   p_type);
-   static  int          FindSQLDatatype(char* p_type);
-   static  const char*  FindSQLDatatype(int   p_type);
-           int          FindDataTypeFromSQLType();
 
    // Assignment operator
    SQLVariant& operator  =(const SQLVariant& p_original);
@@ -324,14 +306,14 @@ private:
    void    ThrowErrorOperator(SQLVarOperator p_operator);
 
    // Private Data
-   int    m_datatype;         // Primary datatype SQL_C_XXXX
-   int    m_sqlDatatype;      // Secondary datatype SQL_XXXX for CHAR and BINARY types
-   int    m_binaryLength;     // Buffer length of CHAR types and BINARY types
-   bool   m_useAtExec;        // As atExec procedure to put/get
-   int    m_binaryPieceSize;  // Buffer piece at a time to put/get
-   SQLLEN m_indicator;        // Null indicator at length of gotten data
-   int    m_columnNumber;     // Column number in the result set
-   int    m_paramType;        // Input/output/input-output/result/column
+   int          m_datatype;         // Primary datatype SQL_C_XXXX
+   int          m_sqlDatatype;      // Secondary datatype SQL_XXXX for CHAR and BINARY types
+   int          m_binaryLength;     // Buffer length of CHAR types and BINARY types
+   bool         m_useAtExec;        // As atExec procedure to put/get
+   int          m_binaryPieceSize;  // Buffer piece at a time to put/get
+   SQLLEN       m_indicator;        // Null indicator at length of gotten data
+   int          m_columnNumber;     // Column number in the result set
+   SQLParamType m_paramType;        // Input/output/input-output/result/column
    union _data
    {
       // POINTER TYPES
@@ -340,17 +322,17 @@ private:
       void*                           m_dataBINARY;       // SQL_C_BINARY             SQL_BINARY
       // STORAGE TYPES
       short                           m_dataSHORT;        // SQL_C_SHORT              SQL_SMALLINT
-      signed short                    m_dataSSHORT;       // SQL_C_SSHORT             signed
-      unsigned short                  m_dataUSHORT;       // SQL_C_USHORT             unsigned
+      signed short                    m_dataSSHORT;       // SQL_C_SSHORT             SQL_SHORT
+      unsigned short                  m_dataUSHORT;       // SQL_C_USHORT             SQL_USHORT
       long                            m_dataLONG;         // SQL_C_LONG               SQL_INTEGER
-      signed long                     m_dataSLONG;        // SQL_C_SLONG              signed
-      unsigned long                   m_dataULONG;        // SQL_C_ULONG              unsigned
+      signed long                     m_dataSLONG;        // SQL_C_SLONG              SQL_LONG
+      unsigned long                   m_dataULONG;        // SQL_C_ULONG              SQL_ULONG
       float                           m_dataFLOAT;        // SQL_C_FLOAT              SQL_REAL
       double                          m_dataDOUBLE;       // SQL_C_DOUBLE             SQL_DOUBLE
       char                            m_dataBIT;          // SQL_C_BIT                SQL_BIT
       char                            m_dataTINYINT;      // SQL_C_TINYINT            SQL_TINYINT
-      signed char                     m_dataSTINYINT;     // SQL_C_STINYINT           signed
-      unsigned char                   m_dataUTINYINT;     // SQL_C_UTINYINT           unsigned
+      signed char                     m_dataSTINYINT;     // SQL_C_STINYINT           SQL_TINYINT
+      unsigned char                   m_dataUTINYINT;     // SQL_C_UTINYINT           SQL_UTINYINT
       SQLBIGINT                       m_dataSBIGINT;      // SQL_C_SBIGINT            SQL_BIGINT
       SQLUBIGINT                      m_dataUBIGINT;      // SQL_C_UBIGINT            SQL_UBIGINT
       SQL_NUMERIC_STRUCT              m_dataNUMERIC;      // SQL_C_NUMERIC            SQL_NUMERIC
@@ -426,7 +408,7 @@ SQLVariant::SetColumnNumber(int p_column)
   m_columnNumber = p_column;
 }
 
-inline int
+inline SQLParamType
 SQLVariant::GetParameterType() const
 {
   return m_paramType;

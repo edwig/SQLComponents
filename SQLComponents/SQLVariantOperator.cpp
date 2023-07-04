@@ -27,6 +27,7 @@
 #include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
+#include "SQLDataType.h"
 #include "SQLDate.h"
 #include "SQLGuid.h"
 #include "bcd.h"
@@ -598,7 +599,7 @@ void
 SQLVariant::ThrowErrorOperator(SQLVarOperator p_operator)
 {
   XString error;
-  const char* type = FindDatatype(m_datatype);
+  const char* type = SQLDataType::FindDatatype(m_datatype);
   const char* oper = nullptr;
   switch (p_operator)
   {

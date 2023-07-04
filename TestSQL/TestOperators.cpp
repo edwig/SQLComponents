@@ -28,6 +28,7 @@
 #include "SQLVariant.h"
 #include "SQLVariantOperator.h"
 #include "SQLDate.h"
+#include "SQLDataType.h"
 #include "bcd.h"
 
 SQLVariant variants[CT_LAST];
@@ -93,8 +94,8 @@ void TestEqual()
       SQLVariant* left  = &variants[x];
       SQLVariant* right = &variants[y];
 
-      XString leftType  = left ->FindDatatype(left ->GetDataType());
-      XString rightType = right->FindDatatype(right->GetDataType());
+      XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
+      XString rightType = SQLDataType::FindDatatype(right->GetDataType());
       XString message;
       message.Format("Equality test %s == %s ",leftType,rightType);
       printf(message);
@@ -148,8 +149,8 @@ TestAdd()
       SQLVariant* left  = &variants[x];
       SQLVariant* right = &others[y];
 
-      XString leftType  = left ->FindDatatype(left ->GetDataType());
-      XString rightType = right->FindDatatype(right->GetDataType());
+      XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
+      XString rightType = SQLDataType::FindDatatype(right->GetDataType());
       XString message;
       message.Format("Add test %s + %s ",leftType,rightType);
       printf(message);

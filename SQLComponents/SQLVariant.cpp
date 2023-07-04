@@ -26,6 +26,7 @@
 #include "StdAfx.h"
 #include "SQLComponents.h"
 #include "SQLVariant.h"
+#include "SQLDataType.h"
 #include "SQLVariantTrim.h"
 #include "SQLDate.h"
 #include "SQLTime.h"
@@ -44,85 +45,6 @@ static char THIS_FILE[] = __FILE__;
 
 namespace SQLComponents
 {
-
-// Translation list of SQL datatype constants and names
-typedef struct _types
-{
-  const char* name;
-  int         type;
-}
-DataTypes;
-
-static DataTypes allTypes[] = 
-{
-   { "<NO TYPE>",                  0                               }
-  ,{ "CHAR",                       SQL_C_CHAR                      } 
-  ,{ "SHORT",                      SQL_C_SHORT                     }
-  ,{ "SIGNED SHORT",               SQL_C_SSHORT                    }
-  ,{ "UNSIGNED SHORT",             SQL_C_USHORT                    }
-  ,{ "LONG",                       SQL_C_LONG                      }
-  ,{ "SIGNED LONG",                SQL_C_SLONG                     }
-  ,{ "UNSIGNED LONG",              SQL_C_ULONG                     }
-  ,{ "REAL",                       SQL_C_FLOAT                     }
-  ,{ "FLOAT",                      SQL_C_FLOAT                     }
-  ,{ "DOUBLE",                     SQL_C_DOUBLE                    }
-  ,{ "BIT",                        SQL_C_BIT                       }
-  ,{ "TINYINT",                    SQL_C_TINYINT                   }
-  ,{ "SIGNED TINYINT",             SQL_C_STINYINT                  }
-  ,{ "UNSIGNED TINYINT",           SQL_C_UTINYINT                  }
-  ,{ "SIGNED BIGINT",              SQL_C_SBIGINT                   }
-  ,{ "UNSIGNED BIGINT",            SQL_C_UBIGINT                   }
-  ,{ "DECIMAL",                    SQL_C_NUMERIC                   }
-  ,{ "NUMERIC",                    SQL_C_NUMERIC                   }
-  ,{ "GUID",                       SQL_C_GUID                      }
-  ,{ "BINARY",                     SQL_C_BINARY                    }
-  ,{ "DATE",                       SQL_C_DATE                      }
-  ,{ "TIME",                       SQL_C_TIME                      }
-  ,{ "TIMESTAMP",                  SQL_C_TIMESTAMP                 }
-  ,{ "TYPE DATE",                  SQL_C_TYPE_DATE                 }
-  ,{ "TYPE TIME",                  SQL_C_TYPE_TIME                 }
-  ,{ "TYPE TIMESTAMP",             SQL_C_TYPE_TIMESTAMP            }
-  ,{ "INTERVAL YEAR",              SQL_C_INTERVAL_YEAR             }
-  ,{ "INTERVAL MONTH",             SQL_C_INTERVAL_MONTH            }
-  ,{ "INTERVAL DAY",               SQL_C_INTERVAL_DAY              }
-  ,{ "INTERVAL HOUR",              SQL_C_INTERVAL_HOUR             }
-  ,{ "INTERVAL MINUTE",            SQL_C_INTERVAL_MINUTE           }
-  ,{ "INTERVAL SECOND",            SQL_C_INTERVAL_SECOND           }
-  ,{ "INTERVAL YEAR TO MONTH",     SQL_C_INTERVAL_YEAR_TO_MONTH    }
-  ,{ "INTERVAL DAY TO HOUR",       SQL_C_INTERVAL_DAY_TO_HOUR      }
-  ,{ "INTERVAL DAY TO MINUTE",     SQL_C_INTERVAL_DAY_TO_MINUTE    }
-  ,{ "INTERVAL DAY TO SECOND",     SQL_C_INTERVAL_DAY_TO_SECOND    }
-  ,{ "INTERVAL HOUR TO MINUTE",    SQL_C_INTERVAL_HOUR_TO_MINUTE   }
-  ,{ "INTERVAL HOUR TO SECOND",    SQL_C_INTERVAL_HOUR_TO_SECOND   }
-  ,{ "INTERVAL MINUTE TO SECOND",  SQL_C_INTERVAL_MINUTE_TO_SECOND }
-  ,{ NULL,                         0                               }
-};
-
-// All datatypes not having a counterpart in SQL_C_XXX set
-// SQL Datatypes should be used for binding in SQLBindParameter
-static DataTypes allOther[] = 
-{
-  { "VARBINARY",       SQL_VARBINARY      }  // LONG RAW
- ,{ "LONGVARBINARY",   SQL_LONGVARBINARY  }  // BLOB
- ,{ "LONGVARCHAR",     SQL_LONGVARCHAR    }  // CLOB
- ,{ "VARCHAR",         SQL_VARCHAR        }  // VARCHAR2
- ,{ "WCHAR",           SQL_WCHAR          }  // NCHAR
- ,{ "WVARCHAR",        SQL_WVARCHAR       }  // NVARCHAR
- ,{ "WLONGVARCHAR",    SQL_WLONGVARCHAR   }  // NCLOB
- ,{ NULL,              0                  } 
-};
-
-// Names must appear in this order to work properly!!
-static DataTypes allParams[] = 
-{
-  { "<UNKNOWN>", P_SQL_PARAM_TYPE_UNKNOWN }    // 0
- ,{ "INPUT",     P_SQL_PARAM_INPUT        }    // 1
- ,{ "INOUT",     P_SQL_PARAM_INPUT_OUTPUT }    // 2
- ,{ "COLUMN",    P_SQL_RESULT_COL         }    // 3
- ,{ "OUTPUT",    P_SQL_PARAM_OUTPUT       }    // 4
- ,{ "RETURN",    P_SQL_RETURN_VALUE       }    // 5
- ,{ NULL,        0                        }
-};
 
 // General constructors
 SQLVariant::SQLVariant()
@@ -453,7 +375,7 @@ SQLVariant::Init()
   m_binaryLength    = 0;
   m_binaryPieceSize = 0;
   m_columnNumber    = 0;
-  m_paramType       = 0;
+  m_paramType       = P_SQL_PARAM_TYPE_UNKNOWN;
   m_useAtExec       = false;
 }
 
@@ -728,98 +650,6 @@ SQLVariant::FindDataTypeFromSQLType()
   }
   // Gets you the ordinary datatype
   return m_datatype;
-}
-
-int
-SQLVariant::FindDatatype(char* p_type)
-{
-  DataTypes* types = allTypes;
-  while(types->name)
-  {
-    if(_stricmp(p_type,types->name) == 0)
-    {
-      return types->type;
-    }
-    ++types;
-  }
-  return 0;
-}
-
-const char* 
-SQLVariant::FindDatatype(int p_type)
-{
-  DataTypes* types = allTypes;
-  while(types->name)
-  {
-    if(types->type == p_type)
-    {
-      return types->name;
-    }
-    ++types;
-  }
-  return "";
-}
-
-int
-SQLVariant::FindParamtype(char* p_type)
-{
-  DataTypes* param = allParams;
-  while(param->name)
-  {
-    if(_stricmp(p_type,param->name) == 0)
-    {
-      return param->type;
-    }
-    ++param;
-  }
-  return 0;
-}
-
-const char*
-SQLVariant::FindParamtype(int p_type)
-{
-  DataTypes* param = allParams;
-  while(param->name)
-  {
-    if(param->type == p_type)
-    {
-      return param->name;
-    }
-    ++param;
-  }
-  return "";
-}
-
-// Find the extra SQL_XXX datatype for
-// variants of CHAR and BINARY
-int
-SQLVariant::FindSQLDatatype(char* p_type)
-{
-  DataTypes* types = allOther;
-  while(types->name)
-  {
-    if(_stricmp(types->name,p_type) == 0)
-    {
-      return types->type;
-    }
-    ++types;
-  }
-  return 0;
-}
-
-const char* 
-SQLVariant::FindSQLDatatype(int p_type)
-{
-  DataTypes* types = allOther;
-  while(types->name)
-  {
-    if(types->type == p_type)
-    {
-      return types->name;
-    }
-    ++types;
-  }
-  return "";
 }
 
 void
@@ -3158,8 +2988,8 @@ void*
 SQLVariant::ThrowErrorDatatype(int p_getas)
 {
   XString error;
-  const char* type  = SQLVariant::FindDatatype(m_datatype);
-  const char* getas = SQLVariant::FindDatatype(p_getas);
+  const char* type  = SQLDataType::FindDatatype(m_datatype);
+  const char* getas = SQLDataType::FindDatatype(p_getas);
   error.Format("Cannot get a %s as a %s datatype.",type,getas);
   throw StdException(error);
 }

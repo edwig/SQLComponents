@@ -30,6 +30,7 @@
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
 #include "SQLInterval.h"
+#include "SQLDataType.h"
 #include "bcd.h"
 #include "UnitTest.h"
 
@@ -103,8 +104,8 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &variants[y];
 
-          XString leftType  = left ->FindDatatype(left ->GetDataType());
-          XString rightType = right->FindDatatype(right->GetDataType());
+          XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
+          XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
           message.Format("Equality test %s == %s",leftType,rightType);
           Logger::WriteMessage(message);
@@ -134,8 +135,8 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          XString leftType  = left ->FindDatatype(left ->GetDataType());
-          XString rightType = right->FindDatatype(right->GetDataType());
+          XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
+          XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
           message.Format("InEquality test %s != %s",leftType,rightType);
           Logger::WriteMessage(message);
@@ -165,8 +166,8 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          XString leftType  = left ->FindDatatype(left ->GetDataType());
-          XString rightType = right->FindDatatype(right->GetDataType());
+          XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
+          XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
           message.Format("InEquality test %s > %s",leftType,rightType);
           Logger::WriteMessage(message);
@@ -196,8 +197,8 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          XString leftType  = left ->FindDatatype(left ->GetDataType());
-          XString rightType = right->FindDatatype(right->GetDataType());
+          XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
+          XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
           message.Format("InEquality test %s >= %s",leftType,rightType);
           Logger::WriteMessage(message);
@@ -228,8 +229,8 @@ namespace OperatorUnitTest
           SQLVariant* left  = &variants[x];
           SQLVariant* right = &other[y];
 
-          XString leftType  = left ->FindDatatype(left ->GetDataType());
-          XString rightType = right->FindDatatype(right->GetDataType());
+          XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
+          XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
           message.Format("InEquality test %s < %s",rightType,leftType);
           Logger::WriteMessage(message);
@@ -259,8 +260,8 @@ namespace OperatorUnitTest
           SQLVariant* left = &variants[x];
           SQLVariant* right = &other[y];
 
-          XString leftType = left->FindDatatype(left->GetDataType());
-          XString rightType = right->FindDatatype(right->GetDataType());
+          XString leftType  = SQLDataType::FindDatatype(left->GetDataType());
+          XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
           message.Format("InEquality test %s <= %s",rightType,leftType);
           Logger::WriteMessage(message);

@@ -192,6 +192,7 @@
     </ClCompile>
     <ClCompile Include="SQLConnections.cpp" />
     <ClCompile Include="SQLDatabasePool.cpp" />
+    <ClCompile Include="SQLDataType.cpp" />
     <ClCompile Include="SQLDriverManager.cpp" />
     <ClCompile Include="SQLGetExePath.cpp" />
     <ClCompile Include="SQLGuid.cpp" />
@@ -262,6 +263,7 @@
     <ClInclude Include="SQLComponentsVersion.h" />
     <ClInclude Include="SQLConnections.h" />
     <ClInclude Include="SQLDatabasePool.h" />
+    <ClInclude Include="SQLDataType.h" />
     <ClInclude Include="SQLDriverManager.h" />
     <ClInclude Include="SQLFunction.h" />
     <ClInclude Include="SQLGetExePath.h" />
@@ -296,6 +298,7 @@
     <ClInclude Include="SQLMutation.h" />
     <ClInclude Include="sqlncli.h" />
     <ClInclude Include="SQLOperator.h" />
+    <ClInclude Include="SQLParameterType.h" />
     <ClInclude Include="SQLPrimaryKey.h" />
     <ClInclude Include="SQLQuery.h" />
     <ClInclude Include="SQLRecord.h" />

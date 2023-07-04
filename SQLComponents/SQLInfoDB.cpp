@@ -56,9 +56,9 @@ SQLInfoDB::~SQLInfoDB()
 // Can be 'TABLE', 'VIEW', 'ALIAS', 'SYNONYM', 'SYSTEM TABLE' etc
 bool    
 SQLInfoDB::MakeInfoTableObject(MTableMap& p_tables
-                               ,XString&  p_errors
-                               ,XString   p_schema
-                               ,XString   p_tablename)
+                              ,XString&  p_errors
+                              ,XString   p_schema
+                              ,XString   p_tablename)
 {
   // Clear the results
   p_tables.clear();

@@ -26,6 +26,7 @@
 #include "stdafx.h"
 #include "SQLComponents.h"
 #include "SQLDataSet.h"
+#include "SQLDataType.h"
 #include "SQLQuery.h"
 #include "SQLVariantFormat.h"
 #include "SQLInfoDB.h"
@@ -1920,7 +1921,7 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
       XMLElement* field = p_msg->AddElement(structure,nameField,XDT_String,fieldname);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_ID],(int)ind);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPE],type);
-      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],var->FindDatatype(type));
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],SQLDataType::FindDatatype(type));
     }
   }
   else if(m_types.size() > 0)
@@ -1934,7 +1935,7 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
       XMLElement* field = p_msg->AddElement(structure,nameField,XDT_String,fieldname);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_ID],(int)ind);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPE],type);
-      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],var.FindDatatype(type));
+      p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],SQLDataType::FindDatatype(type));
     }
   }
 
