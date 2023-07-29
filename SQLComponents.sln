@@ -11,6 +11,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestSQL", "TestSQL\TestSQL.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{949635B6-421F-42B2-B9AB-A56CE0B371E7}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		Documentation\DesignRules.txt = Documentation\DesignRules.txt
 		framework.h = framework.h
 		Planning.txt = Planning.txt
@@ -46,6 +47,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseLibrary", "BaseLibrary\BaseLibrary.vcxproj", "{2364C44B-2E4D-4631-A050-B47509AFBC82}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SQLXport", "SQLXport\SQLXport.vcxproj", "{A48D18EF-EB83-44DA-B50C-8A7CFD05FE55}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0E56E030-9CDD-47A7-B580-DCD4E103F968} = {0E56E030-9CDD-47A7-B580-DCD4E103F968}
+		{2364C44B-2E4D-4631-A050-B47509AFBC82} = {2364C44B-2E4D-4631-A050-B47509AFBC82}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

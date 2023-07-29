@@ -122,13 +122,13 @@ namespace DatabaseUnitTest
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database,"TransCommit");
-        UpdateRecord(1,100.0);
-        CheckRecord (1,100.0);
-        UpdateRecord(1,200.0);
-        CheckRecord (1,200.0);
+        UpdateRecord(1,bcd(100.0));
+        CheckRecord (1,bcd(100.0));
+        UpdateRecord(1,bcd(200.0));
+        CheckRecord (1,bcd(200.0));
         trans.Commit();
 
-        CheckRecord(1,200.0);
+        CheckRecord(1,bcd(200.0));
 
         CloseDatabase();
       }
@@ -143,19 +143,19 @@ namespace DatabaseUnitTest
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database,"TransCommit");
-        UpdateRecord(1,100.0);
-        CheckRecord (1,100.0);
+        UpdateRecord(1,bcd(100.0));
+        CheckRecord (1,bcd(100.0));
         trans.Commit();
-        CheckRecord (1,100.0);
+        CheckRecord (1,bcd(100.0));
 
         // Extra scope
         {
           SQLTransaction trans(m_database,"TransRollback");
-          UpdateRecord(1,400.0);
-          CheckRecord (1,400.0);
+          UpdateRecord(1,bcd(400.0));
+          CheckRecord (1,bcd(400.0));
         }
         // Extra transaction is out of scope and should have done a rollback
-        CheckRecord(1,100.0);
+        CheckRecord(1,bcd(100.0));
 
         CloseDatabase();
       }
@@ -170,13 +170,13 @@ namespace DatabaseUnitTest
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database->GetDBHandle(),true);
-        UpdateRecord(1,100.0);
-        CheckRecord(1,100.0);
-        UpdateRecord(1,200.0);
-        CheckRecord(1,200.0);
+        UpdateRecord(1,bcd(100.0));
+        CheckRecord (1,bcd(100.0));
+        UpdateRecord(1,bcd(200.0));
+        CheckRecord (1,bcd(200.0));
         trans.Commit();
 
-        CheckRecord(1,200.0);
+        CheckRecord(1,bcd(200.0));
 
         CloseDatabase();
       }
@@ -191,19 +191,19 @@ namespace DatabaseUnitTest
       if(OpenDatabase())
       {
         SQLTransaction trans(m_database->GetDBHandle(),true);
-        UpdateRecord(1,100.0);
-        CheckRecord(1,100.0);
+        UpdateRecord(1,bcd(100.0));
+        CheckRecord (1,bcd(100.0));
         trans.Commit();
-        CheckRecord(1,100.0);
+        CheckRecord (1,bcd(100.0));
 
         // Extra scope
         {
           SQLTransaction trans(m_database->GetDBHandle(),true);
-          UpdateRecord(1,400.0);
-          CheckRecord(1,400.0);
+          UpdateRecord(1,bcd(400.0));
+          CheckRecord (1,bcd(400.0));
         }
         // Extra transaction is out of scope and should have done a rollback
-        CheckRecord(1,100.0);
+        CheckRecord(1,bcd(100.0));
 
         CloseDatabase();
       }
@@ -220,10 +220,10 @@ namespace DatabaseUnitTest
         // Extra scope
         {
           SQLTransaction trans(m_database,"Check");
-          UpdateRecord(1,100.0);
-          CheckRecord(1,100.0);
+          UpdateRecord(1,bcd(100.0));
+          CheckRecord (1,bcd(100.0));
           trans.Commit();
-          CheckRecord(1,100.0);
+          CheckRecord (1,bcd(100.0));
         }
 
         try
@@ -231,8 +231,8 @@ namespace DatabaseUnitTest
           // Extra scope
           {
             SQLTransaction trans(m_database,"OpenTransaction");
-            UpdateRecord(1,400.0);
-            CheckRecord(1,400.0);
+            UpdateRecord(1,bcd(400.0));
+            CheckRecord (1,bcd(400.0));
             CloseDatabase();
           }
         }
@@ -245,7 +245,7 @@ namespace DatabaseUnitTest
       if(OpenDatabase())
       {
         // Extra transaction is out of scope and should have done a rollback
-        CheckRecord(1,100.0);
+        CheckRecord(1,bcd(100.0));
         CloseDatabase();
       }
     }

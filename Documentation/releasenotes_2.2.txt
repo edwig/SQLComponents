@@ -17,7 +17,7 @@ Version 2.2.0 of 19-03-2023
     database SQL_NUMERCIC_STRUCT.
 4)  Updated to the last version of the BaseLibrary (1.0.9)
 
-Version 2.2.1 of 23-04-2024
+Version 2.2.1 of 23-04-2023
 ---------------------------
 1)  Fix for reading of DECIMAL/NUMERIC columns that are in ordinal order
     behind a large at-exec column like a (C)(B)LOB column.
@@ -27,3 +27,8 @@ Version 2.2.1 of 23-04-2024
 4)  At-Exec data must be at the end of a SELECT statement, or no NUMERIC
     data will be gotten by SQLGetData.
 
+Version 2.2.2 of 29-07-2023
+---------------------------
+1)  Updated with the last version of BaseLibrary (checked with CPPCheck)
+2)  Fully checked with CPPCheck 2.11
+    As a consequence many class interfaces now have been 'const' by the const-police :-)

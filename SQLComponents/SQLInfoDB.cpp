@@ -39,13 +39,12 @@ namespace SQLComponents
 
 SQLInfoDB::SQLInfoDB(SQLDatabase* p_database)
           :SQLInfo(p_database)
+          // Must be 'PUBLIC' for an ANSI-compliant database
+          ,m_grantedUsers("PUBLIC")
 {
   // Granted users.
   // Comma separated list of granted users
   // e.g. "meta3", "meta2", "meta1", "model" and "data"
-
-  // Must be 'PUBLIC' for an ANSI-compliant database
-  m_grantedUsers = "PUBLIC";
 }
 
 SQLInfoDB::~SQLInfoDB()

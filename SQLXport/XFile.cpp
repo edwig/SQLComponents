@@ -859,8 +859,8 @@ XFile::WriteData(SQLComponents::SQLVariant* p_var)
   int   length =  p_var->GetDataSize();
   int   type   =  p_var->GetDataType();
   int   sqltyp =  p_var->GetSQLDataType();
-  void* buffer =  p_var->GetDataPointer();
   bool  isnull = *p_var->GetIndicatorPointer() == SQL_NULL_DATA;
+  const void* buffer = p_var->GetDataPointer();
 
   // Potentially a shorter string
   if(type == SQL_C_CHAR)

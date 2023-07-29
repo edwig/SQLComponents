@@ -76,7 +76,7 @@ SQLStatement::CheckRecords(int p_records)
 }
 
 void
-SQLStatement::AddToStatement(XString& p_statement)
+SQLStatement::AddToStatement(const XString& p_statement)
 {
   m_statement += p_statement;
 }

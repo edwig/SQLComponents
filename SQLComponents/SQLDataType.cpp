@@ -116,27 +116,27 @@ SQLDataType::SQLDataType()
 }
 
 SQLDataType::SQLDataType(int p_sqlType)
+            :m_sqlType(p_sqlType)
+            ,m_typeName(FindDatatype(p_sqlType))
 {
-  m_sqlType  = p_sqlType;
-  m_typeName = FindDatatype(p_sqlType);
 }
 
 SQLDataType::SQLDataType(XString p_typeName)
+            :m_typeName(p_typeName)
 {
-  m_typeName = p_typeName;
-  m_sqlType  = FindDatatype((char*)p_typeName.GetString());
+  m_sqlType  = FindDatatype(reinterpret_cast<char*>(const_cast<char*>(p_typeName.GetString())));
 }
 
 SQLDataType::SQLDataType(MetaColumn& p_column)
+            :m_typeName     (p_column.m_typename)
+            ,m_columnSize   (p_column.m_columnSize)
+            ,m_bufferSize   (p_column.m_bufferLength)
+            ,m_decimalDigits(p_column.m_decimalDigits)
+            ,m_radix        (p_column.m_numRadix)
+            ,m_octetLength  (p_column.m_octet_length)
+            ,m_subType      (p_column.m_sub_datatype)
 {
-  m_typeName      = p_column.m_typename;
-  m_sqlType       = FindDatatype((char*)m_typeName.GetString());
-  m_columnSize    = p_column.m_columnSize;
-  m_bufferSize    = p_column.m_bufferLength;
-  m_decimalDigits = p_column.m_decimalDigits;
-  m_radix         = p_column.m_numRadix;
-  m_octetLength   = p_column.m_octet_length;
-  m_subType       = p_column.m_sub_datatype;
+  m_sqlType = FindDatatype(reinterpret_cast<char*>(const_cast<char*>(m_typeName.GetString())));
 }
 
 SQLDataType::~SQLDataType()

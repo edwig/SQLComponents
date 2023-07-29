@@ -600,7 +600,7 @@ namespace OperatorUnitTest
       XString guidString("{AABBCCDD-0899-6677-1122-030455667788}");
       one.SetData(SQL_C_GUID,guidString);   // Assignment SetData!
 
-      SQLGUID* guid = one.GetAsGUID();
+      const SQLGUID* guid = one.GetAsGUID();
 
       Assert::AreEqual((int)SQL_C_GUID,one.GetDataType());
 

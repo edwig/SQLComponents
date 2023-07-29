@@ -9,9 +9,9 @@ class SQLDataType
 {
 public:
   SQLDataType();
-  SQLDataType(int p_sqlType);
-  SQLDataType(XString p_typeName);
-  SQLDataType(MetaColumn& p_column);
+  explicit SQLDataType(int p_sqlType);
+  explicit SQLDataType(XString p_typeName);
+  explicit SQLDataType(MetaColumn& p_column);
 
   ~SQLDataType();
 

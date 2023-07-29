@@ -222,30 +222,30 @@ namespace OperatorUnitTest
       // Constant value
       TestFunctionConstant("fieldname",OP_Greater,FN_PI,"fieldname > {fn PI()}");
       // Unary function call
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ABS,              "18", "{fn ABS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ACOS,             "0.5","{fn ACOS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ASIN,             "0.5","{fn ASIN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN,             "0.5","{fn ATAN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN2,            "0.5","{fn ATAN2(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_CEILING,          "5",  "{fn CEILING(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_COS,              "0.5","{fn COS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_COT,              "0.5","{fn COT(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DEGREES,          "180","{fn DEGREES(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_EXP,              "5E6","{fn EXP(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_FLOOR,            "4",  "{fn FLOOR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG,              "4",  "{fn LOG(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG10,            "4",  "{fn LOG10(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_RADIANS,          "0.5","{fn RADIANS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_RAND,             "0.5","{fn RAND(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SIGN,             "-5", "{fn SIGN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SIN,              "0.5","{fn SIN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SQRT,             "2",  "{fn SQRT(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_TAN,              "0.5","{fn TAN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ABS,              bcd("18"), "{fn ABS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ACOS,             bcd("0.5"),"{fn ACOS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ASIN,             bcd("0.5"),"{fn ASIN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN,             bcd("0.5"),"{fn ATAN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN2,            bcd("0.5"),"{fn ATAN2(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_CEILING,          bcd("5"),  "{fn CEILING(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_COS,              bcd("0.5"),"{fn COS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_COT,              bcd("0.5"),"{fn COT(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DEGREES,          bcd("180"),"{fn DEGREES(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_EXP,              bcd("5E6"),"{fn EXP(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_FLOOR,            bcd("4"),  "{fn FLOOR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG,              bcd("4"),  "{fn LOG(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG10,            bcd("4"),  "{fn LOG10(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_RADIANS,          bcd("0.5"),"{fn RADIANS(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_RAND,             bcd("0.5"),"{fn RAND(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SIGN,             bcd("-5"), "{fn SIGN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SIN,              bcd("0.5"),"{fn SIN(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SQRT,             bcd("2"),  "{fn SQRT(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_TAN,              bcd("0.5"),"{fn TAN(fieldname)} = ?");
       // Dual number function call
-      TestFunctionNumber2("fieldname",OP_Equal,FN_MOD,              "12","5","{fn MOD(fieldname,?)} = ?");
-      TestFunctionNumber2("fieldname",OP_Equal,FN_POWER,            "2","64","{fn POWER(fieldname,?)} = ?");
-      TestFunctionNumber2("fieldname",OP_Equal,FN_ROUND,            "3.52","1","{fn ROUND(fieldname,?)} = ?");
-      TestFunctionNumber2("fieldname",OP_Equal,FN_TRUNCATE,         "3",   "1","{fn TRUNCATE(fieldname,?)} = ?");
+      TestFunctionNumber2("fieldname",OP_Equal,FN_MOD,              bcd("12"),  bcd("5"), "{fn MOD(fieldname,?)} = ?");
+      TestFunctionNumber2("fieldname",OP_Equal,FN_POWER,            bcd("2"),   bcd("64"),"{fn POWER(fieldname,?)} = ?");
+      TestFunctionNumber2("fieldname",OP_Equal,FN_ROUND,            bcd("3.52"),bcd("1"), "{fn ROUND(fieldname,?)} = ?");
+      TestFunctionNumber2("fieldname",OP_Equal,FN_TRUNCATE,         bcd("3"),   bcd("1"), "{fn TRUNCATE(fieldname,?)} = ?");
 
       // DATE/TIME/INTERVAL
 
@@ -256,18 +256,18 @@ namespace OperatorUnitTest
       TestFunctionConstant("fieldname",OP_Smaller,FN_NOW,           "fieldname < {fn NOW()}");
 
       // Unary date/time function
-      TestFunctionString1("fieldname",OP_Equal,FN_DAYNAME,          "Sunday",   "{fn DAYNAME(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_MONTHNAME,        "June",     "{fn MONTHNAME(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFMONTH,       "1",        "{fn DAYOFMONTH(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFWEEK,        "1",        "{fn DAYOFWEEK(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFYEAR,        "172",      "{fn DAYOFYEAR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_QUARTER,          "2",        "{fn QUARTER(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_YEAR,             "2019",     "{fn YEAR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_MONTH,            "6",        "{fn MONTH(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_WEEK,             "23",       "{fn WEEK(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_HOUR,             "17",       "{fn HOUR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_MINUTE,           "53",       "{fn MINUTE(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SECOND,           "12",       "{fn SECOND(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_DAYNAME,          "Sunday",        "{fn DAYNAME(fieldname)} = ?");
+      TestFunctionString1("fieldname",OP_Equal,FN_MONTHNAME,        "June",          "{fn MONTHNAME(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFMONTH,       bcd("1"),        "{fn DAYOFMONTH(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFWEEK,        bcd("1"),        "{fn DAYOFWEEK(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFYEAR,        bcd("172"),      "{fn DAYOFYEAR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_QUARTER,          bcd("2"),        "{fn QUARTER(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_YEAR,             bcd("2019"),     "{fn YEAR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_MONTH,            bcd("6"),        "{fn MONTH(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_WEEK,             bcd("23"),       "{fn WEEK(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_HOUR,             bcd("17"),       "{fn HOUR(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_MINUTE,           bcd("53"),       "{fn MINUTE(fieldname)} = ?");
+      TestFunctionNumber1("fieldname",OP_Equal,FN_SECOND,           bcd("12"),       "{fn SECOND(fieldname)} = ?");
 
       // Secondary date/time functions
       TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_YEAR,  "2019","{fn EXTRACT(YEAR FROM fieldname)} = ?");

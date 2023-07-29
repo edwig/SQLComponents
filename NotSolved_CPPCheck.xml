@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results version="2">
+    <cppcheck version="2.11"/>
+    <errors>
+        <error id="noExplicitConstructor" severity="style" msg="Struct &amp;#039;SmartPtr &amp;lt; CellBlock &amp;gt;&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Struct &amp;#039;SmartPtr &amp;lt; CellBlock &amp;gt;&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.h" line="856"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Struct &amp;#039;SmartPtr &amp;lt; BasicExcelWorksheet &amp;gt;&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Struct &amp;#039;SmartPtr &amp;lt; BasicExcelWorksheet &amp;gt;&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.h" line="856"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Struct &amp;#039;SmartPtr &amp;lt; Formula &amp;gt;&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Struct &amp;#039;SmartPtr &amp;lt; Formula &amp;gt;&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.h" line="856"/>
+        </error>
+        <error id="returnDanglingLifetime" severity="error" msg="Returning pointer to local variable &amp;#039;str&amp;#039; that will be invalid when returning." verbose="Returning pointer to local variable &amp;#039;str&amp;#039; that will be invalid when returning." cwe="562" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="6653" info=""/>
+            <location file="SQLComponents\BasicExcel.cpp" line="6641" info="Variable created here."/>
+            <location file="SQLComponents\BasicExcel.cpp" line="6642" info="Pointer to container is created here."/>
+        </error>
+        <error id="useInitializationList" severity="performance" msg="Variable &amp;#039;intdouble_&amp;#039; is assigned in constructor body. Consider performing initialization in initialization list." verbose="When an object of a class is created, the constructors of all member variables are called consecutively in the order the variables are declared, even if you don&amp;#039;t explicitly write them to the initialization list. You could avoid assigning &amp;#039;intdouble_&amp;#039; a value by passing the value to the constructor in the initialization list." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="4094"/>
+        </error>
+        <error id="knownConditionTrueFalse" severity="style" msg="Condition &amp;#039;size!=0&amp;#039; is always true" verbose="Condition &amp;#039;size!=0&amp;#039; is always true" cwe="571" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="2539" info="Condition &amp;#039;size!=0&amp;#039; is always true"/>
+            <location file="SQLComponents\BasicExcel.cpp" line="2535" info="Compound assignment &amp;#039;-=&amp;#039;, assigned value is 0"/>
+            <location file="SQLComponents\BasicExcel.cpp" line="2532" info="Assuming that condition &amp;#039;size&amp;gt;8224&amp;#039; is not redundant"/>
+        </error>
+        <error id="knownConditionTrueFalse" severity="style" msg="Condition &amp;#039;8224-relativeOffset&amp;gt;=12&amp;#039; is always true" verbose="Condition &amp;#039;8224-relativeOffset&amp;gt;=12&amp;#039; is always true" cwe="571" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="6004" info="Condition &amp;#039;8224-relativeOffset&amp;gt;=12&amp;#039; is always true"/>
+            <location file="SQLComponents\BasicExcel.cpp" line="5981" info="Assuming that condition &amp;#039;8224-relativeOffset&amp;gt;=12&amp;#039; is not redundant"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="6631"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="6637"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="6642"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;newRow&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;newRow&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="6099"/>
+        </error>
+        <error id="clarifyCalculation" severity="style" msg="Clarify calculation precedence for &amp;#039;+&amp;#039; and &amp;#039;?&amp;#039;." verbose="Suspicious calculation. Please use parentheses to clarify the code. The code &amp;#039;&amp;#039;a+b?c:d&amp;#039;&amp;#039; should be written as either &amp;#039;&amp;#039;(a+b)?c:d&amp;#039;&amp;#039; or &amp;#039;&amp;#039;a+(b?c:d)&amp;#039;&amp;#039;." cwe="783" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="5953"/>
+        </error>
+        <error id="constVariableReference" severity="style" msg="Variable &amp;#039;e&amp;#039; can be declared as reference to const" verbose="Variable &amp;#039;e&amp;#039; can be declared as reference to const" cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="3728"/>
+        </error>
+        <error id="constVariableReference" severity="style" msg="Variable &amp;#039;ss&amp;#039; can be declared as reference to const" verbose="Variable &amp;#039;ss&amp;#039; can be declared as reference to const" cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="6818"/>
+        </error>
+        <error id="unassignedVariable" severity="style" msg="Variable &amp;#039;rec&amp;#039; is not assigned a value." verbose="Variable &amp;#039;rec&amp;#039; is not assigned a value." cwe="665" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="3007"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;size&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;size&amp;#039; is assigned a value that is never used." cwe="563" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="3441"/>
+        </error>
+        <error id="unassignedVariable" severity="style" msg="Variable &amp;#039;rec&amp;#039; is not assigned a value." verbose="Variable &amp;#039;rec&amp;#039; is not assigned a value." cwe="665" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="3719"/>
+        </error>
+        <error id="unassignedVariable" severity="style" msg="Variable &amp;#039;rec&amp;#039; is not assigned a value." verbose="Variable &amp;#039;rec&amp;#039; is not assigned a value." cwe="665" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="4958"/>
+        </error>
+        <error id="unassignedVariable" severity="style" msg="Variable &amp;#039;rec&amp;#039; is not assigned a value." verbose="Variable &amp;#039;rec&amp;#039; is not assigned a value." cwe="665" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicExcel.cpp" line="5791"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Struct &amp;#039;ExcelFont&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Struct &amp;#039;ExcelFont&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\ExcelFormat.h" line="100"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;XLSFormatManager&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;XLSFormatManager&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\ExcelFormat.h" line="205"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Struct &amp;#039;CellFormat&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Struct &amp;#039;CellFormat&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/BasicExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\ExcelFormat.h" line="404"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/BasicXmlExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicXmlExcel.cpp" line="622"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/BasicXmlExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicXmlExcel.cpp" line="709"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/BasicXmlExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicXmlExcel.cpp" line="840"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;intValue&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;intValue&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/BasicXmlExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicXmlExcel.cpp" line="325"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;dblValue&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;dblValue&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/BasicXmlExcel.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\BasicXmlExcel.cpp" line="326"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="64"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="67"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="68"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="69"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="70"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="71"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="72"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="73"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="74"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="75"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="76"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="77"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="78"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="79"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="80"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="81"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="83"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="84"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="85"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="86"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="88"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="89"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="90"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="91"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="92"/>
+        </error>
+        <error id="noExplicitConstructor" severity="style" msg="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit." verbose="Class &amp;#039;SQLVariant&amp;#039; has a constructor with 1 argument that is not explicit. Such constructors should in general be explicit for type safety reasons. Using the explicit keyword in the constructor means some mistakes when using the class can be avoided." cwe="398" file0="SQLComponents/SQLAssociation.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.h" line="93"/>
+        </error>
+        <error id="noCopyConstructor" severity="warning" msg="Class &amp;#039;SQLDataSetXLS&amp;#039; does not have a copy constructor which is recommended since it has dynamic memory/resource allocation(s)." verbose="Class &amp;#039;SQLDataSetXLS&amp;#039; does not have a copy constructor which is recommended since it has dynamic memory/resource allocation(s)." cwe="398" file0="SQLComponents/SQLDataSetXLS.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLDataSetXLS.cpp" line="69"/>
+        </error>
+        <error id="noOperatorEq" severity="warning" msg="Class &amp;#039;SQLDataSetXLS&amp;#039; does not have a operator= which is recommended since it has dynamic memory/resource allocation(s)." verbose="Class &amp;#039;SQLDataSetXLS&amp;#039; does not have a operator= which is recommended since it has dynamic memory/resource allocation(s)." cwe="398" file0="SQLComponents/SQLDataSetXLS.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLDataSetXLS.cpp" line="69"/>
+        </error>
+        <error id="constVariablePointer" severity="style" msg="Variable &amp;#039;record&amp;#039; can be declared as pointer to const" verbose="Variable &amp;#039;record&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLDataSetXLS.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLDataSetXLS.cpp" line="203"/>
+        </error>
+        <error id="constVariablePointer" severity="style" msg="Variable &amp;#039;record&amp;#039; can be declared as pointer to const" verbose="Variable &amp;#039;record&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLDataSetXLS.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLDataSetXLS.cpp" line="351"/>
+        </error>
+        <error id="constVariablePointer" severity="style" msg="Variable &amp;#039;record&amp;#039; can be declared as pointer to const" verbose="Variable &amp;#039;record&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLDataSetXLS.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLDataSetXLS.cpp" line="452"/>
+        </error>
+        <error id="constParameterPointer" severity="style" msg="Parameter &amp;#039;p_value&amp;#039; can be declared as pointer to const" verbose="Parameter &amp;#039;p_value&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLFilter.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLFilter.cpp" line="75"/>
+        </error>
+        <error id="constVariableReference" severity="style" msg="Variable &amp;#039;variant&amp;#039; can be declared as pointer to const" verbose="Variable &amp;#039;variant&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLFilter.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLFilter.cpp" line="195"/>
+        </error>
+        <error id="constVariablePointer" severity="style" msg="Variable &amp;#039;var&amp;#039; can be declared as pointer to const" verbose="Variable &amp;#039;var&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLFilter.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLFilter.cpp" line="275"/>
+        </error>
+        <error id="constVariablePointer" severity="style" msg="Variable &amp;#039;field&amp;#039; can be declared as pointer to const" verbose="Variable &amp;#039;field&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLFilter.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLFilter.cpp" line="360"/>
+        </error>
+        <error id="constParameterPointer" severity="style" msg="Parameter &amp;#039;p_record&amp;#039; can be declared as pointer to const" verbose="Parameter &amp;#039;p_record&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLFilter.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLFilter.cpp" line="349"/>
+        </error>
+        <error id="constVariableReference" severity="style" msg="Variable &amp;#039;SQLVariant&amp;#039; can be declared as pointer to const" verbose="Variable &amp;#039;SQLVariant&amp;#039; can be declared as pointer to const" cwe="398" file0="SQLComponents/SQLFilter.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLFilter.cpp" line="860"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2536"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2538"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2541"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2543"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2545"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2547"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2549"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2552"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2554"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2556"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2558"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2585"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2598"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2608"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2628"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2638"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2648"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2658"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2668"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2678"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2688"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2698"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2708"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2720"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2730"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2740"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2750"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2760"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2771"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/SQLVariant.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariant.cpp" line="2782"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;bThousend&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;bThousend&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/SQLVariantFormat.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariantFormat.cpp" line="260"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;bNegative&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;bNegative&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/SQLVariantFormat.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariantFormat.cpp" line="265"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;bThousend&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;bThousend&amp;#039; is assigned a value that is never used." cwe="563" file0="SQLComponents/SQLVariantFormat.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariantFormat.cpp" line="260"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;bNegative&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;bNegative&amp;#039; is assigned a value that is never used." cwe="563" file0="SQLComponents/SQLVariantFormat.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariantFormat.cpp" line="265"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;bNegative&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;bNegative&amp;#039; is assigned a value that is never used." cwe="563" file0="SQLComponents/SQLVariantFormat.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariantFormat.cpp" line="310"/>
+        </error>
+        <error id="unreadVariable" severity="style" msg="Variable &amp;#039;bThousend&amp;#039; is assigned a value that is never used." verbose="Variable &amp;#039;bThousend&amp;#039; is assigned a value that is never used." cwe="563" file0="SQLComponents/SQLVariantFormat.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\SQLVariantFormat.cpp" line="335"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="40"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="56"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="69"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="83"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="158"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="202"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="220"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="266"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="269"/>
+        </error>
+        <error id="cstyleCast" severity="style" msg="C-style pointer casting" verbose="C-style pointer casting detected. C++ offers four different kinds of casts as replacements: static_cast, const_cast, dynamic_cast and reinterpret_cast. A C-style cast could evaluate to any of those automatically, thus it is considered safer if the programmer explicitly states which kind of cast is expected." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="328"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;i&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;i&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="233"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;bno&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;bno&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="233"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;size&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;size&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="234"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;pnt&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;pnt&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="235"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;bno&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;bno&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="292"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;i&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;i&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="292"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;ap&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;ap&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="293"/>
+        </error>
+        <error id="variableScope" severity="style" msg="The scope of the variable &amp;#039;error&amp;#039; can be reduced." verbose="The scope of the variable &amp;#039;error&amp;#039; can be reduced. Warning: Be careful when fixing this message, especially when there are inner loops. Here is an example where cppcheck will write that the scope for &amp;#039;i&amp;#039; can be reduced:&#10;void f(int x)&#10;{&#10;    int i = 0;&#10;    if (x) {&#10;        // it&amp;#039;s safe to move &amp;#039;int i = 0;&amp;#039; here&#10;        for (int n = 0; n &amp;lt; 10; ++n) {&#10;            // it is possible but not safe to move &amp;#039;int i = 0;&amp;#039; here&#10;            do_something(&amp;amp;i);&#10;        }&#10;    }&#10;}&#10;When you see this message it is always safe to reduce the variable scope 1 level." cwe="398" file0="SQLComponents/xmem.cpp" sinceDate="d-M-yyyy">
+            <location file="SQLComponents\xmem.cpp" line="297"/>
+        </error>
+    </errors>
+</results>

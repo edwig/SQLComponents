@@ -867,7 +867,7 @@ SQLInfoGenericODBC::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
 
   // Add the foreign key columns
   bool extra = false;
-  for(auto& key : p_foreigns)
+  for(const auto& key : p_foreigns)
   {
     if(extra) query += ",";
     query += key.m_fkColumnName;
@@ -879,7 +879,7 @@ SQLInfoGenericODBC::GetCATALOGForeignCreate(MForeignMap& p_foreigns) const
 
   // Add the primary key columns
   extra = false;
-  for(auto& key : p_foreigns)
+  for(const auto& key : p_foreigns)
   {
     if(extra) query += ",";
     query += key.m_pkColumnName;
@@ -935,8 +935,8 @@ SQLInfoGenericODBC::GetCATALOGForeignAlter(MForeignMap& p_original,MForeignMap& 
     return "";
   }
 
-  MetaForeign& original  = p_original.front();
-  MetaForeign& requested = p_requested.front();
+  const MetaForeign& original  = p_original.front();
+  const MetaForeign& requested = p_requested.front();
 
   // Construct the correct tablename
   XString table(original.m_fkTableName);

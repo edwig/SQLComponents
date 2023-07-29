@@ -15,6 +15,7 @@ binDebug_win32/
 binRelease_x64/
 binRelease_win32/
 Include/
+SQLComponents-cppcheck-build-dir/
  
 # User-specific files (MonoDevelop/Xamarin Studio) 
 *.userprefs

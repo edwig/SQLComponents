@@ -58,7 +58,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(MonthNames)
     {
-      Logger::WriteMessage("Unit testing names of the months fo the year");
+      Logger::WriteMessage("Unit testing names of the months for the year");
 
       SetDefaultSQLLanguage(LN_ENGLISH);
       SQLDate birth("15-10-1959");
@@ -382,5 +382,57 @@ namespace DatabaseUnitTest
         Assert::Fail();
       }
     }
+
+    TEST_METHOD(WeekdayNamesTimestamp)
+    {
+      Logger::WriteMessage("Unit testing names of the days of the week");
+
+      InitSQLComponents();
+
+      SQLTimestamp birth("15-10-1959 15:40:00");
+
+      XString in_english = birth.WeekDayName();
+      XString in_dutch   = birth.WeekDayName(LN_DUTCH);
+      XString in_german  = birth.WeekDayName(LN_GERMAN);
+      XString in_french  = birth.WeekDayName(LN_FRENCH);
+
+      Logger::WriteMessage("English: " + in_english);
+      Logger::WriteMessage("Dutch  : " + in_dutch);
+      Logger::WriteMessage("German : " + in_german);
+      Logger::WriteMessage("French : " + in_french);
+
+      Assert::AreEqual("thursday",in_english);
+      Assert::AreEqual("donderdag",in_dutch);
+      Assert::AreEqual("Donnerstag",in_german);
+      Assert::AreEqual("jeudi",in_french);
+      number_of_tests += 4;
+    }
+
+    TEST_METHOD(MonthNamesTimestamp)
+    {
+      Logger::WriteMessage("Unit testing names of the months for the year");
+      InitSQLComponents();
+
+      SetDefaultSQLLanguage(LN_ENGLISH);
+      SQLTimestamp birth("1959-10-15 15:40:00");
+
+      XString in_english = birth.MonthName();
+      XString in_dutch   = birth.MonthName(LN_DUTCH);
+      XString in_german  = birth.MonthName(LN_GERMAN);
+      XString in_french  = birth.MonthName(LN_FRENCH);
+
+      Logger::WriteMessage("English: " + in_english);
+      Logger::WriteMessage("Dutch  : " + in_dutch);
+      Logger::WriteMessage("German : " + in_german);
+      Logger::WriteMessage("French : " + in_french);
+
+      Assert::AreEqual("october",in_english);
+      Assert::AreEqual("oktober",in_dutch);
+      Assert::AreEqual("Oktober",in_german);
+      Assert::AreEqual("octobre",in_french);
+
+      number_of_tests += 4;
+    }
+
   };
 }
