@@ -462,6 +462,7 @@ SQLInfoAccess::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*p_
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -489,6 +490,24 @@ SQLInfoAccess::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString 
+SQLInfoAccess::GetCATALOGDefaultCharset() const
+{
+  return "utf-16";
+}
+
+XString
+SQLInfoAccess::GetCATALOGDefaultCharsetNCV() const
+{
+  return "utf-16";
+}
+
+XString 
+SQLInfoAccess::GetCATALOGDefaultCollation() const
+{
+  return "-";
 }
 
 // Get SQL to check if a table already exists in the database

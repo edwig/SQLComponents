@@ -664,6 +664,7 @@ SQLInfoSQLServer::DoBindParameterFixup(SQLSMALLINT& p_sqlDatatype,SQLULEN& p_col
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -690,6 +691,24 @@ SQLInfoSQLServer::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString
+SQLInfoSQLServer::GetCATALOGDefaultCharset() const
+{
+  return "iso-8859-1";
+}
+
+XString
+SQLInfoSQLServer::GetCATALOGDefaultCharsetNCV() const
+{
+  return "utf-16";
+}
+
+XString
+SQLInfoSQLServer::GetCATALOGDefaultCollation() const
+{
+  return "SELECT SERVERPROPERTY('Collation')";
 }
 
 // Get SQL to check if a table already exists in the database

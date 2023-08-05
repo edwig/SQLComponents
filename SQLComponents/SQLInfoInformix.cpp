@@ -506,6 +506,7 @@ SQLInfoInformix::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -533,6 +534,24 @@ SQLInfoInformix::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString
+SQLInfoInformix::GetCATALOGDefaultCharset() const
+{
+  return "iso-8859-1";
+}
+
+XString
+SQLInfoInformix::GetCATALOGDefaultCharsetNCV() const
+{
+  return "UTF-16";
+}
+
+XString
+SQLInfoInformix::GetCATALOGDefaultCollation() const
+{
+  return "-";
 }
 
 // Get SQL to check if a table already exists in the database

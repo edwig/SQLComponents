@@ -124,6 +124,99 @@ SQLInfoDB::MakeInfoMetaTypes(MMetaMap& p_objects,XString& p_errors,int p_type)
 }
 
 bool
+SQLInfoDB::MakeInfoDefaultCharset(XString& p_default)
+{
+  p_default.Empty();
+  XString sql = GetCATALOGDefaultCharset();
+
+  if(sql.IsEmpty() || sql.Find(' ') < 0)
+  {
+    m_defaultCharset = sql;
+    p_default = m_defaultCharset;
+    return true;
+  }
+
+  try
+  {
+    SQLQuery qry(m_database);
+    qry.DoSQLStatement(sql);
+    if(qry.GetRecord())
+    {
+      m_defaultCharset = qry[1].GetAsChar();
+      p_default = m_defaultCharset;
+      return true;
+    }
+  }
+  catch(...)
+  {
+    m_defaultCharset.Empty();
+  }
+  return false;
+}
+
+bool
+SQLInfoDB::MakeInfoDefaultCharsetNC(XString& p_default)
+{
+  p_default.Empty();
+  XString sql = GetCATALOGDefaultCharsetNCV();
+
+  if(sql.IsEmpty() || sql.Find(' ') < 0)
+  {
+    m_defaultCharsetNCV = sql;
+    p_default = m_defaultCharsetNCV;
+    return true;
+  }
+
+  try
+  {
+    SQLQuery qry(m_database);
+    qry.DoSQLStatement(sql);
+    if(qry.GetRecord())
+    {
+      m_defaultCharsetNCV = qry[1].GetAsChar();
+      p_default = m_defaultCharsetNCV;
+      return true;
+    }
+  }
+  catch(...)
+  {
+    m_defaultCharsetNCV.Empty();
+  }
+  return false;
+}
+
+bool
+SQLInfoDB::MakeInfoDefaultCollation(XString& p_default)
+{
+  p_default.Empty();
+  XString sql = GetCATALOGDefaultCollation();
+
+  if(sql.IsEmpty() || sql.Find(' ') < 0)
+  {
+    m_defaultCollation = sql;
+    p_default = m_defaultCollation;
+    return true;
+  }
+
+  try
+  {
+    SQLQuery qry(m_database);
+    qry.DoSQLStatement(sql);
+    if(qry.GetRecord())
+    {
+      m_defaultCollation = qry[1].GetAsChar();
+      p_default = m_defaultCollation;
+      return true;
+    }
+  }
+  catch(...)
+  {
+    m_defaultCollation.Empty();
+  }
+  return false;
+}
+
+bool
 SQLInfoDB::MakeInfoTableTable(MTableMap& p_tables
                              ,XString&   p_errors
                              ,XString    p_schema

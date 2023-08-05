@@ -616,6 +616,7 @@ SQLInfoOracle::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*p_
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -674,6 +675,30 @@ SQLInfoOracle::GetCATALOGMetaTypes(int p_type) const
                         break;
   }
   return sql;
+}
+
+XString
+SQLInfoOracle::GetCATALOGDefaultCharset() const
+{
+  return "SELECT value\n"
+         "  FROM nls_database_parameters\n"
+         " WHERE parameter = 'NLS_CHARACTERSET'";
+}
+
+XString
+SQLInfoOracle::GetCATALOGDefaultCharsetNCV() const
+{
+  return "SELECT value\n"
+         "  FROM nls_database_parameters\n"
+         " WHERE parameter = 'NLS_NCHAR_CHARACTERSET'";
+}
+
+XString
+SQLInfoOracle::GetCATALOGDefaultCollation() const
+{
+  XString nlslang;
+  nlslang.GetEnvironmentVariable("NLS_LANG");
+  return nlslang;
 }
 
 // Get SQL to check if a table already exists in the database

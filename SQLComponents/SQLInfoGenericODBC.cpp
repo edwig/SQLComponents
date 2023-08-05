@@ -477,6 +477,7 @@ SQLInfoGenericODBC::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN&
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -504,6 +505,24 @@ SQLInfoGenericODBC::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString
+SQLInfoGenericODBC::GetCATALOGDefaultCharset() const
+{
+  return "iso-8859-1";
+}
+
+XString
+SQLInfoGenericODBC::GetCATALOGDefaultCharsetNCV() const
+{
+  return "utf-16";
+}
+
+XString
+SQLInfoGenericODBC::GetCATALOGDefaultCollation() const
+{
+  return "-";
 }
 
 // ALL FUNCTIONS FOR TABLE(s)

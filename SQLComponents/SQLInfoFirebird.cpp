@@ -590,6 +590,7 @@ SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -616,6 +617,27 @@ SQLInfoFirebird::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString
+SQLInfoFirebird::GetCATALOGDefaultCharset() const
+{
+  return "SELECT rdb$character_set_name\n"
+         "  FROM rdb$database";
+}
+
+XString
+SQLInfoFirebird::GetCATALOGDefaultCharsetNCV() const
+{
+  // Firebird does *NOT* support NVARCHAR
+  return "-";
+}
+
+XString
+SQLInfoFirebird::GetCATALOGDefaultCollation() const
+{
+  return "SELECT rdb$character_set_name\n"
+         "  FROM rdb$database";
 }
 
 // Get SQL to check if a table already exists in the database

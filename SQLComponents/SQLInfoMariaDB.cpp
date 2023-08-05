@@ -617,6 +617,7 @@ SQLInfoMariaDB::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*p
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -644,6 +645,24 @@ SQLInfoMariaDB::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString
+SQLInfoMariaDB::GetCATALOGDefaultCharset() const
+{
+  return "iso-8859-1";
+}
+
+XString
+SQLInfoMariaDB::GetCATALOGDefaultCharsetNCV() const
+{
+  return "UTF-16";
+}
+
+XString
+SQLInfoMariaDB::GetCATALOGDefaultCollation() const
+{
+  return "latin1_swedish_ci";
 }
 
 // Get SQL to check if a table already exists in the database

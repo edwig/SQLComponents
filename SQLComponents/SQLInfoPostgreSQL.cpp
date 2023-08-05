@@ -487,6 +487,7 @@ SQLInfoPostgreSQL::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& 
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -513,6 +514,25 @@ SQLInfoPostgreSQL::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString
+SQLInfoPostgreSQL::GetCATALOGDefaultCharset() const
+{
+  return "iso-8859-1";
+}
+
+XString
+SQLInfoPostgreSQL::GetCATALOGDefaultCharsetNCV() const
+{
+  // NO Support for NVARCHAR or UTF-8/UTF-16
+  return "-";
+}
+
+XString
+SQLInfoPostgreSQL::GetCATALOGDefaultCollation() const
+{
+  return "ucs_basic";
 }
 
 // Get SQL to check if a table already exists in the database

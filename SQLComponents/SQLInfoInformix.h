@@ -213,6 +213,7 @@ public:
   // CATALOG
   // o GetCATALOG<Object[s]><Function>
   //   Objects
+  //   - Catalog
   //   - Table
   //   - Column
   //   - Index
@@ -235,6 +236,9 @@ public:
 
   // Meta info about meta types
   XString GetCATALOGMetaTypes(int p_type) const override;
+  XString GetCATALOGDefaultCharset() const override;
+  XString GetCATALOGDefaultCharsetNCV() const override;
+  XString GetCATALOGDefaultCollation() const override;
   // All table functions
   XString GetCATALOGTableExists       (XString& p_schema,XString& p_tablename)  const override;
   XString GetCATALOGTablesList        (XString& p_schema,XString& p_pattern)    const override;

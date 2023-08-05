@@ -490,6 +490,7 @@ SQLInfoMySQL::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*p_c
 // CATALOG
 // o GetCATALOG<Object[s]><Function>
 //   Objects
+//   - Catalog
 //   - Table
 //   - Column
 //   - Index
@@ -517,6 +518,24 @@ SQLInfoMySQL::GetCATALOGMetaTypes(int p_type) const
 {
   UNREFERENCED_PARAMETER(p_type);
   return "";
+}
+
+XString
+SQLInfoMySQL::GetCATALOGDefaultCharset() const
+{
+  return "Latin1";
+}
+
+XString
+SQLInfoMySQL::GetCATALOGDefaultCharsetNCV() const
+{
+  return "UTF-8";
+}
+
+XString
+SQLInfoMySQL::GetCATALOGDefaultCollation() const
+{
+  return "latin1_swedish_ci";
 }
 
 // Get SQL to check if a table already exists in the database
