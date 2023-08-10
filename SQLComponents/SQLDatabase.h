@@ -82,6 +82,7 @@ typedef struct _datasourceInternal
   XString m_datasource;
   XString m_username;
   XString m_password;
+  XString m_options;
   bool    m_system         { false };
   bool    m_outputOMF      { false };
   bool    m_default        { false };
@@ -122,6 +123,7 @@ public:
   bool           Open(XString const& p_datasource
                      ,XString const& p_username
                      ,XString const& p_password
+                     ,XString        p_options  = ""
                      ,bool           p_readOnly = false);
   // Open the database on basis of a connect string only
   bool           Open(XString const& p_connectString,bool p_readOnly = false);

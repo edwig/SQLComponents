@@ -47,6 +47,7 @@ SQLTransaction::SQLTransaction(SQLDatabase* p_database
                               ,bool         p_isSubTransaction) 
                :m_database  (p_database)
                ,m_lock      (p_database,INFINITE)
+               ,m_name      (p_name)
                ,m_active    (false)
                ,m_hdbc      (NULL)
 {

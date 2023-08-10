@@ -246,12 +246,16 @@ bool
 SQLDatabase::Open(XString const& p_datasource
                  ,XString const& p_username
                  ,XString const& p_password
-                 ,bool           p_readOnly)
+                 ,XString        p_options  /* = ""    */
+                 ,bool           p_readOnly /* = false */)
 {
   // get the connect string
   XString connect;
   connect.Format("DSN=%s;UID=%s;PWD=%s;", p_datasource.GetString(), p_username.GetString(), p_password.GetString());
-
+  if(!p_options.IsEmpty())
+  {
+    connect += ";" + p_options;
+  }
   // Add any options passed to 'AddConnectOption'  
   ODBCOptions::iterator it;
   for(it = m_options.begin();it != m_options.end();++it)
@@ -338,6 +342,8 @@ SQLDatabase::Open(XString const& p_connectString,bool p_readOnly)
 void    
 SQLDatabase::SetAttributesBeforeConnect()
 {
+  SetConnectAttr(SQL_ATTR_ASYNC_ENABLE,SQL_ASYNC_ENABLE_OFF,0);
+
   // No dialog boxes at the connect moment please
   SetConnectAttr(SQL_ATTR_QUIET_MODE,0,0);
 
@@ -375,9 +381,11 @@ SQLDatabase::SetAttributesAfterConnect(bool p_readOnly)
   if(m_canDoTransactions != SQL_TC_NONE)
   {
     SetConnectAttr(SQL_ATTR_TXN_ISOLATION,SQL_TXN_READ_COMMITTED,SQL_IS_UINTEGER);
-    if(m_rdbmsType == RDBMS_ACCESS)
+    SetConnectAttr(SQL_ATTR_TXN_ISOLATION,SQL_TXN_READ_COMMITTED,SQL_IS_UINTEGER);
+    if(m_rdbmsType == RDBMS_ACCESS || m_rdbmsType == RDBMS_SQLSERVER)
     {
-      // MS-Access can only shift the autocommit mode once at the start of a connection
+      // Microsoft products (MS-Access and SQL-Server) can only shift the autocommit mode
+      // once at the start of a connection.
       // Afterwards, after statements have occurred, it cannot be turned on or off.
       // See Microsoft KB169469 article for confirmation. It's and ODBC 3.x issue for MS-Access
       // All insert/updates/deletes **must** be transactions
@@ -768,9 +776,8 @@ SQLDatabase::SetAutoCommitMode(bool p_autoCommit)
   {
     return false;
   }
-
   // If we have a database type that can change the autocommit mode
-  if(m_rdbmsType != RDBMS_ACCESS)
+  if(m_rdbmsType != RDBMS_ACCESS && m_rdbmsType != RDBMS_SQLSERVER)
   {
     // Set autocommit mode to be sure. 
     // If 'ON', Programs **CAN** use a transaction by setting SQLTransaction on the stack.
@@ -1197,7 +1204,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
     {
       try
       {
-        if(m_rdbmsType != RDBMS_ACCESS)
+        if(m_rdbmsType != RDBMS_ACCESS && m_rdbmsType != RDBMS_SQLSERVER)
         {
           SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_OFF,SQL_IS_UINTEGER);
         }
@@ -1213,10 +1220,11 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
 
     // If asked so, start a subtransaction if there was a transaction
     // otherwise this still is NOT a sub-transaction!
-    if(m_transactions.size() > 0 && p_startSubtransaction)
+    if(m_transactions.size() > 0 || p_startSubtransaction)
     {
-      // Get transaction name
-      transName.Format("AutoSavePoint%I64d", m_transactions.size());
+      // Get transaction name and add the 'Auto Save Point'
+      transName = p_transaction->GetName();
+      transName.AppendFormat("ASP%d",static_cast<int>(m_transactions.size()));
 
       // Set savepoint
       XString startSubtrans = m_info->GetSQLStartSubTransaction(transName);
@@ -1226,7 +1234,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
         {
           SQLQuery rs(this);
           rs.DoSQLStatement(startSubtrans);
-          p_transaction->SetSavepoint(transName);
+          TRACE("Start transaction: %s\n",startSubtrans.GetString());
         }
         catch(StdException& err)
         {
@@ -1281,10 +1289,9 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
         }
         // Re-engage the autocommit mode. If it goes wrong we
         // will automatically reach the catch block
-        if(m_rdbmsType != RDBMS_ACCESS &&
-           m_rdbmsType != RDBMS_SQLSERVER)
+        if(m_rdbmsType != RDBMS_ACCESS && m_rdbmsType != RDBMS_SQLSERVER)
         {
-          SetConnectAttr(SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
+          SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_ON,SQL_IS_UINTEGER);
         }
       }
       catch(StdException& ex) 
@@ -1317,6 +1324,7 @@ SQLDatabase::CommitTransaction(SQLTransaction* p_transaction)
         {
           SQLQuery rs(this);
           rs.DoSQLStatement(startSubtrans);
+          TRACE("Commit transaction: %s\n",startSubtrans.GetString());
         }
         catch(StdException& error)
         {
@@ -1383,10 +1391,9 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
           throw StdException(0);
         }
         // Re-engage the autocommit mode, will throw in case of an error
-        if(m_rdbmsType != RDBMS_ACCESS &&
-           m_rdbmsType != RDBMS_SQLSERVER)
+        if(m_rdbmsType != RDBMS_ACCESS && m_rdbmsType != RDBMS_SQLSERVER)
         {
-          SetConnectAttr(SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER);
+          SetConnectAttr(SQL_ATTR_AUTOCOMMIT,SQL_AUTOCOMMIT_ON,SQL_IS_UINTEGER);
         }
       }
       catch(StdException& ex)
@@ -1412,6 +1419,7 @@ SQLDatabase::RollbackTransaction(SQLTransaction* p_transaction)
         {
           SQLQuery rs(this);
           rs.DoSQLStatement(startSubtrans);
+          TRACE("Rollback transaction: %s\n",startSubtrans.GetString());
         }
         catch(StdException& error)
         {

@@ -35,6 +35,9 @@ public:
   explicit SQLInfoPostgreSQL(SQLDatabase* p_database);
  ~SQLInfoPostgreSQL();
 
+  // RDBMS Uses INDENTITY or SEQUENCE interface
+  void    SetUseSequences(bool p_sequences) override;
+
   //////////////////////////////////////////////////////////////////////////
   //
   // GENERALS (Strings & Booleans) 

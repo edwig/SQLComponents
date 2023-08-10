@@ -48,6 +48,13 @@ SQLInfoInformix::~SQLInfoInformix()
 {
 }
 
+// RDBMS Uses INDENTITY or SEQUENCE interface
+void
+SQLInfoInformix::SetUseSequences(bool /*p_sequences*/)
+{
+  // Does nothing
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // GENERALS (Strings & Booleans) 

@@ -48,6 +48,13 @@ SQLInfoOracle::~SQLInfoOracle()
 {
 }
 
+// RDBMS Uses INDENTITY or SEQUENCE interface
+void
+SQLInfoOracle::SetUseSequences(bool /*p_sequences*/)
+{
+  // Does nothing
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // GENERALS (Strings & Booleans) 

@@ -95,6 +95,9 @@ public:
 
   // PURE VIRTUAL INTERFACE
 
+  // RDBMS Uses INDENTITY or SEQUENCE interface
+  virtual void    SetUseSequences(bool p_sequences) = 0;
+
   //////////////////////////////////////////////////////////////////////////
   //
   // GENERALS (Strings & Booleans) 
