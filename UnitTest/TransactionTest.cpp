@@ -32,7 +32,7 @@
 
 namespace DatabaseUnitTest
 {
-  void CALLBACK LogPrint(void* p_context,const char* p_text);
+  void CALLBACK LogPrint(void* p_context,const TCHAR* p_text);
   int  CALLBACK LogLevel(void* p_context);
   extern XString g_dsn;
   extern XString g_user;
@@ -42,10 +42,10 @@ namespace DatabaseUnitTest
   {
     bool OpenDatabase()
     {
-      Logger::WriteMessage("Opening database....");
+      Logger::WriteMessage(_T("Opening database...."));
 
       m_database = new SQLDatabase();
-      m_database->RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+      m_database->RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
 
       try
       {
@@ -53,7 +53,7 @@ namespace DatabaseUnitTest
         m_database->SetLoginTimeout(0);
         if(m_database->Open(g_dsn,g_user,g_password))
         {
-          Logger::WriteMessage("Database opened.");
+          Logger::WriteMessage(_T("Database opened."));
         }
         else
         {
@@ -73,7 +73,7 @@ namespace DatabaseUnitTest
     {
       if(m_database)
       {
-        Logger::WriteMessage("Closing database....");
+        Logger::WriteMessage(_T("Closing database...."));
         m_database->Close();
         delete m_database;
         m_database = nullptr;
@@ -84,9 +84,9 @@ namespace DatabaseUnitTest
     void UpdateRecord(int p_recno,bcd p_value)
     {
       SQLQuery query(m_database);
-      XString sql("UPDATE test_number\n"
-                  "   SET field3 = ?\n"
-                  " WHERE id     = ?");
+      XString sql(_T("UPDATE test_number\n")
+                  _T("   SET field3 = ?\n")
+                  _T(" WHERE id     = ?"));
       query.SetParameter(1,p_value);
       query.SetParameter(2,p_recno);
       int num = query.DoSQLStatementNonQuery(sql);
@@ -97,9 +97,9 @@ namespace DatabaseUnitTest
     void CheckRecord(int p_recno,bcd p_value)
     {
       SQLQuery query(m_database);
-      XString sql("SELECT field3\n"
-                  "  FROM test_number\n"
-                  " WHERE id = ?");
+      XString sql(_T("SELECT field3\n")
+                  _T("  FROM test_number\n")
+                  _T(" WHERE id = ?"));
       query.DoSQLStatement(sql,p_recno);
       if(query.GetRecord())
       {
@@ -115,13 +115,13 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionCommit)
     {
-      Logger::WriteMessage("Testing standard COMMIT transaction");
+      Logger::WriteMessage(_T("Testing standard COMMIT transaction"));
 
       InitSQLComponents();
 
       if(OpenDatabase())
       {
-        SQLTransaction trans(m_database,"TransCommit");
+        SQLTransaction trans(m_database,_T("TransCommit"));
         UpdateRecord(1,bcd(100.0));
         CheckRecord (1,bcd(100.0));
         UpdateRecord(1,bcd(200.0));
@@ -136,13 +136,13 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionRollback)
     {
-      Logger::WriteMessage("Testing standard ROLLBACK transaction");
+      Logger::WriteMessage(_T("Testing standard ROLLBACK transaction"));
 
       InitSQLComponents();
 
       if(OpenDatabase())
       {
-        SQLTransaction trans(m_database,"TransCommit");
+        SQLTransaction trans(m_database,_T("TransCommit"));
         UpdateRecord(1,bcd(100.0));
         CheckRecord (1,bcd(100.0));
         trans.Commit();
@@ -150,7 +150,7 @@ namespace DatabaseUnitTest
 
         // Extra scope
         {
-          SQLTransaction trans(m_database,"TransRollback");
+          SQLTransaction trans(m_database,_T("TransRollback"));
           UpdateRecord(1,bcd(400.0));
           CheckRecord (1,bcd(400.0));
         }
@@ -163,7 +163,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionCommit_DBC)
     {
-      Logger::WriteMessage("Testing isolated COMMIT transaction");
+      Logger::WriteMessage(_T("Testing isolated COMMIT transaction"));
 
       InitSQLComponents();
 
@@ -184,7 +184,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionRollback_DBC)
     {
-      Logger::WriteMessage("Testing isolated ROLLBACK transaction");
+      Logger::WriteMessage(_T("Testing isolated ROLLBACK transaction"));
 
       InitSQLComponents();
 
@@ -211,7 +211,7 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(TransactionRollback_FAIL)
     {
-      Logger::WriteMessage("Testing the FAILING of the ROLLBACK");
+      Logger::WriteMessage(_T("Testing the FAILING of the ROLLBACK"));
 
       InitSQLComponents();
 
@@ -219,7 +219,7 @@ namespace DatabaseUnitTest
       {
         // Extra scope
         {
-          SQLTransaction trans(m_database,"Check");
+          SQLTransaction trans(m_database,_T("Check"));
           UpdateRecord(1,bcd(100.0));
           CheckRecord (1,bcd(100.0));
           trans.Commit();
@@ -230,7 +230,7 @@ namespace DatabaseUnitTest
         {
           // Extra scope
           {
-            SQLTransaction trans(m_database,"OpenTransaction");
+            SQLTransaction trans(m_database,_T("OpenTransaction"));
             UpdateRecord(1,bcd(400.0));
             CheckRecord (1,bcd(400.0));
             CloseDatabase();
@@ -238,7 +238,7 @@ namespace DatabaseUnitTest
         }
         catch(StdException& er)
         {
-          Logger::WriteMessage("Error in transaction: " + er.GetErrorMessage());
+          Logger::WriteMessage(_T("Error in transaction: ") + er.GetErrorMessage());
         }
       }
 

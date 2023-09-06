@@ -32,7 +32,7 @@
 
 namespace DatabaseUnitTest
 {
-  void CALLBACK LogPrint(void* p_context,const char* p_text);
+  void CALLBACK LogPrint(void* p_context,const TCHAR* p_text);
   int  CALLBACK LogLevel(void* p_context);
   extern XString g_dsn;
   extern XString g_user;
@@ -54,10 +54,10 @@ namespace DatabaseUnitTest
 
     bool OpenDatabase()
     {
-      Logger::WriteMessage("Opening database....");
+      Logger::WriteMessage(_T("Opening database...."));
 
       m_database = new SQLDatabase();
-      m_database->RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+      m_database->RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
 
       try
       {
@@ -65,7 +65,7 @@ namespace DatabaseUnitTest
         m_database->SetLoginTimeout(0);
         if(m_database->Open(g_dsn,g_user,g_password))
         {
-          Logger::WriteMessage("Database opened.");
+          Logger::WriteMessage(_T("Database opened."));
         }
         else
         {
@@ -85,7 +85,7 @@ namespace DatabaseUnitTest
     {
       if(m_database)
       {
-        Logger::WriteMessage("Closing database....");
+        Logger::WriteMessage(_T("Closing database...."));
         m_database->Close();
         delete m_database;
         m_database = nullptr;
@@ -96,8 +96,8 @@ namespace DatabaseUnitTest
     void ResetResultSet()
     {
       SQLQuery query(m_database);
-      SQLTransaction trans(m_database,"DelSet");
-      XString sql = "DELETE FROM test_record";
+      SQLTransaction trans(m_database,_T("DelSet"));
+      XString sql = _T("DELETE FROM test_record");
       query.DoSQLStatementNonQuery(sql);
       trans.Commit();
       number_of_tests++;
@@ -111,8 +111,8 @@ namespace DatabaseUnitTest
       XString dup = m_duplicate + m_duplicate;
 
       SQLQuery query(m_database);
-      SQLTransaction trans(m_database,"DelSet");
-      XString sql = "SELECT * FROM test_record";
+      SQLTransaction trans(m_database,_T("DelSet"));
+      XString sql = _T("SELECT * FROM test_record");
       query.DoSQLStatement(sql);
       while(query.GetRecord())
       {
@@ -133,15 +133,15 @@ namespace DatabaseUnitTest
     void TestCalling()
     {
       XString text;
-      Logger::WriteMessage("Testing FUNCTION CALL interface...");
+      Logger::WriteMessage(_T("Testing FUNCTION CALL interface..."));
 
       // Call with 1 input and 1 output parameter
       SQLQuery query(m_database);
-      SQLTransaction trans(m_database,"testing");
+      SQLTransaction trans(m_database,_T("testing"));
 
-      var* result = query.DoSQLCall(g_schema,"testmul2",12);
+      var* result = query.DoSQLCall(g_schema,_T("testmul2"),12);
 
-      text.Format("Result of the function call (1  input parameter): %d",result->GetAsSLong());
+      text.Format(_T("Result of the function call (1  input parameter): %d"),result->GetAsSLong());
       Logger::WriteMessage(text);
       Assert::AreEqual(24,(int)result->GetAsSLong());
       number_of_tests++;
@@ -149,18 +149,18 @@ namespace DatabaseUnitTest
 
       // Call with 1 input parameter with SQL input
       SQLQuery q2(m_database);
-      result = q2.DoSQLCall(g_schema,"testins",m_program.GetString());
-      text.Format("Result of the function call (0 output parameter): %d",result->GetAsSLong());
+      result = q2.DoSQLCall(g_schema,_T("testins"),m_program.GetString());
+      text.Format(_T("Result of the function call (0 output parameter): %d"),result->GetAsSLong());
       Logger::WriteMessage(text);
 
       // Call with 1 input parameter and a BCD return parameter
       q2.ResetParameters();
       q2.SetParameter(0,bcd(),P_SQL_PARAM_OUTPUT);
       q2.GetParameter(0)->SetNumericPrecisionScale(18,2);
-      var* res = q2.DoSQLCall(g_schema,"getdecimal","345.99");
-      text.Format("Result of GETDECIMAL '345.99' = [%s]",res->GetAsBCD().AsString());
+      var* res = q2.DoSQLCall(g_schema,_T("getdecimal"),_T("345.99"));
+      text.Format(_T("Result of GETDECIMAL '345.99' = [%s]"),res->GetAsBCD().AsString());
       Logger::WriteMessage(text);
-      Assert::AreEqual("345.99",res->GetAsBCD().AsString());
+      Assert::AreEqual(_T("345.99"),res->GetAsBCD().AsString());
       number_of_tests++;
 
       // Call with 1 input parameter and return value AND return parameter
@@ -171,11 +171,11 @@ namespace DatabaseUnitTest
       q2.SetParameter(1,m_duplicate);
       q2.SetParameter(2,&txt,P_SQL_PARAM_OUTPUT);
 
-      res = q2.DoSQLCall(g_schema,"multinout",true);
+      res = q2.DoSQLCall(g_schema,_T("multinout"),true);
 
       bcd number = res->GetAsBCD();
       XString restext = q2.GetParameter(2)->GetAsChar();
-      text.Format("Result of MULTINOUT: [%s] [%s]\n",number.AsString(),restext.GetString());
+      text.Format(_T("Result of MULTINOUT: [%s] [%s]\n"),number.AsString(),restext.GetString());
       Logger::WriteMessage(text);
 
       Assert::AreEqual(77.88,number.AsDouble());
@@ -189,8 +189,8 @@ namespace DatabaseUnitTest
 
   private:
     SQLDatabase* m_database  = nullptr;
-    XString      m_program   = "Testing from within a program." ;
-    XString      m_duplicate = "Multiple duplicate testing.";
+    XString      m_program   = _T("Testing from within a program.") ;
+    XString      m_duplicate = _T("Multiple duplicate testing.");
   };
 }
 

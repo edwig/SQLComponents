@@ -37,96 +37,96 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(InitialWordsAndLines)
     {
-      Logger::WriteMessage("Formatting: Initial words");
+      Logger::WriteMessage(_T("Formatting: Initial words"));
 
       var number(1);
       SQLVariantFormat form(number);
-      XString input("THIS is A LONG and TireSome TesT");
+      XString input(_T("THIS is A LONG and TireSome TesT"));
 
       form.SetFormat(input);
       form.StringInitCapital();
-      Assert::AreEqual("This Is A Long And Tiresome Test",form.GetFormat());
+      Assert::AreEqual(_T("This Is A Long And Tiresome Test"),form.GetFormat());
       number_of_tests++;
 
       form.StringStartCapital();
-      Assert::AreEqual("This is a long and tiresome test",form.GetFormat());
+      Assert::AreEqual(_T("This is a long and tiresome test"),form.GetFormat());
       number_of_tests++;
     }
 
     TEST_METHOD(IsConstantOrNumber)
     {
-      Logger::WriteMessage("Formatting: Is-a-constant-or-a-number (simple form)");
+      Logger::WriteMessage(_T("Formatting: Is-a-constant-or-a-number (simple form)"));
 
       var number(1);
       SQLVariantFormat form(number);
 
-      form.SetFormat("123");       Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("123  ");     Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("  123  ");   Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("+123");      Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("-123");      Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("123.456");   Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("+123.456");  Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("-123.456");  Assert::IsTrue(form.IsConstantOrNumber());
-      form.SetFormat("123,456");   Assert::IsTrue(form.IsConstantOrNumber(','));
+      form.SetFormat(_T("123"));       Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("123  "));     Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("  123  "));   Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("+123"));      Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("-123"));      Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("123.456"));   Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("+123.456"));  Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("-123.456"));  Assert::IsTrue(form.IsConstantOrNumber());
+      form.SetFormat(_T("123,456"));   Assert::IsTrue(form.IsConstantOrNumber(','));
 
-      form.SetFormat("123+12");    Assert::IsFalse(form.IsConstantOrNumber());
-      form.SetFormat("-123+12");   Assert::IsFalse(form.IsConstantOrNumber());
-      form.SetFormat("-123-12");   Assert::IsFalse(form.IsConstantOrNumber());
-      form.SetFormat("+123+12");   Assert::IsFalse(form.IsConstantOrNumber());
-      form.SetFormat("+123-12");   Assert::IsFalse(form.IsConstantOrNumber());
-      form.SetFormat("123  12");   Assert::IsFalse(form.IsConstantOrNumber());
+      form.SetFormat(_T("123+12"));    Assert::IsFalse(form.IsConstantOrNumber());
+      form.SetFormat(_T("-123+12"));   Assert::IsFalse(form.IsConstantOrNumber());
+      form.SetFormat(_T("-123-12"));   Assert::IsFalse(form.IsConstantOrNumber());
+      form.SetFormat(_T("+123+12"));   Assert::IsFalse(form.IsConstantOrNumber());
+      form.SetFormat(_T("+123-12"));   Assert::IsFalse(form.IsConstantOrNumber());
+      form.SetFormat(_T("123  12"));   Assert::IsFalse(form.IsConstantOrNumber());
 
       number_of_tests += 15;
     }
 
     TEST_METHOD(Valuta)
     {
-      Logger::WriteMessage("Formatting: Removing valuta markers");
+      Logger::WriteMessage(_T("Formatting: Removing valuta markers"));
 
       var number(1);
       SQLVariantFormat form(number);
       XString str;
 
-      str = "EUR. 45";  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "45 EUR.";  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "E. 45";    form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "E 45";     form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "45 E.";    form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "45 E";     form.StrValutaNLOmzetten(str,true);  Assert::AreEqual("45",str);
+      str = _T("EUR. 45");  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 EUR.");  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("E. 45");    form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("E 45");     form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 E.");    form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 E");     form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
 
-      str = "E. 3.145,12"; form.StrValutaNLOmzetten(str,false); Assert::AreEqual("3145.12",str);
+      str = _T("E. 3.145,12"); form.StrValutaNLOmzetten(str,false); Assert::AreEqual(_T("3145.12"),str);
 
-      str = "$. 45";    form.StrValutaAMOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "$ 45";     form.StrValutaAMOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "45 $.";    form.StrValutaAMOmzetten(str,true);  Assert::AreEqual("45",str);
-      str = "45 $";     form.StrValutaAMOmzetten(str,true);  Assert::AreEqual("45",str);
+      str = _T("$. 45");    form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("$ 45");     form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 $.");    form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 $");     form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
 
-      str = "$. 3,145.12"; form.StrValutaAMOmzetten(str,false); Assert::AreEqual("3145,12",str);
+      str = _T("$. 3,145.12"); form.StrValutaAMOmzetten(str,false); Assert::AreEqual(_T("3145,12"),str);
 
       number_of_tests += 12;
     }
 
     TEST_METHOD(StringDoubleValue)
     {
-      Logger::WriteMessage("Formatting: String to double values");
+      Logger::WriteMessage(_T("Formatting: String to double values"));
 
       var number(1);
       SQLVariantFormat form(number);
       XString str;
 
-      form.SetFormat("1234.5678");      Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat("1234,5678");      Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat("1.234,5678");     Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat("1,234.5678");     Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat("1.2345678E+03");  Assert::AreEqual(1234.5678,form.StringDoubleValue());
+      form.SetFormat(_T("1234.5678"));      Assert::AreEqual(1234.5678,form.StringDoubleValue());
+      form.SetFormat(_T("1234,5678"));      Assert::AreEqual(1234.5678,form.StringDoubleValue());
+      form.SetFormat(_T("1.234,5678"));     Assert::AreEqual(1234.5678,form.StringDoubleValue());
+      form.SetFormat(_T("1,234.5678"));     Assert::AreEqual(1234.5678,form.StringDoubleValue());
+      form.SetFormat(_T("1.2345678E+03"));  Assert::AreEqual(1234.5678,form.StringDoubleValue());
 
       number_of_tests += 5;
     }
 
     TEST_METHOD(CurrentDate)
     {
-      Logger::WriteMessage("Formatting: Set current date");
+      Logger::WriteMessage(_T("Formatting: Set current date"));
 
       var number;
       SQLVariantFormat form(number);
@@ -135,10 +135,10 @@ namespace DatabaseUnitTest
 
       XString format1 = form.GetFormat();
       XString format2 = today.AsXMLString();
-      format2.Replace("T"," ");
+      format2.Replace(_T("T"),_T(" "));
 
-      Logger::WriteMessage("TODAY1 : " + format1);
-      Logger::WriteMessage("TODAY2 : " + format2);
+      Logger::WriteMessage(_T("TODAY1 : ") + format1);
+      Logger::WriteMessage(_T("TODAY2 : ") + format2);
 
       Assert::IsTrue(format1 == format2);
       number_of_tests++;
@@ -152,39 +152,39 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(FormatDate)
     {
-      Logger::WriteMessage("Formatting: Formatting the date/time");
+      Logger::WriteMessage(_T("Formatting: Formatting the date/time"));
 
       InitSQLComponents();
 
-      XString dateString("15-10-1959");
+      XString dateString(_T("15-10-1959"));
       SQLDate date(dateString);
       var dateVar(&date);
       SQLVariantFormat form(dateVar);
 
-      form.FormatDate("dddd d MMMM yyyy|H:mm:ss");
-      Assert::AreEqual("donderdag 15 oktober 1959",form.GetFormat());
+      form.FormatDate(_T("dddd d MMMM yyyy|H:mm:ss"));
+      Assert::AreEqual(_T("donderdag 15 oktober 1959"),form.GetFormat());
       number_of_tests++;
 
-      form.FormatDate("ddd dd MMM yyyy|H:mm:ss");
+      form.FormatDate(_T("ddd dd MMM yyyy|H:mm:ss"));
       Logger::WriteMessage(form.GetFormat());
-      Assert::AreEqual("do 15 okt 1959",form.GetFormat());
+      Assert::AreEqual(_T("do 15 okt 1959"),form.GetFormat());
       number_of_tests++;
 
-      XString stampString("1959-10-15 15:50:20");
+      XString stampString(_T("1959-10-15 15:50:20"));
       SQLTimestamp stamp(stampString);
       var stampVar(&stamp);
       SQLVariantFormat st(stampVar);
 
-      st.FormatDate("dddd d MMMM yyyy |H:mm:ss");
-      Assert::AreEqual("donderdag 15 oktober 1959 15:50:20",st.GetFormat());
+      st.FormatDate(_T("dddd d MMMM yyyy |H:mm:ss"));
+      Assert::AreEqual(_T("donderdag 15 oktober 1959 15:50:20"),st.GetFormat());
       number_of_tests++;
 
-      st.FormatDate("@");
-      Assert::AreEqual("donderdag 15 oktober 1959",st.GetFormat());
+      st.FormatDate(_T("@"));
+      Assert::AreEqual(_T("donderdag 15 oktober 1959"),st.GetFormat());
       number_of_tests++;
 
-      st.FormatDate("");
-      Assert::AreEqual("15-10-1959",st.GetFormat());
+      st.FormatDate(_T(""));
+      Assert::AreEqual(_T("15-10-1959"),st.GetFormat());
       number_of_tests++;
 
       form.Reset();
@@ -192,213 +192,213 @@ namespace DatabaseUnitTest
       st.ResetValue();
 
       // timestamp formatting on a string
-      XString  theDate("15-10-1959 15:50:20");
+      XString  theDate(_T("15-10-1959 15:50:20"));
       var date2(theDate);
       SQLVariantFormat fdate(date2);
       // Forcing the string to a timestamp
       fdate.SetFormat(theDate);
-      fdate.FormatDate("dddd dd MMMM jjjj |M:mm:ss");
-      Assert::AreEqual("donderdag 15 oktober 1959 15:50:20",fdate.GetFormat());
+      fdate.FormatDate(_T("dddd dd MMMM jjjj |M:mm:ss"));
+      Assert::AreEqual(_T("donderdag 15 oktober 1959 15:50:20"),fdate.GetFormat());
       number_of_tests++;
 
       // Only for date
-      theDate = "15-10-1959";
+      theDate = _T("15-10-1959");
       var date3(theDate);
       SQLVariantFormat fdate3(date3);
       // Forcing the string to a date
       fdate3.SetFormat(theDate);
-      fdate3.FormatDate("dddd dd MMMM jjjj");
-      Assert::AreEqual("donderdag 15 oktober 1959",fdate3.GetFormat());
+      fdate3.FormatDate(_T("dddd dd MMMM jjjj"));
+      Assert::AreEqual(_T("donderdag 15 oktober 1959"),fdate3.GetFormat());
       number_of_tests++;
 
       // Only for time
-      theDate = "15:50:20";
+      theDate = _T("15:50:20");
       var date4(theDate);
       SQLVariantFormat fdate4(date4);
       // Forcing to a time
       fdate.SetFormat(theDate);
-      fdate.FormatDate("|M:mm:ss");
-      Assert::AreEqual("15:50:20",fdate.GetFormat());
+      fdate.FormatDate(_T("|M:mm:ss"));
+      Assert::AreEqual(_T("15:50:20"),fdate.GetFormat());
       number_of_tests++;
     }
 
     TEST_METHOD(NumberFormatting)
     {
-      Logger::WriteMessage("Formatting: Formatting numbers");
+      Logger::WriteMessage(_T("Formatting: Formatting numbers"));
       var num( 45123.12);
       var neg(-66789.56);
       SQLVariantFormat form(num);
       SQLVariantFormat negf(neg);
 
-      form.FormatNumber("",false);
-      Assert::AreEqual("45.123,12",form.GetFormat());
+      form.FormatNumber(_T(""),false);
+      Assert::AreEqual(_T("45.123,12"),form.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("#",false);
+      form.FormatNumber(_T("#"),false);
       Logger::WriteMessage(form.GetFormat());
-      Assert::AreEqual("45123",form.GetFormat());
+      Assert::AreEqual(_T("45123"),form.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("###,###.00",false);      
-      Assert::AreEqual(" 45.123,12",    form.GetFormat());
+      form.FormatNumber(_T("###,###.00"),false);      
+      Assert::AreEqual(_T(" 45.123,12"),    form.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("&&&,&&&.00",false);
-      Assert::AreEqual("45.123,12",form.GetFormat());
+      form.FormatNumber(_T("&&&,&&&.00"),false);
+      Assert::AreEqual(_T("45.123,12"),form.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("&&&,&&&.x",false);
-      Assert::AreEqual("45.123,1",form.GetFormat());
+      form.FormatNumber(_T("&&&,&&&.x"),false);
+      Assert::AreEqual(_T("45.123,1"),form.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("&&&,&&&.X",false);
-      Assert::AreEqual("45.123",form.GetFormat());
+      form.FormatNumber(_T("&&&,&&&.X"),false);
+      Assert::AreEqual(_T("45.123"),form.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("#:00",false);
-      Assert::AreEqual("12",form.GetFormat());
+      form.FormatNumber(_T("#:00"),false);
+      Assert::AreEqual(_T("12"),form.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("+###,###.00",false);
-      Assert::AreEqual ("  45.123,12",form.GetFormat());
+      form.FormatNumber(_T("+###,###.00"),false);
+      Assert::AreEqual (_T("  45.123,12"),form.GetFormat());
       number_of_tests++;
-      negf.FormatNumber("+###,###.00",false);
-      Assert::AreEqual ("- 66.789,56",negf.GetFormat());
+      negf.FormatNumber(_T("+###,###.00"),false);
+      Assert::AreEqual (_T("- 66.789,56"),negf.GetFormat());
       number_of_tests++;
 
-      form.FormatNumber("-###,###.00",false);
-      Assert::AreEqual ("+ 45.123,12",form.GetFormat());
+      form.FormatNumber(_T("-###,###.00"),false);
+      Assert::AreEqual (_T("+ 45.123,12"),form.GetFormat());
       number_of_tests++;
-      negf.FormatNumber("-###,###.00",false);
-      Assert::AreEqual ("- 66.789,56",negf.GetFormat());
+      negf.FormatNumber(_T("-###,###.00"),false);
+      Assert::AreEqual (_T("- 66.789,56"),negf.GetFormat());
       number_of_tests++;
-      negf.FormatNumber("~###,###.00",false);
-      Assert::AreEqual ("- 66.789,56",negf.GetFormat());
+      negf.FormatNumber(_T("~###,###.00"),false);
+      Assert::AreEqual (_T("- 66.789,56"),negf.GetFormat());
       number_of_tests++;
     }
 
     TEST_METHOD(FormatDateCalculation)
     {
-      Logger::WriteMessage("Formatting: date calculations and reformatting");
+      Logger::WriteMessage(_T("Formatting: date calculations and reformatting"));
 
       InitSQLComponents();
 
       // ADDITION
 
       // + n -> interpret as days
-      SQLDate date1("2012-12-25");
+      SQLDate date1(_T("2012-12-25"));
       var vdat1(&date1);
       SQLVariantFormat fdat1(vdat1);
-      fdat1.DateCalculate('+',"9");
-      Assert::AreEqual("03-01-2013",fdat1.GetFormat());
+      fdat1.DateCalculate(_T('+'),_T("9"));
+      Assert::AreEqual(_T("03-01-2013"),fdat1.GetFormat());
       number_of_tests++;
 
       // + nD -> interpret as days
-      SQLDate date2("2012-12-25");
+      SQLDate date2(_T("2012-12-25"));
       var vdat2(&date2);
       SQLVariantFormat fdat2(vdat2);
-      fdat2.DateCalculate('+',"9d");
-      Assert::AreEqual("03-01-2013",fdat2.GetFormat());
+      fdat2.DateCalculate(_T('+'),_T("9d"));
+      Assert::AreEqual(_T("03-01-2013"),fdat2.GetFormat());
       number_of_tests++;
 
       // + nM -> interpret as months
-      SQLDate date3("2012-12-25");
+      SQLDate date3(_T("2012-12-25"));
       var vdat3(&date3);
       SQLVariantFormat fdat3(vdat3);
-      fdat3.DateCalculate('+',"4m");
-      Assert::AreEqual("25-04-2013",fdat3.GetFormat());
+      fdat3.DateCalculate(_T('+'),_T("4m"));
+      Assert::AreEqual(_T("25-04-2013"),fdat3.GetFormat());
       number_of_tests++;
 
       // + nY -> interpret as years
-      SQLDate date4("2012-12-25");
+      SQLDate date4(_T("2012-12-25"));
       var vdat4(&date4);
       SQLVariantFormat fdat4(vdat4);
-      fdat4.DateCalculate('+',"2Y");
-      Assert::AreEqual("25-12-2014",fdat4.GetFormat());
+      fdat4.DateCalculate(_T('+'),_T("2Y"));
+      Assert::AreEqual(_T("25-12-2014"),fdat4.GetFormat());
       number_of_tests++;
 
       // SUBTRACTION 
 
       // - n -> interpret as days
-      SQLDate date5("03-01-2013");
+      SQLDate date5(_T("03-01-2013"));
       var vdat5(&date5);
       SQLVariantFormat fdat5(vdat5);
-      fdat5.DateCalculate('-',"9");
-      Assert::AreEqual("25-12-2012",fdat5.GetFormat());
+      fdat5.DateCalculate(_T('-'),_T("9"));
+      Assert::AreEqual(_T("25-12-2012"),fdat5.GetFormat());
       number_of_tests++;
 
       // - nd -> interpret as days
-      SQLDate date6("03-01-2013");
+      SQLDate date6(_T("03-01-2013"));
       var vdat6(&date6);
       SQLVariantFormat fdat6(vdat6);
-      fdat6.DateCalculate('-',"9");
-      Assert::AreEqual("25-12-2012",fdat6.GetFormat());
+      fdat6.DateCalculate(_T('-'),_T("9"));
+      Assert::AreEqual(_T("25-12-2012"),fdat6.GetFormat());
       number_of_tests++;
 
       // - nM -> interpret as months
-      SQLDate date7("25-04-2013");
+      SQLDate date7(_T("25-04-2013"));
       var vdat7(&date7);
       SQLVariantFormat fdat7(vdat7);
-      fdat7.DateCalculate('-',"4m");
-      Assert::AreEqual("25-12-2012",fdat7.GetFormat());
+      fdat7.DateCalculate(_T('-'),_T("4m"));
+      Assert::AreEqual(_T("25-12-2012"),fdat7.GetFormat());
       number_of_tests++;
 
       // + nY -> interpret as years
-      SQLDate date8("2014-12-25");
+      SQLDate date8(_T("2014-12-25"));
       var vdat8(&date8);
       SQLVariantFormat fdat8(vdat8);
-      fdat8.DateCalculate('-',"2Y");
-      Assert::AreEqual("25-12-2012",fdat8.GetFormat());
+      fdat8.DateCalculate(_T('-'),_T("2Y"));
+      Assert::AreEqual(_T("25-12-2012"),fdat8.GetFormat());
       number_of_tests++;
 
       // SUBTRACTION OF DATES
 
-      SQLDate date9("25-12-2012");
+      SQLDate date9(_T("25-12-2012"));
       var vdat9(&date9);
       SQLVariantFormat fdat9(vdat9);
-      fdat9.DateCalculate('~',"03-01-2013");
-      Assert::AreEqual("-9",fdat9.GetFormat());
+      fdat9.DateCalculate(_T('~'),_T("03-01-2013"));
+      Assert::AreEqual(_T("-9"),fdat9.GetFormat());
       number_of_tests++;
 
-      SQLDate date10("03-01-2013");
+      SQLDate date10(_T("03-01-2013"));
       var vdat10(&date10);
       SQLVariantFormat fdat10(vdat10);
-      fdat10.DateCalculate('~',"25-12-2012");
-      Assert::AreEqual("9",fdat10.GetFormat());
+      fdat10.DateCalculate(_T('~'),_T("25-12-2012"));
+      Assert::AreEqual(_T("9"),fdat10.GetFormat());
       number_of_tests++;
 
       // From other than a date
 
-      XString date11("25-12-2012");
+      XString date11(_T("25-12-2012"));
       var vdat11(date11);
       SQLVariantFormat fdat11(vdat11);
-      fdat11.DateCalculate('+',"9d");
-      Assert::AreEqual("03-01-2013",fdat11.GetFormat());
+      fdat11.DateCalculate(_T('+'),_T("9d"));
+      Assert::AreEqual(_T("03-01-2013"),fdat11.GetFormat());
       number_of_tests++;
 
-      XString date12("");
+      XString date12(_T(""));
       var vdat12(date12);
       SQLVariantFormat fdat12(vdat12);
-      fdat12.SetFormat("25-12-2012");
-      fdat12.DateCalculate('+',"9d");
-      Assert::AreEqual("03-01-2013",fdat12.GetFormat());
+      fdat12.SetFormat(_T("25-12-2012"));
+      fdat12.DateCalculate(_T('+'),_T("9d"));
+      Assert::AreEqual(_T("03-01-2013"),fdat12.GetFormat());
       number_of_tests++;
 
       // Default operator is a '+'
-      SQLDate date13("2012-12-25");
+      SQLDate date13(_T("2012-12-25"));
       var vdat13(&date13);
       SQLVariantFormat fdat13(vdat13);
-      fdat13.DateCalculate(' ',"9d");
-      Assert::AreEqual("03-01-2013",fdat13.GetFormat());
+      fdat13.DateCalculate(_T(' '),_T("9d"));
+      Assert::AreEqual(_T("03-01-2013"),fdat13.GetFormat());
       number_of_tests++;
 
       // Test for negative number of days
 
-      SQLDate date14("03-01-2013");
+      SQLDate date14(_T("03-01-2013"));
       var vdat14(&date14);
       SQLVariantFormat fdat14(vdat14);
-      fdat14.DateCalculate('+',"-9");
-      Assert::AreEqual("25-12-2012",fdat14.GetFormat());
+      fdat14.DateCalculate(_T('+'),_T("-9"));
+      Assert::AreEqual(_T("25-12-2012"),fdat14.GetFormat());
       number_of_tests++;
     }
   };

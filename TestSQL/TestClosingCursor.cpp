@@ -34,11 +34,11 @@
 
 void TestClosingCursor()
 {
-  printf("Test closing the cursor:\n");
-  printf("========================\n");
+  _tprintf(_T("Test closing the cursor:\n"));
+  _tprintf(_T("========================\n"));
 
   SQLDatabase dbs;
-  dbs.AddMacro("$SCHEMA$",g_schema);
+  dbs.AddMacro(_T("$SCHEMA$"),g_schema);
   // Do not log: we want clean output of open/close
   // dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
 
@@ -53,30 +53,30 @@ void TestClosingCursor()
 
     if(dbs.Open(g_dsn,g_user,g_password))
     {
-      printf("Database opened.\n");
+      _tprintf(_T("Database opened.\n"));
       for(unsigned ind = 1;ind <= 1500; ++ind)
       {
         SQLQuery query(&dbs);
-        XString sql("SELECT COUNT(*) FROM $SCHEMA$.DUAL");
+        XString sql(_T("SELECT COUNT(*) FROM $SCHEMA$.DUAL"));
         query.DoSQLStatement(sql);
-        printf(".");
+        _tprintf(_T("."));
         if(ind % 50 == 0)
         {
-          printf(" - %d\n",ind);
+          _tprintf(_T(" - %d\n"),ind);
         }
       }
     }
     else
     {
-      printf("Database ***NOT*** opened.\n");
+      _tprintf(_T("Database ***NOT*** opened.\n"));
     }
   }
   catch(StdException& er)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n", er.GetErrorMessage().GetString());
+    _tprintf(_T("Database ***NOT*** opened. Reason:\n%s\n"), er.GetErrorMessage().GetString());
   }
   long endTime = clock();
-  printf("Open  test performed in: %.6f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("Open  test performed in: %.6f seconds\n"), (double)(endTime - beginTime) / CLOCKS_PER_SEC);
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -90,6 +90,6 @@ void TestClosingCursor()
     dbs.Close();
   }
   endTime = clock();
-  printf("Close test performed in: %.6f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("Close test performed in: %.6f seconds\n"), (double)(endTime - beginTime) / CLOCKS_PER_SEC);
 }
 

@@ -38,71 +38,71 @@ namespace OperatorUnitTest
   {
     TEST_METHOD(FilterTest)
     {
-      Logger::WriteMessage("SQLFilter test for SQL WHERE conditions");
-      Logger::WriteMessage("=======================================");
+      Logger::WriteMessage(_T("SQLFilter test for SQL WHERE conditions"));
+      Logger::WriteMessage(_T("======================================="));
 
       // Needed for date/time/timestamp
       InitSQLComponents(LN_ENGLISH);
 
-      SQLVariant valText("Text");
+      SQLVariant valText(_T("Text"));
       SQLVariant valNumber(123);
-      SQLDate datum("15-10-1959");
+      SQLDate datum(_T("15-10-1959"));
       SQLVariant valDate(&datum);
-      SQLTime then("08:23:49");
+      SQLTime then(_T("08:23:49"));
       SQLVariant valTime(&then);
-      SQLTimestamp stamp("2017-01-22 11:45:16");
+      SQLTimestamp stamp(_T("2017-01-22 11:45:16"));
       SQLVariant valStamp(&stamp);
-      SQLVariant valTextExtra("ZZZ");
+      SQLVariant valTextExtra(_T("ZZZ"));
       SQLVariant valNumberHigh(999);
       SQLVariant valEx3(888);
       SQLVariant valEx4(777);
 
-      TestFilter("fieldname",OP_Equal,valText,  "fieldname = ? : Text");
-      TestFilter("fieldname",OP_Equal,valNumber,"fieldname = ? : 123");
-      TestFilter("fieldname",OP_Equal,valDate,  "fieldname = ? : 15-10-1959");
-      TestFilter("fieldname",OP_Equal,valTime,  "fieldname = ? : 08:23:49");
-      TestFilter("fieldname",OP_Equal,valStamp, "fieldname = ? : 2017-01-22 11:45:16");
+      TestFilter(_T("fieldname"),OP_Equal,valText,  _T("fieldname = ? : Text"));
+      TestFilter(_T("fieldname"),OP_Equal,valNumber,_T("fieldname = ? : 123"));
+      TestFilter(_T("fieldname"),OP_Equal,valDate,  _T("fieldname = ? : 15-10-1959"));
+      TestFilter(_T("fieldname"),OP_Equal,valTime,  _T("fieldname = ? : 08:23:49"));
+      TestFilter(_T("fieldname"),OP_Equal,valStamp, _T("fieldname = ? : 2017-01-22 11:45:16"));
 
-      TestFilter("fieldname",OP_NotEqual,    valNumber,"fieldname <> ? : 123");
-      TestFilter("fieldname",OP_Greater,     valNumber,"fieldname > ? : 123");
-      TestFilter("fieldname",OP_GreaterEqual,valNumber,"fieldname >= ? : 123");
-      TestFilter("fieldname",OP_Smaller,     valNumber,"fieldname < ? : 123");
-      TestFilter("fieldname",OP_SmallerEqual,valNumber,"fieldname <= ? : 123");
+      TestFilter(_T("fieldname"),OP_NotEqual,    valNumber,_T("fieldname <> ? : 123"));
+      TestFilter(_T("fieldname"),OP_Greater,     valNumber,_T("fieldname > ? : 123"));
+      TestFilter(_T("fieldname"),OP_GreaterEqual,valNumber,_T("fieldname >= ? : 123"));
+      TestFilter(_T("fieldname"),OP_Smaller,     valNumber,_T("fieldname < ? : 123"));
+      TestFilter(_T("fieldname"),OP_SmallerEqual,valNumber,_T("fieldname <= ? : 123"));
 
-      TestFilter("fieldname",OP_IsNULL,    valText,"fieldname IS NULL : Text");
-      TestFilter("fieldname",OP_LikeBegin, valText,"fieldname LIKE 'Text%' : Text");
-      TestFilter("fieldname",OP_LikeMiddle,valText,"fieldname LIKE '%Text%' : Text");
+      TestFilter(_T("fieldname"),OP_IsNULL,    valText,_T("fieldname IS NULL : Text"));
+      TestFilter(_T("fieldname"),OP_LikeBegin, valText,_T("fieldname LIKE 'Text%' : Text"));
+      TestFilter(_T("fieldname"),OP_LikeMiddle,valText,_T("fieldname LIKE '%Text%' : Text"));
 
-      TestBetween("fieldname",OP_Between,valText,  valTextExtra, "fieldname BETWEEN ? AND ?  : Text : ZZZ");
-      TestBetween("fieldname",OP_Between,valNumber,valNumberHigh,"fieldname BETWEEN ? AND ?  : 123 : 999");
+      TestBetween(_T("fieldname"),OP_Between,valText,  valTextExtra, _T("fieldname BETWEEN ? AND ?  : Text : ZZZ"));
+      TestBetween(_T("fieldname"),OP_Between,valNumber,valNumberHigh,_T("fieldname BETWEEN ? AND ?  : 123 : 999"));
 
-      TestIN("fieldname",OP_IN,valNumber,valEx4,valEx3,valNumberHigh,"fieldname IN (?,?,?,?) : 123 : 777 : 888 : 999");
-      TestExpression("fieldname",OP_Equal,"{fn UCASE(TheFunction(other))}","fieldname = {fn UCASE(TheFunction(other))}");
+      TestIN(_T("fieldname"),OP_IN,valNumber,valEx4,valEx3,valNumberHigh,_T("fieldname IN (?,?,?,?) : 123 : 777 : 888 : 999"));
+      TestExpression(_T("fieldname"),OP_Equal,_T("{fn UCASE(TheFunction(other))}"),_T("fieldname = {fn UCASE(TheFunction(other))}"));
 
-      TestNegate("fieldname",OP_Equal,valText,  "NOT fieldname = ? : Text");
-      TestNegate("fieldname",OP_Equal,valNumber,"NOT fieldname = ? : 123");
-      TestNegate("fieldname",OP_Equal,valDate,  "NOT fieldname = ? : 15-10-1959");
-      TestNegate("fieldname",OP_Equal,valTime,  "NOT fieldname = ? : 08:23:49");
-      TestNegate("fieldname",OP_Equal,valStamp, "NOT fieldname = ? : 2017-01-22 11:45:16");
+      TestNegate(_T("fieldname"),OP_Equal,valText,  _T("NOT fieldname = ? : Text"));
+      TestNegate(_T("fieldname"),OP_Equal,valNumber,_T("NOT fieldname = ? : 123"));
+      TestNegate(_T("fieldname"),OP_Equal,valDate,  _T("NOT fieldname = ? : 15-10-1959"));
+      TestNegate(_T("fieldname"),OP_Equal,valTime,  _T("NOT fieldname = ? : 08:23:49"));
+      TestNegate(_T("fieldname"),OP_Equal,valStamp, _T("NOT fieldname = ? : 2017-01-22 11:45:16"));
 
-      TestNegate("fieldname",OP_NotEqual,    valNumber,"NOT fieldname <> ? : 123");
-      TestNegate("fieldname",OP_Greater,     valNumber,"NOT fieldname > ? : 123");
-      TestNegate("fieldname",OP_GreaterEqual,valNumber,"NOT fieldname >= ? : 123");
-      TestNegate("fieldname",OP_Smaller,     valNumber,"NOT fieldname < ? : 123");
-      TestNegate("fieldname",OP_SmallerEqual,valNumber,"NOT fieldname <= ? : 123");
+      TestNegate(_T("fieldname"),OP_NotEqual,    valNumber,_T("NOT fieldname <> ? : 123"));
+      TestNegate(_T("fieldname"),OP_Greater,     valNumber,_T("NOT fieldname > ? : 123"));
+      TestNegate(_T("fieldname"),OP_GreaterEqual,valNumber,_T("NOT fieldname >= ? : 123"));
+      TestNegate(_T("fieldname"),OP_Smaller,     valNumber,_T("NOT fieldname < ? : 123"));
+      TestNegate(_T("fieldname"),OP_SmallerEqual,valNumber,_T("NOT fieldname <= ? : 123"));
 
-      TestNegate("fieldname",OP_IsNULL,    valText,"NOT fieldname IS NULL : Text");
-      TestNegate("fieldname",OP_LikeBegin, valText,"NOT fieldname LIKE 'Text%' : Text");
-      TestNegate("fieldname",OP_LikeMiddle,valText,"NOT fieldname LIKE '%Text%' : Text");
+      TestNegate(_T("fieldname"),OP_IsNULL,    valText,_T("NOT fieldname IS NULL : Text"));
+      TestNegate(_T("fieldname"),OP_LikeBegin, valText,_T("NOT fieldname LIKE 'Text%' : Text"));
+      TestNegate(_T("fieldname"),OP_LikeMiddle,valText,_T("NOT fieldname LIKE '%Text%' : Text"));
     }
 
     void TestFilter(XString p_field,SQLOperator p_oper,SQLVariant& p_variant,XString p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
-      XString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant.GetAsChar();
 
-      Logger::WriteMessage("Filter: " + condition);
+      Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
@@ -112,9 +112,9 @@ namespace OperatorUnitTest
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
       filter.Negate();
-      XString condition = filter.GetSQLFilter(query) + " : " + p_variant.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant.GetAsChar();
 
-      Logger::WriteMessage("Filter: " + condition);
+      Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
@@ -128,10 +128,10 @@ namespace OperatorUnitTest
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant1);
       filter.AddValue(&p_variant2);
-      XString condition = filter.GetSQLFilter(query) + " : " + p_variant1.GetAsChar();
-      condition += XString(" : ") + p_variant2.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant1.GetAsChar();
+      condition += XString(_T(" : ")) + p_variant2.GetAsChar();
 
-      Logger::WriteMessage("Filter: " + condition);
+      Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
 
@@ -155,12 +155,12 @@ namespace OperatorUnitTest
       filter.AddValue(&p_variant3);
       filter.AddValue(&p_variant4);
       XString condition = filter.GetSQLFilter(query);
-      condition += XString(" : ") + p_variant1.GetAsChar();
-      condition += XString(" : ") + p_variant2.GetAsChar();
-      condition += XString(" : ") + p_variant3.GetAsChar();
-      condition += XString(" : ") + p_variant4.GetAsChar();
+      condition += XString(_T(" : ")) + p_variant1.GetAsChar();
+      condition += XString(_T(" : ")) + p_variant2.GetAsChar();
+      condition += XString(_T(" : ")) + p_variant3.GetAsChar();
+      condition += XString(_T(" : ")) + p_variant4.GetAsChar();
 
-      Logger::WriteMessage("Filter: " + condition);
+      Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
@@ -172,15 +172,15 @@ namespace OperatorUnitTest
       filter.AddExpression(p_expression);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("Filter: " + condition);
+      Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       number_of_tests++;
     }
 
     TEST_METHOD(FilterFunction)
     {
-      Logger::WriteMessage("SQLFilter test with ODBC functions combined");
-      Logger::WriteMessage("===========================================");
+      Logger::WriteMessage(_T("SQLFilter test with ODBC functions combined"));
+      Logger::WriteMessage(_T("==========================================="));
 
       // Needed for date/time/timestamp
       InitSQLComponents(LN_ENGLISH);
@@ -188,108 +188,108 @@ namespace OperatorUnitTest
       // STRINGS
 
       // Unary string function call
-      TestFunctionString1("fieldname",OP_Equal,FN_ASCII,            "12","{fn ASCII(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_BIT_LENGTH,       "12","{fn BIT_LENGTH(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_CHAR,             "12","{fn CHAR(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_CHAR_LENGTH,      "12","{fn CHAR_LENGTH(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_CHARACTER_LENGTH, "12","{fn CHARACTER_LENGTH(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_LCASE,            "12","{fn LCASE(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_LENGTH,           "12","{fn LENGTH(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_LTRIM,            "12","{fn LTRIM(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_OCTET_LENGTH,     "12","{fn OCTET_LENGTH(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_RTRIM,            "12","{fn RTRIM(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_SOUNDEX,          "12","{fn SOUNDEX(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_SPACE,            "12","{fn SPACE(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_UCASE,            "12","{fn UCASE(fieldname)} = ?");
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_ASCII,            _T("12"),_T("{fn ASCII(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_BIT_LENGTH,       _T("12"),_T("{fn BIT_LENGTH(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_CHAR,             _T("12"),_T("{fn CHAR(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_CHAR_LENGTH,      _T("12"),_T("{fn CHAR_LENGTH(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_CHARACTER_LENGTH, _T("12"),_T("{fn CHARACTER_LENGTH(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_LCASE,            _T("12"),_T("{fn LCASE(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_LENGTH,           _T("12"),_T("{fn LENGTH(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_LTRIM,            _T("12"),_T("{fn LTRIM(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_OCTET_LENGTH,     _T("12"),_T("{fn OCTET_LENGTH(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_RTRIM,            _T("12"),_T("{fn RTRIM(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_SOUNDEX,          _T("12"),_T("{fn SOUNDEX(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_SPACE,            _T("12"),_T("{fn SPACE(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_UCASE,            _T("12"),_T("{fn UCASE(fieldname)} = ?"));
 
       // dual string function call
-      TestFunctionString2("fieldname",OP_Equal,FN_CONCAT,           "value","fieldvalue","{fn CONCAT(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_DIFFERENCE,       "value","fieldvalue","{fn DIFFERENCE(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_LEFT,             "value","fieldvalue","{fn LEFT(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_POSITION,         "value","fieldvalue","{fn POSITION(fieldname IN ?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_REPEAT,           "value","fieldvalue","{fn REPEAT(fieldname,?)} = ?");
-      TestFunctionString2("fieldname",OP_Equal,FN_RIGHT,            "value","fieldvalue","{fn RIGHT(fieldname,?)} = ?");
+      TestFunctionString2(_T("fieldname"),OP_Equal,FN_CONCAT,           _T("value"),_T("fieldvalue"),_T("{fn CONCAT(fieldname,?)} = ?"));
+      TestFunctionString2(_T("fieldname"),OP_Equal,FN_DIFFERENCE,       _T("value"),_T("fieldvalue"),_T("{fn DIFFERENCE(fieldname,?)} = ?"));
+      TestFunctionString2(_T("fieldname"),OP_Equal,FN_LEFT,             _T("value"),_T("fieldvalue"),_T("{fn LEFT(fieldname,?)} = ?"));
+      TestFunctionString2(_T("fieldname"),OP_Equal,FN_POSITION,         _T("value"),_T("fieldvalue"),_T("{fn POSITION(fieldname IN ?)} = ?"));
+      TestFunctionString2(_T("fieldname"),OP_Equal,FN_REPEAT,           _T("value"),_T("fieldvalue"),_T("{fn REPEAT(fieldname,?)} = ?"));
+      TestFunctionString2(_T("fieldname"),OP_Equal,FN_RIGHT,            _T("value"),_T("fieldvalue"),_T("{fn RIGHT(fieldname,?)} = ?"));
       
       // Ternary string function call
-      TestFunctionString3("fieldname",OP_Equal,FN_SUBSTRING,        "value","fieldvalue","2","{fn SUBSTRING(fieldname,?,?)} = ?");
-      TestFunctionString3("fieldname",OP_Equal,FN_REPLACE,          "value","fieldvalue","2","{fn REPLACE(fieldname,?,?)} = ?");
+      TestFunctionString3(_T("fieldname"),OP_Equal,FN_SUBSTRING,        _T("value"),_T("fieldvalue"),_T("2"),_T("{fn SUBSTRING(fieldname,?,?)} = ?"));
+      TestFunctionString3(_T("fieldname"),OP_Equal,FN_REPLACE,          _T("value"),_T("fieldvalue"),_T("2"),_T("{fn REPLACE(fieldname,?,?)} = ?"));
       
-      TestFunctionString4("fieldname",OP_Equal,FN_INSERT,           "value","fieldvalue","1","2","{fn INSERT(fieldname,?,?,?)} = ?");
-      TestFunctionString4("fieldname",OP_Equal,FN_LOCATE,           "value","fieldvalue","1","2","{fn LOCATE(fieldname,?,?,?)} = ?");
+      TestFunctionString4(_T("fieldname"),OP_Equal,FN_INSERT,           _T("value"),_T("fieldvalue"),_T("1"),_T("2"),_T("{fn INSERT(fieldname,?,?,?)} = ?"));
+      TestFunctionString4(_T("fieldname"),OP_Equal,FN_LOCATE,           _T("value"),_T("fieldvalue"),_T("1"),_T("2"),_T("{fn LOCATE(fieldname,?,?,?)} = ?"));
 
       // NUMBERS
 
       // Constant value
-      TestFunctionConstant("fieldname",OP_Greater,FN_PI,"fieldname > {fn PI()}");
+      TestFunctionConstant(_T("fieldname"),OP_Greater,FN_PI,_T("fieldname > {fn PI()}"));
       // Unary function call
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ABS,              bcd("18"), "{fn ABS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ACOS,             bcd("0.5"),"{fn ACOS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ASIN,             bcd("0.5"),"{fn ASIN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN,             bcd("0.5"),"{fn ATAN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_ATAN2,            bcd("0.5"),"{fn ATAN2(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_CEILING,          bcd("5"),  "{fn CEILING(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_COS,              bcd("0.5"),"{fn COS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_COT,              bcd("0.5"),"{fn COT(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DEGREES,          bcd("180"),"{fn DEGREES(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_EXP,              bcd("5E6"),"{fn EXP(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_FLOOR,            bcd("4"),  "{fn FLOOR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG,              bcd("4"),  "{fn LOG(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_LOG10,            bcd("4"),  "{fn LOG10(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_RADIANS,          bcd("0.5"),"{fn RADIANS(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_RAND,             bcd("0.5"),"{fn RAND(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SIGN,             bcd("-5"), "{fn SIGN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SIN,              bcd("0.5"),"{fn SIN(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SQRT,             bcd("2"),  "{fn SQRT(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_TAN,              bcd("0.5"),"{fn TAN(fieldname)} = ?");
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_ABS,              bcd(_T("18")), _T("{fn ABS(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_ACOS,             bcd(_T("0.5")),_T("{fn ACOS(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_ASIN,             bcd(_T("0.5")),_T("{fn ASIN(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_ATAN,             bcd(_T("0.5")),_T("{fn ATAN(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_ATAN2,            bcd(_T("0.5")),_T("{fn ATAN2(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_CEILING,          bcd(_T("5")),  _T("{fn CEILING(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_COS,              bcd(_T("0.5")),_T("{fn COS(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_COT,              bcd(_T("0.5")),_T("{fn COT(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_DEGREES,          bcd(_T("180")),_T("{fn DEGREES(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_EXP,              bcd(_T("5E6")),_T("{fn EXP(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_FLOOR,            bcd(_T("4")),  _T("{fn FLOOR(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_LOG,              bcd(_T("4")),  _T("{fn LOG(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_LOG10,            bcd(_T("4")),  _T("{fn LOG10(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_RADIANS,          bcd(_T("0.5")),_T("{fn RADIANS(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_RAND,             bcd(_T("0.5")),_T("{fn RAND(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_SIGN,             bcd(_T("-5")), _T("{fn SIGN(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_SIN,              bcd(_T("0.5")),_T("{fn SIN(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_SQRT,             bcd(_T("2")),  _T("{fn SQRT(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_TAN,              bcd(_T("0.5")),_T("{fn TAN(fieldname)} = ?"));
       // Dual number function call
-      TestFunctionNumber2("fieldname",OP_Equal,FN_MOD,              bcd("12"),  bcd("5"), "{fn MOD(fieldname,?)} = ?");
-      TestFunctionNumber2("fieldname",OP_Equal,FN_POWER,            bcd("2"),   bcd("64"),"{fn POWER(fieldname,?)} = ?");
-      TestFunctionNumber2("fieldname",OP_Equal,FN_ROUND,            bcd("3.52"),bcd("1"), "{fn ROUND(fieldname,?)} = ?");
-      TestFunctionNumber2("fieldname",OP_Equal,FN_TRUNCATE,         bcd("3"),   bcd("1"), "{fn TRUNCATE(fieldname,?)} = ?");
+      TestFunctionNumber2(_T("fieldname"),OP_Equal,FN_MOD,              bcd(_T("12")),  bcd(_T("5")), _T("{fn MOD(fieldname,?)} = ?"));
+      TestFunctionNumber2(_T("fieldname"),OP_Equal,FN_POWER,            bcd(_T("2")),   bcd(_T("64")),_T("{fn POWER(fieldname,?)} = ?"));
+      TestFunctionNumber2(_T("fieldname"),OP_Equal,FN_ROUND,            bcd(_T("3.52")),bcd(_T("1")), _T("{fn ROUND(fieldname,?)} = ?"));
+      TestFunctionNumber2(_T("fieldname"),OP_Equal,FN_TRUNCATE,         bcd(_T("3")),   bcd(_T("1")), _T("{fn TRUNCATE(fieldname,?)} = ?"));
 
       // DATE/TIME/INTERVAL
 
       // Constant value
-      TestFunctionConstant("fieldname",OP_Smaller,FN_CURRENT_DATE,  "fieldname < {fn CURRENT_DATE()}");
-      TestFunctionConstant("fieldname",OP_Smaller,FN_CURDATE,       "fieldname < {fn CURDATE()}");
-      TestFunctionConstant("fieldname",OP_Smaller,FN_CURTIME,       "fieldname < {fn CURTIME()}");
-      TestFunctionConstant("fieldname",OP_Smaller,FN_NOW,           "fieldname < {fn NOW()}");
+      TestFunctionConstant(_T("fieldname"),OP_Smaller,FN_CURRENT_DATE,  _T("fieldname < {fn CURRENT_DATE()}"));
+      TestFunctionConstant(_T("fieldname"),OP_Smaller,FN_CURDATE,       _T("fieldname < {fn CURDATE()}"));
+      TestFunctionConstant(_T("fieldname"),OP_Smaller,FN_CURTIME,       _T("fieldname < {fn CURTIME()}"));
+      TestFunctionConstant(_T("fieldname"),OP_Smaller,FN_NOW,           _T("fieldname < {fn NOW()}"));
 
       // Unary date/time function
-      TestFunctionString1("fieldname",OP_Equal,FN_DAYNAME,          "Sunday",        "{fn DAYNAME(fieldname)} = ?");
-      TestFunctionString1("fieldname",OP_Equal,FN_MONTHNAME,        "June",          "{fn MONTHNAME(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFMONTH,       bcd("1"),        "{fn DAYOFMONTH(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFWEEK,        bcd("1"),        "{fn DAYOFWEEK(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_DAYOFYEAR,        bcd("172"),      "{fn DAYOFYEAR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_QUARTER,          bcd("2"),        "{fn QUARTER(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_YEAR,             bcd("2019"),     "{fn YEAR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_MONTH,            bcd("6"),        "{fn MONTH(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_WEEK,             bcd("23"),       "{fn WEEK(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_HOUR,             bcd("17"),       "{fn HOUR(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_MINUTE,           bcd("53"),       "{fn MINUTE(fieldname)} = ?");
-      TestFunctionNumber1("fieldname",OP_Equal,FN_SECOND,           bcd("12"),       "{fn SECOND(fieldname)} = ?");
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_DAYNAME,          _T("Sunday"),        _T("{fn DAYNAME(fieldname)} = ?"));
+      TestFunctionString1(_T("fieldname"),OP_Equal,FN_MONTHNAME,        _T("June"),          _T("{fn MONTHNAME(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_DAYOFMONTH,       bcd(_T("1")),        _T("{fn DAYOFMONTH(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_DAYOFWEEK,        bcd(_T("1")),        _T("{fn DAYOFWEEK(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_DAYOFYEAR,        bcd(_T("172")),      _T("{fn DAYOFYEAR(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_QUARTER,          bcd(_T("2")),        _T("{fn QUARTER(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_YEAR,             bcd(_T("2019")),     _T("{fn YEAR(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_MONTH,            bcd(_T("6")),        _T("{fn MONTH(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_WEEK,             bcd(_T("23")),       _T("{fn WEEK(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_HOUR,             bcd(_T("17")),       _T("{fn HOUR(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_MINUTE,           bcd(_T("53")),       _T("{fn MINUTE(fieldname)} = ?"));
+      TestFunctionNumber1(_T("fieldname"),OP_Equal,FN_SECOND,           bcd(_T("12")),       _T("{fn SECOND(fieldname)} = ?"));
 
       // Secondary date/time functions
-      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_YEAR,  "2019","{fn EXTRACT(YEAR FROM fieldname)} = ?");
-      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_MONTH,    "6","{fn EXTRACT(MONTH FROM fieldname)} = ?");
-      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_DAY,     "21","{fn EXTRACT(DAY FROM fieldname)} = ?");
-      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_HOUR,    "19","{fn EXTRACT(HOUR FROM fieldname)} = ?");
-      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_MINUTE,  "55","{fn EXTRACT(MINUTE FROM fieldname)} = ?");
-      TestFunctionExtract("fieldname",OP_Equal,FN_EXTRACT,TS_EXT_SECOND,  "12","{fn EXTRACT(SECOND FROM fieldname)} = ?");
+      TestFunctionExtract(_T("fieldname"),OP_Equal,FN_EXTRACT,TS_EXT_YEAR,  _T("2019"),_T("{fn EXTRACT(YEAR FROM fieldname)} = ?"));
+      TestFunctionExtract(_T("fieldname"),OP_Equal,FN_EXTRACT,TS_EXT_MONTH,    _T("6"),_T("{fn EXTRACT(MONTH FROM fieldname)} = ?"));
+      TestFunctionExtract(_T("fieldname"),OP_Equal,FN_EXTRACT,TS_EXT_DAY,     _T("21"),_T("{fn EXTRACT(DAY FROM fieldname)} = ?"));
+      TestFunctionExtract(_T("fieldname"),OP_Equal,FN_EXTRACT,TS_EXT_HOUR,    _T("19"),_T("{fn EXTRACT(HOUR FROM fieldname)} = ?"));
+      TestFunctionExtract(_T("fieldname"),OP_Equal,FN_EXTRACT,TS_EXT_MINUTE,  _T("55"),_T("{fn EXTRACT(MINUTE FROM fieldname)} = ?"));
+      TestFunctionExtract(_T("fieldname"),OP_Equal,FN_EXTRACT,TS_EXT_SECOND,  _T("12"),_T("{fn EXTRACT(SECOND FROM fieldname)} = ?"));
 
       // Ternary date/time functions
-      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_YEAR,   3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_YEAR,?,fieldname)} < ?");
-      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_MONTH,  3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_MONTH,?,fieldname)} < ?");
-      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_DAY,    3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_DAY,?,fieldname)} < ?");
-      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_HOUR,   3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_HOUR,?,fieldname)} < ?");
-      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_MINUTE, 3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_MINUTE,?,fieldname)} < ?");
-      TestFunctionTSCalc("fieldname",OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_SECOND, 3,"2019-06-01","{fn TIMESTAMPADD(SQL_TSI_SECOND,?,fieldname)} < ?");
+      TestFunctionTSCalc(_T("fieldname"),OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_YEAR,   3,_T("2019-06-01"),_T("{fn TIMESTAMPADD(SQL_TSI_YEAR,?,fieldname)} < ?"));
+      TestFunctionTSCalc(_T("fieldname"),OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_MONTH,  3,_T("2019-06-01"),_T("{fn TIMESTAMPADD(SQL_TSI_MONTH,?,fieldname)} < ?"));
+      TestFunctionTSCalc(_T("fieldname"),OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_DAY,    3,_T("2019-06-01"),_T("{fn TIMESTAMPADD(SQL_TSI_DAY,?,fieldname)} < ?"));
+      TestFunctionTSCalc(_T("fieldname"),OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_HOUR,   3,_T("2019-06-01"),_T("{fn TIMESTAMPADD(SQL_TSI_HOUR,?,fieldname)} < ?"));
+      TestFunctionTSCalc(_T("fieldname"),OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_MINUTE, 3,_T("2019-06-01"),_T("{fn TIMESTAMPADD(SQL_TSI_MINUTE,?,fieldname)} < ?"));
+      TestFunctionTSCalc(_T("fieldname"),OP_Smaller,FN_TIMESTAMPADD,SQL_TSI_SECOND, 3,_T("2019-06-01"),_T("{fn TIMESTAMPADD(SQL_TSI_SECOND,?,fieldname)} < ?"));
 
       // SYSTEM FUNCTIONS
 
-      TestFunctionConstant("'testing'",OP_Equal,FN_DATABASE,        "'testing' = {fn DATABASE()}");
-      TestFunctionConstant("'sysdba'", OP_Equal,FN_USER,            "'sysdba' = {fn USER()}");
-      TestFunctionString2 ("fieldname",OP_Equal,FN_IFNULL,          "other", "other", "{fn IFNULL(fieldname,?)} = ?");
+      TestFunctionConstant(_T("'testing'"),OP_Equal,FN_DATABASE,        _T("'testing' = {fn DATABASE()}"));
+      TestFunctionConstant(_T("'sysdba'"), OP_Equal,FN_USER,            _T("'sysdba' = {fn USER()}"));
+      TestFunctionString2 (_T("fieldname"),OP_Equal,FN_IFNULL,          _T("other"), _T("other"), _T("{fn IFNULL(fieldname,?)} = ?"));
     }
 
     void TestFunctionConstant(XString p_field,SQLOperator p_oper,SQLFunction p_function,XString p_expect)
@@ -299,7 +299,7 @@ namespace OperatorUnitTest
       filter.SetFunction(p_function);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("Filter with constant: " + condition);
+      Logger::WriteMessage(_T("Filter with constant: ") + condition);
       Assert::AreEqual(p_expect.GetString(), condition.GetString());
       ++number_of_tests;
     }
@@ -313,7 +313,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("String function filter: " + condition);
+      Logger::WriteMessage(_T("String function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
@@ -329,7 +329,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val2);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("String function filter: " + condition);
+      Logger::WriteMessage(_T("String function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
@@ -349,7 +349,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val3);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("String function filter: " + condition);
+      Logger::WriteMessage(_T("String function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
@@ -371,7 +371,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val4);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("String function filter: " + condition);
+      Logger::WriteMessage(_T("String function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
@@ -385,7 +385,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val1);
       XString  condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("Number function filter: " + condition);
+      Logger::WriteMessage(_T("Number function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
@@ -401,7 +401,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val2);
       XString  condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("Number function filter: " + condition);
+      Logger::WriteMessage(_T("Number function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
       ++number_of_tests;
     }
@@ -416,7 +416,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val1);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("EXTRACT function filter: " + condition);
+      Logger::WriteMessage(_T("EXTRACT function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(), condition.GetString());
       ++number_of_tests;
     }
@@ -433,7 +433,7 @@ namespace OperatorUnitTest
       filter.AddValue(&val2);
       XString condition = filter.GetSQLFilter(query);
 
-      Logger::WriteMessage("TIMSTAMP ADD/DIFF function filter: " + condition);
+      Logger::WriteMessage(_T("TIMSTAMP ADD/DIFF function filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(), condition.GetString());
       ++number_of_tests;
     }

@@ -47,4 +47,4 @@ int FindMatchingBracket(const CString& p_string,int p_bracketPos);
 
 // Split arguments with p_splitter not within brackets
 // p_pos must be 0 initially
-bool SplitArgument(int& p_pos,const CString& p_data,char p_splitter,CString& p_argument);
+bool SplitArgument(int& p_pos,const CString& p_data,TCHAR p_splitter,CString& p_argument);

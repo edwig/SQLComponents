@@ -45,7 +45,7 @@ public:
     SQLConnection* theConn = conn.GetConnection("Other");
     if(theConn)
     {
-       Assert::AreEqual(theConn->m_password,"user_password");
+       Assert::AreEqual(theConn->m_password,_T("user_password"));
        ++number_of_tests;
     }
     else
@@ -82,10 +82,10 @@ public:
     result = other.LoadConnectionsFile();
     Assert::IsTrue(result);
 
-    SQLConnection* theConn = other.GetConnection("Other");
+    SQLConnection* theConn = other.GetConnection(_T("Other"));
     if(theConn)
     {
-      Assert::AreEqual(theConn->m_password,"user_password");
+      Assert::AreEqual(theConn->m_password,_T("user_password"));
       ++number_of_tests;
     }
     else
@@ -106,16 +106,16 @@ public:
 
     // Extra scope to test auto pointer
     {
-      SQLAutoDBS dbs(m_pool,"MyConn");
+      SQLAutoDBS dbs(m_pool,_T("MyConn"));
       Assert::IsNotNull(dbs.get());
 
-      XString sql("SELECT description FROM DETAIL where ID = 7");
+      XString sql(_T("SELECT description FROM DETAIL where ID = 7"));
       SQLQuery query(dbs);
       query.DoSQLStatement(sql);
       if(query.GetRecord())
       {
         XString description = query[1];
-        Assert::AreEqual(description, "Fourth line of second invoice");
+        Assert::AreEqual(description, _T("Fourth line of second invoice"));
       }
     }
     Assert::AreEqual(m_pool.GetConnections(),(unsigned) 1);
@@ -126,7 +126,7 @@ public:
   {
     Logger::WriteMessage("Testing the cleanup of the SQLDatabasePool");
 
-    // Open some conenctions to the database server
+    // Open some connections to the database server
     PoolTesting();
 
     m_pool.Cleanup(true);
@@ -139,7 +139,7 @@ public:
   {
     Logger::WriteMessage("Testing the reuse of connections in the SQLDatabasePool");
 
-    // Open some conenctions to the database server
+    // Open some connections to the database server
     PoolTesting();
     PoolTesting();
     PoolTesting();
@@ -152,8 +152,8 @@ public:
 
   void FillConnections(SQLConnections& p_conn)
   {
-    p_conn.AddConnection("MyConn","testing", "sysdba","altijd",       "DBA=W;");
-    p_conn.AddConnection("Other", "testing", "user",  "user_password","DBA=R;");
+    p_conn.AddConnection(_T("MyConn"),_T("testing"), _T("sysdba"),_T("altijd"),       _T("DBA=W;"));
+    p_conn.AddConnection(_T("Other"), _T("testing"), _T("user"),  _T("user_password"),_T("DBA=R;"));
   }
 
   // This is the database pool for connections

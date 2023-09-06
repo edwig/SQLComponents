@@ -39,7 +39,7 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("Unit testing XLSX spreadsheet reading");
       InitSQLComponents();
 
-      BasicXmlExcel excel("..\\UnitTest\\BasicExcel.xlsx");
+      BasicXmlExcel excel(_T("..\\UnitTest\\BasicExcel.xlsx"));
       Assert::IsTrue(excel.Load());
       number_of_tests++;
 
@@ -51,9 +51,9 @@ namespace DatabaseUnitTest
         number_of_tests++;
       }
 
-      TestXMLWorksheet(excel,1,"First");
-      TestXMLWorksheet(excel,2,"Second");
-      TestXMLWorksheet(excel,3,"Third");
+      TestXMLWorksheet(excel,1,_T("First"));
+      TestXMLWorksheet(excel,2,_T("Second"));
+      TestXMLWorksheet(excel,3,_T("Third"));
     }
 
     void TestXMLWorksheet(BasicXmlExcel& p_excel,int p_sheet,XString p_name)
@@ -75,7 +75,7 @@ namespace DatabaseUnitTest
         {
           XString expect;
           XString value = sheet->GetCellValue(row,col);
-          expect.Format("%d%d%d",p_sheet,row,col);
+          expect.Format(_T("%d%d%d"),p_sheet,row,col);
 
           Logger::WriteMessage(value);
           Assert::IsTrue(expect == value);
@@ -89,14 +89,14 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("Unit testing XLS spreadsheet reading");
       InitSQLComponents();
 
-      BasicExcel excel("..\\UnitTest\\BasicExcel.xls");
+      BasicExcel excel(_T("..\\UnitTest\\BasicExcel.xls"));
       XString error = excel.GetError();
       Assert::IsTrue(error.IsEmpty());
       number_of_tests++;
 
-      TestWorksheet(excel,1,"First");
-      TestWorksheet(excel,2,"Second");
-      TestWorksheet(excel,3,"Third");
+      TestWorksheet(excel,1,_T("First"));
+      TestWorksheet(excel,2,_T("Second"));
+      TestWorksheet(excel,3,_T("Third"));
     }
 
     void TestWorksheet(BasicExcel& p_excel,int p_sheet,XString p_name)
@@ -115,10 +115,10 @@ namespace DatabaseUnitTest
       {
         for(int col = 1; col < 4; ++col)
         {
-          char buffer[200];
+          TCHAR buffer[200];
           XString expect;
           XString value = sheet->CellValue(row - 1,col - 1,buffer,200);
-          expect.Format("%d%d%d",p_sheet,row,col);
+          expect.Format(_T("%d%d%d"),p_sheet,row,col);
 
           Logger::WriteMessage(value);
           Assert::IsTrue(expect == value);

@@ -39,34 +39,34 @@ Parameters::~Parameters()
 void
 Parameters::PrintArguments()
 {
-  xprintf(false,"Operation of this run of SQLXport\n");
-  xprintf(false,"---------------------------------\n");
-  xprintf(false,"Direction of operation  : %s\n",m_direction.GetString());
-  xprintf(false,"Database connected to   : %s\n",m_database.GetString());
-  xprintf(false,"Logged in as user       : %s\n",m_user.GetString());
-  xprintf(false,"Schema to act upon      : %s\n",m_schema.GetString());
-  xprintf(false,"Object to export/import : %s\n",m_object.IsEmpty() ? "*" : m_object.GetString());
-  xprintf(false,"File for export dump    : %s\n",m_file.GetString());
+  xprintf(false,_T("Operation of this run of SQLXport\n"));
+  xprintf(false,_T("---------------------------------\n"));
+  xprintf(false,_T("Direction of operation  : %s\n"),m_direction.GetString());
+  xprintf(false,_T("Database connected to   : %s\n"),m_database.GetString());
+  xprintf(false,_T("Logged in as user       : %s\n"),m_user.GetString());
+  xprintf(false,_T("Schema to act upon      : %s\n"),m_schema.GetString());
+  xprintf(false,_T("Object to export/import : %s\n"),m_object.IsEmpty() ? _T("*") : m_object.GetString());
+  xprintf(false,_T("File for export dump    : %s\n"),m_file.GetString());
   if(m_export)
   {
-    xprintf(false,"Extra filter for data   : %s\n",m_filter.GetString());
-    xprintf(false,"Export table data rows  : %s\n",m_rows        ? "true" : "false");
-    xprintf(false,"Export table constraints: %s\n",m_constraints ? "true" : "false");
-    xprintf(false,"Export rights           : %s\n",m_grants      ? "true" : "false");
-    xprintf(false,"Export source code      : %s\n",m_source      ? "true" : "false");
-    xprintf(false,"Use consistent export   : %s\n",m_consistent  ? "true" : "false");
-    xprintf(false,"Use lock wait time      : %d\n",m_waitTime);
+    xprintf(false,_T("Extra filter for data   : %s\n"),m_filter.GetString());
+    xprintf(false,_T("Export table data rows  : %s\n"),m_rows        ? _T("true") : _T("false"));
+    xprintf(false,_T("Export table constraints: %s\n"),m_constraints ? _T("true") : _T("false"));
+    xprintf(false,_T("Export rights           : %s\n"),m_grants      ? _T("true") : _T("false"));
+    xprintf(false,_T("Export source code      : %s\n"),m_source      ? _T("true") : _T("false"));
+    xprintf(false,_T("Use consistent export   : %s\n"),m_consistent  ? _T("true") : _T("false"));
+    xprintf(false,_T("Use lock wait time      : %d\n"),m_waitTime);
   }
   else
   {
-    xprintf(false,"Drop schema contents    : %s\n",m_drop        ? "true" : "false");
-    xprintf(false,"Do statistics on import : %s\n",m_statistics  ? "true" : "false");
-    xprintf(false,"Do recompile  on import : %s\n",m_recompile   ? "true" : "false");
-    xprintf(false,"Listing SQL only        : %s\n",m_listOnly    ? "true" : "false");
-    xprintf(false,"Strip diacritics        : %s\n",m_stripDiacs  ? "true" : "false");
+    xprintf(false,_T("Drop schema contents    : %s\n"),m_drop        ? _T("true") : _T("false"));
+    xprintf(false,_T("Do statistics on import : %s\n"),m_statistics  ? _T("true") : _T("false"));
+    xprintf(false,_T("Do recompile  on import : %s\n"),m_recompile   ? _T("true") : _T("false"));
+    xprintf(false,_T("Listing SQL only        : %s\n"),m_listOnly    ? _T("true") : _T("false"));
+    xprintf(false,_T("Strip diacritics        : %s\n"),m_stripDiacs  ? _T("true") : _T("false"));
   }
-  xprintf(false,"Debugging row data      : %s\n",m_debug       ? "true" : "false");
-  xprintf(false,"\n");
+  xprintf(false,_T("Debugging row data      : %s\n"),m_debug       ? _T("true") : _T("false"));
+  xprintf(false,_T("\n"));
 }
 
 void
@@ -83,57 +83,57 @@ Parameters::CheckArguments()
 
   if(m_direction.IsEmpty())
   {
-    xerror("SQLXport: Must specify a import/export direction with /DIR:\n");
+    xerror(_T("SQLXport: Must specify a import/export direction with /DIR:\n"));
   }
-  if(m_direction.CompareNoCase("export") && m_direction.CompareNoCase("import"))
+  if(m_direction.CompareNoCase(_T("export")) && m_direction.CompareNoCase(_T("import")))
   {
-    xerror("SQLXport: you must either specify \"import\" or \"export\" as a working direction\n");
+    xerror(_T("SQLXport: you must either specify \"import\" or \"export\" as a working direction\n"));
   }
   // Really do an import
-  if(m_direction.CompareNoCase("import") == 0)
+  if(m_direction.CompareNoCase(_T("import")) == 0)
   {
     m_export = false;
   }
   if(m_database.IsEmpty() && m_listOnly == false)
   {
-    xerror("SQLXport: No database name given with /DBASE:\n");
+    xerror(_T("SQLXport: No database name given with /DBASE:\n"));
   }
   if(m_user.IsEmpty() && m_listOnly == false)
   {
-    xerror("SQLXport: No database user given with /USER:\n");
+    xerror(_T("SQLXport: No database user given with /USER:\n"));
   }
   if(m_password.IsEmpty() && m_listOnly == false)
   {
-    xerror("SQLXPort: No login password given with /PASSWD:\n");
+    xerror(_T("SQLXPort: No login password given with /PASSWD:\n"));
   }
   if(m_export && m_schema.IsEmpty() && m_listOnly == false)
   {
-    xerror("SQLXport: Need a schema name upon exporting a database\n");
+    xerror(_T("SQLXport: Need a schema name upon exporting a database\n"));
   }
   if(m_export && m_statistics)
   {
-    xerror("SQLXport: Can only perform statistics upon import\n");
+    xerror(_T("SQLXport: Can only perform statistics upon import\n"));
   }
   if(m_export && m_recompile)
   {
-    xerror("SQLXport: Can only perform full recompile upon export\n");
+    xerror(_T("SQLXport: Can only perform full recompile upon export\n"));
   }
   if(m_file.IsEmpty())
   {
-    m_file = "ExportDump.dmp";
-    xprintf(false,"SQLXport: WARNING: Using default dump file name: %s\n",m_file.GetString());
+    m_file = _T("ExportDump.dmp");
+    xprintf(false,_T("SQLXport: WARNING: Using default dump file name: %s\n"),m_file.GetString());
   }
   if(m_export && m_user.CompareNoCase(m_schema) != 0 )
   {
-    xerror("SQLXport: WARNING: not logged in, in the schema to export/import.\n");
-    xerror("Correct functioning of this program is **NOT** garantueed.\n");
-    xerror("You have been warned!!\n\n");
+    xerror(_T("SQLXport: WARNING: not logged in, in the schema to export/import.\n"));
+    xerror(_T("Correct functioning of this program is **NOT** garantueed.\n"));
+    xerror(_T("You have been warned!!\n\n"));
   }
   if(!m_export)
   {
     if(m_commitRange < DATA_COMMIT_RANGE_MINIMUM || m_commitRange > DATA_COMMIT_RANGE_MAXIMUM)
     {
-      xerror("SQLXport: Data commit out of range. Must be between %d and %d\n"
+      xerror(_T("SQLXport: Data commit out of range. Must be between %d and %d\n")
             ,DATA_COMMIT_RANGE_MINIMUM,DATA_COMMIT_RANGE_MAXIMUM);
     }
   }
@@ -154,53 +154,53 @@ Parameters::CheckArguments()
   {
     if(m_drop)
     {
-      xerror("SQLXport can only drop the schema content on import\n");
+      xerror(_T("SQLXport can only drop the schema content on import\n"));
     }
     if(m_statistics)
     {
-      xerror("SQLXport can only recompute statistics on import\n");
+      xerror(_T("SQLXport can only recompute statistics on import\n"));
     }
     if(m_recompile)
     {
-      xerror("SQLXport can only do a full recompile on import\n");
+      xerror(_T("SQLXport can only do a full recompile on import\n"));
     }
     if(m_commitRange != DATA_COMMIT_RANGE_DEFAULT)
     {
-      xerror("SQLXport can only set commit range on import\n");
+      xerror(_T("SQLXport can only set commit range on import\n"));
     }
   }
   else // m_export == false
   {
     if(m_rows == false)
     {
-      xerror("SQLXport can only use /NOROWS upon export mode\n");
+      xerror(_T("SQLXport can only use /NOROWS upon export mode\n"));
     }
     if(m_constraints == false)
     {
-      xerror("OraXport can only use /NOCONSTRAINTS upon export mode\n");
+      xerror(_T("OraXport can only use /NOCONSTRAINTS upon export mode\n"));
     }
     if(m_source == false)
     {
-      xerror("SQLXport can only use /NOSOURCE upon export mode\n");
+      xerror(_T("SQLXport can only use /NOSOURCE upon export mode\n"));
     }
     if(m_grants == false)
     {
-      xerror("SQLXport can only use /NOGRANTS upon export mode\n");
+      xerror(_T("SQLXport can only use /NOGRANTS upon export mode\n"));
     }
     if(m_createSql)
     {
-      xerror("SQLXport can only use /CREATESQL upon export mode\n");
+      xerror(_T("SQLXport can only use /CREATESQL upon export mode\n"));
     }
   }
 
   // Do error
   if(m_errors)
   {
-    xputs("\n");
+    xputs(_T("\n"));
     Usage();
 
-    xputs("\n");
-    xputs("Program aborted\n");
+    xputs(_T("\n"));
+    xputs(_T("Program aborted\n"));
     exit(2);
   }
 }
@@ -208,36 +208,36 @@ Parameters::CheckArguments()
 void
 Parameters::Usage()
 {
-  xprintf(false, "Usage:\n");
-  xprintf(false, "SQLXport /DIR:{export | import} options\n");
-  xprintf(false, "The following are valid options:\n");
-  xprintf(false, "\n");
-  xprintf(false, "/DBASE:<database>    Name of the database to export from/import to\n");
-  xprintf(false, "/USER:<username>     Name of the user logging in to the database\n");
-  xprintf(false, "/PASSWD:<password>   Password of the user logging in\n");
-  xprintf(false, "/FILE:<filename>     Name of the file the export goes into/import comes from\n");
-  xprintf(false, "/SCHEMA:<schemaname> Name of the schema that's been exported (export only)\n");
-  xprintf(false, "/OBJECT:<objectname> Name of the object to be exported or imported\n");
-  xprintf(false, "                     You can use multiple objects delimited by a ',' char\n");
-  xprintf(false, "/FILTER:<filter>     Extra filter to select data rows (export only)\n");
-  xprintf(false, "/PARAMS:<filename>   File with these parameters\n");
-  xprintf(false, "/DROP                Drop schema contents (import only)\n");
-  xprintf(false, "/CONSISTENT          Use share table lock (export only)\n");
-  xprintf(false, "/WAIT:<seconds>      Time to wait for a share table lock (export only)\n");
-  xprintf(false, "/NOROWS              Do not export the tables data rows\n");
-  xprintf(false, "/NOCONSTRAINTS       Do not export indices/primary/foreign/check constraints\n");
-  xprintf(false, "/NOSOURCE            Do not export functions/procedures/types/packages/triggers\n");
-  xprintf(false, "/NOGRANTS            Do not export the object's access rights\n");
-  xprintf(false, "/COMMIT:<nnn>        Do commit after <nnn> records (import only)\n");
-  xprintf(false, "/STATISTICS          Start full statistics after import\n");
-  xprintf(false, "/RECOMPILE           Start full recompile after import\n");
-  xprintf(false, "/LIST                Only list resulting SQL. (import only)\n");
-  xprintf(false, "/STRIPDIAC           Strip European diacritics (import only)\n");
-  xprintf(false, "/CREATESQL           Create scripts (export only)\n");
-  xprintf(false, "/DEBUG               Debug reading/writing of row data\n");
-  xprintf(false, "/NOHANG              Stop hanging in virus scanner at the end\n");
-  xprintf(false, "/H(ELP) or /?        This help page\n");
-  xprintf(false, "\n");
+  xprintf(false, _T("Usage:\n"));
+  xprintf(false, _T("SQLXport /DIR:{export | import} options\n"));
+  xprintf(false, _T("The following are valid options:\n"));
+  xprintf(false, _T("\n"));
+  xprintf(false, _T("/DBASE:<database>    Name of the database to export from/import to\n"));
+  xprintf(false, _T("/USER:<username>     Name of the user logging in to the database\n"));
+  xprintf(false, _T("/PASSWD:<password>   Password of the user logging in\n"));
+  xprintf(false, _T("/FILE:<filename>     Name of the file the export goes into/import comes from\n"));
+  xprintf(false, _T("/SCHEMA:<schemaname> Name of the schema that's been exported (export only)\n"));
+  xprintf(false, _T("/OBJECT:<objectname> Name of the object to be exported or imported\n"));
+  xprintf(false, _T("                     You can use multiple objects delimited by a ',' char\n"));
+  xprintf(false, _T("/FILTER:<filter>     Extra filter to select data rows (export only)\n"));
+  xprintf(false, _T("/PARAMS:<filename>   File with these parameters\n"));
+  xprintf(false, _T("/DROP                Drop schema contents (import only)\n"));
+  xprintf(false, _T("/CONSISTENT          Use share table lock (export only)\n"));
+  xprintf(false, _T("/WAIT:<seconds>      Time to wait for a share table lock (export only)\n"));
+  xprintf(false, _T("/NOROWS              Do not export the tables data rows\n"));
+  xprintf(false, _T("/NOCONSTRAINTS       Do not export indices/primary/foreign/check constraints\n"));
+  xprintf(false, _T("/NOSOURCE            Do not export functions/procedures/types/packages/triggers\n"));
+  xprintf(false, _T("/NOGRANTS            Do not export the object's access rights\n"));
+  xprintf(false, _T("/COMMIT:<nnn>        Do commit after <nnn> records (import only)\n"));
+  xprintf(false, _T("/STATISTICS          Start full statistics after import\n"));
+  xprintf(false, _T("/RECOMPILE           Start full recompile after import\n"));
+  xprintf(false, _T("/LIST                Only list resulting SQL. (import only)\n"));
+  xprintf(false, _T("/STRIPDIAC           Strip European diacritics (import only)\n"));
+  xprintf(false, _T("/CREATESQL           Create scripts (export only)\n"));
+  xprintf(false, _T("/DEBUG               Debug reading/writing of row data\n"));
+  xprintf(false, _T("/NOHANG              Stop hanging in virus scanner at the end\n"));
+  xprintf(false, _T("/H(ELP) or /?        This help page\n"));
+  xprintf(false, _T("\n"));
 }
 
 // Read all parameters from a parameter file
@@ -245,14 +245,14 @@ void
 Parameters::ReadParameterFile(XString p_filename)
 {
   FILE* file = nullptr;
-  errno_t error = fopen_s(&file, p_filename, "r");
+  errno_t error = _tfopen_s(&file, p_filename, _T("r"));
   if(error == 0)
   {
-    char buffer[MAX_PATH];
-    while(fgets(buffer,MAX_PATH,file))
+    TCHAR buffer[MAX_PATH];
+    while(_fgetts(buffer,MAX_PATH,file))
     {
       XString line(buffer);
-      line.Trim("\r\n");
+      line.Trim(_T("\r\n"));
       if(line.GetAt(0) != '#')
       {
         ProcessOneParameter(line);
@@ -262,14 +262,14 @@ Parameters::ReadParameterFile(XString p_filename)
   }
   else
   {
-    xprintf(false,"ERROR: [%d] Cannot open parameter file: %s\n",(int)error,p_filename.GetString());
+    xprintf(false,_T("ERROR: [%d] Cannot open parameter file: %s\n"),(int)error,p_filename.GetString());
     TerminateWithoutCleanup(3);
   }
 }
 
 // Processing the options on the command line
 void
-Parameters::ProcessCommandLine(int argc,char* argv[])
+Parameters::ProcessCommandLine(int argc,TCHAR* argv[])
 {
   // Find the direction from the executable name
   FindDirection();
@@ -278,11 +278,11 @@ Parameters::ProcessCommandLine(int argc,char* argv[])
   // /DIR: overrides the executable name
   for (int i=1; i < argc; i++)
   {
-    LPCSTR param = argv[i];
+    LPCTSTR param = argv[i];
 
-    if (param[0] == '-' || param[0] == '/')
+    if (param[0] == _T('-') || param[0] == '/')
     {
-      if(tolower(param[1]) =='h' || param[1] == '?')
+      if(_totlower(param[1]) ==_T('h') || param[1] == '?')
       {
         Usage();
         TerminateWithoutCleanup(3);
@@ -308,15 +308,15 @@ Parameters::MakeLogfile()
   {
     filename = filename.Left(pos);
   }
-  filename += "_";
+  filename += _T("_");
   filename += m_direction;
-  filename += ".txt";
+  filename += _T(".txt");
 
   // Open in write mode
-  fopen_s(&m_logfile,filename,"w");
+  _tfopen_s(&m_logfile,filename,_T("w"));
   if(m_logfile == NULL)
   {
-    printf("WARNING: Could not open logfile: %s\n",(LPCTSTR) filename);
+    _tprintf(_T("WARNING: Could not open logfile: %s\n"),(LPCTSTR) filename);
   }
 }
 
@@ -330,7 +330,7 @@ Parameters::CloseLogfile()
   {
     if(fclose(m_logfile))
     {
-      printf("WARNING: Logfile not correctly flushed to disk.\n");
+      _tprintf(_T("WARNING: Logfile not correctly flushed to disk.\n"));
     }
     m_logfile = nullptr;
   }
@@ -345,7 +345,7 @@ Parameters::CloseLogfile()
 void
 Parameters::MakeMultipleObjectQuery()
 {
-  XString objects("IN (");
+  XString objects(_T("IN ("));
   int pos = m_object.Find(',');
   int count = 0;
 
@@ -360,29 +360,29 @@ Parameters::MakeMultipleObjectQuery()
     // Put object in objects string
     if(count > 1)
     {
-      objects += ",";
+      objects += _T(",");
     }
-    objects += "\'";
+    objects += _T("\'");
     objects += first;
-    objects += "\'";
+    objects += _T("\'");
 
     // Find next delimiter
     pos = m_object.Find(',');
     if(pos < 0)
     {
-      objects += ",\'" + m_object + "\'";
+      objects += _T(",\'") + m_object + _T("\'");
     }
   }
   // Finalize
-  m_object = objects + ")";
+  m_object = objects + _T(")");
 }
 
 void
 Parameters::MakeMultipleObjectSelect()
 {
-  XString objects("LIKE '");
+  XString objects(_T("LIKE '"));
   objects += m_object;
-  objects += "'\n";
+  objects += _T("'\n");
 
   m_object = objects;
 }
@@ -393,8 +393,8 @@ void
 Parameters::FindDirection()
 {
   XString name = GetExeFile();
-  if(name.CompareNoCase("export") == 0 ||
-     name.CompareNoCase("import") == 0)
+  if(name.CompareNoCase(_T("export")) == 0 ||
+     name.CompareNoCase(_T("import")) == 0)
   {
     m_direction = name;
   }
@@ -408,30 +408,30 @@ Parameters::FindDirection()
 void
 Parameters::ProcessOneParameter(XString p_parameter)
 {
-       if(p_parameter.Left(4) .CompareNoCase("dir:")          == 0) m_direction    = p_parameter.Mid(4);
-  else if(p_parameter.Left(6) .CompareNoCase("dbase:")        == 0) m_database     = p_parameter.Mid(6);
-  else if(p_parameter.Left(5) .CompareNoCase("user:")         == 0) m_user         = p_parameter.Mid(5);
-  else if(p_parameter.Left(7) .CompareNoCase("passwd:")       == 0) m_password     = p_parameter.Mid(7);
-  else if(p_parameter.Left(7) .CompareNoCase("schema:")       == 0) m_schema       = p_parameter.Mid(7);
-  else if(p_parameter.Left(5) .CompareNoCase("file:")         == 0) m_file         = p_parameter.Mid(5);
-  else if(p_parameter.Left(7) .CompareNoCase("object:")       == 0) m_object       = p_parameter.Mid(7);
-  else if(p_parameter.Left(7) .CompareNoCase("filter:")       == 0) m_filter       = p_parameter.Mid(7);
-  else if(p_parameter.Left(5) .CompareNoCase("wait:")         == 0) m_waitTime     = atoi(p_parameter.Mid(5));
-  else if(p_parameter.Left(7) .CompareNoCase("commit:")       == 0) m_commitRange  = atoi(p_parameter.Mid(7));
-  else if(p_parameter.Left(10).CompareNoCase("consistent")    == 0) m_consistent   = true;
-  else if(p_parameter.Left(4) .CompareNoCase("drop")          == 0) m_drop         = true;
-  else if(p_parameter.Left(4) .CompareNoCase("list")          == 0) m_listOnly     = true;
-  else if(p_parameter.Left(5) .CompareNoCase("debug")         == 0) m_debug        = true;
-  else if(p_parameter.Left(10).CompareNoCase("statistics")    == 0) m_statistics   = true;
-  else if(p_parameter.Left(9) .CompareNoCase("recompile")     == 0) m_recompile    = true;
-  else if(p_parameter.Left(8) .CompareNoCase("nogrants")      == 0) m_grants       = false;
-  else if(p_parameter.Left(6) .CompareNoCase("norows")        == 0) m_rows         = false;
-  else if(p_parameter.Left(13).CompareNoCase("noconstraints") == 0) m_constraints  = false;
-  else if(p_parameter.Left(8) .CompareNoCase("nosource")      == 0) m_source       = false;
-  else if(p_parameter.Left(9) .CompareNoCase("createsql")     == 0) m_createSql    = true;
-  else if(p_parameter.Left(6) .CompareNoCase("nohang")        == 0) m_noHang       = true;
-  else if(p_parameter.Left(9) .CompareNoCase("stripdiac")     == 0) m_stripDiacs   = true;
-  else if(p_parameter.Left(6) .CompareNoCase("params")        == 0)
+       if(p_parameter.Left(4) .CompareNoCase(_T("dir:"))          == 0) m_direction    = p_parameter.Mid(4);
+  else if(p_parameter.Left(6) .CompareNoCase(_T("dbase:"))        == 0) m_database     = p_parameter.Mid(6);
+  else if(p_parameter.Left(5) .CompareNoCase(_T("user:"))         == 0) m_user         = p_parameter.Mid(5);
+  else if(p_parameter.Left(7) .CompareNoCase(_T("passwd:"))       == 0) m_password     = p_parameter.Mid(7);
+  else if(p_parameter.Left(7) .CompareNoCase(_T("schema:"))       == 0) m_schema       = p_parameter.Mid(7);
+  else if(p_parameter.Left(5) .CompareNoCase(_T("file:"))         == 0) m_file         = p_parameter.Mid(5);
+  else if(p_parameter.Left(7) .CompareNoCase(_T("object:"))       == 0) m_object       = p_parameter.Mid(7);
+  else if(p_parameter.Left(7) .CompareNoCase(_T("filter:"))       == 0) m_filter       = p_parameter.Mid(7);
+  else if(p_parameter.Left(5) .CompareNoCase(_T("wait:"))         == 0) m_waitTime     = _ttoi(p_parameter.Mid(5));
+  else if(p_parameter.Left(7) .CompareNoCase(_T("commit:"))       == 0) m_commitRange  = _ttoi(p_parameter.Mid(7));
+  else if(p_parameter.Left(10).CompareNoCase(_T("consistent"))    == 0) m_consistent   = true;
+  else if(p_parameter.Left(4) .CompareNoCase(_T("drop"))          == 0) m_drop         = true;
+  else if(p_parameter.Left(4) .CompareNoCase(_T("list"))          == 0) m_listOnly     = true;
+  else if(p_parameter.Left(5) .CompareNoCase(_T("debug"))         == 0) m_debug        = true;
+  else if(p_parameter.Left(10).CompareNoCase(_T("statistics"))    == 0) m_statistics   = true;
+  else if(p_parameter.Left(9) .CompareNoCase(_T("recompile"))     == 0) m_recompile    = true;
+  else if(p_parameter.Left(8) .CompareNoCase(_T("nogrants"))      == 0) m_grants       = false;
+  else if(p_parameter.Left(6) .CompareNoCase(_T("norows"))        == 0) m_rows         = false;
+  else if(p_parameter.Left(13).CompareNoCase(_T("noconstraints")) == 0) m_constraints  = false;
+  else if(p_parameter.Left(8) .CompareNoCase(_T("nosource"))      == 0) m_source       = false;
+  else if(p_parameter.Left(9) .CompareNoCase(_T("createsql"))     == 0) m_createSql    = true;
+  else if(p_parameter.Left(6) .CompareNoCase(_T("nohang"))        == 0) m_noHang       = true;
+  else if(p_parameter.Left(9) .CompareNoCase(_T("stripdiac"))     == 0) m_stripDiacs   = true;
+  else if(p_parameter.Left(6) .CompareNoCase(_T("params"))        == 0)
   {
     XString filename = p_parameter.Mid(7);
     ReadParameterFile(filename);
@@ -439,7 +439,7 @@ Parameters::ProcessOneParameter(XString p_parameter)
   else
   {
     // No known parameter
-    xprintf(false,"ERROR: Unknown startup parameter: %s\n",p_parameter.GetString());
+    xprintf(false,_T("ERROR: Unknown startup parameter: %s\n"),p_parameter.GetString());
     TerminateWithoutCleanup(3);
   }
 }

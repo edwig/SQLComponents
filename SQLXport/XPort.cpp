@@ -66,7 +66,7 @@ XPort::Export()
   // STEP 4: Lock all tables
   if(m_parameters.m_consistent)
   {
-    xprintf(false,"CONSISTENT Export mode: locking all tables in share mode\n");
+    xprintf(false,_T("CONSISTENT Export mode: locking all tables in share mode\n"));
     if(ConsistentTables(m_parameters.m_schema) == false)
     {
       return;
@@ -117,7 +117,7 @@ XPort::Export()
   // STEP 16: End-of file marker
   CloseDumpFile();
 
-  xprintf(false,"\n*** Export ready ***\n\n");
+  xprintf(false,_T("\n*** Export ready ***\n\n"));
 }
 
 void
@@ -156,17 +156,17 @@ XPort::Import()
   // After everything is in database, extra processing
   if(m_parameters.m_statistics)
   {
-    xprintf(false,"Starting 'compute statistics' upon completion of the import\n");
+    xprintf(false,_T("Starting 'compute statistics' upon completion of the import\n"));
     PerformStatistics();
   }
 
   // STEP 7: Recompile
   if(m_parameters.m_recompile)
   {
-    xprintf(false,"Starting 'full recompile' upon completion of the import\n");
+    xprintf(false,_T("Starting 'full recompile' upon completion of the import\n"));
     PerformRecompile();
   }
-  xprintf(false,"\n*** Import ready ***\n\n");
+  xprintf(false,_T("\n*** Import ready ***\n\n"));
 }
 
 bool
@@ -182,14 +182,14 @@ XPort::Connect()
   }
   catch(StdException& er)
   {
-    xerror("Cannot open database [%s]. Error: %s\n",database.GetString(),er.GetErrorMessage().GetString());
+    xerror(_T("Cannot open database [%s]. Error: %s\n"),database.GetString(),er.GetErrorMessage().GetString());
     return false;
   }
-  xprintf(false,"Database [%s] opened by user [%s]\n",database.GetString(),user.GetString());
+  xprintf(false,_T("Database [%s] opened by user [%s]\n"),database.GetString(),user.GetString());
   if(!schema.IsEmpty())
   {
-    m_database.AddMacro("$SCHEMA$",schema);
-    xprintf(false,"Default schema for import set to [%s]\n",schema.GetString());
+    m_database.AddMacro(_T("$SCHEMA$"),schema);
+    xprintf(false,_T("Default schema for import set to [%s]\n"),schema.GetString());
   }
   return true;
 }
@@ -202,11 +202,11 @@ XPort::Disconnect()
     // Now closing the database
     XString name = m_database.GetDatabaseName();
     m_database.Close();
-    xprintf(false,"Database connection with [%s] closed\n",name.GetString());
+    xprintf(false,_T("Database connection with [%s] closed\n"),name.GetString());
   }
   else
   {
-    xerror("Database connection was not open\n");
+    xerror(_T("Database connection was not open\n"));
   }
   return true;
 }
@@ -216,7 +216,7 @@ XPort::OpenDumpFileWrite()
 {
   if(!m_xfile.OpenCreate(m_parameters.m_file,m_database.GetDatabaseTypeName()))
   {
-    xprintf(false,"Cannot open the export file [%s]\n",m_parameters.m_file.GetString());
+    xprintf(false,_T("Cannot open the export file [%s]\n"),m_parameters.m_file.GetString());
     return false;
   }
   return true;
@@ -239,7 +239,7 @@ void
 XPort::DropSchema()
 {
   XString drop;
-  XString name("DroppingSchema");
+  XString name(_T("DroppingSchema"));
   int count  = 0;
   int errors = 0;
   OList statements;
@@ -254,7 +254,7 @@ XPort::DropSchema()
   XString allconstraints = info->GetCATALOGForeignList  (m_schema,all);
   XString alltables      = info->GetCATALOGTablesList   (m_schema,all);
 
-  xprintf(false,"Gathering contents of schema: %s\n",m_schema.GetString());
+  xprintf(false,_T("Gathering contents of schema: %s\n"),m_schema.GetString());
   try
   {
     SQLQuery query(&m_database);
@@ -264,7 +264,7 @@ XPort::DropSchema()
     while(query.GetRecord())
     {
       ++count;
-      XString dropline = "DROP SYNONYM " + m_schema + "." + (XString)query[3];
+      XString dropline = _T("DROP SYNONYM ") + m_schema + _T(".") + (XString)query[3];
       statements.push_back(dropline);
     }
     // SEQUENCES
@@ -321,13 +321,13 @@ XPort::DropSchema()
   }
   catch(StdException& ex)
   {
-  	xerror("Cannot drop schema:%s\nSQL: %s\nError: %s\n",m_schema.GetString(),drop.GetString(),ex.GetErrorMessage().GetString());
+  	xerror(_T("Cannot drop schema:%s\nSQL: %s\nError: %s\n"),m_schema.GetString(),drop.GetString(),ex.GetErrorMessage().GetString());
     return;
   }
 
-  XString transname("DropSchema");
+  XString transname(_T("DropSchema"));
   SQLTransaction trans(GetDatabase(),transname);
-  xprintf(false, "Dropping the contents of schema: %s\n", m_schema.GetString());
+  xprintf(false, _T("Dropping the contents of schema: %s\n"), m_schema.GetString());
   for(auto& statement : statements)
   {
     if(ImportSQL(statement) != 0)
@@ -337,22 +337,22 @@ XPort::DropSchema()
     if((count % COMMIT_SIZE) == 0)
     {
       trans.Commit();
-      printf("DDL DROP statements done: %d/%d\r",count,(int)statements.size());
+      _tprintf(_T("DDL DROP statements done: %d/%d\r"),count,(int)statements.size());
       trans.Start(transname);
     }
   }
   trans.Commit();
   if(count >= COMMIT_SIZE)
   {
-    printf("\n");
+    _tprintf(_T("\n"));
   }
   // Tell what we've done
-  xprintf(false,"Schema dropped: %d SQL statements done",count);
+  xprintf(false,_T("Schema dropped: %d SQL statements done"),count);
   if(errors)
   {
-    xprintf(false,". Errors: %d",errors);
+    xprintf(false,_T(". Errors: %d"),errors);
   }
-  xprintf(false,"\n");
+  xprintf(false,_T("\n"));
 }
 
 int  
@@ -377,7 +377,7 @@ XPort::GetAllTables()
       XString type  = qry[4];
       // Skip local and global temporary tables
       // Skip system tables and views
-      if(type.Compare("TABLE") == 0)
+      if(type.Compare(_T("TABLE")) == 0)
       {
         m_tables.push_back(table);
       }
@@ -385,7 +385,7 @@ XPort::GetAllTables()
   }
   catch(StdException& ex)
   {
-    xerror("Error counting tables: %s\n",ex.GetErrorMessage().GetString());
+    xerror(_T("Error counting tables: %s\n"),ex.GetErrorMessage().GetString());
     m_tables.clear();
     count = 0;
   }
@@ -416,7 +416,7 @@ XPort::GetAllCheckConstraints()
   }
   catch(StdException& ex)
   {
-    xerror("Internal error: Getting a check constraint count : %s\n",ex.GetErrorMessage().GetString());
+    xerror(_T("Internal error: Getting a check constraint count : %s\n"),ex.GetErrorMessage().GetString());
     count = 0;
   }
   return count;
@@ -447,7 +447,7 @@ XPort::GetAllViews()
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error: Reading count of views\n");
+    xerror(_T("Internal error: Reading count of views\n"));
     count = 0;
   }
   return count;
@@ -479,7 +479,7 @@ XPort::GetAllSequences()
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error reading count of sequences.\n");
+    xerror(_T("Internal error reading count of sequences.\n"));
     count = 0;
   }
   return count;
@@ -492,7 +492,7 @@ XPort::GetAllProcedures()
   XString object(m_object);
   if(!object.IsEmpty() && (object.Find('%') < 0))
   {
-    object = "%" + object + "%";
+    object = _T("%") + object + _T("%");
   }
   XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,object);
 
@@ -508,16 +508,16 @@ XPort::GetAllProcedures()
     while(qry.GetRecord())
     {
       ++count;
-      XString procType = qry[8].GetAsSLong() == 1 ? "procedure" : "function";
+      XString procType = qry[8].GetAsSLong() == 1 ? _T("procedure") : _T("function");
       XString procName = qry[3];
-      XString procedure = procType + ":" + procName;
+      XString procedure = procType + _T(":") + procName;
       m_procedures.push_back(procedure);
     }
   }
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error reading count of procedures.\n");
+    xerror(_T("Internal error reading count of procedures.\n"));
     return 0;
   }
   return count;
@@ -555,7 +555,7 @@ XPort::GetAllSynonyms()
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error reading count of synonyms.\n");
+    xerror(_T("Internal error reading count of synonyms.\n"));
     return 0;
   }
   return count;
@@ -578,8 +578,8 @@ XPort::DoSQLStatement(XString& p_sql,bool p_can_retry)
       m_retries.push_back(p_sql);
       return 0;
     }
-    p_sql.Replace("$SCHEMA$",m_parameters.m_schema);
-    xerror("Error in sql: %s\n%s\n",ex.GetErrorMessage().GetString(),p_sql.GetString());
+    p_sql.Replace(_T("$SCHEMA$"),m_parameters.m_schema);
+    xerror(_T("Error in sql: %s\n%s\n"),ex.GetErrorMessage().GetString(),p_sql.GetString());
     return -1;
   }
   return 0;
@@ -593,16 +593,16 @@ XPort::ConsistentTables(XString p_schema)
   for(unsigned ind = 0;ind < m_tables.size(); ++ind)
   {
     XString table = m_tables[ind];
-    xprintf(false,"Lock table [%s.%-32s] for export [%u/%u]\n",p_schema.GetString(),table.GetString(),ind + 1,m_tables.size());
+    xprintf(false,_T("Lock table [%s.%-32s] for export [%u/%u]\n"),p_schema.GetString(),table.GetString(),ind + 1,m_tables.size());
 
     lock = m_database.GetSQLInfoDB()->GetSQLLockTable(p_schema,table,false,0); // gWaitTime);
     if(DoSQLStatement(lock,false))
     {
-      xprintf(false,"Cannot lock table [%s.%s] for export\n",p_schema.GetString(),table.GetString());
+      xprintf(false,_T("Cannot lock table [%s.%s] for export\n"),p_schema.GetString(),table.GetString());
       return false;
     }
   }
-  printf("\n");
+  _tprintf(_T("\n"));
   return true;
 }
 
@@ -614,12 +614,12 @@ XPort::PerformStatistics()
 
   for(auto& table : m_tables)
   {
-    xprintf(false,"Gather statistics for table: %s.%s [%u/%u]\n",m_schema.GetString(),table.GetString(),ind++,m_tables.size());
+    xprintf(false,_T("Gather statistics for table: %s.%s [%u/%u]\n"),m_schema.GetString(),table.GetString(),ind++,m_tables.size());
 
     calc = m_database.GetSQLInfoDB()->GetSQLOptimizeTable(m_schema,table);
     DoSQLStatement(calc);
   }
-  xprintf(false,"\n");
+  xprintf(false,_T("\n"));
 }
 
 void
@@ -628,8 +628,8 @@ XPort::PerformRecompile()
   if(m_database.GetDatabaseType() == DatabaseType::RDBMS_ORACLE)
   {
     XString compile;
-    xprintf(false,"Do a full recompile for all objects in schema: %s\n",m_schema.GetString());
-    compile.Format("execute dbms_utility.compile_schema(schema => '%s')",m_schema.GetString());
+    xprintf(false,_T("Do a full recompile for all objects in schema: %s\n"),m_schema.GetString());
+    compile.Format(_T("execute dbms_utility.compile_schema(schema => '%s')"),m_schema.GetString());
     DoSQLStatement(compile);
   }
 }
@@ -639,12 +639,12 @@ void
 XPort::ShowRetryName(XString& p_sql)
 {
   XString name;
-  int pos = p_sql.Find("\n");
+  int pos = p_sql.Find(_T("\n"));
   if(pos > 0)
   {
     name = p_sql.Left(pos);
-    name.Replace("$SCHEMA$",m_parameters.m_schema);
-    xprintf(false,"Retry: %s\n",name.GetString());
+    name.Replace(_T("$SCHEMA$"),m_parameters.m_schema);
+    xprintf(false,_T("Retry: %s\n"),name.GetString());
   }
 }
 
@@ -661,15 +661,15 @@ XPort::PerformRetries()
   int   retries = (int) m_retries.size() * 10;
 
   // We are going to do the retry queue from here
-  xprintf(false,"\nRETRY QUEUE of previously rejected DDL statements\n");
-  xprintf(false,  "=================================================\n");
-  xprintf(false,  "Maximum number of retry passes: %d\n",retries);
+  xprintf(false,_T("\nRETRY QUEUE of previously rejected DDL statements\n"));
+  xprintf(false,  _T("=================================================\n"));
+  xprintf(false,  _T("Maximum number of retry passes: %d\n"),retries);
 
   // Do while objects in the retry queue, and we have a calculated retry count
   // Retries protect against loops from endless queues
   while(retries > 0 && !m_retries.empty())
   {
-    xprintf(false,"Pass: %d. Number of objects in the retry queue: %d\n",++pass,m_retries.size());
+    xprintf(false,_T("Pass: %d. Number of objects in the retry queue: %d\n"),++pass,m_retries.size());
     for(size_t ind = 0;ind < m_retries.size(); ++ind)
     {
       XString sql = m_retries[ind];
@@ -696,16 +696,16 @@ XPort::PerformRetries()
   // Print the contents, if something left in the queue
   if(!second.empty())
   {
-    xprintf(false,"\nRETRY QUEUE IS NOT EMPTY:\n");
+    xprintf(false,_T("\nRETRY QUEUE IS NOT EMPTY:\n"));
     // At the end of the retry 
     // If any errors left, show them
-    xprintf(false,"The following %d objects where unresolvable:\n",second.size());
+    xprintf(false,_T("The following %d objects where unresolvable:\n"),second.size());
     for(size_t ind = 0;ind < second.size();++ind)
     {
       XString sql = second[ind];
       ShowRetryName(sql);
     }
-    xprintf(false,"After %d passes\n\n",pass);
+    xprintf(false,_T("After %d passes\n\n"),pass);
   }
 
   // Clear the queue
@@ -720,7 +720,7 @@ XPort::GetDefineSQLTable(XString p_table)
   try
   {
     // Getting columns and options for the first statement
-    XString table = m_schema + "." + p_table;
+    XString table = m_schema + _T(".") + p_table;
     DDLS statements = create.GetTableStatements(table,true,true,false,false,false,false,false,false);
     if(statements.size() == 1)
     {
@@ -732,8 +732,8 @@ XPort::GetDefineSQLTable(XString p_table)
   {
     xerror(ex.GetErrorMessage());
   }
-  xerror("Error retrieving table columns for table [%s]\n",p_table.GetString());
-  return "";
+  xerror(_T("Error retrieving table columns for table [%s]\n"),p_table.GetString());
+  return _T("");
 }
 
 DDLS
@@ -760,7 +760,7 @@ XPort::GetDefineSQLIndex(XString p_table)
   {
     xerror(ex.GetErrorMessage());
   }
-  xerror("Error retrieving index information for table [%s]\n",p_table.GetString());
+  xerror(_T("Error retrieving index information for table [%s]\n"),p_table.GetString());
   DDLS empty;
   return empty;
 }
@@ -784,7 +784,7 @@ XPort::GetDefineSQLPrimary(XString p_table)
   {
     xerror(ex.GetErrorMessage());
   }
-  xerror("Error retrieving primary key information for table [%s]\n",p_table.GetString());
+  xerror(_T("Error retrieving primary key information for table [%s]\n"),p_table.GetString());
   DDLS empty;
   return empty;
 }
@@ -805,7 +805,7 @@ XPort::GetDefineSQLForeigns(XString p_table)
   {
     xerror(ex.GetErrorMessage());
   }
-  xerror("Error retrieving foreign key information for table [%s]\n",p_table.GetString());
+  xerror(_T("Error retrieving foreign key information for table [%s]\n"),p_table.GetString());
   DDLS empty;
   return empty;
 }
@@ -834,7 +834,7 @@ XPort::RecordAllIndices(DDLCreateTable& p_create,DDLS& p_ddls)
     }
     XString sql = *it;
     sql.MakeLower();
-    if(sql.Find("primary key") < 0)
+    if(sql.Find(_T("primary key")) < 0)
     {
       m_indices.push_back(name);
       ++it;
@@ -860,7 +860,7 @@ XPort::RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls)
     }
     XString sql = *it;
     sql.MakeLower();
-    if(sql.Find("primary key") >= 0)
+    if(sql.Find(_T("primary key")) >= 0)
     {
       m_constraints.push_back(name);
       ++it;
@@ -903,8 +903,8 @@ XPort::GetDefineSQLView(XString p_view)
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error: Getting information for view: %s\n",p_view.GetString());
-    return "";
+    xerror(_T("Internal error: Getting information for view: %s\n"),p_view.GetString());
+    return _T("");
   }
   return create;
 }
@@ -940,7 +940,7 @@ XPort::GetDefineSQLSequence(XString p_sequence)
   catch (StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error reading sequence: %s\n",p_sequence.GetString());
+    xerror(_T("Internal error reading sequence: %s\n"),p_sequence.GetString());
   }
   return define;
 }
@@ -969,9 +969,9 @@ XPort::GetDefineSQLProcedure(XString p_procedure)
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error reading PSM source of %s.%s\n",m_schema.GetString(),p_procedure.GetString());
+    xerror(_T("Internal error reading PSM source of %s.%s\n"),m_schema.GetString(),p_procedure.GetString());
   }
-  create = create.TrimLeft("\r\n");
+  create = create.TrimLeft(_T("\r\n"));
   return create;
 }
 
@@ -999,7 +999,7 @@ XPort::GetDefineSQLSynonym(XString p_synonym)
   catch (StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("Internal error reading synonym of %s.%s\n",m_schema.GetString(),p_synonym.GetString());
+    xerror(_T("Internal error reading synonym of %s.%s\n"),m_schema.GetString(),p_synonym.GetString());
   }
   return create;
 }
@@ -1009,26 +1009,26 @@ XPort::GetDefineSQLSynonym(XString p_synonym)
 XString
 XPort::GetDefineRowSelect(XString p_table)
 {
-  XString select("SELECT ");
+  XString select(_T("SELECT "));
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
   {
-    if(ind > 0) select += "      ,";
+    if(ind > 0) select += _T("      ,");
     select += m_columns[ind];
-    select += "\n";
+    select += _T("\n");
   }
-  select += " FROM ";
+  select += _T(" FROM ");
   select += m_schema;
-  select += ".";
+  select += _T(".");
   select += p_table;
 
   if(!m_parameters.m_filter.IsEmpty())
   {
-    select += "\n WHERE ";
+    select += _T("\n WHERE ");
     select += m_parameters.m_filter;
   }
-  if(m_parameters.m_filter.Find("OID") >= 0)
+  if(m_parameters.m_filter.Find(_T("OID")) >= 0)
   {
-    select += "\n ORDER BY OID";
+    select += _T("\n ORDER BY OID");
   }
   return select;
 }
@@ -1036,13 +1036,13 @@ XPort::GetDefineRowSelect(XString p_table)
 XString
 XPort::GetDefineCountSelect(XString p_table)
 {
-  XString select("SELECT COUNT(*) FROM ");
+  XString select(_T("SELECT COUNT(*) FROM "));
   select += m_schema;
-  select += ".";
+  select += _T(".");
   select += p_table;
   if(!m_parameters.m_filter.IsEmpty())
   {
-    select += "\n WHERE ";
+    select += _T("\n WHERE ");
     select += m_parameters.m_filter;
   }
   return select;
@@ -1051,30 +1051,30 @@ XPort::GetDefineCountSelect(XString p_table)
 XString
 XPort::GetDefineRowInsert(XString p_table)
 {
-  XString insert("INSERT INTO ");
+  XString insert(_T("INSERT INTO "));
 
   insert += m_schema;
-  insert += ".";
+  insert += _T(".");
   insert += p_table;
-  insert += "\n(";
+  insert += _T("\n(");
 
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
   {
-    insert += (ind > 0) ? " ," : " ";
+    insert += (ind > 0) ? _T(" ,") : _T(" ");
     insert += m_columns[ind];
-    insert += "\n";
+    insert += _T("\n");
   }
-  insert += ")\nVALUES(";
+  insert += _T(")\nVALUES(");
 
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
   {
     if(ind > 0) 
     {
-      insert += ",";
+      insert += _T(",");
     }
-    insert += "?";
+    insert += _T("?");
   }
-  insert += ")";
+  insert += _T(")");
 
   return insert;
 }
@@ -1093,22 +1093,22 @@ XPort::WriteTableAccessRights(XString p_object,int& p_count)
     {
       XString grantee   = query[5];
       XString privilege = query[6];
-      bool    grantable = _stricmp(query[7].GetAsChar(),"YES") == 0;
+      bool    grantable = _tcsicmp(query[7].GetAsChar(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
       {
-        printf("%d records processed\r",p_count);
-        printf("Exporting access rights: ");
+        _tprintf(_T("%d records processed\r"),p_count);
+        _tprintf(_T("Exporting access rights: "));
       }
     }
   }
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("\nInternal error reading table access rights for [%s.%s]\n",m_schema.GetString(),m_object.GetString());
+    xerror(_T("\nInternal error reading table access rights for [%s.%s]\n"),m_schema.GetString(),m_object.GetString());
   }
 }
 
@@ -1132,22 +1132,22 @@ XPort::WriteColumnAccessRights(XString p_object,int& p_count)
     {
       XString grantee   = query[6];
       XString privilege = query[7];
-      bool    grantable = _stricmp(query[8].GetAsChar(),"YES") == 0;
+      bool    grantable = _tcsicmp(query[8].GetAsChar(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
       {
-        printf("%d records processed\r",p_count);
-        printf("Exporting access rights: ");
+        _tprintf(_T("%d records processed\r"),p_count);
+        _tprintf(_T("Exporting access rights: "));
       }
     }
   }
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("\nInternal error reading column access rights for [%s.%s]\n",m_schema.GetString(),m_object.GetString());
+    xerror(_T("\nInternal error reading column access rights for [%s.%s]\n"),m_schema.GetString(),m_object.GetString());
   }
 }
 
@@ -1170,22 +1170,22 @@ XPort::WriteProcedureAccessRights(XString p_object,int& p_count)
     {
       XString grantee   = query[5];
       XString privilege = query[6];
-      bool    grantable = _stricmp(query[7].GetAsChar(),"YES") == 0;
+      bool    grantable = _tcsicmp(query[7].GetAsChar(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
       {
-        printf("%d records processed\r",p_count);
-        printf("Exporting access rights: ");
+        _tprintf(_T("%d records processed\r"),p_count);
+        _tprintf(_T("Exporting access rights: "));
       }
     }
   }
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("\nInternal error reading procedure access rights for [%s.%s]\n",m_schema.GetString(),m_object.GetString());
+    xerror(_T("\nInternal error reading procedure access rights for [%s.%s]\n"),m_schema.GetString(),m_object.GetString());
   }
 }
 
@@ -1214,22 +1214,22 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
     {
       XString privilege = query[4];
       XString grantee   = query[5];
-      bool    grantable = _stricmp(query[6].GetAsChar(),"YES") == 0;
+      bool    grantable = _tcsicmp(query[6].GetAsChar(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_sequence,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
       {
-        printf("%d records processed\r",p_count);
-        printf("Exporting access rights: ");
+        _tprintf(_T("%d records processed\r"),p_count);
+        _tprintf(_T("Exporting access rights: "));
       }
     }
   }
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror("\nInternal error reading sequence access rights for [%s.%s]\n",m_schema.GetString(),m_object.GetString());
+    xerror(_T("\nInternal error reading sequence access rights for [%s.%s]\n"),m_schema.GetString(),m_object.GetString());
   }
 }
 
@@ -1242,7 +1242,7 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
 void
 XPort::ExportTables()
 {
-  m_xfile.WriteSection("TABLES");
+  m_xfile.WriteSection(_T("TABLES"));
   for(auto& table : m_tables)
   {
     // STEP 5: Export of all columns in one (1) table
@@ -1253,7 +1253,7 @@ XPort::ExportTables()
     // STEP 6: Export of all data rows in one (1) table
     if(m_parameters.m_createSql)
     {
-      xprintf(false,"\n");
+      xprintf(false,_T("\n"));
       m_xfile.WriteSectionEnd();
     }
     else
@@ -1268,7 +1268,7 @@ XPort::ExportTables()
 void
 XPort::ExportIndices()
 {
-  m_xfile.WriteSection("INDICES");
+  m_xfile.WriteSection(_T("INDICES"));
 
   for(auto& table : m_tables)
   {
@@ -1291,7 +1291,7 @@ void
 XPort::ExportPrimaryKeys()
 {
   int ind = 1;
-  m_xfile.WriteSection("PRIMARY KEYS");
+  m_xfile.WriteSection(_T("PRIMARY KEYS"));
 
   for(auto& table : m_tables)
   {
@@ -1311,7 +1311,7 @@ void
 XPort::ExportForeignKeys()
 {
   int ind = 1;
-  m_xfile.WriteSection("FOREIGN KEYS");
+  m_xfile.WriteSection(_T("FOREIGN KEYS"));
 
   for(auto& table : m_tables)
   {
@@ -1331,7 +1331,7 @@ void
 XPort::ExportDefaultConstraints()
 {
   int ind = 0;
-  m_xfile.WriteSection("DEFAULTS");
+  m_xfile.WriteSection(_T("DEFAULTS"));
   SQLInfoDB* info = m_database.GetSQLInfoDB();
 
   for(auto& table : m_tables)
@@ -1364,14 +1364,14 @@ XPort::ExportDefaultConstraints()
   m_xfile.Flush();
 
   // All check constraints
-  xprintf(false,"Total default constraints: %d\n",ind);
+  xprintf(false,_T("Total default constraints: %d\n"),ind);
 }
 
 void
 XPort::ExportCheckConstraints()
 {
   int ind = 0;
-  m_xfile.WriteSection("CHECKS");
+  m_xfile.WriteSection(_T("CHECKS"));
   SQLInfoDB* info = m_database.GetSQLInfoDB();
 
   for(auto& table : m_tables)
@@ -1403,13 +1403,13 @@ XPort::ExportCheckConstraints()
   m_xfile.Flush();
 
   // All check constraints
-  xprintf(false,"Total check constraints: %d\n",ind);
+  xprintf(false,_T("Total check constraints: %d\n"),ind);
 }
 
 void
 XPort::ExportViews()
 {
-  m_xfile.WriteSection("VIEWS");
+  m_xfile.WriteSection(_T("VIEWS"));
   GetAllViews();
   for(auto& view : m_views)
   {
@@ -1424,7 +1424,7 @@ XPort::ExportViews()
 void
 XPort::ExportSequences()
 {
-  m_xfile.WriteSection("SEQUENCES");
+  m_xfile.WriteSection(_T("SEQUENCES"));
   GetAllSequences();
   for(auto& sequence : m_sequences)
   {
@@ -1439,7 +1439,7 @@ XPort::ExportSequences()
 void
 XPort::ExportProcedures()
 {
-  m_xfile.WriteSection("PROCEDURES");
+  m_xfile.WriteSection(_T("PROCEDURES"));
   GetAllProcedures();
   for(auto& procedure : m_procedures)
   {
@@ -1454,7 +1454,7 @@ XPort::ExportProcedures()
 void
 XPort::ExportSynonyms()
 {
-  m_xfile.WriteSection("SYNONYMS");
+  m_xfile.WriteSection(_T("SYNONYMS"));
 
   GetAllSynonyms();
   for(auto& synonym : m_synonyms)
@@ -1471,11 +1471,11 @@ XPort::ExportSynonyms()
 void
 XPort::ExportRights()
 {
-  m_xfile.WriteSection("ACCESS RIGHTS");
+  m_xfile.WriteSection(_T("ACCESS RIGHTS"));
 
   int count = 0;
 
-  xprintf(false,"Exporting access rights: ");
+  xprintf(false,_T("Exporting access rights: "));
   for(auto& table : m_tables)
   {
     WriteTableAccessRights (table,count);
@@ -1494,7 +1494,7 @@ XPort::ExportRights()
   {
     WriteSequenceAccessRights(sequence,count);
   }
-  xprintf(false,"%d records exported.\n",count);
+  xprintf(false,_T("%d records exported.\n"),count);
 
   m_xfile.WriteSectionEnd();
   m_xfile.Flush();
@@ -1510,77 +1510,77 @@ void
 XPort::ImportDump()
 {
   // STEP 3: As long as the end-marker is not reached
-  char type = m_xfile.NextType();
-  while(type != 'X' && type != EOF)
+  TCHAR type = m_xfile.NextType();
+  while(type != _T('X') && type != _TEOF)
   {
     // Expecting a section to read
     if(type != 'S')
     {
-      xerror("Broking import. Expecting a section header.\n");
+      xerror(_T("Broking import. Expecting a section header.\n"));
       break;
     }
     // Read and show the section name
     XString section_name = m_xfile.ReadSection();
 
-    if(section_name.CompareNoCase("TABLES") == 0)
+    if(section_name.CompareNoCase(_T("TABLES")) == 0)
     {
       // STEP 5: IMporting tables
       ImportTables(m_parameters.m_listOnly,type);
     }
-    else if(section_name.CompareNoCase("INDICI") == 0 ||
-            section_name.CompareNoCase("INDICES") == 0)
+    else if(section_name.CompareNoCase(_T("INDICI")) == 0 ||
+            section_name.CompareNoCase(_T("INDICES")) == 0)
     {
       // STEP 6: Import all indices
       ImportIndices(type);
     }
-    else if(section_name.CompareNoCase("PRIMARY KEYS") == 0)
+    else if(section_name.CompareNoCase(_T("PRIMARY KEYS")) == 0)
     {
       // STEP 7: Import all primary keys
       ImportPrimaryKeys(type);
     }
-    else if(section_name.CompareNoCase("FOREIGN KEYS") == 0)
+    else if(section_name.CompareNoCase(_T("FOREIGN KEYS")) == 0)
     {
       // STEP 8: Import all foreign keys
       ImportForeignKeys(type);
     }
-    else if(section_name.CompareNoCase("DEFAULTS") == 0)
+    else if(section_name.CompareNoCase(_T("DEFAULTS")) == 0)
     {
       // STEP 9: Import all default constraints
       ImportDefaults(type);
     }
-    else if(section_name.CompareNoCase("CHECKS") == 0)
+    else if(section_name.CompareNoCase(_T("CHECKS")) == 0)
     {
       // STEP 10: Import all check constraints/not-nulls
       ImportChecks(type);
     }
-    else if(section_name.CompareNoCase("VIEWS") == 0)
+    else if(section_name.CompareNoCase(_T("VIEWS")) == 0)
     {
       // STEP 11: Import all views
       ImportViews(type);
     }
-    else if(section_name.CompareNoCase("SEQUENCES") == 0)
+    else if(section_name.CompareNoCase(_T("SEQUENCES")) == 0)
     {
       // STEP 12: Importing all sequences
       ImportSequences(type);
     }
-    else if(section_name.CompareNoCase("PROCEDURES") == 0)
+    else if(section_name.CompareNoCase(_T("PROCEDURES")) == 0)
     {
       // STEP 13: Importing all PL/SQL source
       ImportProcedures(type);
     }
-    else if(section_name.CompareNoCase("SYNONYMS") == 0)
+    else if(section_name.CompareNoCase(_T("SYNONYMS")) == 0)
     {
       // STEP 14: Importing synonyms
       ImportSynonyms(type);
     }
-    else if(section_name.CompareNoCase("ACCESS RIGHTS") == 0)
+    else if(section_name.CompareNoCase(_T("ACCESS RIGHTS")) == 0)
     {
       // STEP 15: All rights on all objects (missing column rights)
       ImportRights(m_parameters.m_listOnly,type);
     }
     else
     {
-      xerror("ALARM: Unknown section named [%s]\n",section_name.GetString());
+      xerror(_T("ALARM: Unknown section named [%s]\n"),section_name.GetString());
       break;
     }
   }
@@ -1597,9 +1597,9 @@ XPort::ImportDump()
 //////////////////////////////////////////////////////////////////////////
 
 void
-XPort::ImportTables(bool p_listOnly,char& p_type)
+XPort::ImportTables(bool p_listOnly,TCHAR& p_type)
 {
-  xprintf(false,"Importing tables definitions and table data.\n");
+  xprintf(false,_T("Importing tables definitions and table data.\n"));
   // Do the tables section
   p_type = m_xfile.NextType();
   // STEP 4: while not at end of all tables
@@ -1615,7 +1615,7 @@ XPort::ImportTables(bool p_listOnly,char& p_type)
         XString sql = m_xfile.ReadSQL();
         m_xfile.ReadColumns(GetColumns());
 
-        SQLTransaction trans(GetDatabase(),"table_" + table);
+        SQLTransaction trans(GetDatabase(),_T("table_") + table);
         if(ImportObject(m_object,table))
         {
           int code = ImportSQL(sql);
@@ -1641,9 +1641,9 @@ XPort::ImportTables(bool p_listOnly,char& p_type)
 }
 
 void
-XPort::ImportIndices(char& p_type)
+XPort::ImportIndices(TCHAR& p_type)
 {
-  xprintf(false,"Importing indices and unique constraints.\n");
+  xprintf(false,_T("Importing indices and unique constraints.\n"));
 
   p_type = m_xfile.NextType();
   while(p_type != 'E')
@@ -1652,7 +1652,7 @@ XPort::ImportIndices(char& p_type)
     XString sql = m_xfile.ReadSQL();
     if(ImportObject(m_object,index))
     {
-      SQLTransaction trans(GetDatabase(),"index_" + index);
+      SQLTransaction trans(GetDatabase(),_T("index_") + index);
       ImportSQL(sql);
       trans.Commit();
     }
@@ -1663,9 +1663,9 @@ XPort::ImportIndices(char& p_type)
 }
 
 void
-XPort::ImportPrimaryKeys(char& p_type)
+XPort::ImportPrimaryKeys(TCHAR& p_type)
 {
-  xprintf(false,"Enforcing primary key constraints.\n");
+  xprintf(false,_T("Enforcing primary key constraints.\n"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
@@ -1673,7 +1673,7 @@ XPort::ImportPrimaryKeys(char& p_type)
     XString sql = m_xfile.ReadSQL();
     if(ImportObject(m_object,constraint))
     {
-      SQLTransaction trans(GetDatabase(),"primary_" + constraint);
+      SQLTransaction trans(GetDatabase(),_T("primary_") + constraint);
       ImportSQL(sql);
       trans.Commit();
     }
@@ -1684,9 +1684,9 @@ XPort::ImportPrimaryKeys(char& p_type)
 }
 
 void
-XPort::ImportForeignKeys(char& p_type)
+XPort::ImportForeignKeys(TCHAR& p_type)
 {
-  xprintf(false,"Enforcing foreign key constraints.\n");
+  xprintf(false,_T("Enforcing foreign key constraints.\n"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
@@ -1694,7 +1694,7 @@ XPort::ImportForeignKeys(char& p_type)
     XString sql = m_xfile.ReadSQL();
     if(ImportObject(m_object,constraint))
     {
-      SQLTransaction trans(GetDatabase(),"foreign_" + constraint);
+      SQLTransaction trans(GetDatabase(),_T("foreign_") + constraint);
       ImportSQL(sql);
       trans.Commit();
     }
@@ -1705,9 +1705,9 @@ XPort::ImportForeignKeys(char& p_type)
 }
 
 void
-XPort::ImportDefaults(char& p_type)
+XPort::ImportDefaults(TCHAR& p_type)
 {
-  xprintf(false,"Enforcing default constraints for table columns.\n");
+  xprintf(false,_T("Enforcing default constraints for table columns.\n"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
@@ -1726,9 +1726,9 @@ XPort::ImportDefaults(char& p_type)
 }
 
 void
-XPort::ImportChecks(char& p_type)
+XPort::ImportChecks(TCHAR& p_type)
 {
-  xprintf(false,"Enforcing check constraints and not-null constraints.\n");
+  xprintf(false,_T("Enforcing check constraints and not-null constraints.\n"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
@@ -1736,7 +1736,7 @@ XPort::ImportChecks(char& p_type)
     XString sql = m_xfile.ReadSQL();
     if(ImportObject(m_object,constraint))
     {
-      SQLTransaction trans(GetDatabase(),"cons_" + constraint);
+      SQLTransaction trans(GetDatabase(),_T("cons_") + constraint);
       ImportSQL(sql);
       trans.Commit();
     }
@@ -1747,9 +1747,9 @@ XPort::ImportChecks(char& p_type)
 }
 
 void
-XPort::ImportViews(char& p_type)
+XPort::ImportViews(TCHAR& p_type)
 {
-  xprintf(false,"Importing views.\n");
+  xprintf(false,_T("Importing views.\n"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
@@ -1757,7 +1757,7 @@ XPort::ImportViews(char& p_type)
     XString sql = m_xfile.ReadSQL();
     if(ImportObject(m_object,view))
     {
-      SQLTransaction trans(GetDatabase(),"view_" + view);
+      SQLTransaction trans(GetDatabase(),_T("view_") + view);
       ImportSQL(sql,true);
       trans.Commit();
     }
@@ -1768,10 +1768,10 @@ XPort::ImportViews(char& p_type)
 }
 
 void
-XPort::ImportSequences(char& p_type)
+XPort::ImportSequences(TCHAR& p_type)
 {
-  xprintf(false,"Importing sequences\n");
-  SQLTransaction trans(GetDatabase(),"sequences");
+  xprintf(false,_T("Importing sequences\n"));
+  SQLTransaction trans(GetDatabase(),_T("sequences"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
@@ -1789,9 +1789,9 @@ XPort::ImportSequences(char& p_type)
 }
 
 void
-XPort::ImportProcedures(char& p_type)
+XPort::ImportProcedures(TCHAR& p_type)
 {
-  xprintf(false,"Importing all PSM source procedures/functions/triggers.\n");
+  xprintf(false,_T("Importing all PSM source procedures/functions/triggers.\n"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
@@ -1799,8 +1799,8 @@ XPort::ImportProcedures(char& p_type)
     XString sql = m_xfile.ReadSQL();
     if(ImportObject(m_object,procedure))
     {
-      SQLTransaction trans(GetDatabase(),"psm_" + procedure);
-      ImportSQL(sql,true,"\n/");
+      SQLTransaction trans(GetDatabase(),_T("psm_") + procedure);
+      ImportSQL(sql,true,_T("\n/"));
       trans.Commit();
     }
     p_type = m_xfile.NextType();
@@ -1810,10 +1810,10 @@ XPort::ImportProcedures(char& p_type)
 }
 
 void
-XPort::ImportSynonyms(char& p_type)
+XPort::ImportSynonyms(TCHAR& p_type)
 {
-  xprintf(false,"Importing public synonyms.\n");
-  SQLTransaction trans(GetDatabase(),"synonyms");
+  xprintf(false,_T("Importing public synonyms.\n"));
+  SQLTransaction trans(GetDatabase(),_T("synonyms"));
 
   p_type = m_xfile.NextType();
   while(p_type != 'E')
@@ -1834,21 +1834,21 @@ XPort::ImportSynonyms(char& p_type)
 }
 
 void
-XPort::ImportRights(bool p_listOnly,char& p_type)
+XPort::ImportRights(bool p_listOnly,TCHAR& p_type)
 {
   int count = 0;
   int errors = 0;
   
   p_type = m_xfile.NextType();
   // What we will do
-  xprintf(false,"Importing access rights: ");
+  xprintf(false,_T("Importing access rights: "));
   if(p_listOnly)
   {
-    xprintf(false,"\n");
+    xprintf(false,_T("\n"));
   }
 
   // Loop until end
-  SQLTransaction trans(GetDatabase(),"privileges");
+  SQLTransaction trans(GetDatabase(),_T("privileges"));
   while(p_type != 'E')
   {
     ++count;
@@ -1859,18 +1859,18 @@ XPort::ImportRights(bool p_listOnly,char& p_type)
     p_type = m_xfile.NextType();
     if((count % COMMIT_SIZE) == 0)
     {
-      printf("%d records processed\r",count);
-      printf("Importing access rights: ");
+      _tprintf(_T("%d records processed\r"),count);
+      _tprintf(_T("Importing access rights: "));
     }
   }
   trans.Commit();
 
-  xprintf(false,"%d records imported.",count);
+  xprintf(false,_T("%d records imported."),count);
   if(errors)
   {
-    xprintf(false," %d records failed.",errors);
+    xprintf(false,_T(" %d records failed."),errors);
   }
-  xprintf(false,"\n");
+  xprintf(false,_T("\n"));
   m_xfile.ReadEnd();
   p_type = m_xfile.NextType();
 }
@@ -1896,15 +1896,15 @@ XPort::ImportSQL(XString& p_sql,bool p_retries/*= false*/,XString p_delim /*=";"
 {
   if(m_parameters.m_listOnly)
   {
-    p_sql.Replace("$SCHEMA$",m_parameters.m_schema);
+    p_sql.Replace(_T("$SCHEMA$"),m_parameters.m_schema);
     xprint(true,p_sql.GetString());
     if(p_sql.Right(p_delim.GetLength()) != p_delim)
     {
-      xprintf(true,"%s",p_delim.GetString());
+      xprintf(true,_T("%s"),p_delim.GetString());
     }
-    if(p_sql.Right(1) != "\n")
+    if(p_sql.Right(1) != _T("\n"))
     {
-      xprintf(true,"\n");
+      xprintf(true,_T("\n"));
     }
     return 0;
   }

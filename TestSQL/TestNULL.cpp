@@ -31,21 +31,21 @@
 
 void InsertWithNULL(SQLDatabase* p_dbs)
 {
-  XString sql = "INSERT INTO k2b_def_sleutel\n"
-                "(organisatie_id,pakket_id,sl_id,sl_naam,sl_oms)\n"
-                "VALUES (? ,? ,? ,? ,? )";
+  XString sql = _T("INSERT INTO k2b_def_sleutel\n")
+                _T("(organisatie_id,pakket_id,sl_id,sl_naam,sl_oms)\n")
+                _T("VALUES (? ,? ,? ,? ,? )");
 
   try
   {
-    SQLTransaction trans(p_dbs,"InsertNULL");
+    SQLTransaction trans(p_dbs,_T("InsertNULL"));
     SQLQuery query(p_dbs);
 
-    SQLVariant var("");
+    SQLVariant var(_T(""));
 
     query.SetParameter(1,(long) 0);
     query.SetParameter(2,(long) 2);
     query.SetParameter(3,(long) 3000);
-    query.SetParameter(4,"Dit is een naam");
+    query.SetParameter(4,_T("Dit is een naam"));
     query.SetParameter(5,&var);
 
     query.DoSQLStatement(sql);
@@ -53,18 +53,18 @@ void InsertWithNULL(SQLDatabase* p_dbs)
   }
   catch(StdException& er)
   {
-    printf("Insert went wrong: %s\n",er.GetErrorMessage().GetString());
+    _tprintf(_T("Insert went wrong: %s\n"),er.GetErrorMessage().GetString());
   }
 }
 
 int
 SelectNULL(SQLDatabase* p_dbs)
 {
-  XString sql = "SELECT organisatie_id\n"
-                "      ,sl_id\n"
-                "      ,sl_oms\n"
-                "  FROM k2b_def_sleutel\n"
-                " WHERE sl_id = ?";
+  XString sql = _T("SELECT organisatie_id\n")
+                _T("      ,sl_id\n")
+                _T("      ,sl_oms\n")
+                _T("  FROM k2b_def_sleutel\n")
+                _T(" WHERE sl_id = ?");
 
   try
   {
@@ -78,13 +78,13 @@ SelectNULL(SQLDatabase* p_dbs)
       XString oms = query.GetColumn(3)->GetAsChar();
       SQLVariant* var = query.GetColumn(3);
 
-      printf("Description: %s\n",oms.GetString());
-      printf("Length string: %d\n",oms.GetLength());
+      _tprintf(_T("Description: %s\n"),oms.GetString());
+      _tprintf(_T("Length string: %d\n"),oms.GetLength());
     }
   }
   catch(StdException& er)
   {
-    printf("Error: %s\n",er.GetErrorMessage().GetString());
+    _tprintf(_T("Error: %s\n"),er.GetErrorMessage().GetString());
   }
   return 0;
 }
@@ -93,11 +93,11 @@ SelectNULL(SQLDatabase* p_dbs)
 void
 TestNULL()
 {
-  printf("Testing the NULL functionality:\n");
-  printf("===============================\n");
+  _tprintf(_T("Testing the NULL functionality:\n"));
+  _tprintf(_T("===============================\n"));
 
   SQLDatabase dbs;
-  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
   long beginTime = clock();
 
   try
@@ -108,21 +108,21 @@ TestNULL()
 
     if(dbs.Open(g_dsn,g_user,g_password))
     {
-      printf("Database opened.\n");
+      _tprintf(_T("Database opened.\n"));
 
 //       InsertWithNULL(&dbs);
 //       SelectNULL(&dbs);
     }
     else
     {
-      printf("Database ***NOT*** opened.\n");
+      _tprintf(_T("Database ***NOT*** opened.\n"));
     }
     dbs.Close();
   }
   catch(StdException& er)
   {
-    printf("Database error. Reason:\n%s\n",er.GetErrorMessage().GetString());
+    _tprintf(_T("Database error. Reason:\n%s\n"),er.GetErrorMessage().GetString());
   }
   long endTime = clock();
-  printf("NULL test performed in: %.4f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("NULL test performed in: %.4f seconds\n"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 }

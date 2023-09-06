@@ -34,10 +34,12 @@ extern XString g_user;
 extern XString g_password;
 extern XString g_schema;
 
-extern void CALLBACK LogPrint(void* p_context,const char* p_text);
+extern void CALLBACK LogPrint(void* p_context,LPCTSTR p_text);
 extern int  CALLBACK LogLevel(void* p_context);
 
 extern void TestConnection();
+extern void TestSelections();
+extern void TestNVarchar();
 extern void TestClosingCursor();
 extern void TestFormatting();
 extern void TestDataSet();

@@ -35,11 +35,11 @@
 
 void TestCalling()
 {
-  printf("Test calling function/procedure:\n");
-  printf("================================\n");
+  _tprintf(_T("Test calling function/procedure:\n"));
+  _tprintf(_T("================================\n"));
 
   SQLDatabase dbs;
-  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
 
   long beginTime = clock();
 
@@ -52,13 +52,13 @@ void TestCalling()
 
     if(dbs.Open(g_dsn,g_user,g_password))
     {
-      printf("Database opened.\n");
+      _tprintf(_T("Database opened.\n"));
 
       beginTime = clock();
 
       // Call with 1 input and 1 output parameter
       SQLQuery query(dbs);
-      SQLTransaction trans(&dbs,"testing");
+      SQLTransaction trans(&dbs,_T("testing"));
 //       var* result = query.DoSQLCall(g_schema,"testmul2",12);
 //       printf("Result of the function call: %d\n",result->GetAsSLong());
 // 
@@ -75,44 +75,44 @@ void TestCalling()
       // Call with 1 input parameter and LONG return value
       beginTime = clock();
       SQLQuery q2(&dbs);
-      q2.SetParameter(1,"TESTING");
-      q2.SetParameterName(1,"p_text");
-      SQLVariant* result = q2.DoSQLCall(g_schema,"testins");
-      printf("Result: %d\n", result ? result->GetAsSLong() : 0);
+      q2.SetParameter(1,_T("TESTING"));
+      q2.SetParameterName(1,_T("p_text"));
+      SQLVariant* result = q2.DoSQLCall(g_schema,_T("testins"));
+      _tprintf(_T("Result: %d\n"), result ? result->GetAsSLong() : 0);
 
       long endTime = clock();
-      printf("Calling test 2 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      _tprintf(_T("Calling test 2 performed in: %.6f seconds\n"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 
       // Call with 1 input parameter and return value AND return parameter
       beginTime = clock();
       var txt(SQL_C_CHAR,5000);
       XString line;
-      for(unsigned ind = 0; ind < 202; ++ind) line += "-";
+      for(unsigned ind = 0; ind < 202; ++ind) line += _T("-");
 
       q2.ResetParameters();
-      q2.SetParameter(0,bcd("11.11"),P_SQL_PARAM_OUTPUT);
-      q2.SetParameter(1,"Multi duplicate testing.");
-      q2.SetParameter(2,line,P_SQL_PARAM_OUTPUT);
-      var* res = q2.DoSQLCall(g_schema,"multinout",true);
+      q2.SetParameter(0,bcd(_T("11.11")),P_SQL_PARAM_OUTPUT);
+      q2.SetParameter(1,_T("Multi duplicate testing."));
+      q2.SetParameter(2,line,false,P_SQL_PARAM_OUTPUT);
+      var* res = q2.DoSQLCall(g_schema,_T("multinout"),true);
 
       endTime = clock();
-      printf("Calling test 3 performed in: %.6f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      _tprintf(_T("Calling test 3 performed in: %.6f seconds\n"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 
       int status = 0;
       bcd number = q2.GetParameter(0)->GetAsBCD();
       XString text = q2.GetParameter(2)->GetAsChar();
-      printf("Result of MULTINOUT = status:%d [%s] [%s]\n",status,number.AsString().GetString(),text.GetString());
+      _tprintf(_T("Result of MULTINOUT = status:%d [%s] [%s]\n"),status,number.AsString().GetString(),text.GetString());
 
       trans.Commit();
     }
     else
     {
-      printf("Database ***NOT*** opened.\n");
+      _tprintf(_T("Database ***NOT*** opened.\n"));
     }
   }
   catch(StdException& er)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",er.GetErrorMessage().GetString());
+    _tprintf(_T("Database ***NOT*** opened. Reason:\n%s\n"),er.GetErrorMessage().GetString());
   }
   if(dbs.IsOpen())
   {

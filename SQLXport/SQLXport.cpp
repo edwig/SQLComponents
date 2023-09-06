@@ -50,9 +50,9 @@ errormap all_errors;
 
 // print string to terminal and logfile
 void
-xputs(const char* p_string)
+xputs(const TCHAR* p_string)
 {
-  size_t len = strlen(p_string);
+  size_t len = _tcslen(p_string);
 
   if(params.m_logfile)
   {
@@ -65,18 +65,18 @@ xputs(const char* p_string)
 
 // Formatted print to terminal and logfile
 void
-xprint(bool p_sql,const char* p_string)
+xprint(bool p_sql,const TCHAR* p_string)
 {
   if(params.m_listOnly && !p_sql)
   {
-    xputs("-- ");
+    xputs(_T("-- "));
   }
   xputs(p_string);
 }
 
 // Formatted print to terminal and logfile
 void
-xprintf(bool p_sql,const char* p_format,...)
+xprintf(bool p_sql,const TCHAR* p_format,...)
 {
   XString buffer;
 
@@ -87,14 +87,14 @@ xprintf(bool p_sql,const char* p_format,...)
 
   if(params.m_listOnly && !p_sql)
   {
-    xputs("-- ");
+    xputs(_T("-- "));
   }
   xputs(buffer);
 }
 
 // Print error to terminal and logfile
 void
-xerror(const char* p_format,...)
+xerror(const TCHAR* p_format,...)
 {
   XString buffer;
 
@@ -120,7 +120,7 @@ xerror(int p_rownum,XString p_string)
   {
     all_errors.insert(std::make_pair(p_string,1));
     // Show total error + row number
-    text.Format("\n%s. Row: %d\n",p_string.GetString(),p_rownum);
+    text.Format(_T("\n%s. Row: %d\n"),p_string.GetString(),p_rownum);
 
     // Show on terminal and in logfile
     xputs(text);
@@ -128,7 +128,7 @@ xerror(int p_rownum,XString p_string)
   else
   {
     // Only show the record number
-    text.Format("Row number: %d\n",p_rownum);
+    text.Format(_T("Row number: %d\n"),p_rownum);
     xputs(text);
     // Number of times found this error
     pos->second++;
@@ -148,7 +148,7 @@ print_all_errors()
     if(err.second > 1)
     {
       XString text;
-      text.Format("%s: Total errors: %d\n",err.first.GetString(),err.second);
+      text.Format(_T("%s: Total errors: %d\n"),err.first.GetString(),err.second);
     }
   }
 }
@@ -156,10 +156,10 @@ print_all_errors()
 void
 PrintCopyright()
 {
-  xprintf(false,"SQLXport: SQL-Server export/import program for ODBC connections\n");
-  xprintf(false,"Copyright (c) " XPORT_YEAR " ir. W.E. Huisman\n");
-  xprintf(false,"Version: " XPORT_VERSION " Date: " XPORT_DATE "\n");
-  xprintf(false,"\n");
+  xprintf(false,_T("SQLXport: SQL-Server export/import program for ODBC connections\n"));
+  xprintf(false,_T("Copyright (c) ") XPORT_YEAR _T(" ir. W.E. Huisman\n"));
+  xprintf(false,_T("Version: ") XPORT_VERSION _T(" Date: ") XPORT_DATE _T("\n"));
+  xprintf(false,_T("\n"));
 }
 
 void
@@ -168,22 +168,22 @@ PrintTotalTime(SQLTimestamp& p_starting,SQLTimestamp& p_stopping)
   bool printing = false;
   SQLInterval howlong = p_stopping - p_starting;
 
-  xprintf(false, "SQLXport total processing time: ");
+  xprintf(false, _T("SQLXport total processing time: "));
   if (howlong.GetDays())
   {
-    xprintf(false,"%d days ",howlong.GetDays());
+    xprintf(false,_T("%d days "),howlong.GetDays());
     printing = true;
   }
   if(howlong.GetHours() || printing)
   {
-    xprintf(false,"%d hours ",howlong.GetHours() % 24);
+    xprintf(false,_T("%d hours "),howlong.GetHours() % 24);
     printing = true;
   }
   if(howlong.GetMinutes() || printing)
   {
-    xprintf(false,"%d min ",howlong.GetMinutes() % 60);
+    xprintf(false,_T("%d min "),howlong.GetMinutes() % 60);
   }
-  xprintf(false,"%d seconds\n",howlong.GetSeconds() % 60);
+  xprintf(false,_T("%d seconds\n"),howlong.GetSeconds() % 60);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -206,7 +206,7 @@ ExportImport()
   // Main processing of export or import
   try
   {
-    if(params.m_direction.CompareNoCase("export") == 0)
+    if(params.m_direction.CompareNoCase(_T("export")) == 0)
     {
       // Export object on the stack
       XPort xport(params);
@@ -221,20 +221,20 @@ ExportImport()
   }
   catch(int ifeof)
   {
-    xprintf(false,"SQLXport: serious error: %d\n",ifeof);
+    xprintf(false,_T("SQLXport: serious error: %d\n"),ifeof);
   }
 
   // Printing the result
   if(params.m_errors == 0)
   {
-    xprintf(false,"SQLXport: %sed with no errors\n",params.m_direction.GetString());
+    xprintf(false,_T("SQLXport: %sed with no errors\n"),params.m_direction.GetString());
   }
   else
   {
-    xprintf(false,"SQLXport: %sed with %d error%c\n"
+    xprintf(false,_T("SQLXport: %sed with %d error%c\n")
            ,params.m_direction.GetString()
            ,params.m_errors
-           ,params.m_errors > 1 ? 's' : ' ');
+           ,params.m_errors > 1 ? _T('s') : ' ');
     print_all_errors();
   }
 
@@ -252,7 +252,7 @@ ExportImport()
 //
 //////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char* argv[])
+int _tmain(int argc, TCHAR* argv[])
 {
   // Initialize the SQL components
   InitSQLComponents(LN_ENGLISH);

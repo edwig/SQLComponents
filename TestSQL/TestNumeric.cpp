@@ -33,11 +33,11 @@
 
 void TestNumeric()
 {
-  printf("Testing Numeric reading/writing:\n");
-  printf("================================\n");
+  _tprintf(_T("Testing Numeric reading/writing:\n"));
+  _tprintf(_T("================================\n"));
 
   SQLDatabase dbs;
-  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
   long beginTime = clock();
 
   try
@@ -52,9 +52,9 @@ void TestNumeric()
 
     if(dbs.Open(g_dsn,g_user,g_password))
     {
-      printf("Database opened.\n");
+      _tprintf(_T("Database opened.\n"));
 
-      XString sql = "SELECT field2,field3 FROM test_number";
+      XString sql = _T("SELECT field2,field3 FROM test_number");
       SQLQuery query(&dbs);
 
       query.DoSQLStatement(sql);
@@ -63,7 +63,7 @@ void TestNumeric()
         double field1 = query[1];
         bcd    field2 = query[2];
 
-        printf("Field 1 [%.4f] Field 2 [%s]\n",field1,field2.AsString().GetString());
+        _tprintf(_T("Field 1 [%.4f] Field 2 [%s]\n"),field1,field2.AsString().GetString());
 
         SQL_NUMERIC_STRUCT num;
         int size = sizeof(SQL_NUMERIC_STRUCT);
@@ -71,24 +71,24 @@ void TestNumeric()
         memcpy_s(&num,size,query.GetColumn(1)->GetAsNumeric(),size);
 
         icd testing(&num);
-        printf("ICD %s\n",testing.AsString().GetString());
+        _tprintf(_T("ICD %s\n"),testing.AsString().GetString());
 
         SQL_NUMERIC_STRUCT test;
         testing.AsNumeric(&test);
 
         if(memcmp(&num,&test,size) != 0)
         {
-          printf("Conversion back is invalid!\n");
+          _tprintf(_T("Conversion back is invalid!\n"));
         }
       }
 
 
       // Do an update
-      SQLTransaction trans(&dbs,"UpdNum");
-      sql = "UPDATE test_number\n"
-            "   SET field3 = ?\n"
-            " WHERE id     = 1";
-      bcd num("33445.2");
+      SQLTransaction trans(&dbs,_T("UpdNum"));
+      sql = _T("UPDATE test_number\n")
+            _T("   SET field3 = ?\n")
+            _T(" WHERE id     = 1");
+      bcd num(_T("33445.2"));
 
       // Parameter must match prec/scale of the database field
       query.SetParameter(1,num);
@@ -98,24 +98,24 @@ void TestNumeric()
     }
     else
     {
-      printf("Database ***NOT*** opened.\n");
+      _tprintf(_T("Database ***NOT*** opened.\n"));
     }
     dbs.Close();
   }
   catch (StdException& er)
   {
-    printf("Database error. Reason: %s\n",er.GetErrorMessage().GetString());
+    _tprintf(_T("Database error. Reason: %s\n"),er.GetErrorMessage().GetString());
   }
   long endTime = clock();
-  printf("NUMERIC test performed in: %.4f seconds\n",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("NUMERIC test performed in: %.4f seconds\n"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
 }
 
 // Test BCD to NUMERIC conversions
 void TestBcd()
 {
   // Header
-  printf("Testing bcd to SQL_NUMERIC_STRUCT\n");
-  printf("---------------------------------\n");
+  _tprintf(_T("Testing bcd to SQL_NUMERIC_STRUCT\n"));
+  _tprintf(_T("---------------------------------\n"));
 
   // num = 10.001 (ten and 1 thousandth)
   SQL_NUMERIC_STRUCT num;
@@ -132,7 +132,7 @@ void TestBcd()
 
   bcd ten(&num);
 
-  printf("SQL_NUMERIC_STRUCT -> bcd: %s\n",ten.AsString().GetString());
+  _tprintf(_T("SQL_NUMERIC_STRUCT -> bcd: %s\n"),ten.AsString().GetString());
 
 
   // Now back again to a SQL_NUMERIC_STRUCT
@@ -142,21 +142,21 @@ void TestBcd()
 //   printf("Scale    : %d\n",res.scale);
 //   printf("Sign     : %d\n",res.sign);
 
-  for(char ind = 0;ind <= res.scale; ++ind)
+  for(TCHAR ind = 0;ind <= res.scale; ++ind)
   {
-    printf("Numeric mantissa [%d:%02.2X]\n",ind,res.val[ind]);
+    _tprintf(_T("Numeric mantissa [%d:%02.2X]\n"),ind,res.val[ind]);
   }
 
   bcd check(&res);
-  printf("bcd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString().GetString());
+  _tprintf(_T("bcd -> SQL_NUMERIC_STRUCT: %s\n"),check.AsString().GetString());
 }
 
 // Test BCD to NUMERIC conversions
 void TestIcd()
 {
   // Header
-  printf("Testing icd to SQL_NUMERIC_STRUCT\n");
-  printf("---------------------------------\n");
+  _tprintf(_T("Testing icd to SQL_NUMERIC_STRUCT\n"));
+  _tprintf(_T("---------------------------------\n"));
 
   // num = 10.001 (ten and 1 thousandth)
   SQL_NUMERIC_STRUCT num;
@@ -173,23 +173,23 @@ void TestIcd()
 
   icd ten(&num);
 
-  printf("SQL_NUMERIC_STRUCT -> icd: %s\n",ten.AsString().GetString());
+  _tprintf(_T("SQL_NUMERIC_STRUCT -> icd: %s\n"),ten.AsString().GetString());
 
 
   // Now back again to a SQL_NUMERIC_STRUCT
   ten.AsNumeric(&res);
 
-  printf("Precision: %d\n",res.precision);
-  printf("Scale    : %d\n",res.scale);
-  printf("Sign     : %d\n",res.sign);
+  _tprintf(_T("Precision: %d\n"),res.precision);
+  _tprintf(_T("Scale    : %d\n"),res.scale);
+  _tprintf(_T("Sign     : %d\n"),res.sign);
 
-  for(char ind = 0;ind <= res.scale; ++ind)
+  for(TCHAR ind = 0;ind <= res.scale; ++ind)
   {
-    printf("Numeric mantissa [%d:%02.2X]\n",ind,res.val[ind]);
+    _tprintf(_T("Numeric mantissa [%d:%02.2X]\n"),ind,res.val[ind]);
   }
 
   icd check(&res);
-  printf("icd -> SQL_NUMERIC_STRUCT: %s\n",check.AsString().GetString());
+  _tprintf(_T("icd -> SQL_NUMERIC_STRUCT: %s\n"),check.AsString().GetString());
 }
 
 void TestBCDIndividual()
@@ -197,8 +197,8 @@ void TestBCDIndividual()
   long x = 8000000;
   bcd num2(0,x);
 
-  printf("BCD %d : %s\n",x,num2.AsString(bcd::Format::Bookkeeping,false,4).GetString());
+  _tprintf(_T("BCD %d : %s\n"),x,num2.AsString(bcd::Format::Bookkeeping,false,4).GetString());
   num2.SetLengthAndPrecision(8,2);
-  printf("BCD %d : %s\n",x,num2.AsString(bcd::Format::Bookkeeping,false,4).GetString());
+  _tprintf(_T("BCD %d : %s\n"),x,num2.AsString(bcd::Format::Bookkeeping,false,4).GetString());
 
 }

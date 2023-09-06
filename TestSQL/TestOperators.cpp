@@ -34,47 +34,9 @@
 SQLVariant variants[CT_LAST];
 SQLVariant others  [CT_LAST];
 
-void TestGreater()
+void FillVariants42()
 {
-  printf("Testing SQLVariant > SQLVariant\n");
-  printf("===============================\n");
-
-  SQLVariant var1((short)13);
-  SQLVariant var2(15);
-
-  if(var1 > var2)
-  {
-    printf("Error in operator (short > long)\n");
-  }
-  else
-  {
-    printf("OK\n");
-  }
-}
-
-void TestSub()
-{
-  printf("Testing SQLDate - SQLDate -> SQLInterval\n");
-  printf("========================================\n");
-
-  SQLDate date1("15-10-1959");
-  SQLDate date2("20-11-2016");
-  SQLVariant var1(&date1);
-  SQLVariant var2(&date2);
-
-  SQLVariant var3 = var2 - var1;
-  CString diff;
-  var3.GetAsString(diff);
-  printf("Found interval is: %s\n",diff.GetString());
-}
-
-void TestEqual()
-{
-  printf("Testing the equality operator of SQLVariant\n");
-  printf("===========================================\n");
-
-  // Init the test array
-  variants[CT_CHAR]     = SQLVariant("42");
+  variants[CT_CHAR]     = SQLVariant(_T("42"));
   variants[CT_SSHORT]   = SQLVariant((short)42);
   variants[CT_USHORT]   = SQLVariant((unsigned short)42);
   variants[CT_SLONG]    = SQLVariant((int)42);
@@ -82,10 +44,54 @@ void TestEqual()
   variants[CT_FLOAT]    = SQLVariant((float)42.0);
   variants[CT_DOUBLE]   = SQLVariant((double)42.0);
   variants[CT_BIT]      = SQLVariant(true);
-  variants[CT_STINYINT] = SQLVariant((char)42);
-  variants[CT_UTINYINT] = SQLVariant((unsigned char)42);
+  variants[CT_STINYINT] = SQLVariant((TCHAR)42);
+  variants[CT_UTINYINT] = SQLVariant((_TUCHAR)42);
   variants[CT_SBIGINT]  = SQLVariant((__int64)42);
   variants[CT_UBIGINT]  = SQLVariant((unsigned __int64)42);
+}
+
+
+void TestGreater()
+{
+  _tprintf(_T("Testing SQLVariant > SQLVariant\n"));
+  _tprintf(_T("===============================\n"));
+
+  SQLVariant var1((short)13);
+  SQLVariant var2(15);
+
+  if(var1 > var2)
+  {
+    _tprintf(_T("Error in operator (short > long)\n"));
+  }
+  else
+  {
+    _tprintf(_T("OK\n"));
+  }
+}
+
+void TestSub()
+{
+  _tprintf(_T("Testing SQLDate - SQLDate -> SQLInterval\n"));
+  _tprintf(_T("========================================\n"));
+
+  SQLDate date1(_T("15-10-1959"));
+  SQLDate date2(_T("20-11-2016"));
+  SQLVariant var1(&date1);
+  SQLVariant var2(&date2);
+
+  SQLVariant var3 = var2 - var1;
+  CString diff;
+  var3.GetAsString(diff);
+  _tprintf(_T("Found interval is: %s\n"),diff.GetString());
+}
+
+void TestEqual()
+{
+  _tprintf(_T("Testing the equality operator of SQLVariant\n"));
+  _tprintf(_T("===========================================\n"));
+
+  // Init the test array
+  FillVariants42();
 
   for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
   {
@@ -97,17 +103,11 @@ void TestEqual()
       XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
       XString rightType = SQLDataType::FindDatatype(right->GetDataType());
       XString message;
-      message.Format("Equality test %s == %s ",leftType,rightType);
-      printf(message);
+      message.Format(_T("Equality test %s == %s "),leftType,rightType);
+      _tprintf(message);
 
-      printf(*left == *right ? "OK\n" : "ERROR\n");
+      _tprintf(*left == *right ? _T("OK\n") : _T("ERROR\n"));
     }
-  }
-
-  // Clean out the test data
-  for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
-  {
-    variants[x].SetData(SQL_C_LONG,"0");
   }
 }
 
@@ -120,11 +120,13 @@ TestAddVar()
 void
 TestAdd()
 {
-  printf("Testing the add operator of SQLVariant\n");
-  printf("======================================\n");
+  _tprintf(_T("Testing the add operator of SQLVariant\n"));
+  _tprintf(_T("======================================\n"));
 
   // Init the test array
-  others[CT_CHAR]     = SQLVariant("5");
+  FillVariants42();
+
+  others[CT_CHAR]     = SQLVariant(_T("5"));
   others[CT_SSHORT]   = SQLVariant((short)5);
   others[CT_USHORT]   = SQLVariant((unsigned short)5);
   others[CT_SLONG]    = SQLVariant((int)5);
@@ -132,8 +134,8 @@ TestAdd()
   others[CT_FLOAT]    = SQLVariant((float)5);
   others[CT_DOUBLE]   = SQLVariant((double)5);
   others[CT_BIT]      = SQLVariant(true);
-  others[CT_STINYINT] = SQLVariant((char)5);
-  others[CT_UTINYINT] = SQLVariant((unsigned char)5);
+  others[CT_STINYINT] = SQLVariant((TCHAR)5);
+  others[CT_UTINYINT] = SQLVariant((_TUCHAR)5);
   others[CT_SBIGINT]  = SQLVariant((__int64)5);
   others[CT_UBIGINT]  = SQLVariant((unsigned __int64)5);
 
@@ -152,8 +154,8 @@ TestAdd()
       XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
       XString rightType = SQLDataType::FindDatatype(right->GetDataType());
       XString message;
-      message.Format("Add test %s + %s ",leftType,rightType);
-      printf(message);
+      message.Format(_T("Add test %s + %s "),leftType,rightType);
+      _tprintf(message);
 
       SQLVariant result(*left + *right); // TEST
       XString res;
@@ -162,11 +164,11 @@ TestAdd()
       if(x == CT_CHAR && y == CT_CHAR)
       {
         // Adding strings
-        printf(res.Compare("425") ? "ERROR\n" : "OK\n");
+        _tprintf(res.Compare(_T("425")) ? _T("ERROR\n") : _T("OK\n"));
       }
       else
       {
-        printf(res.Compare("47") ? "ERROR\n" : "OK\n");
+        _tprintf(res.Compare(_T("47")) ? _T("ERROR\n") : _T("OK\n"));
       }
     }
   }
@@ -174,13 +176,13 @@ TestAdd()
   // Clean out the test data
   for(int x = CT_CHAR; x <= CT_UBIGINT; ++x)
   {
-    others[x].SetData(SQL_C_LONG,"0");
+    others[x].SetData(SQL_C_LONG,_T("0"));
   }
 }
 
 void TestMul()
 {
-  XString numString("42");
+  XString numString(_T("42"));
   bcd num(5);
 
   SQLVariant var1(numString);
@@ -189,17 +191,17 @@ void TestMul()
   SQLVariant var3 = var1 * var2;
   XString diff;
   var3.GetAsString(diff);
-  printf("The result of the char*decimal = %s\n",diff.GetString());
+  _tprintf(_T("The result of the char*decimal = %s\n"),diff.GetString());
 }
 
 void TestCast()
 {
-  printf("Testing the cast operators of SQLVariant\n");
-  printf("========================================\n");
+  _tprintf(_T("Testing the cast operators of SQLVariant\n"));
+  _tprintf(_T("========================================\n"));
 
   SQLVariant varBit   ((bool) true);
   SQLVariant varSTiny ((char) -67);
-  SQLVariant varUTiny ((unsigned char) 189);
+  SQLVariant varUTiny ((uchar) 189);
   SQLVariant varSShort((short) -567);
   SQLVariant varUShort((ushort) 567);
   SQLVariant varInt   ((int) 2 * 42);
@@ -213,13 +215,13 @@ void TestCast()
   int      numberInt     = varInt;
   unsigned numberUInt    = varUInt;
 
-  printf("Test for correct bit cast               : %s\n",numberBit ? "true" : "false");
-  printf("Test for correct signed tiny int cast   : %d\n",(int) numberSTiny);
-  printf("Test for correct unsigned tiny int cast : %d\n",(int) numberUTiny);
-  printf("Test for correct signed short int cast  : %d\n",(int) numberSShort);
-  printf("Test for correct unsigned short int cast: %d\n",(int) numberUShort);
-  printf("Test for correct int cast               : %d\n",numberInt);
-  printf("Test for correct unsigned int cast      : %X\n",numberUInt);
+  _tprintf(_T("Test for correct bit cast               : %s\n"),numberBit ? _T("true") : _T("false"));
+  _tprintf(_T("Test for correct signed tiny int cast   : %d\n"),(int) numberSTiny);
+  _tprintf(_T("Test for correct unsigned tiny int cast : %d\n"),(int) numberUTiny);
+  _tprintf(_T("Test for correct signed short int cast  : %d\n"),(int) numberSShort);
+  _tprintf(_T("Test for correct unsigned short int cast: %d\n"),(int) numberUShort);
+  _tprintf(_T("Test for correct int cast               : %d\n"),numberInt);
+  _tprintf(_T("Test for correct unsigned int cast      : %X\n"),numberUInt);
 }
 
 void TestOperators()

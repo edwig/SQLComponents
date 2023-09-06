@@ -47,7 +47,7 @@ public:
   // Print a help page
   void Usage();
   // Processing the options on the command line
-  void ProcessCommandLine(int argc,char* argv[]);
+  void ProcessCommandLine(int argc,TCHAR* argv[]);
   // Process parameters from a parameter file
   void ReadParameterFile(XString p_filename);
   // Create the logfile

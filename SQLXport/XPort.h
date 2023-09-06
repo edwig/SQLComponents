@@ -117,23 +117,23 @@ private:
   void          WriteSequenceAccessRights(XString p_sequence,int& p_count);
   void          ShowRetryName(XString& p_sql);
   bool          ImportObject(XString& p_object,XString& p_importing);
-  int           ImportSQL(XString& p_sql,bool p_retries = false,XString p_delim =";");
+  int           ImportSQL(XString& p_sql,bool p_retries = false,XString p_delim = _T(";"));
   void          RecordAllColumns  (DDLCreateTable& p_create);
   void          RecordAllIndices  (DDLCreateTable& p_create,DDLS& p_ddls);
   void          RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls);
   void          RecordAllForeigns (DDLCreateTable& p_create);
 
-  void          ImportTables(bool p_listOnly,char& p_type);
-  void          ImportIndices(char& p_type);
-  void          ImportPrimaryKeys(char& p_type);
-  void          ImportForeignKeys(char& p_type);
-  void          ImportDefaults(char& p_type);
-  void          ImportChecks(char& p_type);
-  void          ImportViews(char& p_type);
-  void          ImportSequences(char& p_type);
-  void          ImportProcedures(char& p_type);
-  void          ImportSynonyms(char& p_type);
-  void          ImportRights(bool p_listOnly,char& p_type);
+  void          ImportTables(bool p_listOnly,TCHAR& p_type);
+  void          ImportIndices(TCHAR& p_type);
+  void          ImportPrimaryKeys(TCHAR& p_type);
+  void          ImportForeignKeys(TCHAR& p_type);
+  void          ImportDefaults(TCHAR& p_type);
+  void          ImportChecks(TCHAR& p_type);
+  void          ImportViews(TCHAR& p_type);
+  void          ImportSequences(TCHAR& p_type);
+  void          ImportProcedures(TCHAR& p_type);
+  void          ImportSynonyms(TCHAR& p_type);
+  void          ImportRights(bool p_listOnly,TCHAR& p_type);
 
   // All the parameters
   Parameters& m_parameters;

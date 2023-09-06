@@ -46,7 +46,7 @@ TEST_MODULE_INITIALIZE(ModuleInitialize)
 TEST_MODULE_CLEANUP(ModuleCleanup)
 {
   XString message;
-  message.Format("Number of tests conducted: %d\n",number_of_tests);
+  message.Format(_T("Number of tests conducted: %d\n"),number_of_tests);
   Logger::WriteMessage("\n\nTOTAL TESTS:\n");
   Logger::WriteMessage(message);
 
@@ -70,18 +70,18 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = CONST CHAR *");
 
-      SQLVariant one("23");     // XTOR const char* -> to SQLVariant
+      SQLVariant one(_T("23"));     // XTOR const char* -> to SQLVariant
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_CHAR,one.GetDataType());
 
-      SQLVariant two = "34";    // Assignment const char* -> SQLVariant
+      SQLVariant two   = _T("34");    // Assignment const char* -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_CHAR,two.GetDataType());
 
       number_of_tests += 4;
@@ -91,19 +91,19 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = XString");
 
-      XString twentythree("23");
+      XString twentythree(_T("23"));
       SQLVariant one(twentythree);  // XTOR XString -> to SQLVariant
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_CHAR,one.GetDataType());
 
       SQLVariant two = twentythree; // Assignment XString -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("23",twoString);
+      Assert::AreEqual(_T("23"),twoString);
       Assert::AreEqual(SQL_C_CHAR,two.GetDataType());
 
       number_of_tests += 4;
@@ -117,14 +117,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_SLONG,one.GetDataType());
 
       SQLVariant two = 34;  // Assignment signed long -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_SLONG,two.GetDataType());
 
       number_of_tests += 4;
@@ -138,14 +138,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_ULONG,one.GetDataType());
 
       SQLVariant two = (unsigned)34;  // Assignment unsigned long -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_ULONG,two.GetDataType());
 
       number_of_tests += 4;
@@ -159,14 +159,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_SSHORT,one.GetDataType());
 
       SQLVariant two = (short)34;  // Assignment short -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_SSHORT,two.GetDataType());
 
       number_of_tests += 4;
@@ -180,14 +180,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_USHORT,one.GetDataType());
 
       SQLVariant two = (unsigned short)34;  // Assignment unsigned short -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_USHORT,two.GetDataType());
 
       number_of_tests += 4;
@@ -201,14 +201,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_STINYINT,one.GetDataType());
 
       SQLVariant two = (char)34;  // Assignment tinyint -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_STINYINT,two.GetDataType());
 
       number_of_tests += 4;
@@ -222,14 +222,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_UTINYINT,one.GetDataType());
 
       SQLVariant two = (unsigned char)34;  // Assignment unsigned tinyint -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_UTINYINT,two.GetDataType());
 
       number_of_tests += 4;
@@ -243,14 +243,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_FLOAT,one.GetDataType());
 
       SQLVariant two = (float)34.0;  // Assignment float -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_FLOAT,two.GetDataType());
 
       number_of_tests += 4;
@@ -264,14 +264,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_DOUBLE,one.GetDataType());
 
       SQLVariant two = (double)34.0;  // Assignment double -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_DOUBLE,two.GetDataType());
 
       number_of_tests += 4;
@@ -285,14 +285,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("1",oneString);
+      Assert::AreEqual(_T("1"),oneString);
       Assert::AreEqual(SQL_C_BIT,one.GetDataType());
 
       SQLVariant two = true;      // Assignment bool -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("1",twoString);
+      Assert::AreEqual(_T("1"),twoString);
       Assert::AreEqual(SQL_C_BIT,two.GetDataType());
 
       number_of_tests += 4;
@@ -306,14 +306,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_SBIGINT,one.GetDataType());
 
       SQLVariant two = (__int64)34;  // Assignment bigint -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_SBIGINT,two.GetDataType());
 
       number_of_tests += 4;
@@ -327,14 +327,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("23",oneString);
+      Assert::AreEqual(_T("23"),oneString);
       Assert::AreEqual(SQL_C_UBIGINT,one.GetDataType());
 
       SQLVariant two = (unsigned __int64)34;  // Assignment unsigned bigint -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("34",twoString);
+      Assert::AreEqual(_T("34"),twoString);
       Assert::AreEqual(SQL_C_UBIGINT,two.GetDataType());
 
       number_of_tests += 4;
@@ -346,19 +346,19 @@ namespace OperatorUnitTest
 
       InitSQLComponents();
 
-      SQLDate date("15-10-1959");
+      SQLDate date(_T("15-10-1959"));
       SQLVariant one(&date);        // XTOR SQLDate -> to SQLVariant
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("15-10-1959",oneString);
+      Assert::AreEqual(_T("15-10-1959"),oneString);
       Assert::AreEqual(SQL_C_DATE,one.GetDataType());
 
       SQLVariant two = &date;      // Assignment SQLDate -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("15-10-1959",twoString);
+      Assert::AreEqual(_T("15-10-1959"),twoString);
       Assert::AreEqual(SQL_C_DATE,two.GetDataType());
 
       number_of_tests += 4;
@@ -376,14 +376,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("15-10-1959",oneString);
+      Assert::AreEqual(_T("15-10-1959"),oneString);
       Assert::AreEqual(SQL_C_DATE,one.GetDataType());
 
       SQLVariant two = &date;       // Assignment DATE_STRUCT -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("15-10-1959",twoString);
+      Assert::AreEqual(_T("15-10-1959"),twoString);
       Assert::AreEqual(SQL_C_DATE,two.GetDataType());
 
       number_of_tests += 4;
@@ -395,19 +395,19 @@ namespace OperatorUnitTest
 
       InitSQLComponents();
 
-      SQLTime time("15:55:42");
+      SQLTime time(_T("15:55:42"));
       SQLVariant one(&time);        // XTOR DATE_STRUCT -> SQLVariant
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("15:55:42",oneString);
+      Assert::AreEqual(_T("15:55:42"),oneString);
       Assert::AreEqual(SQL_C_TIME,one.GetDataType());
 
       SQLVariant two = &time;       // Assignment DATE_STRCUT -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("15:55:42",twoString);
+      Assert::AreEqual(_T("15:55:42"),twoString);
       Assert::AreEqual(SQL_C_TIME,two.GetDataType());
 
       number_of_tests += 4;
@@ -425,14 +425,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("15:55:42",oneString);
+      Assert::AreEqual(_T("15:55:42"),oneString);
       Assert::AreEqual(SQL_C_TIME,one.GetDataType());
 
       SQLVariant two = &time;       // Assignment TIME_STRUCT -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("15:55:42",twoString);
+      Assert::AreEqual(_T("15:55:42"),twoString);
       Assert::AreEqual(SQL_C_TIME,two.GetDataType());
 
       number_of_tests += 4;
@@ -444,19 +444,19 @@ namespace OperatorUnitTest
 
       InitSQLComponents();
 
-      SQLTimestamp stamp("1959-10-15 15:55:42");
+      SQLTimestamp stamp(_T("1959-10-15 15:55:42"));
       SQLVariant one(&stamp);       // XTOR SQLTimestamp -> SQLVariant
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("1959-10-15 15:55:42",oneString);
+      Assert::AreEqual(_T("1959-10-15 15:55:42"),oneString);
       Assert::AreEqual(SQL_C_TIMESTAMP,one.GetDataType());
 
       SQLVariant two = &stamp;      // Assignment SQLTimestamp -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("1959-10-15 15:55:42",twoString);
+      Assert::AreEqual(_T("1959-10-15 15:55:42"),twoString);
       Assert::AreEqual(SQL_C_TIMESTAMP,two.GetDataType());
 
       number_of_tests += 4;
@@ -478,14 +478,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("1959-10-15 15:55:42",oneString);
+      Assert::AreEqual(_T("1959-10-15 15:55:42"),oneString);
       Assert::AreEqual(SQL_C_TIMESTAMP,one.GetDataType());
 
       SQLVariant two = &stamp;      // Assignment TIMESTAMP_STRUCT -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("1959-10-15 15:55:42",twoString);
+      Assert::AreEqual(_T("1959-10-15 15:55:42"),twoString);
       Assert::AreEqual(SQL_C_TIMESTAMP,two.GetDataType());
 
       number_of_tests += 4;
@@ -495,19 +495,19 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = SQLInterval Year-Month");
 
-      SQLInterval intval("P57Y2M");
+      SQLInterval intval(_T("P57Y2M"));
       SQLVariant one(&intval);      // XTOR SQLInterval -> SQLVariant
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("57-2",oneString);
+      Assert::AreEqual(_T("57-2"),oneString);
       Assert::AreEqual(SQL_C_INTERVAL_YEAR_TO_MONTH,one.GetDataType());
 
       SQLVariant two = &intval;     // Assignment SQLInterval -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("57-2",twoString);
+      Assert::AreEqual(_T("57-2"),twoString);
       Assert::AreEqual(SQL_C_INTERVAL_YEAR_TO_MONTH,two.GetDataType());
 
       number_of_tests += 4;
@@ -517,12 +517,12 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = SQLInterval Day-Second from string");
 
-      SQLInterval intval(SQL_IS_DAY_TO_SECOND,"20578 14:22:08");
+      SQLInterval intval(SQL_IS_DAY_TO_SECOND,_T("20578 14:22:08"));
       SQLVariant one(&intval);
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("20578 14:22:8",oneString);
+      Assert::AreEqual(_T("20578 14:22:8"),oneString);
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
 
       number_of_tests += 2;
@@ -537,7 +537,7 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("20578 14:22:8",oneString);
+      Assert::AreEqual(_T("20578 14:22:8"),oneString);
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
 
       number_of_tests += 2;
@@ -547,12 +547,12 @@ namespace OperatorUnitTest
     {
       Logger::WriteMessage("SQLVariant = SQLInterval Day-Second from XML Period");
 
-      SQLInterval intval("P20578DT14H22M8S");
+      SQLInterval intval(_T("P20578DT14H22M8S"));
       SQLVariant one(&intval);
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("20578 14:22:8",oneString);
+      Assert::AreEqual(_T("20578 14:22:8"),oneString);
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
 
       number_of_tests += 2;
@@ -578,14 +578,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual("{AABBCCDD-0899-6677-1122-030455667788}",oneString);
+      Assert::AreEqual(_T("{AABBCCDD-0899-6677-1122-030455667788}"),oneString);
       Assert::AreEqual((int)SQL_C_GUID,(int)one.GetDataType());
 
       SQLVariant two = &guid;     // Assignment GUID -> SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual("{AABBCCDD-0899-6677-1122-030455667788}",twoString);
+      Assert::AreEqual(_T("{AABBCCDD-0899-6677-1122-030455667788}"),twoString);
       Assert::AreEqual((int)SQL_C_GUID,(int)two.GetDataType());
 
       number_of_tests += 4;
@@ -597,7 +597,7 @@ namespace OperatorUnitTest
 
       SQLVariant one;
       XString oneString;
-      XString guidString("{AABBCCDD-0899-6677-1122-030455667788}");
+      XString guidString(_T("{AABBCCDD-0899-6677-1122-030455667788}"));
       one.SetData(SQL_C_GUID,guidString);   // Assignment SetData!
 
       const SQLGUID* guid = one.GetAsGUID();
@@ -649,7 +649,7 @@ namespace OperatorUnitTest
 
       Assert::AreEqual((bool)true,numberBit);
       Assert::AreEqual((char)-67, numberSTiny);
-      Assert::AreEqual((unsigned char)189,numberUTiny);
+      Assert::AreEqual((uchar) 189,numberUTiny);
       Assert::AreEqual((short)-567,numberSShort);
       Assert::AreEqual((int)567,(int)numberUShort);
       Assert::AreEqual((int)84,numberInt);

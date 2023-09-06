@@ -66,7 +66,7 @@ public:
   void    Flush();
 
   // Reading from the export file
-  char    NextType();
+  _TUCHAR NextType();
   XString ReadSection();
   XString ReadTable(bool p_doNewline);
   void    ReadColumns(OList* p_columns);
@@ -85,13 +85,13 @@ private:
   // Private objects occurring multiple times
   void    WriteHeader(XString p_type);
   bool    ReadHeader(XString& p_type);
-  void    WriteString(char p_type,XString& p_string);
-  bool    ReadString(char& p_type,XString& p_string);
-  void    WriteObject(char p_type,int  p_length);
-  bool    ReadObject(char& p_type,int& p_length);
+  void    WriteString(TCHAR p_type,XString& p_string);
+  bool    ReadString(TCHAR& p_type,XString& p_string);
+  void    WriteObject(TCHAR p_type,int  p_length);
+  bool    ReadObject(TCHAR& p_type,int& p_length);
   void    WriteData(SQLComponents::SQLVariant* p_var);
   bool    ReadData (SQLComponents::SQLVariant* p_var);
-  void    StripDiacritics(unsigned char* p_buffer);
+  void    StripDiacritics(_TUCHAR* p_buffer);
 
   // Data
   FILE*       m_file { nullptr };

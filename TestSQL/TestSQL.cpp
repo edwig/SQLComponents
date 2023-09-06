@@ -35,16 +35,16 @@
 // in the project root folder
 //
 // TESTING 
-XString g_dsn("testing");
-XString g_user("sysdba");
-XString g_password("altijd");
-XString g_schema("sysdba");
+XString g_dsn(_T("testing"));
+XString g_user(_T("sysdba"));
+XString g_password(_T("altijd"));
+XString g_schema(_T("sysdba"));
 
-void CALLBACK LogPrint(void* p_context,const char* p_text)
+void CALLBACK LogPrint(void* p_context,const TCHAR* p_text)
 {
-  const char *context = (const char*) p_context;
-  printf(context);
-  printf(p_text);
+  const TCHAR *context = (const TCHAR*) p_context;
+  _tprintf(context);
+  _tprintf(p_text);
 }
 
 int CALLBACK LogLevel(void* p_context)
@@ -56,7 +56,7 @@ int CALLBACK LogLevel(void* p_context)
 
 using namespace std;
 
-int main(int argc,char* argv[],char* envp[])
+int _tmain(int argc,TCHAR* argv[],TCHAR* envp[])
 {
   int nRetCode = 0;
 
@@ -66,6 +66,10 @@ int main(int argc,char* argv[],char* envp[])
   TestBCDIndividual();
   // Basic connection test
   TestConnection();
+  // Test selections
+  TestSelections();
+  // Test NVARCHAR Selections
+  TestNVarchar();
   // Test calling procedure/function
   TestCalling();
   // Test BCD to NUMERIC conversions
@@ -93,10 +97,10 @@ int main(int argc,char* argv[],char* envp[])
   //
   //////////////////////////////////////////////////////////////////////////
 
-  printf("Give your opinion: ");
+  _tprintf(_T("Give your opinion: "));
   fflush(stdout);
-  char buffer[101] = "";
-  gets_s(buffer,100);
+  TCHAR buffer[101] = _T("");
+  _getts_s(buffer,100);
 
   return nRetCode;
 }

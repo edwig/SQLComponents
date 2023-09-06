@@ -57,6 +57,12 @@
     <ClCompile Include="Icd.cpp">
       <Filter>ICD</Filter>
     </ClCompile>
+    <ClCompile Include="TestSelections.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestNvarchar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">

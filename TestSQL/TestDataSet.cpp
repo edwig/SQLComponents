@@ -35,47 +35,47 @@
 double
 TestAppend(SQLDatabase* p_dbs,int p_master)
 {
-  printf("Testing the DataSet append function:\n");
-  printf("====================================\n");
+  _tprintf(_T("Testing the DataSet append function:\n"));
+  _tprintf(_T("====================================\n"));
 
-  SQLDataSet details("detail",p_dbs);
-  details.SetPrimaryTable("","detail");
-  details.SetPrimaryKeyColumn("id");
-  details.SetParameter("mast_id",SQLVariant(p_master));
-  details.SetSelection("*"); // Select all columns
+  SQLDataSet details(_T("detail"),p_dbs);
+  details.SetPrimaryTable(_T(""),_T("detail"));
+  details.SetPrimaryKeyColumn(_T("id"));
+  details.SetParameter(_T("mast_id"),SQLVariant(p_master));
+  details.SetSelection(_T("*")); // Select all columns
 
   if(details.Open())
   {
-    printf("Dataset details (mast_id = %d) opened. Rows: %d\n",p_master,details.GetNumberOfRecords());
+    _tprintf(_T("Dataset details (mast_id = %d) opened. Rows: %d\n"),p_master,details.GetNumberOfRecords());
   }
   else
   {
-    printf("Dataset details (mast_id = %d) ***NOT*** openend\n",p_master);
+    _tprintf(_T("Dataset details (mast_id = %d) ***NOT*** openend\n"),p_master);
   }
 
   // Prev master record
-  printf("Dataset append. Number of records: %d\n",details.GetNumberOfRecords());
+  _tprintf(_T("Dataset append. Number of records: %d\n"),details.GetNumberOfRecords());
   --p_master;
-  details.SetParameter("mast_id",SQLVariant(p_master));
+  details.SetParameter(_T("mast_id"),SQLVariant(p_master));
   details.Append();
-  printf("Dataset append. Number of records: %d\n",details.GetNumberOfRecords());
+  _tprintf(_T("Dataset append. Number of records: %d\n"),details.GetNumberOfRecords());
 
   // Calculate the aggregation of the amount field
-  int column = details.GetFieldNumber("amount");
+  int column = details.GetFieldNumber(_T("amount"));
   AggregateInfo info;
   details.Aggregate(column,info);
 
-  printf("Aggregation of the field 'amount':\n"
-         "- sum  = %14.2f\n"
-         "- max  = %14.2f\n"
-         "- min  = %14.2f\n"
-         "- mean = %14.2f\n"
+  _tprintf(_T("Aggregation of the field 'amount':\n")
+         _T("- sum  = %14.2f\n")
+         _T("- max  = %14.2f\n")
+         _T("- min  = %14.2f\n")
+         _T("- mean = %14.2f\n")
          ,info.m_sum,info.m_max,info.m_min,info.m_mean);
          
-  printf("Testing the object cache\n");
+  _tprintf(_T("Testing the object cache\n"));
   SQLRecord* record = details.FindObjectRecord(8);       
-  SQLVariant* var = record->GetField(details.GetFieldNumber("id"));
-  printf("Found record with id: [%d]\n",var->GetAsSLong());        
+  SQLVariant* var = record->GetField(details.GetFieldNumber(_T("id")));
+  _tprintf(_T("Found record with id: [%d]\n"),var->GetAsSLong());        
          
   return info.m_sum;
 }
@@ -84,11 +84,11 @@ TestAppend(SQLDatabase* p_dbs,int p_master)
 double
 ReadDetailSet(SQLDatabase* p_dbs,int p_master)
 {
-  SQLDataSet details("detail",p_dbs);
-  details.SetPrimaryTable("","detail");
-  details.SetPrimaryKeyColumn("id");
-  details.SetParameter("mast_id",SQLVariant(p_master));
-  details.SetSelection("*"); // Select all columns
+  SQLDataSet details(_T("detail"),p_dbs);
+  details.SetPrimaryTable(_T(""),_T("detail"));
+  details.SetPrimaryKeyColumn(_T("id"));
+  details.SetParameter(_T("mast_id"),SQLVariant(p_master));
+  details.SetSelection(_T("*")); // Select all columns
 
   // Alternatively to "SetSelection", we may specify a complete query
 //   XString sql("SELECT id\n"
@@ -102,23 +102,23 @@ ReadDetailSet(SQLDatabase* p_dbs,int p_master)
 
   if(details.Open())
   {
-    printf("Dataset details (mast_id = %d) opened. Rows: %d\n",p_master,details.GetNumberOfRecords());
+    _tprintf(_T("Dataset details (mast_id = %d) opened. Rows: %d\n"),p_master,details.GetNumberOfRecords());
   }
   else
   {
-    printf("Dataset details (mast_id = %d) ***NOT*** openend\n",p_master);
+    _tprintf(_T("Dataset details (mast_id = %d) ***NOT*** openend\n"),p_master);
   }
 
   // Calculate the aggregation of the amount field
-  int column = details.GetFieldNumber("amount");
+  int column = details.GetFieldNumber(_T("amount"));
   AggregateInfo info;
   details.Aggregate(column,info);
 
-  printf("Aggregation of the field 'amount':\n"
-         "- sum  = %14.2f\n"
-         "- max  = %14.2f\n"
-         "- min  = %14.2f\n"
-         "- mean = %14.2f\n"
+  _tprintf(_T("Aggregation of the field 'amount':\n")
+         _T("- sum  = %14.2f\n")
+         _T("- max  = %14.2f\n")
+         _T("- min  = %14.2f\n")
+         _T("- mean = %14.2f\n")
         ,info.m_sum,info.m_max,info.m_min,info.m_mean);
   return info.m_sum;
 }
@@ -126,30 +126,30 @@ ReadDetailSet(SQLDatabase* p_dbs,int p_master)
 double
 ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
 {
-  SQLDataSet master("master",p_dbs);
-  master.SetPrimaryTable("","master");
-  master.SetPrimaryKeyColumn("id");
-  master.SetParameter("key",SQLVariant(p_master));
-  XString sql ("SELECT id\n"
-               "      ,invoice\n"
-               "      ,description\n"
-               "      ,total\n"
-               "  FROM master\n"
-               " WHERE id = $key");
+  SQLDataSet master(_T("master"),p_dbs);
+  master.SetPrimaryTable(_T(""),_T("master"));
+  master.SetPrimaryKeyColumn(_T("id"));
+  master.SetParameter(_T("key"),SQLVariant(p_master));
+  XString sql (_T("SELECT id\n")
+               _T("      ,invoice\n")
+               _T("      ,description\n")
+               _T("      ,total\n")
+               _T("  FROM master\n")
+               _T(" WHERE id = $key"));
   master.SetQuery(sql);
   // Read in the dataset
   if(master.Open())
   {
-    printf("Dataset master (id = %d) opened\n",p_master);
+    _tprintf(_T("Dataset master (id = %d) opened\n"),p_master);
   }
   else
   {
-    printf("Dataset master (id = %d) ***NOT*** opened!\n",p_master);
+    _tprintf(_T("Dataset master (id = %d) ***NOT*** opened!\n"),p_master);
   }
 
-  int fieldnum = master.GetFieldNumber("total");
+  int fieldnum = master.GetFieldNumber(_T("total"));
   double total = master.GetCurrentField(fieldnum)->GetAsDouble();
-  printf("Total amount of this record is: %.2f\n",total);
+  _tprintf(_T("Total amount of this record is: %.2f\n"),total);
 
   // Change field
   SQLRecord* record = master.GetRecord(0);
@@ -168,11 +168,11 @@ ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
 void
 TestDataSet()
 {
-  printf("Testing the DataSet function:\n");
-  printf("=============================\n");
+  _tprintf(_T("Testing the DataSet function:\n"));
+  _tprintf(_T("=============================\n"));
 
   SQLDatabase dbs;
-  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
   long beginTime = clock();
 
   try
@@ -183,7 +183,7 @@ TestDataSet()
 
     if(dbs.Open(g_dsn,g_user,g_password))
     {
-      printf("Database opened.\n");
+      _tprintf(_T("Database opened.\n"));
 
       long   master = 2;
       double amount = 0.0;
@@ -193,21 +193,21 @@ TestDataSet()
 
       if(amount != total)
       {
-        printf("Amounts differ. Check that database update has been done!\n");
+        _tprintf(_T("Amounts differ. Check that database update has been done!\n"));
       }
 
       TestAppend(&dbs,master);
     }
     else
     {
-      printf("Database ***NOT*** opened.\n");
+      _tprintf(_T("Database ***NOT*** opened.\n"));
     }
     dbs.Close();
   }
   catch(StdException& er)
   {
-    printf("Database error. Reason:\n%s\n",er.GetErrorMessage().GetString());
+    _tprintf(_T("Database error. Reason:\n%s\n"),er.GetErrorMessage().GetString());
   }
   long endTime = clock();
-  printf("DATASET test performed in: %.4f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("DATASET test performed in: %.4f seconds\n"), (double)(endTime - beginTime) / CLOCKS_PER_SEC);
 }

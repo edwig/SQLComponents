@@ -93,7 +93,7 @@ BOOL SQLConnectionsApp::InitInstance()
 	}
 	else if (nResponse == -1)
 	{
-		TRACE(traceAppMsg, 0, "Warning: dialog creation failed, so application is terminating unexpectedly.\n");
+		TRACE(traceAppMsg, 0, _T("Warning: dialog creation failed, so application is terminating unexpectedly.\n"));
 	}
 
 #if !defined(_AFXDLL) && !defined(_AFX_NO_MFC_CONTROLS_IN_DIALOGS)
@@ -104,4 +104,3 @@ BOOL SQLConnectionsApp::InitInstance()
 	//  application, rather than start the application's message pump.
 	return FALSE;
 }
-

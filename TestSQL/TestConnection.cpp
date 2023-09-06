@@ -33,11 +33,11 @@
 
 void TestConnection()
 {
-  printf("Testing the connection:\n");
-  printf("=======================\n");
+  _tprintf(_T("Testing the connection:\n"));
+  _tprintf(_T("=======================\n"));
 
   SQLDatabase dbs;
-  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+  dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
 
   long beginTime = clock();
 
@@ -52,19 +52,19 @@ void TestConnection()
 
     if(dbs.Open(g_dsn,g_user,g_password))
     {
-      printf("Database opened.\n");
+      _tprintf(_T("Database opened.\n"));
     }
     else
     {
-      printf("Database ***NOT*** opened.\n");
+      _tprintf(_T("Database ***NOT*** opened.\n"));
     }
   }
   catch(StdException& er)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n",er.GetErrorMessage().GetString());
+    _tprintf(_T("Database ***NOT*** opened. Reason:\n%s\n"),er.GetErrorMessage().GetString());
   }
   long endTime = clock();
-  printf("Open  test performed in: %.6f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("Open  test performed in: %.6f seconds\n"), (double)(endTime - beginTime) / CLOCKS_PER_SEC);
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -78,6 +78,6 @@ void TestConnection()
     dbs.Close();
   }
   endTime = clock();
-  printf("Close test performed in: %.6f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("Close test performed in: %.6f seconds\n"), (double)(endTime - beginTime) / CLOCKS_PER_SEC);
 }
 

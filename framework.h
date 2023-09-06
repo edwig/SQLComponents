@@ -16,8 +16,8 @@
 //
 
 // Included in an Microsoft Application Framework eXtension environment (MFC)
-#include <tchar.h>
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
+// #include <tchar.h>
+// #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
 #include <afx.h>
 
 /////////////////////////////////////////////////////////////////////////////////

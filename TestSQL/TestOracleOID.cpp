@@ -37,22 +37,22 @@ void PerformUpdateTest1(SQLDatabase* p_dbs)
   SQLDataSet set;
 
   set.SetDatabase(p_dbs);
-  set.SetPrimaryTable("kdba","kiw_gem");
-  set.SetPrimaryKeyColumn("oid");
-  set.SetSelection("*");
+  set.SetPrimaryTable(_T("kdba"),_T("kiw_gem"));
+  set.SetPrimaryKeyColumn(_T("oid"));
+  set.SetSelection(_T("*"));
 //  set.SetWhereCondition("oid = 1323");
-  set.SetWhereCondition("gemhoortwrg = 23");
+  set.SetWhereCondition(_T("gemhoortwrg = 23"));
 
   if(set.Open())
   {
     if(set.GetNumberOfRecords() == 1)
     {
-      set.GetRecord(0)->ModifyField("gemeentenaam", "Capelle aan den IJssel");
+      set.GetRecord(0)->ModifyField(_T("gemeentenaam"), _T("Capelle aan den IJssel"));
       set.Synchronize();
     }
     else
     {
-      printf("Test record not found!\n");
+      _tprintf(_T("Test record not found!\n"));
     }
     set.Close();
   }
@@ -63,21 +63,21 @@ void PerformUpdateTest2(SQLDatabase* p_dbs)
   SQLDataSet set;
 
   set.SetDatabase(p_dbs);
-  set.SetPrimaryTable("kdba", "kiw_gem");
-  set.SetPrimaryKeyColumn("oid");
-  set.SetSelection("*");
-  set.SetWhereCondition("oid = 1323");
+  set.SetPrimaryTable(_T("kdba"), _T("kiw_gem"));
+  set.SetPrimaryKeyColumn(_T("oid"));
+  set.SetSelection(_T("*"));
+  set.SetWhereCondition(_T("oid = 1323"));
 
   if (set.Open())
   {
     if (set.GetNumberOfRecords() == 1)
     {
-      set.GetRecord(0)->ModifyField("gemeentenaam","Meppel");
+      set.GetRecord(0)->ModifyField(_T("gemeentenaam"),_T("Meppel"));
       set.Synchronize();
     }
     else
     {
-      printf("Test record not found!\n");
+      _tprintf(_T("Test record not found!\n"));
     }
     set.Close();
   }
@@ -85,11 +85,11 @@ void PerformUpdateTest2(SQLDatabase* p_dbs)
 
 void TestOracleOID()
 {
-  printf("Testing the connection:\n");
-  printf("=======================\n");
+  _tprintf(_T("Testing the connection:\n"));
+  _tprintf(_T("=======================\n"));
 
   SQLDatabase dbs;
-  dbs.RegisterLogContext(LOGLEVEL_MAX, LogLevel, LogPrint, (void*)"");
+  dbs.RegisterLogContext(LOGLEVEL_MAX, LogLevel, LogPrint, (void*)_T(""));
 
   long beginTime = clock();
 
@@ -100,21 +100,21 @@ void TestOracleOID()
     // ORACLE OPTIONS
 
     // Fill in your password!
-    if(dbs.Open("owoc1201","kdba","******"))
+    if(dbs.Open(_T("owoc1201"),_T("kdba"),_T("******")))
     {
-      printf("Database opened.\n");
+      _tprintf(_T("Database opened.\n"));
       PerformUpdateTest1(&dbs);
       PerformUpdateTest2(&dbs);
     }
     else
     {
-      printf("Database ***NOT*** opened.\n");
+      _tprintf(_T("Database ***NOT*** opened.\n"));
     }
   }
   catch (StdException& er)
   {
-    printf("Database ***NOT*** opened. Reason:\n%s\n", er.GetErrorMessage().GetString());
+    _tprintf(_T("Database ***NOT*** opened. Reason:\n%s\n"), er.GetErrorMessage().GetString());
   }
   long endTime = clock();
-  printf("Open  test performed in: %.6f seconds\n", (double)(endTime - beginTime) / CLOCKS_PER_SEC);
+  _tprintf(_T("Open  test performed in: %.6f seconds\n"), (double)(endTime - beginTime) / CLOCKS_PER_SEC);
 }

@@ -1,0 +1,26 @@
+RELEASENOTES SQLCOMPONENTS VERSION 2.3
+======================================
+===== Released since: 06-09-2023 =====
+======================================
+
+Version 2.3.0 of 06-09-2023
+---------------------------
+1)  Library is now fully Unicode compliant
+2)  Can be compiled in MBCS or in Unicode text mode
+    Beware that you write all of your string literals with the _T("") macro
+    Beware that you use the "_t" variants of the C standard library functions
+    so use e.g. "_ttoi(i)" instead of "atoi(i)"
+3)  Most uses of "const char*" are now mitigated to LPCTSTR
+    Most uses of "char" are mitigated to TCHAR
+    Most uses of "unsigned char" are mitigated to _TUCHAR
+    BUT NOT ALL: Be aware of various buffers in this library!
+3)  The SQLVariant type has been extended with the "SQL_C_WCHAR" type
+    And various constructors and SetParameter methods have been extended
+    with the "bool p_wide = false" parameter to give you the ability to write
+    code to enter / bind a XString with a Unicode string to a database column
+4)  The BasicExcel and BasicXmlExcel classes have been expanded to be able to
+    handle spreadsheet files in Unicode compilation mode.
+    Internal XML sheets are converted from UTF-8 to internal strings before handling
+5)  Handle the "SQLQuery.SetParameter" calls in your code with care!
+    For the XString and LPCTSTR variants, the extra 'p_wide' parameter comes BEFORE
+    the optional parameter for the type.

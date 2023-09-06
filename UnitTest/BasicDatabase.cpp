@@ -40,14 +40,14 @@ namespace DatabaseUnitTest
   // DSN "testing" points to the "testing.fdb" database
   // in the project root folder
   //
-  XString g_dsn("testing");
-  XString g_user("sysdba");
-  XString g_password("altijd");
-  XString g_schema("");
+  XString g_dsn(_T("testing"));
+  XString g_user(_T("sysdba"));
+  XString g_password(_T("altijd"));
+  XString g_schema(_T(""));
 
-  void CALLBACK LogPrint(void* p_context,const char* p_text)
+  void CALLBACK LogPrint(void* p_context,LPCTSTR p_text)
   {
-    XString message((const char*)p_context);
+    XString message((LPCTSTR)p_context);
     message += p_text;
     Logger::WriteMessage(message);
   }
@@ -66,7 +66,7 @@ namespace DatabaseUnitTest
       InitSQLComponents();
 
       SQLDatabase dbs;
-      dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+      dbs.RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
       number_of_tests++;
 
       long beginTime = clock();
@@ -94,7 +94,7 @@ namespace DatabaseUnitTest
       }
       long endTime = clock();
       XString performance;
-      performance.Format("Open  test performed in: %.6f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      performance.Format(_T("Open  test performed in: %.6f seconds"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(performance);
       //////////////////////////////////////////////////////////////////////////
       //
@@ -108,7 +108,7 @@ namespace DatabaseUnitTest
         dbs.Close();
       }
       endTime = clock();
-      performance.Format("Close test performed in: %.6f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      performance.Format(_T("Close test performed in: %.6f seconds"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(performance);
     }
 
@@ -117,11 +117,11 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("In unit test Database query function");
 
       double grandTotal = 0.0;
-      XString sql("SELECT id\n"
-                  "      ,invoice\n"
-                  "      ,description\n" 
-                  "      ,total\n" 
-                  "  FROM master");
+      XString sql(_T("SELECT id\n"
+                     "      ,invoice\n"
+                     "      ,description\n" 
+                     "      ,total\n" 
+                     "  FROM master"));
 
       InitSQLComponents();
 
@@ -175,60 +175,60 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("Testing the DataSet append function:");
       Logger::WriteMessage("====================================");
 
-      SQLDataSet details("detail",p_dbs);
-      details.SetPrimaryTable(g_schema,"detail");
-      details.SetPrimaryKeyColumn("id");
-      details.SetParameter("mast_id",SQLVariant(p_master));
-      details.SetSelection("*"); // Select all columns
+      SQLDataSet details(_T("detail"),p_dbs);
+      details.SetPrimaryTable(g_schema,_T("detail"));
+      details.SetPrimaryKeyColumn(_T("id"));
+      details.SetParameter(_T("mast_id"),SQLVariant(p_master));
+      details.SetSelection(_T("*")); // Select all columns
       number_of_tests += 5;
 
       if(details.Open())
       {
-        msg.Format("Dataset details (mast_id = %d) opened. Rows: %d",p_master,details.GetNumberOfRecords());
+        msg.Format(_T("Dataset details (mast_id = %d) opened. Rows: %d"),p_master,details.GetNumberOfRecords());
         Logger::WriteMessage(msg);
       }
       else
       {
-        msg.Format("Dataset details (mast_id = %d) ***NOT*** openend",p_master);
+        msg.Format(_T("Dataset details (mast_id = %d) ***NOT*** openend"),p_master);
         Logger::WriteMessage(msg);
         Assert::Fail(L"Details table not opened");
       }
       number_of_tests++;
 
       // Prev master record
-      msg.Format("Dataset append. Number of records: %d",details.GetNumberOfRecords());
+      msg.Format(_T("Dataset append. Number of records: %d"),details.GetNumberOfRecords());
       Logger::WriteMessage(msg);
       --p_master;
-      details.SetParameter("mast_id",SQLVariant(p_master));
+      details.SetParameter(_T("mast_id"),SQLVariant(p_master));
       details.Append();
-      msg.Format("Dataset append. Number of records: %d",details.GetNumberOfRecords());
+      msg.Format(_T("Dataset append. Number of records: %d"),details.GetNumberOfRecords());
       Logger::WriteMessage(msg);
       number_of_tests++;
 
       // Calculate the aggregation of the amount field
-      int column = details.GetFieldNumber("amount");
+      int column = details.GetFieldNumber(_T("amount"));
       AggregateInfo info;
       details.Aggregate(column,info);
 
-      msg.Format("Aggregation of the field 'amount':\n"
-                 "- sum  = %14.2f\n"
-                 "- max  = %14.2f\n"
-                 "- min  = %14.2f\n"
-                 "- mean = %14.2f\n"
-                 ,info.m_sum,info.m_max,info.m_min,info.m_mean);
+      msg.Format(_T("Aggregation of the field 'amount':\n"
+                    "- sum  = %14.2f\n"
+                    "- max  = %14.2f\n"
+                    "- min  = %14.2f\n"
+                    "- mean = %14.2f\n")
+                    ,info.m_sum,info.m_max,info.m_min,info.m_mean);
       Logger::WriteMessage(msg);
       number_of_tests++;
 
       Logger::WriteMessage("Testing the object cache");
       SQLRecord* record = details.FindObjectRecord(8);
       SQLVariant* var = record->GetField(details.GetFieldNumber("id"));
-      msg.Format("Found record with id: [%d]",var->GetAsSLong());
+      msg.Format(_T("Found record with id: [%d]"),var->GetAsSLong());
       Logger::WriteMessage(msg);
       number_of_tests++;
 
       // Test saving as an XML file
       SetDefaultSQLLanguage(LN_DUTCH);
-      bool saved = details.XMLSave("SQLDataSet_Details.xml","TestDetails");
+      bool saved = details.XMLSave(_T("SQLDataSet_Details.xml"),_T("TestDetails"));
       Assert::AreEqual(true,saved);
       number_of_tests++;
 
@@ -238,11 +238,11 @@ namespace DatabaseUnitTest
     double ReadDetailSet(SQLDatabase* p_dbs,int p_master)
     {
       XString msg;
-      SQLDataSet details("detail",p_dbs);
-      details.SetPrimaryTable(g_schema,"detail");
-      details.SetPrimaryKeyColumn("id");
-      details.SetParameter("mast_id",SQLVariant(p_master));
-      details.SetSelection("*"); // Select all columns
+      SQLDataSet details(_T("detail"),p_dbs);
+      details.SetPrimaryTable(g_schema,_T("detail"));
+      details.SetPrimaryKeyColumn(_T("id"));
+      details.SetParameter(_T("mast_id"),SQLVariant(p_master));
+      details.SetSelection(_T("*")); // Select all columns
       number_of_tests += 4;
 
       // Alternatively to "SetSelection", we may specify a complete query
@@ -257,29 +257,29 @@ namespace DatabaseUnitTest
 
       if(details.Open())
       {
-        msg.Format("Dataset details (mast_id = %d) openend. Rows: %d",p_master,details.GetNumberOfRecords());
+        msg.Format(_T("Dataset details (mast_id = %d) openend. Rows: %d"),p_master,details.GetNumberOfRecords());
         Logger::WriteMessage(msg);
       }
       else
       {
-        msg.Format("Dataset details (mast_id = %d) ***NOT*** openend",p_master);
+        msg.Format(_T("Dataset details (mast_id = %d) ***NOT*** openend"),p_master);
         Logger::WriteMessage(msg);
         Assert::Fail(L"Table details not opened");
       }
       number_of_tests++;
 
       // Calculate the aggregation of the amount field
-      int column = details.GetFieldNumber("amount");
+      int column = details.GetFieldNumber(_T("amount"));
       AggregateInfo info;
       details.Aggregate(column,info);
       number_of_tests++;
 
-      msg.Format("Aggregation of the field 'amount':\n"
-                 "- sum  = %14.2f\n"
-                 "- max  = %14.2f\n"
-                 "- min  = %14.2f\n"
-                 "- mean = %14.2f\n"
-                 ,info.m_sum,info.m_max,info.m_min,info.m_mean);
+      msg.Format(_T("Aggregation of the field 'amount':\n"
+                    "- sum  = %14.2f\n"
+                    "- max  = %14.2f\n"
+                    "- min  = %14.2f\n"
+                    "- mean = %14.2f\n")
+                    ,info.m_sum,info.m_max,info.m_min,info.m_mean);
       Logger::WriteMessage(msg);
       return info.m_sum;
     }
@@ -287,34 +287,34 @@ namespace DatabaseUnitTest
     double ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
     {
       XString msg;
-      SQLDataSet master("master",p_dbs);
-      master.SetPrimaryTable(g_schema,"master");
-      master.SetPrimaryKeyColumn("id");
-      master.SetParameter("key",SQLVariant(p_master));
-      XString sql("SELECT id\n"
-                  "      ,invoice\n"
-                  "      ,description\n"
-                  "      ,total\n"
-                  "  FROM master\n"
-                  " WHERE id = $key");
+      SQLDataSet master(_T("master"),p_dbs);
+      master.SetPrimaryTable(g_schema,_T("master"));
+      master.SetPrimaryKeyColumn(_T("id"));
+      master.SetParameter(_T("key"),SQLVariant(p_master));
+      XString sql(_T("SELECT id\n"
+                     "      ,invoice\n"
+                     "      ,description\n"
+                     "      ,total\n"
+                     "  FROM master\n"
+                     " WHERE id = $key"));
       master.SetQuery(sql);
       // Read in the dataset
       if(master.Open())
       {
-        msg.Format("Dataset master (id = %d) opened",p_master);
+        msg.Format(_T("Dataset master (id = %d) opened"),p_master);
         Logger::WriteMessage(msg);
       }
       else
       {
-        msg.Format("Dataset master (id = %d) ***NOT*** opened!",p_master);
+        msg.Format(_T("Dataset master (id = %d) ***NOT*** opened!"),p_master);
         Logger::WriteMessage(msg);
         Assert::Fail(L"Table master not opened");
       }
       number_of_tests++;
 
-      int fieldnum = master.GetFieldNumber("total");
+      int fieldnum = master.GetFieldNumber(_T("total"));
       double total = master.GetCurrentField(fieldnum)->GetAsDouble();
-      msg.Format("Total amount of this record is: %.2f",total);
+      msg.Format(_T("Total amount of this record is: %.2f"),total);
       Logger::WriteMessage(msg);
       number_of_tests++;
 
@@ -385,7 +385,7 @@ namespace DatabaseUnitTest
       number_of_tests++;
 
       XString msg;
-      msg.Format("DATASET test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      msg.Format(_T("DATASET test performed in: %.4f seconds"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(msg);
     }
 
@@ -415,7 +415,7 @@ namespace DatabaseUnitTest
         {
           Logger::WriteMessage("Database opened.");
 
-          XString sql = "SELECT field2,field3 FROM test_number";
+          XString sql = _T("SELECT field2,field3 FROM test_number");
           SQLQuery query(&dbs);
 
           query.DoSQLStatement(sql);
@@ -425,16 +425,16 @@ namespace DatabaseUnitTest
             bcd    field2 = query[2];
 
             XString msg;
-            msg.Format("Field 1 [%.4f] Field 2 [%s]",field1,field2.AsString());
+            msg.Format(_T("Field 1 [%.4f] Field 2 [%s]"),field1,field2.AsString());
             Logger::WriteMessage(msg);
           }
           number_of_tests++;
 
           // Change value
-          SQLTransaction trans(&dbs,"UpdNum");
-          XString sql2 = "UPDATE test_number\n"
-                         "   SET field3 = ?\n"
-                         " WHERE id     = 1";
+          SQLTransaction trans(&dbs,_T("UpdNum"));
+          XString sql2 = _T("UPDATE test_number\n"
+                            "   SET field3 = ?\n"
+                            " WHERE id     = 1");
           bcd num(3034.6);
           query.SetConcurrency(SQL_CONCUR_LOCK);
           query.SetParameter(1,num);
@@ -443,7 +443,7 @@ namespace DatabaseUnitTest
           number_of_tests++;
 
           // Reselect
-          sql += " WHERE id = 1";
+          sql += _T(" WHERE id = 1");
           query.DoSQLStatement(sql);
           if(query.GetRecord())
           {
@@ -477,7 +477,7 @@ namespace DatabaseUnitTest
       number_of_tests++;
 
       XString msg;
-      msg.Format("NUMERIC test performed in: %.4f seconds",(double)(endTime - beginTime) / CLOCKS_PER_SEC);
+      msg.Format(_T("NUMERIC test performed in: %.4f seconds"),(double)(endTime - beginTime) / CLOCKS_PER_SEC);
       Logger::WriteMessage(msg);
     }
 
@@ -495,7 +495,7 @@ namespace DatabaseUnitTest
       SQLRecord* masterRecord = assoc.FollowToMaster();
       if(masterRecord)
       {
-        SQLVariant* desc = masterRecord->GetField("description");
+        SQLVariant* desc = masterRecord->GetField(_T("description"));
         XString name;
         desc->GetAsString(name);
         Logger::WriteMessage("Master record: " + name);
@@ -511,7 +511,7 @@ namespace DatabaseUnitTest
       bcd total;
       for(auto& rec : *recSet)
       {
-        bcd num = rec->GetField("amount")->GetAsBCD();
+        bcd num = rec->GetField(_T("amount"))->GetAsBCD();
         Logger::WriteMessage("Detail record: " + num.AsString());
         total += num;
         number_of_tests++;
@@ -519,7 +519,7 @@ namespace DatabaseUnitTest
       Logger::WriteMessage("Total of details: " + total.AsString());
       number_of_tests++;
 
-      // Delete details resultset
+      // Delete details result set
       delete recSet;
 
       return total;
@@ -548,22 +548,22 @@ namespace DatabaseUnitTest
           number_of_tests++;
 
           // Set up the datasets
-          SQLDataSet master("master",&dbs);
-          SQLDataSet detail("detail",&dbs);
-          XString    masterQuery = "SELECT * FROM master";
-          XString    detailQuery = "SELECT * FROM detail";
+          SQLDataSet master(_T("master"),&dbs);
+          SQLDataSet detail(_T("detail"),&dbs);
+          XString    masterQuery = _T("SELECT * FROM master");
+          XString    detailQuery = _T("SELECT * FROM detail");
 
           master.SetQuery(masterQuery);
           detail.SetQuery(detailQuery);
-          master.SetPrimaryTable(g_schema,"master");
-          detail.SetPrimaryTable(g_schema,"detail");
-          master.SetPrimaryKeyColumn("id");
-          detail.SetPrimaryKeyColumn("id");
+          master.SetPrimaryTable(g_schema,_T("master"));
+          detail.SetPrimaryTable(g_schema,_T("detail"));
+          master.SetPrimaryKeyColumn(_T("id"));
+          detail.SetPrimaryKeyColumn(_T("id"));
           number_of_tests += 8;
 
           // Set up an association
           SQLAssociation assoc(&master,&detail);
-          assoc.SetAssociation("id","mast_id");
+          assoc.SetAssociation(_T("id"),_T("mast_id"));
           number_of_tests++;
 
           // Print the set
@@ -598,21 +598,21 @@ namespace DatabaseUnitTest
     void ReportString(XString p_prompt,XString p_info)
     {
       XString text;
-      text.Format("%s %s",p_prompt,p_info);
+      text.Format(_T("%s %s"),p_prompt,p_info);
       Logger::WriteMessage(text);
     }
 
     void ReportBoolean(XString p_prompt,bool p_info)
     {
       XString text;
-      text.Format("%s %s",p_prompt,p_info ? "true" : "false");
+      text.Format(_T("%s %s"),p_prompt,p_info ? _T("true") : _T("false"));
       Logger::WriteMessage(text);
     }
 
     void ReportLong(XString p_prompt,long p_info)
     {
       XString text;
-      text.Format("%s %d",p_prompt,p_info);
+      text.Format(_T("%s %d"),p_prompt,p_info);
       Logger::WriteMessage(text);
     }
 
@@ -631,37 +631,37 @@ namespace DatabaseUnitTest
 
     void ReportDBInfo(SQLInfoDB* p_info)
     {
-      XString schema ("dbo");
-      XString table  ("master");
-      XString column ("id");
-      XString type   ("integer");
-      XString select ("SELECT id FROM master\n");
-      XString columns("oid,description,amount");
-      XString procedure("procedure");
-      XString mode("auto");
-      XString destiny("variable");
-      XString source("\'Test'\"");
-      XString indexname("01_master_id");
-      XString condition("variable IS NOT NULL");
-      XString foreign("fk_master_one");
-      XString triggername("master_check");
-      XString viewname("myview");
-      XString procedurename("calculate");
-      XString tabledef("(ID INTEGER,NAME VARCHAR(200),NUMBER DECIMAL(14,2));");
+      XString schema (_T("dbo"));
+      XString table  (_T("master"));
+      XString column (_T("id"));
+      XString type   (_T("integer"));
+      XString select (_T("SELECT id FROM master\n"));
+      XString columns(_T("oid,description,amount"));
+      XString procedure(_T("procedure"));
+      XString mode(_T("auto"));
+      XString destiny(_T("variable"));
+      XString source(_T("\'Test'\""));
+      XString indexname(_T("01_master_id"));
+      XString condition(_T("variable IS NOT NULL"));
+      XString foreign(_T("fk_master_one"));
+      XString triggername(_T("master_check"));
+      XString viewname(_T("myview"));
+      XString procedurename(_T("calculate"));
+      XString tabledef(_T("(ID INTEGER,NAME VARCHAR(200),NUMBER DECIMAL(14,2));"));
       XString precursor;
-      XString cursorname("selcursor");
-      XString splParam1("CHAR");
-      XString splParam2("NUMERIC");
-      XString quoteString("This is 'a' string");
+      XString cursorname(_T("selcursor"));
+      XString splParam1(_T("CHAR"));
+      XString splParam2(_T("NUMERIC"));
+      XString quoteString(_T("This is 'a' string"));
       int     statements = 0;
       bool    notnull    = true;
 
       MetaIndex index;
       index.m_indexName  = indexname;
-      index.m_columnName = "id";
+      index.m_columnName = _T("id");
       index.m_position   = 0;
       index.m_nonunique  = false;
-      index.m_ascending  = "A";
+      index.m_ascending  = _T("A");
 
       MetaTable    tables;
       MetaColumn   metacolumns;
@@ -677,158 +677,158 @@ namespace DatabaseUnitTest
       std::vector<XString> cursorparameters; // Fetch into
 
       // RDBMS
-      ReportLong   ("Database type                      :",p_info->GetRDBMSDatabaseType());
-      ReportString ("Database vendor name               :",p_info->GetRDBMSVendorName());
+      ReportLong   (_T("Database type                      :"),p_info->GetRDBMSDatabaseType());
+      ReportString (_T("Database vendor name               :"),p_info->GetRDBMSVendorName());
       number_of_tests += 2;
     //ReportString ("Database physical name             :",p_info->GetRDBMSPhysicalDatabaseName());
-      ReportBoolean("Catalog is in upper case           :",p_info->GetRDBMSIsCatalogUpper());
-      ReportBoolean("Database understands schemas       :",p_info->GetRDBMSUnderstandsSchemas());
-      ReportBoolean("Driver understands comments        :",p_info->GetRDBMSSupportsComments());
-      ReportBoolean("Support deferred constraints       :",p_info->GetRDBMSSupportsDeferredConstraints());
-      ReportBoolean("Support order-by expressions       :",p_info->GetRDBMSSupportsOrderByExpression());
-      ReportBoolean("Supports {[?=] CALL escapes}       :",p_info->GetRDBMSSupportsComments());
-      ReportBoolean("Time stored as decimal             :",p_info->GetRDBMSSupportsDatatypeTime());
-      ReportBoolean("Interval type supported            :",p_info->GetRDBMSSupportsDatatypeInterval());
-      ReportLong   ("Maximum SQL length                 :",p_info->GetRDBMSMaxStatementLength());
-      ReportBoolean("Must Commit DDL                    :",p_info->GetRDBMSMustCommitDDL());
+      ReportBoolean(_T("Catalog is in upper case           :"),p_info->GetRDBMSIsCatalogUpper());
+      ReportBoolean(_T("Database understands schemas       :"),p_info->GetRDBMSUnderstandsSchemas());
+      ReportBoolean(_T("Driver understands comments        :"),p_info->GetRDBMSSupportsComments());
+      ReportBoolean(_T("Support deferred constraints       :"),p_info->GetRDBMSSupportsDeferredConstraints());
+      ReportBoolean(_T("Support order-by expressions       :"),p_info->GetRDBMSSupportsOrderByExpression());
+      ReportBoolean(_T("Supports {[?=] CALL escapes}       :"),p_info->GetRDBMSSupportsComments());
+      ReportBoolean(_T("Time stored as decimal             :"),p_info->GetRDBMSSupportsDatatypeTime());
+      ReportBoolean(_T("Interval type supported            :"),p_info->GetRDBMSSupportsDatatypeInterval());
+      ReportLong   (_T("Maximum SQL length                 :"),p_info->GetRDBMSMaxStatementLength());
+      ReportBoolean(_T("Must Commit DDL                    :"),p_info->GetRDBMSMustCommitDDL());
       number_of_tests += 10;
       // KEYWORDS
-      ReportString ("Database DATETIME keyword          :",p_info->GetKEYWORDCurrentTimestamp());
-      ReportString ("Database date keyword              :",p_info->GetKEYWORDCurrentDate());
-      ReportString ("Concatenation operator             :",p_info->GetKEYWORDConcatanationOperator());
-      ReportString ("Quote character                    :",p_info->GetKEYWORDQuoteCharacter());
-      ReportString ("Default NULL for parameter         :",p_info->GetKEYWORDParameterDefaultNULL());
-      ReportString ("Parameter is for INPUT and OUTPUT  :",p_info->GetKEYWORDParameterINOUT());
-      ReportString ("Parameter is for OUTPUT only       :",p_info->GetKEYWORDParameterOUT());
-      ReportString ("Network dbs primary key type       :",p_info->GetKEYWORDNetworkPrimaryKeyType());
-      ReportString ("Datatype for TIMESTAMP / DATETIME  :",p_info->GetKEYWORDTypeTimestamp());
-      ReportString ("Parameter prefix in PSM module     :",p_info->GetKEYWORDParameterPrefix());
-      ReportString ("Identity string                    :",p_info->GetKEYWORDIdentityString(table));
-      ReportString ("Function UPPER()                   :",p_info->GetKEYWORDUpper(source));
-      ReportString ("INTERVAL 1 minute ago              :",p_info->GetKEYWORDInterval1MinuteAgo());
-      ReportString("Statement Not Null Value (NVL)     :", p_info->GetKEYWORDStatementNVL(column,source));
+      ReportString (_T("Database DATETIME keyword          :"),p_info->GetKEYWORDCurrentTimestamp());
+      ReportString (_T("Database date keyword              :"),p_info->GetKEYWORDCurrentDate());
+      ReportString (_T("Concatenation operator             :"),p_info->GetKEYWORDConcatanationOperator());
+      ReportString (_T("Quote character                    :"),p_info->GetKEYWORDQuoteCharacter());
+      ReportString (_T("Default NULL for parameter         :"),p_info->GetKEYWORDParameterDefaultNULL());
+      ReportString (_T("Parameter is for INPUT and OUTPUT  :"),p_info->GetKEYWORDParameterINOUT());
+      ReportString (_T("Parameter is for OUTPUT only       :"),p_info->GetKEYWORDParameterOUT());
+      ReportString (_T("Network dbs primary key type       :"),p_info->GetKEYWORDNetworkPrimaryKeyType());
+      ReportString (_T("Datatype for TIMESTAMP / DATETIME  :"),p_info->GetKEYWORDTypeTimestamp());
+      ReportString (_T("Parameter prefix in PSM module     :"),p_info->GetKEYWORDParameterPrefix());
+      ReportString (_T("Identity string                    :"),p_info->GetKEYWORDIdentityString(table));
+      ReportString (_T("Function UPPER()                   :"),p_info->GetKEYWORDUpper(source));
+      ReportString (_T("INTERVAL 1 minute ago              :"),p_info->GetKEYWORDInterval1MinuteAgo());
+      ReportString (_T("Statement Not Null Value (NVL)     :"),p_info->GetKEYWORDStatementNVL(column,source));
       number_of_tests += 14;
       // SQL's
-      ReportSQL    ("Generate new serial                :",p_info->GetSQLGenerateSerial(table));
-      ReportString ("Effective serial                   :",p_info->GetSQLEffectiveSerial("oid"));
-      ReportSQL    ("Start new subtransaction           :",p_info->GetSQLStartSubTransaction(table));
-      ReportSQL    ("Commit subtransaction              :",p_info->GetSQLCommitSubTransaction(table));
-      ReportSQL    ("Rollback subtransaction            :",p_info->GetSQLRollbackSubTransaction(table));
-      ReportString ("FROM part for single row select    :",p_info->GetSQLFromDualClause());
-      ReportSQL    ("SQL lock table                     :",p_info->GetSQLLockTable(schema,table,true,0));
-      ReportSQL    ("SQL Optimize table                 :",p_info->GetSQLOptimizeTable(schema,table));
-      ReportString ("SQL string quotes                  :",p_info->GetSQLString(quoteString));
-      ReportString ("SQL date string                    :",p_info->GetSQLDateString(1959,15,10));
-      ReportString ("SQL time string                    :",p_info->GetSQLTimeString(15,50,20));
-      ReportString ("SQL datetime string (timestamp)    :",p_info->GetSQLDateTimeString(1959,10,15,15,50,20));
-      ReportString ("SQL datetime bound string          :",p_info->GetSQLDateTimeBoundString());
-      ReportString ("SQL datetime stripped string       :",p_info->GetSQLDateTimeStrippedString(1959,10,15,15,50,20));
+      ReportSQL    (_T("Generate new serial                :"),p_info->GetSQLGenerateSerial(table));
+      ReportString (_T("Effective serial                   :"),p_info->GetSQLEffectiveSerial("oid"));
+      ReportSQL    (_T("Start new subtransaction           :"),p_info->GetSQLStartSubTransaction(table));
+      ReportSQL    (_T("Commit subtransaction              :"),p_info->GetSQLCommitSubTransaction(table));
+      ReportSQL    (_T("Rollback subtransaction            :"),p_info->GetSQLRollbackSubTransaction(table));
+      ReportString (_T("FROM part for single row select    :"),p_info->GetSQLFromDualClause());
+      ReportSQL    (_T("SQL lock table                     :"),p_info->GetSQLLockTable(schema,table,true,0));
+      ReportSQL    (_T("SQL Optimize table                 :"),p_info->GetSQLOptimizeTable(schema,table));
+      ReportString (_T("SQL string quotes                  :"),p_info->GetSQLString(quoteString));
+      ReportString (_T("SQL date string                    :"),p_info->GetSQLDateString(1959,15,10));
+      ReportString (_T("SQL time string                    :"),p_info->GetSQLTimeString(15,50,20));
+      ReportString (_T("SQL datetime string (timestamp)    :"),p_info->GetSQLDateTimeString(1959,10,15,15,50,20));
+      ReportString (_T("SQL datetime bound string          :"),p_info->GetSQLDateTimeBoundString());
+      ReportString (_T("SQL datetime stripped string       :"),p_info->GetSQLDateTimeStrippedString(1959,10,15,15,50,20));
       number_of_tests += 14;
       // CATALOG FUNCTION SQL
       // CATALOG TABLE
-      ReportSQL    ("TABLE exists                       :",p_info->GetCATALOGTableExists    (schema,table));
-      ReportSQL    ("TABLE list                         :",p_info->GetCATALOGTablesList     (schema,table));
-      ReportSQL    ("TABLE attributes                   :",p_info->GetCATALOGTableAttributes(schema,table));
-      ReportSQL    ("TABLE Synonyms                     :",p_info->GetCATALOGTableSynonyms  (schema,table));
-      ReportSQL    ("TABLE Catalogs                     :",p_info->GetCATALOGTableCatalog   (schema,table));
-      ReportSQL    ("TABLE exists                       :",p_info->GetCATALOGTableExists    (schema,table));
-      ReportSQL    ("TABLE create                       :",p_info->GetCATALOGTableCreate    (tables,metacolumns));
-      ReportSQL    ("TABLE Rename                       :",p_info->GetCATALOGTableRename    (schema,table,table + "_ext"));
-      ReportSQL    ("TABLE Drop                         :",p_info->GetCATALOGTableDrop      (schema,table));
+      ReportSQL    (_T("TABLE exists                       :"),p_info->GetCATALOGTableExists    (schema,table));
+      ReportSQL    (_T("TABLE list                         :"),p_info->GetCATALOGTablesList     (schema,table));
+      ReportSQL    (_T("TABLE attributes                   :"),p_info->GetCATALOGTableAttributes(schema,table));
+      ReportSQL    (_T("TABLE Synonyms                     :"),p_info->GetCATALOGTableSynonyms  (schema,table));
+      ReportSQL    (_T("TABLE Catalogs                     :"),p_info->GetCATALOGTableCatalog   (schema,table));
+      ReportSQL    (_T("TABLE exists                       :"),p_info->GetCATALOGTableExists    (schema,table));
+      ReportSQL    (_T("TABLE create                       :"),p_info->GetCATALOGTableCreate    (tables,metacolumns));
+      ReportSQL    (_T("TABLE Rename                       :"),p_info->GetCATALOGTableRename    (schema,table,table + "_ext"));
+      ReportSQL    (_T("TABLE Drop                         :"),p_info->GetCATALOGTableDrop      (schema,table));
       number_of_tests += 9;
       // CATALOG Temp table
-      ReportSQL    ("TEMP TABLE create                  :",p_info->GetCATALOGTemptableCreate  (schema,table,select));
-      ReportSQL    ("TEMP TABLE select into temp        :",p_info->GetCATALOGTemptableIntoTemp(schema,table,select));
-      ReportSQL    ("TEMP TABLE drop                    :",p_info->GetCATALOGTemptableDrop    (schema,table));
+      ReportSQL    (_T("TEMP TABLE create                  :"),p_info->GetCATALOGTemptableCreate  (schema,table,select));
+      ReportSQL    (_T("TEMP TABLE select into temp        :"),p_info->GetCATALOGTemptableIntoTemp(schema,table,select));
+      ReportSQL    (_T("TEMP TABLE drop                    :"),p_info->GetCATALOGTemptableDrop    (schema,table));
       number_of_tests += 3;
       // CATALOG Columns
-      ReportSQL    ("COLUMN exists                      :",p_info->GetCATALOGColumnExists    (schema,table,column));
-      ReportSQL    ("COLUMN all column info of a table  :",p_info->GetCATALOGColumnList      (schema,table));
-      ReportSQL    ("COLUMN all attributes of the column:",p_info->GetCATALOGColumnAttributes(schema,table,column));
-      ReportSQL    ("COLUMN Create                      :",p_info->GetCATALOGColumnCreate    (metacolumns));
-      ReportSQL    ("COLUMN Alter                       :", p_info->GetCATALOGColumnAlter    (metacolumns));
-      ReportSQL    ("COLUMN Rename                      :",p_info->GetCATALOGColumnRename    (schema,table,column,column + "_ext",type));
-      ReportSQL    ("COLUMN Drop                        :",p_info->GetCATALOGColumnDrop      (schema,table,column));
+      ReportSQL    (_T("COLUMN exists                      :"),p_info->GetCATALOGColumnExists    (schema,table,column));
+      ReportSQL    (_T("COLUMN all column info of a table  :"),p_info->GetCATALOGColumnList      (schema,table));
+      ReportSQL    (_T("COLUMN all attributes of the column:"),p_info->GetCATALOGColumnAttributes(schema,table,column));
+      ReportSQL    (_T("COLUMN Create                      :"),p_info->GetCATALOGColumnCreate    (metacolumns));
+      ReportSQL    (_T("COLUMN Alter                       :"),p_info->GetCATALOGColumnAlter     (metacolumns));
+      ReportSQL    (_T("COLUMN Rename                      :"),p_info->GetCATALOGColumnRename    (schema,table,column,column + "_ext",type));
+      ReportSQL    (_T("COLUMN Drop                        :"),p_info->GetCATALOGColumnDrop      (schema,table,column));
       number_of_tests += 7;
       // CATALOG Index
-      ReportSQL    ("INDEX exists                       :",p_info->GetCATALOGIndexExists    (schema,table,indexname));
-      ReportSQL    ("INDEX list all indices of a table  :",p_info->GetCATALOGIndexList      (schema,table));
-      ReportSQL    ("INDEX attributes of an index       :",p_info->GetCATALOGIndexAttributes(schema,table,indexname));
-      ReportSQL    ("INDEX Create                       :",p_info->GetCATALOGIndexCreate    (indices));
-      ReportSQL    ("INDEX Drop                         :",p_info->GetCATALOGIndexDrop      (schema,table,indexname));
+      ReportSQL    (_T("INDEX exists                       :"),p_info->GetCATALOGIndexExists    (schema,table,indexname));
+      ReportSQL    (_T("INDEX list all indices of a table  :"),p_info->GetCATALOGIndexList      (schema,table));
+      ReportSQL    (_T("INDEX attributes of an index       :"),p_info->GetCATALOGIndexAttributes(schema,table,indexname));
+      ReportSQL    (_T("INDEX Create                       :"),p_info->GetCATALOGIndexCreate    (indices));
+      ReportSQL    (_T("INDEX Drop                         :"),p_info->GetCATALOGIndexDrop      (schema,table,indexname));
       number_of_tests += 5;
       //ReportSQL    ("INDEX Filter                       :",p_info->GetCATALOGIndexFilter    (metaIndex));
       // CATALOG Primary key
-      ReportSQL    ("PRIMARY KEY exists                 :",p_info->GetCATALOGPrimaryExists    (schema,table));
-      ReportSQL    ("PRIMARY KEY attributes             :",p_info->GetCATALOGPrimaryAttributes(schema,table));
-      ReportSQL    ("PRIMARY KEY create                 :",p_info->GetCATALOGPrimaryCreate    (primaries));
-      ReportSQL    ("PRIMARY KEY drop                   :",p_info->GetCATALOGPrimaryDrop      (schema,table,"pk_" + table));
+      ReportSQL    (_T("PRIMARY KEY exists                 :"),p_info->GetCATALOGPrimaryExists    (schema,table));
+      ReportSQL    (_T("PRIMARY KEY attributes             :"),p_info->GetCATALOGPrimaryAttributes(schema,table));
+      ReportSQL    (_T("PRIMARY KEY create                 :"),p_info->GetCATALOGPrimaryCreate    (primaries));
+      ReportSQL    (_T("PRIMARY KEY drop                   :"),p_info->GetCATALOGPrimaryDrop      (schema,table,"pk_" + table));
       number_of_tests += 4;
       // CATALOG Foreign key
-      ReportSQL    ("FOREIGN KEY exists                 :",p_info->GetCATALOGForeignExists    (schema,table,foreign));
-      ReportSQL    ("FOREIGN KEY list                   :",p_info->GetCATALOGForeignList      (schema,table));
-      ReportSQL    ("FOREIGN KEY attributes             :",p_info->GetCATALOGForeignAttributes(schema,table,foreign));
+      ReportSQL    (_T("FOREIGN KEY exists                 :"),p_info->GetCATALOGForeignExists    (schema,table,foreign));
+      ReportSQL    (_T("FOREIGN KEY list                   :"),p_info->GetCATALOGForeignList      (schema,table));
+      ReportSQL    (_T("FOREIGN KEY attributes             :"),p_info->GetCATALOGForeignAttributes(schema,table,foreign));
     //ReportSQL    ("FOREIGN KEY create                 :",p_info->GetCATALOGForeignCreate    (foreigns));
-      ReportSQL    ("FOREIGN KEY alter                  :",p_info->GetCATALOGForeignAlter     (foreigns,foreigns));
-      ReportSQL    ("FOREIGN KEY drop                   :",p_info->GetCATALOGForeignDrop      (schema,table,foreign));
+      ReportSQL    (_T("FOREIGN KEY alter                  :"),p_info->GetCATALOGForeignAlter     (foreigns,foreigns));
+      ReportSQL    (_T("FOREIGN KEY drop                   :"),p_info->GetCATALOGForeignDrop      (schema,table,foreign));
       number_of_tests += 5;
       // CATALOG Triggers
-      ReportSQL    ("TRIGGER exists                     :",p_info->GetCATALOGTriggerExists    (schema,table,triggername));
-      ReportSQL    ("TRIGGER lists                      :",p_info->GetCATALOGTriggerList      (schema,table));
-      ReportSQL    ("TRIGGER attributes                 :",p_info->GetCATALOGTriggerAttributes(schema,table,triggername));
-      ReportSQL    ("TRIGGER create                     :",p_info->GetCATALOGTriggerCreate    (trigger));
-      ReportSQL    ("TRIGGER drop                       :",p_info->GetCATALOGTriggerDrop      (schema,table,triggername));
+      ReportSQL    (_T("TRIGGER exists                     :"),p_info->GetCATALOGTriggerExists    (schema,table,triggername));
+      ReportSQL    (_T("TRIGGER lists                      :"),p_info->GetCATALOGTriggerList      (schema,table));
+      ReportSQL    (_T("TRIGGER attributes                 :"),p_info->GetCATALOGTriggerAttributes(schema,table,triggername));
+      ReportSQL    (_T("TRIGGER create                     :"),p_info->GetCATALOGTriggerCreate    (trigger));
+      ReportSQL    (_T("TRIGGER drop                       :"),p_info->GetCATALOGTriggerDrop      (schema,table,triggername));
       number_of_tests += 5;
       // CATALOG Sequence
-      ReportSQL    ("SEQUENCE exists                    :",p_info->GetCATALOGSequenceExists    (schema,table));
-      ReportSQL    ("SEQUENCE lists                     :",p_info->GetCATALOGSequenceList      (schema,table));
-      ReportSQL    ("SEQUENCE attributes                :",p_info->GetCATALOGSequenceAttributes(schema,table));
-      ReportSQL    ("SEQUENCE create                    :",p_info->GetCATALOGSequenceCreate    (sequence));
-      ReportSQL    ("SEQUENCE drop                      :",p_info->GetCATALOGSequenceDrop      (schema,table + "_seq"));
+      ReportSQL    (_T("SEQUENCE exists                    :"),p_info->GetCATALOGSequenceExists    (schema,table));
+      ReportSQL    (_T("SEQUENCE lists                     :"),p_info->GetCATALOGSequenceList      (schema,table));
+      ReportSQL    (_T("SEQUENCE attributes                :"),p_info->GetCATALOGSequenceAttributes(schema,table));
+      ReportSQL    (_T("SEQUENCE create                    :"),p_info->GetCATALOGSequenceCreate    (sequence));
+      ReportSQL    (_T("SEQUENCE drop                      :"),p_info->GetCATALOGSequenceDrop      (schema,table + "_seq"));
       number_of_tests += 5;
       // CATALOG View
-      ReportSQL    ("VIEW exists                        :",p_info->GetCATALOGViewExists    (schema,viewname));
-      ReportSQL    ("VIEW list                          :",p_info->GetCATALOGViewList      (schema,viewname));
-      ReportSQL    ("VIEW attributes                    :",p_info->GetCATALOGViewAttributes(schema,viewname));
-      ReportSQL    ("VIEW Create                        :",p_info->GetCATALOGViewCreate    (schema,table,select));
-      ReportSQL    ("VIEW Drop                          :",p_info->GetCATALOGViewDrop      (schema,table,precursor));
+      ReportSQL    (_T("VIEW exists                        :"),p_info->GetCATALOGViewExists    (schema,viewname));
+      ReportSQL    (_T("VIEW list                          :"),p_info->GetCATALOGViewList      (schema,viewname));
+      ReportSQL    (_T("VIEW attributes                    :"),p_info->GetCATALOGViewAttributes(schema,viewname));
+      ReportSQL    (_T("VIEW Create                        :"),p_info->GetCATALOGViewCreate    (schema,table,select));
+      ReportSQL    (_T("VIEW Drop                          :"),p_info->GetCATALOGViewDrop      (schema,table,precursor));
       number_of_tests += 5;
       // PERSISTENT STORED MODULES
-      ReportSQL    ("PSM PROCEDURE exists               :",p_info->GetPSMProcedureExists    (schema,procedurename));
-      ReportSQL    ("PSM PROCEDURE list                 :",p_info->GetPSMProcedureList      (schema));
-      ReportSQL    ("PSM PROCEDURE attributes           :",p_info->GetPSMProcedureAttributes(schema,procedurename));
-      ReportSQL    ("PSM PROCEDURE sourcecode           :",p_info->GetPSMProcedureSourcecode(schema,procedurename));
-      ReportSQL    ("PSM PROCEDURE create               :",p_info->GetPSMProcedureCreate    (metaproc));
-      ReportSQL    ("PSM PROCEDURE drop                 :",p_info->GetPSMProcedureDrop      (schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE exists               :"),p_info->GetPSMProcedureExists    (schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE list                 :"),p_info->GetPSMProcedureList      (schema));
+      ReportSQL    (_T("PSM PROCEDURE attributes           :"),p_info->GetPSMProcedureAttributes(schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE sourcecode           :"),p_info->GetPSMProcedureSourcecode(schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE create               :"),p_info->GetPSMProcedureCreate    (metaproc));
+      ReportSQL    (_T("PSM PROCEDURE drop                 :"),p_info->GetPSMProcedureDrop      (schema,procedurename));
     //ReportSQL    ("PSM PROCEDURE errors               :",p_info->GetPSMProcedureErrors    (schema,procedurename));
-      ReportSQL    ("PSM PROCEDURE parameters           :",p_info->GetPSMProcedureParameters(schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE parameters           :"),p_info->GetPSMProcedureParameters(schema,procedurename));
       number_of_tests += 7;
       // PSM elements
     //ReportString ("PSM Declaration                    :",p_info->GetPSMDeclaration(true,destiny,SQL_INTEGER,10,0,"","",""));
-      ReportString ("Assignment to variable             :",p_info->GetPSMAssignment(destiny,source));
-      ReportString ("PSM IF statement                   :",p_info->GetPSMIF(condition));
-      ReportString ("PSM IF else                        :",p_info->GetPSMIFElse());
-      ReportString ("PSM IF End of the IF               :",p_info->GetPSMIFEnd());
-      ReportString ("PSM WHILE loop                     :",p_info->GetPSMWhile(condition));
-      ReportString ("PSM WHILE end                      :",p_info->GetPSMWhileEnd());
-      ReportString ("PSM LOOP                           :",p_info->GetPSMLOOP());
-      ReportString ("PSM LOOP end                       :",p_info->GetPSMLOOPEnd());
-      ReportString ("PSM BREAK                          :",p_info->GetPSMBREAK());
-      ReportString ("PSM RETURN                         :",p_info->GetPSMRETURN(source));
-      ReportString ("PSM EXECUTE                        :",p_info->GetPSMExecute(procedurename,parameters));
-      ReportString ("PSM CURSOR declaration             :",p_info->GetPSMCursorDeclaration(destiny,select));
-      ReportString ("PSM CURSOR Fetch                   :",p_info->GetPSMCursorFetch(cursorname,cursorcolumns,cursorparameters));
-      ReportString ("PSM exception catch NODATA         :",p_info->GetPSMExceptionCatchNoData());
-      ReportString ("PSM exception catch SQLSTATE       :",p_info->GetPSMExceptionCatch("HY001"));
-      ReportString ("PSM exception raise                :",p_info->GetPSMExceptionRaise("NODATA"));
+      ReportString (_T("Assignment to variable             :"),p_info->GetPSMAssignment(destiny,source));
+      ReportString (_T("PSM IF statement                   :"),p_info->GetPSMIF(condition));
+      ReportString (_T("PSM IF else                        :"),p_info->GetPSMIFElse());
+      ReportString (_T("PSM IF End of the IF               :"),p_info->GetPSMIFEnd());
+      ReportString (_T("PSM WHILE loop                     :"),p_info->GetPSMWhile(condition));
+      ReportString (_T("PSM WHILE end                      :"),p_info->GetPSMWhileEnd());
+      ReportString (_T("PSM LOOP                           :"),p_info->GetPSMLOOP());
+      ReportString (_T("PSM LOOP end                       :"),p_info->GetPSMLOOPEnd());
+      ReportString (_T("PSM BREAK                          :"),p_info->GetPSMBREAK());
+      ReportString (_T("PSM RETURN                         :"),p_info->GetPSMRETURN(source));
+      ReportString (_T("PSM EXECUTE                        :"),p_info->GetPSMExecute(procedurename,parameters));
+      ReportString (_T("PSM CURSOR declaration             :"),p_info->GetPSMCursorDeclaration(destiny,select));
+      ReportString (_T("PSM CURSOR Fetch                   :"),p_info->GetPSMCursorFetch(cursorname,cursorcolumns,cursorparameters));
+      ReportString (_T("PSM exception catch NODATA         :"),p_info->GetPSMExceptionCatchNoData());
+      ReportString (_T("PSM exception catch SQLSTATE       :"),p_info->GetPSMExceptionCatch("HY001"));
+      ReportString (_T("PSM exception raise                :"),p_info->GetPSMExceptionRaise("NODATA"));
       number_of_tests += 16;
       // SESSION CONTROL
-      ReportSQL    ("SESSION Getting session/terminal   :",p_info->GetSESSIONMyself());
-      ReportSQL    ("SESSION exists                     :",p_info->GetSESSIONExists("123"));
-      ReportSQL    ("SESSION list                       :",p_info->GetSESSIONList());
-      ReportSQL    ("SESSION attributes                 :",p_info->GetSESSIONExists("123"));
-      ReportSQL    ("SET ALL CONSTRAINTS DEFERRED       :",p_info->GetSESSIONConstraintsDeferred());
-      ReportSQL    ("SET ALL CONSTRAINTS IMMEDIATE      :",p_info->GetSESSIONConstraintsImmediate());
+      ReportSQL    (_T("SESSION Getting session/terminal   :"),p_info->GetSESSIONMyself());
+      ReportSQL    (_T("SESSION exists                     :"),p_info->GetSESSIONExists("123"));
+      ReportSQL    (_T("SESSION list                       :"),p_info->GetSESSIONList());
+      ReportSQL    (_T("SESSION attributes                 :"),p_info->GetSESSIONExists("123"));
+      ReportSQL    (_T("SET ALL CONSTRAINTS DEFERRED       :"),p_info->GetSESSIONConstraintsDeferred());
+      ReportSQL    (_T("SET ALL CONSTRAINTS IMMEDIATE      :"),p_info->GetSESSIONConstraintsImmediate());
       number_of_tests += 6;
     }
     

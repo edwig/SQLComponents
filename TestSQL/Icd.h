@@ -8,7 +8,13 @@
 #include <sqltypes.h>
 #include <ostream>
 
+#ifdef UNICODE
+using std::wostream;
+#define tstream wostream
+#else
 using std::ostream;
+#define tstream ostream
+#endif
 
 static const long  icdBase          = 100000000L; // Base   per element of m_data
 static const short icdDigits        = 8;          // Digits per element of m_data
@@ -84,7 +90,7 @@ public:
   const bool operator>=(const icd& icd) const;
 
   // standard output operator
-  friend ostream& operator<<(ostream& os, const icd& icd);
+  friend tstream& operator<<(tstream& os, const icd& icd);
 
   // MATHEMATICAL FUNCTIONS
 

@@ -143,7 +143,7 @@ BOOL SQLConnectionsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	SetWindowText("SQL Connections");
+	SetWindowText(_T("SQL Connections"));
 
   // Add "About..." menu item to system menu.
 
@@ -172,7 +172,7 @@ BOOL SQLConnectionsDlg::OnInitDialog()
 
   // Init the connections list
   m_list.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EDITLABELS);
-  m_list.InsertColumn(0, "Connection",LVCFMT_LEFT,180);
+  m_list.InsertColumn(0, _T("Connection"),LVCFMT_LEFT,180);
 
   // Load Datasource names
   LoadDataSources();
@@ -317,7 +317,7 @@ SQLConnectionsDlg::SaveConnections()
 	// Save m_connections
   if(!m_connections.SaveConnectionsFile())
   {
-		::MessageBox(GetSafeHwnd(),"Could **NOT** save the 'database.xml' file","Error",MB_OK | MB_ICONERROR);
+		::MessageBox(GetSafeHwnd(),_T("Could **NOT** save the 'database.xml' file"),_T("Error"),MB_OK | MB_ICONERROR);
     return false;
   }
   m_changed = false;
@@ -435,21 +435,21 @@ SQLConnectionsDlg::SanityChecks(int p_index)
 			SQLConnection* conn = (SQLConnection*)m_list.GetItemData(i);
 			if (m_connectionName.CompareNoCase(conn->m_name) == 0)
 			{
-				errors += m_connectionName + " already exists.\n";
+				errors += m_connectionName + _T(" already exists.\n");
 				break;
 			}
 		}
 	}
 
-	if(m_connectionName.IsEmpty()) errors += "You must provide a connection name.\n";
-  if(m_datasource.IsEmpty())     errors += "You must provide a datasource name.\n";
-  if(m_username  .IsEmpty())     errors += "You must provide a user name.\n";
-  if(m_password1.IsEmpty())      errors += "You must provide a password.\n";
-	if(m_password1.Compare(m_password2)) errors += "The passwords do **NOT** match.\n";
+	if(m_connectionName.IsEmpty()) errors += _T("You must provide a connection name.\n");
+  if(m_datasource.IsEmpty())     errors += _T("You must provide a datasource name.\n");
+  if(m_username  .IsEmpty())     errors += _T("You must provide a user name.\n");
+  if(m_password1.IsEmpty())      errors += _T("You must provide a password.\n");
+	if(m_password1.Compare(m_password2)) errors += _T("The passwords do **NOT** match.\n");
 
   if(!errors.IsEmpty())
   {
-		::MessageBox(GetSafeHwnd(),errors,"Error", MB_OK | MB_ICONERROR);
+		::MessageBox(GetSafeHwnd(),errors,_T("Error"), MB_OK | MB_ICONERROR);
     return false;
   }
   return true;
@@ -466,22 +466,22 @@ SQLConnectionsDlg::TestTheConnection()
     if(database.Open(m_datasource,m_username,m_password1))
     {
       XString message;
-      message.Format("The connection with [%s] as user [%s] has succeeded!\n\n"
-                     "The 'true' database name is: %s\n"
-                     "This database is a [%s:%s] database\n"
-                     "Vendors ODBC driver version is: %s"
+      message.Format(_T("The connection with [%s] as user [%s] has succeeded!\n\n")
+                     _T("The 'true' database name is: %s\n")
+                     _T("This database is a [%s:%s] database\n")
+                     _T("Vendors ODBC driver version is: %s")
                     ,m_datasource
                     ,m_username
                     ,database.GetDatabaseName()
                     ,database.GetDBVendorName()
                     ,database.GetDBVendorVersion()
                     ,database.GetDBVendorDriverVersion());
-			::MessageBox(GetSafeHwnd(),message,"Melding",MB_OK);
+			::MessageBox(GetSafeHwnd(),message,_T("Melding"),MB_OK);
       database.Close();
     }
     else
     {
-			::MessageBox(GetSafeHwnd(),"We are sorry: **NO** connection made!!","No Connection", MB_OK | MB_ICONERROR);
+			::MessageBox(GetSafeHwnd(),_T("We are sorry: **NO** connection made!!"),_T("No Connection"), MB_OK | MB_ICONERROR);
     }
   }
   catch(StdException& ex)
@@ -496,7 +496,7 @@ SQLConnectionsDlg::TestTheConnection()
   // Error handling needed?
   if(!error.IsEmpty())
   {
-    ::MessageBox(GetSafeHwnd(),"ERROR while opening database: " + error,"Error", MB_OK | MB_ICONERROR);
+    ::MessageBox(GetSafeHwnd(),_T("ERROR while opening database: ") + error,_T("Error"), MB_OK | MB_ICONERROR);
   }
 }
 
@@ -659,7 +659,7 @@ SQLConnectionsDlg::OnBnClickedNew()
 	SaveConnection(m_selection);
 
 	// Clean up all the fields
-	m_connectionName = "New connection";
+	m_connectionName = _T("New connection");
 	m_username.Empty();
 	m_password1.Empty();
 	m_password2.Empty();
@@ -688,7 +688,7 @@ SQLConnectionsDlg::OnBnClickedDelete()
 void 
 SQLConnectionsDlg::OnBnClickedCancel()
 {
-	if (m_changed && ::MessageBox(GetSafeHwnd(),"CANCEL: Changes where made. Are you sure?","Changes were made", MB_YESNO | MB_DEFBUTTON2) == IDNO)
+	if (m_changed && ::MessageBox(GetSafeHwnd(),_T("CANCEL: Changes where made. Are you sure?"),_T("Changes were made"), MB_YESNO | MB_DEFBUTTON2) == IDNO)
   {
     return;
   }

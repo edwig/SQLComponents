@@ -50,11 +50,11 @@ namespace OperatorUnitTest
 
     void FillArrays()
     {
-      bcd num1("42");
-      bcd num2("5");
+      bcd num1(_T("42"));
+      bcd num2(_T("5"));
 
       // Init the test array
-      variants[CT_CHAR]     = SQLVariant("42");
+      variants[CT_CHAR]     = SQLVariant(_T("42"));
       variants[CT_SSHORT]   = SQLVariant((short)42);
       variants[CT_USHORT]   = SQLVariant((unsigned short)42);
       variants[CT_SLONG]    = SQLVariant(42);
@@ -68,7 +68,7 @@ namespace OperatorUnitTest
       variants[CT_UBIGINT]  = SQLVariant((unsigned __int64)42);
       variants[CT_NUMERIC]  = SQLVariant(&num1);
 
-      other[CT_CHAR]     = SQLVariant("5");
+      other[CT_CHAR]     = SQLVariant(_T("5"));
       other[CT_SSHORT]   = SQLVariant((short)5);
       other[CT_USHORT]   = SQLVariant((unsigned short)5);
       other[CT_SLONG]    = SQLVariant(5);
@@ -112,7 +112,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("Add test %s + %s",leftType,rightType);
+          message.Format(_T("Add test %s + %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           SQLVariant result = *left + *right; // TEST
@@ -121,11 +121,11 @@ namespace OperatorUnitTest
 
           if(x == CT_CHAR && y == CT_CHAR)
           {
-            Assert::AreEqual("425",res);  // Adding strings
+            Assert::AreEqual(_T("425"),res);  // Adding strings
           }
           else
           {
-            if(res.Compare("47") && res.Compare("47.00"))
+            if(res.Compare(_T("47")) && res.Compare(_T("47.00")))
             {
               Assert::Fail();
             }
@@ -157,7 +157,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("Subtraction test %s - %s",leftType,rightType);
+          message.Format(_T("Subtraction test %s - %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR)
@@ -171,7 +171,7 @@ namespace OperatorUnitTest
             XString res;
             result.GetAsString(res);
 
-            if (res.Compare("37") && res.Compare("37.00"))
+            if (res.Compare(_T("37")) && res.Compare(_T("37.00")))
             {
               Assert::Fail();
             }
@@ -183,7 +183,7 @@ namespace OperatorUnitTest
       FreeArrays();
 
       XString msg;
-      msg.Format("Number of subtraction tests: %d",numtests);
+      msg.Format(_T("Number of subtraction tests: %d"),numtests);
       Logger::WriteMessage(msg);
     }
 
@@ -207,7 +207,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("Multiplication test %s * %s",leftType,rightType);
+          message.Format(_T("Multiplication test %s * %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR ||
@@ -221,7 +221,7 @@ namespace OperatorUnitTest
             XString res;
             result.GetAsString(res);
 
-            if(res.Compare("210") && res.Compare("210.00"))
+            if(res.Compare(_T("210")) && res.Compare(_T("210.00")))
             {
               Assert::Fail();
             }
@@ -252,7 +252,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("Division test %s / %s",leftType,rightType);
+          message.Format(_T("Division test %s / %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR)
@@ -266,7 +266,7 @@ namespace OperatorUnitTest
             result.GetAsString(res);
             res.TrimRight('0');
 
-            if(res.Compare("8") && res.Compare("8.4"))
+            if(res.Compare(_T("8")) && res.Compare(_T("8.4")))
             {
               Assert::Fail(L"Division error");
             }
@@ -297,7 +297,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("Modulo test %s %% %s",leftType,rightType);
+          message.Format(_T("Modulo test %s %% %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR)
@@ -312,7 +312,7 @@ namespace OperatorUnitTest
             res.TrimRight('0');
             res.TrimRight('.');
 
-            Assert::AreEqual("2",res);
+            Assert::AreEqual(_T("2"),res);
             number_of_tests++;
           }
         }

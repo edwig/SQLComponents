@@ -32,7 +32,7 @@
 
 namespace DatabaseUnitTest
 {
-  void CALLBACK LogPrint(void* p_context,const char* p_text);
+  void CALLBACK LogPrint(void* p_context,const TCHAR* p_text);
   int  CALLBACK LogLevel(void* p_context);
   extern XString g_dsn;
   extern XString g_user;
@@ -44,8 +44,8 @@ namespace DatabaseUnitTest
 
     TEST_METHOD(Discovery)
     {
-      Logger::WriteMessage("SQLInfo Discovery test for tables and procedures");
-      Logger::WriteMessage("================================================");
+      Logger::WriteMessage(_T("SQLInfo Discovery test for tables and procedures"));
+      Logger::WriteMessage(_T("================================================"));
 
       InitSQLComponents();
 
@@ -54,23 +54,23 @@ namespace DatabaseUnitTest
       // Types of objects we recognize
       MetaTypes();
       // Discover a few tables
-      TableDiscovery("master");
-      TableDiscovery("detail");
+      TableDiscovery(_T("master"));
+      TableDiscovery(_T("detail"));
       // Discover a few procedures
-      ProcedureDiscovery("multinout");
-      ProcedureDiscovery("getdecimal");
+      ProcedureDiscovery(_T("multinout"));
+      ProcedureDiscovery(_T("getdecimal"));
       // Try out Native translation of the driver
-      TranslateSQLtoNative("SELECT {fn UCASE(description)} FROM detail");
+      TranslateSQLtoNative(_T("SELECT {fn UCASE(description)} FROM detail"));
 
       CloseDatabase();
     }
 
     void MetaTypes()
     {
-      Logger::WriteMessage("Meta types that can be discovered");
-      MetaType(META_CATALOGS,"catalogs");
-      MetaType(META_SCHEMAS, "schemata");
-      MetaType(META_TABLES,  "tables");
+      Logger::WriteMessage(_T("Meta types that can be discovered"));
+      MetaType(META_CATALOGS,_T("catalogs"));
+      MetaType(META_SCHEMAS, _T("schemata"));
+      MetaType(META_TABLES,  _T("tables"));
     }
 
     void MetaType(int p_type,XString p_name)
@@ -85,27 +85,27 @@ namespace DatabaseUnitTest
 
         for(auto& obj : objects)
         {
-          Logger::WriteMessage("Metatype " + p_name + " : " + obj.m_objectName);
+          Logger::WriteMessage(_T("Metatype ") + p_name + _T(" : ") + obj.m_objectName);
           number_of_tests++;
         }
       }
       else
       {
         // Essentially not an error. It's an optional feature of ODBC
-        Logger::WriteMessage("Cannot get the meta types for: " + p_name);
+        Logger::WriteMessage(_T("Cannot get the meta types for: ") + p_name);
         number_of_tests++;
       }
     }
 
     void TableDiscovery(XString p_table)
     {
-      Logger::WriteMessage("\nDO TABLE DISCOVERY: " + p_table);
+      Logger::WriteMessage(_T("\nDO TABLE DISCOVERY: ") + p_table);
 
       SQLInfoDB* info = m_database->GetSQLInfoDB();
       MTableMap tables;
       XString   errors;
 
-      if(info->MakeInfoTableTable(tables,errors,"",p_table))
+      if(info->MakeInfoTableTable(tables,errors,_T(""),p_table))
       {
         number_of_tests++;
 
@@ -114,7 +114,7 @@ namespace DatabaseUnitTest
           XString schema  = table.m_schema;
           XString tabname = table.m_table;
 
-          Logger::WriteMessage("Table found: " + table.m_fullName);
+          Logger::WriteMessage(_T("Table found: ") + table.m_fullName);
 
           ColumnsDiscovery(info,schema,tabname);
           PrimaryDiscovery(info,schema,tabname);
@@ -143,7 +143,7 @@ namespace DatabaseUnitTest
 
         for(auto& column : columns)
         {
-          Logger::WriteMessage("Column: " + column.m_column);
+          Logger::WriteMessage(_T("Column: ") + column.m_column);
           number_of_tests++;
         }
       }
@@ -165,10 +165,10 @@ namespace DatabaseUnitTest
 
         for(auto& primary : primaries)
         {
-          Logger::WriteMessage("Primary key constraint: " + primary.m_constraintName);
+          Logger::WriteMessage(_T("Primary key constraint: ") + primary.m_constraintName);
 
           XString text;
-          text.Format("Primary key %d: %s"
+          text.Format(_T("Primary key %d: %s")
                       ,primary.m_columnPosition
                       ,primary.m_columnName);
           Logger::WriteMessage(text);
@@ -192,7 +192,7 @@ namespace DatabaseUnitTest
         number_of_tests++;
         for(auto& ref : references)
         {
-          Logger::WriteMessage("Foreign: " + ref.m_foreignConstraint);
+          Logger::WriteMessage(_T("Foreign: ") + ref.m_foreignConstraint);
           number_of_tests++;
         }
       }
@@ -213,7 +213,7 @@ namespace DatabaseUnitTest
 
         for(auto& ind : statistics)
         {
-          Logger::WriteMessage("Indices: " + ind.m_indexName);
+          Logger::WriteMessage(_T("Indices: ") + ind.m_indexName);
           number_of_tests++;
         }
       }
@@ -233,7 +233,7 @@ namespace DatabaseUnitTest
 
         for(auto& spec : specials)
         {
-          Logger::WriteMessage("Specials: " + spec.m_columnName);
+          Logger::WriteMessage(_T("Specials: ") + spec.m_columnName);
           number_of_tests++;
         }
       }
@@ -255,23 +255,23 @@ namespace DatabaseUnitTest
         number_of_tests++;
         for(auto& trigger : triggers)
         {
-          line.Format("Trigger: [%d] %s",trigger.m_position,trigger.m_triggerName);
+          line.Format(_T("Trigger: [%d] %s"),trigger.m_position,trigger.m_triggerName);
           Logger::WriteMessage(line);
 
-          line.Format("Trigger fires: %s",trigger.m_before ? "before" : "after");
+          line.Format(_T("Trigger fires: %s"),trigger.m_before ? _T("before") : _T("after"));
           Logger::WriteMessage(line);
 
           // Triggers for which statement
-          line.Format("Trigger DML INSERT: %s",trigger.m_insert ? "yes" : "no");
+          line.Format(_T("Trigger DML INSERT: %s"),trigger.m_insert ? _T("yes") : _T("no"));
           Logger::WriteMessage(line);
-          line.Format("Trigger DML UPDATE: %s",trigger.m_update ? "yes" : "no");
+          line.Format(_T("Trigger DML UPDATE: %s"),trigger.m_update ? _T("yes") : _T("no"));
           Logger::WriteMessage(line);
-          line.Format("Trigger DML DELETE: %s",trigger.m_delete ? "yes" : "no");
+          line.Format(_T("Trigger DML DELETE: %s"),trigger.m_delete ? _T("yes") : _T("no"));
           Logger::WriteMessage(line);
-          line.Format("Trigger DML SELECT: %s",trigger.m_select ? "yes" : "no");
+          line.Format(_T("Trigger DML SELECT: %s"),trigger.m_select ? _T("yes") : _T("no"));
           Logger::WriteMessage(line);
 
-          line.Format("Trigger source: %s",trigger.m_source);
+          line.Format(_T("Trigger source: %s"),trigger.m_source);
           Logger::WriteMessage(line);
           number_of_tests++;
         }
@@ -294,7 +294,7 @@ namespace DatabaseUnitTest
         for(auto& priv : privileges)
         {
           XString line;
-          line.Format("Table privilege: %s was granted %s by %s"
+          line.Format(_T("Table privilege: %s was granted %s by %s")
                      ,priv.m_grantee
                      ,priv.m_privilege
                      ,priv.m_grantor);
@@ -310,25 +310,25 @@ namespace DatabaseUnitTest
 
     void ProcedureDiscovery(XString p_procedure)
     {
-      Logger::WriteMessage("\nDO PROCEDURE DISCOVERY: " + p_procedure);
+      Logger::WriteMessage(_T("\nDO PROCEDURE DISCOVERY: ") + p_procedure);
 
       SQLInfoDB* info = m_database->GetSQLInfoDB();
 
       MProcedureMap procedures;
       XString errors;
-      if(info->MakeInfoPSMProcedures(procedures,errors,"",p_procedure))
+      if(info->MakeInfoPSMProcedures(procedures,errors,_T(""),p_procedure))
       {
         number_of_tests++;
         for(auto& proc : procedures)
         {
-          Logger::WriteMessage("Procedure : " + proc.m_procedureName);
+          Logger::WriteMessage(_T("Procedure : ") + proc.m_procedureName);
           ParametersDiscovery(info,proc.m_schemaName,proc.m_procedureName);
           number_of_tests++;
         }
       }
       else if(!errors.IsEmpty())
       {
-        Logger::WriteMessage("Cannot find procedure: " + p_procedure);
+        Logger::WriteMessage(_T("Cannot find procedure: ") + p_procedure);
       }
     }
 
@@ -342,7 +342,7 @@ namespace DatabaseUnitTest
         number_of_tests++;
         for(auto& parm : params)
         {
-          Logger::WriteMessage("Parameter : " + parm.m_parameter);
+          Logger::WriteMessage(_T("Parameter : ") + parm.m_parameter);
           number_of_tests++;
         }
       }
@@ -357,8 +357,8 @@ namespace DatabaseUnitTest
       SQLInfoDB* info = m_database->GetSQLInfoDB();
       XString translated = info->NativeSQL(NULL,p_sql);
 
-      Logger::WriteMessage("TRANSLATE : " + p_sql);
-      Logger::WriteMessage("Translated: " + translated);
+      Logger::WriteMessage(_T("TRANSLATE : ") + p_sql);
+      Logger::WriteMessage(_T("Translated: ") + translated);
       number_of_tests++;
     }
 
@@ -366,10 +366,10 @@ namespace DatabaseUnitTest
 
     bool OpenDatabase()
     {
-      Logger::WriteMessage("Opening database....");
+      Logger::WriteMessage(_T("Opening database...."));
 
       m_database = new SQLDatabase();
-      m_database->RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)"");
+      m_database->RegisterLogContext(LOGLEVEL_MAX,LogLevel,LogPrint,(void*)_T(""));
 
       try
       {
@@ -377,7 +377,7 @@ namespace DatabaseUnitTest
         m_database->SetLoginTimeout(0);
         if(m_database->Open(g_dsn,g_user,g_password))
         {
-          Logger::WriteMessage("Database opened.");
+          Logger::WriteMessage(_T("Database opened."));
         }
         else
         {
@@ -397,7 +397,7 @@ namespace DatabaseUnitTest
     {
       if(m_database)
       {
-        Logger::WriteMessage("Closing database....");
+        Logger::WriteMessage(_T("Closing database...."));
         m_database->Close();
         delete m_database;
         m_database = nullptr;

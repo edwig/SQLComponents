@@ -31,9 +31,9 @@ using namespace SQLComponents;
 #define XPORT_DATE    "16-06-2023"
 #define XPORT_YEAR    "2023"
 
-void xputs (const char* p_string);
-void xerror(const char* p_format,...);
+void xputs (const TCHAR* p_string);
+void xerror(const TCHAR* p_format,...);
 void xerror(int p_rownum,XString p_string);
-void xprint (bool p_sql,const char* p_string);
-void xprintf(bool p_sql,const char* p_format,...);
+void xprint (bool p_sql,const TCHAR* p_string);
+void xprintf(bool p_sql,const TCHAR* p_format,...);
 void print_all_errors();

@@ -96,7 +96,7 @@ typedef std::map<int,int>               RebindMap;
 typedef std::map<XString,XString>       ODBCOptions;
 typedef std::map<XString,XString>       Macros;
 
-typedef void (CALLBACK* LOGPRINT)(void*,const char*);
+typedef void (CALLBACK* LOGPRINT)(void*,LPCTSTR);
 typedef int  (CALLBACK* LOGLEVEL)(void*);
 
 // Forward declaration
@@ -123,7 +123,7 @@ public:
   bool           Open(XString const& p_datasource
                      ,XString const& p_username
                      ,XString const& p_password
-                     ,XString        p_options  = ""
+                     ,XString        p_options  = _T("")
                      ,bool           p_readOnly = false);
   // Open the database on basis of a connect string only
   bool           Open(XString const& p_connectString,bool p_readOnly = false);
@@ -245,7 +245,7 @@ public:
 
   // Support of logging functions 
   void           RegisterLogContext(int p_level,LOGLEVEL p_loglevel,LOGPRINT p_logprinter,void* p_logContext);
-  void           LogPrint(const char* p_text);
+  void           LogPrint(LPCTSTR p_text);
   int            LogLevel();
   bool           WilLog();
   void           SetLoggingActivation(int p_loglevel);
@@ -281,9 +281,9 @@ protected:
   void           SetAttributesBeforeConnect();
   // Setting connection attributes AFTER connect
   void           SetAttributesAfterConnect(bool p_readOnly);
-  // Running the initialisations for the session
+  // Running the initializations for the session
   void           SetConnectionInitialisations();
-  // Find number of quotes up to the lastpos position
+  // Find number of quotes up to the last position
   int            FindQuotes(XString& p_statement,int p_lastpos);
   // Replace **ONE** macro in the statement text
   void           ReplaceMacro(XString& p_statement,int p_pos,int p_length,XString p_replace);

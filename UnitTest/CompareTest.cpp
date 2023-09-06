@@ -54,7 +54,7 @@ namespace OperatorUnitTest
       bcd num2(24);
 
       // Init the test array
-      variants[CT_CHAR]     = SQLVariant("42");
+      variants[CT_CHAR]     = SQLVariant(_T("42"));
       variants[CT_SSHORT]   = SQLVariant((short)42);
       variants[CT_USHORT]   = SQLVariant((unsigned short)42);
       variants[CT_SLONG]    = SQLVariant((int)42);
@@ -68,7 +68,7 @@ namespace OperatorUnitTest
       variants[CT_UBIGINT]  = SQLVariant((unsigned __int64)42);
       variants[CT_NUMERIC]  = SQLVariant(&num1);
 
-      other[CT_CHAR]     = SQLVariant("24");
+      other[CT_CHAR]     = SQLVariant(_T("24"));
       other[CT_SSHORT]   = SQLVariant((short)24);
       other[CT_USHORT]   = SQLVariant((unsigned short)24);
       other[CT_SLONG]    = SQLVariant((int)24);
@@ -107,7 +107,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("Equality test %s == %s",leftType,rightType);
+          message.Format(_T("Equality test %s == %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*left == *right);  // TEST
@@ -138,7 +138,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("InEquality test %s != %s",leftType,rightType);
+          message.Format(_T("InEquality test %s != %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*left != *right);  // TEST
@@ -169,7 +169,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("InEquality test %s > %s",leftType,rightType);
+          message.Format(_T("InEquality test %s > %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*left > *right);  // TEST
@@ -200,7 +200,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("InEquality test %s >= %s",leftType,rightType);
+          message.Format(_T("InEquality test %s >= %s"),leftType,rightType);
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*left >= *right);  // GREATER
@@ -232,7 +232,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("InEquality test %s < %s",rightType,leftType);
+          message.Format(_T("InEquality test %s < %s"),rightType,leftType);
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*right < *left);  // SMALLER
@@ -263,7 +263,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format("InEquality test %s <= %s",rightType,leftType);
+          message.Format(_T("InEquality test %s <= %s"),rightType,leftType);
           Logger::WriteMessage(message);
 
           Assert::IsTrue(*right < *left);  // SMALLER
