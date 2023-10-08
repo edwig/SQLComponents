@@ -1905,15 +1905,119 @@ SQLInfoFirebird::GetCATALOGViewDrop(XString /*p_schema*/,XString p_viewname,XStr
 
 // All Privilege functions
 XString
-SQLInfoFirebird::GetCATALOGTablePrivileges(XString& /*p_schema*/,XString& /*p_tablename*/) const
+SQLInfoFirebird::GetCATALOGTablePrivileges(XString& p_schema,XString& p_tablename) const
 {
-  return XString();
+  XString sql = _T("SELECT ''                           as catalog_name\n")
+                _T("      ,trim(rel.rdb$owner_name)     as table_schema\n")
+                _T("      ,trim(priv.rdb$relation_name) as table_name\n")
+                _T("      ,CASE\n")
+                _T("            WHEN priv.rdb$user = priv.rdb$grantor THEN '_SYSTEM'\n")
+                _T("            ELSE trim(priv.rdb$grantor)\n")
+                _T("       END as grantor\n")
+                _T("      ,trim(priv.rdb$user)          as grantee\n")
+                _T("      ,trim(CASE priv.rdb$privilege\n")
+                _T("                 WHEN 'I' THEN 'INSERT'\n")
+                _T("                 WHEN 'S' THEN 'SELECT'\n")
+                _T("                 WHEN 'U' THEN 'UPDATE'\n")
+                _T("                 WHEN 'D' THEN 'DELETE'\n")
+                _T("                 WHEN 'R' THEN 'REFERENCES'\n")
+                _T("       END) AS privilege\n")
+                _T("      ,CASE priv.rdb$grant_option\n")
+                _T("           WHEN  0 THEN 'NO'\n")
+                _T("           WHEN  1 THEN 'YES'\n")
+                _T("           ELSE 'NO'\n")
+                _T("       END as grantable\n")
+                _T("  FROM rdb$user_privileges priv\n")
+                _T("       inner join rdb$relations rel ON priv.rdb$relation_name = rel.rdb$relation_name\n")
+                _T(" WHERE priv.rdb$field_name IS NULL\n");
+  // Add the filter
+  if(!p_schema.IsEmpty())
+  {
+    sql += _T("   AND rel.rdb$owner_name = '") + p_schema + _T("'\n");
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    sql += _T("   AND priv.rdb$relation_name = '") + p_tablename + _T("'\n");
+  }
+  sql += _T(" ORDER BY 1,2,3,4,5");
+
+  return sql;
 }
 
 XString 
-SQLInfoFirebird::GetCATALOGColumnPrivileges(XString& /*p_schema*/,XString& /*p_tablename*/,XString& /*p_columnname*/) const
+SQLInfoFirebird::GetCATALOGColumnPrivileges(XString& p_schema,XString& p_tablename,XString& p_columnname) const
 {
-  return XString();
+  XString col = _T("SELECT ''                           as catalog_name\n")
+                _T("      ,trim(rel .rdb$owner_name)    as table_schema\n")
+                _T("      ,trim(priv.rdb$relation_name) as table_name\n")
+                _T("      ,trim(priv.rdb$field_name)    as column_name\n")
+                _T("      ,CASE\n")
+                _T("            WHEN priv.rdb$user = priv.rdb$grantor THEN trim('_SYSTEM')\n")
+                _T("            ELSE trim(priv.rdb$grantor)\n")
+                _T("       END as grantor\n")
+                _T("      ,trim(priv.rdb$user)          as grantee\n")
+                _T("      ,trim(CASE priv.rdb$privilege\n")
+                _T("                 WHEN 'I' THEN 'INSERT'\n")
+                _T("                 WHEN 'S' THEN 'SELECT'\n")
+                _T("                 WHEN 'U' THEN 'UPDATE'\n")
+                _T("                 WHEN 'D' THEN 'DELETE'\n")
+                _T("                 WHEN 'R' THEN 'REFERENCES'\n")
+                _T("       END) AS privilege\n")
+                _T("      ,CASE priv.rdb$grant_option\n")
+                _T("           WHEN  0 THEN 'NO'\n")
+                _T("           WHEN  1 THEN 'YES'\n")
+                _T("           ELSE 'NO'\n")
+                _T("       END as grantable\n")
+                _T("  FROM rdb$user_privileges priv\n")
+                _T("       inner join rdb$relations rel ON priv.rdb$relation_name = rel.rdb$relation_name\n")
+                _T(" WHERE NOT priv.rdb$field_name IS NULL\n");
+
+  XString tab = _T("SELECT ''                           as catalog_name\n")
+                _T("      ,trim(rel .rdb$owner_name)    as table_schema\n")
+                _T("      ,trim(priv.rdb$relation_name) as table_name\n")
+                _T("      ,trim(fld .rdb$field_name)    as column_name\n")
+                _T("      ,CASE\n")
+                _T("            WHEN priv.rdb$user = priv.rdb$grantor THEN trim('_SYSTEM')\n")
+                _T("            ELSE trim(priv.rdb$grantor)\n")
+                _T("       END as grantor\n")
+                _T("      ,trim(priv.rdb$user)          as grantee\n")
+                _T("      ,trim(CASE priv.rdb$privilege\n")
+                _T("                 WHEN 'I' THEN 'INSERT'\n")
+                _T("                 WHEN 'S' THEN 'SELECT'\n")
+                _T("                 WHEN 'U' THEN 'UPDATE'\n")
+                _T("                 WHEN 'D' THEN 'DELETE'\n")
+                _T("                 WHEN 'R' THEN 'REFERENCES'\n")
+                _T("       END) AS privilege\n")
+                _T("      ,CASE priv.rdb$grant_option\n")
+                _T("           WHEN  0 THEN 'NO'\n")
+                _T("           WHEN  1 THEN 'YES'\n")
+                _T("           ELSE 'NO'\n")
+                _T("       END as grantable\n")
+                _T("  FROM rdb$user_privileges priv\n")
+                _T("       inner join rdb$relations       rel ON priv.rdb$relation_name = rel.rdb$relation_name\n")
+                _T("       inner join rdb$relation_fields fld ON fld .rdb$relation_name = rel.rdb$relation_name\n")
+                _T(" WHERE priv.rdb$field_name IS NULL\n");
+
+  // Add the filters
+  if(!p_schema.IsEmpty())
+  {
+    col += _T("   AND rel.rdb$owner_name = '") + p_schema + _T("'\n");
+    tab += _T("   AND rel.rdb$owner_name = '") + p_schema + _T("'\n");
+  }
+  if(!p_tablename.IsEmpty())
+  {
+    col += _T("   AND priv.rdb$relation_name = '") + p_tablename + _T("'\n");
+    tab += _T("   AND priv.rdb$relation_name = '") + p_tablename + _T("'\n");
+  }
+  if(!p_columnname.IsEmpty())
+  {
+    col += _T("   AND priv.rdb$field_name = ") + p_columnname + _T("'\n");
+  }
+  // Add together and order the results
+  XString sql = col + _T("UNION ALL\n") + tab;
+  sql += _T(" ORDER BY 1,2,6,7,3,4,5");
+
+  return sql;
 }
 
 XString

@@ -166,7 +166,7 @@ public:
   void      ForgetFile(); // BEWARE!
 
   // OPERATIONS TO READ AND WRITE CONTENT
-  bool      Read(CString& p_string);
+  bool      Read(CString& p_string,uchar p_delim = '\n');
   bool      Read(void* p_buffer,size_t p_bufsize,int& p_read);
   bool      Write(const CString& p_string);
   bool      Write(void* p_buffer,size_t p_bufsize);
@@ -240,7 +240,7 @@ public:
 
   // Check for a Byte-Order-Mark (BOM)
   static BOMOpenResult  DefuseBOM(const uchar*  p_pointer     // First gotten string in the file
-                                 ,Encoding&      p_type        // Return: type of BOM (if any)
+                                 ,Encoding&      p_type       // Return: type of BOM (if any)
                                  ,unsigned int& p_skip);      // Return: number of chars to skip
   // Check for Unicode UTF-16 in the buffer
   static bool IsTextUnicodeUTF16(const uchar* p_pointer,size_t p_length);
@@ -250,16 +250,16 @@ public:
   bool      SetFilenameByDialog(HWND     p_parent             // Parent HWND (if any)
                                ,bool     p_open               // true = Open/New, false = SaveAs
                                ,CString  p_title              // Title of the dialog
-                               ,CString  p_defext   = _T("")      // Default extension
-                               ,CString  p_filename = _T("")      // Default first file
+                               ,CString  p_defext   = _T("")  // Default extension
+                               ,CString  p_filename = _T("")  // Default first file
                                ,int      p_flags    = 0       // Default flags
-                               ,CString  p_filter   = _T("")      // Filter for extensions
-                               ,CString  p_direct   = _T(""));    // Directory to start in
+                               ,CString  p_filter   = _T("")  // Filter for extensions
+                               ,CString  p_direct   = _T(""));// Directory to start in
   // Open file as a shared memory segment
-  void*     OpenAsSharedMemory(CString  p_name               // Name of the shared memory segment to open
-                              ,bool     p_local     = true   // Standard on your local session, otherwise global
-                              ,bool     p_trycreate = false  // Create with m_filename if not exists
-                              ,size_t   p_size      = 0);    // Size of memory if we create it
+  void*     OpenAsSharedMemory(CString  p_name                // Name of the shared memory segment to open
+                              ,bool     p_local     = true    // Standard on your local session, otherwise global
+                              ,bool     p_trycreate = false   // Create with m_filename if not exists
+                              ,size_t   p_size      = 0);     // Size of memory if we create it
   CString   LegalDirectoryName(CString  p_name,bool p_extensionAllowed = true);
 
   // OPERATORS
@@ -267,6 +267,31 @@ public:
   bool     operator==(const WinFile& p_other);
   bool     operator!=(const WinFile& p_other);
   WinFile& operator= (const WinFile& p_other);
+
+  // STREAMING OPERATORS
+
+  WinFile& operator<<(const TCHAR    p_char);
+  WinFile& operator<<(const short    p_num);
+  WinFile& operator<<(const int      p_num);
+  WinFile& operator<<(const unsigned p_num);
+  WinFile& operator<<(const INT64    p_num);
+  WinFile& operator<<(const float    p_num);
+  WinFile& operator<<(const double   p_num);
+  WinFile& operator<<(const LPCTSTR  p_string);
+  WinFile& operator<<(const CString& p_string);
+
+  WinFile& operator>>(TCHAR&    p_char);
+  WinFile& operator>>(short&    p_num);
+  WinFile& operator>>(int&      p_num);
+  WinFile& operator>>(unsigned& p_num);
+  WinFile& operator>>(INT64&    p_num);
+  WinFile& operator>>(float&    p_num);
+  WinFile& operator>>(double&   p_num);
+  WinFile& operator>>(CString&  p_string);
+
+  // Handy for streaming an end-of-line as output
+  // Does *NOT* do a flush as std::endl does!!
+  static const TCHAR endl { '\n' };
 
   // Not thread safe: Must be set for the total process!
   // And can only be set in multiples of 4K up to 1024K

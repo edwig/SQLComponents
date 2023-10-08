@@ -65,13 +65,14 @@ XString CreateAuthentication(XString p_user,XString p_password)
   }
 
   // STEP 5) Five random characters in front and as a trailer
+  // '~' (ASCII 127) - ' ' (ASCII 32) = 95. Equi-distance of printable chars
   time_t now;
   XString before,after;
   srand((unsigned int)time(&now));
   for(int index = 0;index < 5;++index)
   {
-    before += (TCHAR)(_T(' ') + (TCHAR)rand() % (_T('~') - _T(' ')));
-    after  += (TCHAR)(_T(' ') + (TCHAR)rand() % (_T('~') - _T(' ')));
+    before += (TCHAR)(_T(' ') + (TCHAR)(rand() % 95) - _T(' '));
+    after  += (TCHAR)(_T(' ') + (TCHAR)(rand() % 95) - _T(' '));
   }
   authenticate = before + authenticate + after;
     
@@ -118,7 +119,7 @@ bool DecodeAuthentication(XString p_scramble,XString& p_user,XString& p_password
     return false;
   }
 
-  // STEP 4) Invert the ceasar cipher
+  // STEP 4) Invert the Ceasar cipher
   for(int index = 0;index < authenticate.GetLength(); ++index)
   {
     XString::XCHAR ch = authenticate.GetAt(index);
@@ -129,7 +130,7 @@ bool DecodeAuthentication(XString p_scramble,XString& p_user,XString& p_password
     }
   }
 
-  // STEP 5: Search the seperator
+  // STEP 5: Search the separator
   int pos1 = authenticate.Find(_T("^"));
   if(pos1 > 0)
   {
@@ -156,6 +157,6 @@ bool DecodeAuthentication(XString p_scramble,XString& p_user,XString& p_password
 
     return true;
   }
-  // No seperator!!
+  // No separator!!
   return false;
 }

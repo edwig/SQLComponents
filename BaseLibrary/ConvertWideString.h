@@ -100,9 +100,9 @@ XString ConstructBOM();
 // Construct a BOM
 XString ConstructBOM(Encoding p_encoding);
 // Decoding incoming strings from the internet. Defaults to UTF-8 encoding
-XString DecodeStringFromTheWire(XString p_string,XString p_charset = "utf-8");
+XString DecodeStringFromTheWire(XString p_string,XString p_charset = _T("utf-8"));
 // Encode to string for internet. Defaults to UTF-8 encoding
-XString EncodeStringForTheWire (XString p_string,XString p_charset = "utf-8");
+XString EncodeStringForTheWire (XString p_string,XString p_charset = _T("utf-8"));
 // Scan for UTF-8 chars in a string
 bool    DetectUTF8(XString& p_string);
 bool    DetectUTF8(const uchar* p_bytes);

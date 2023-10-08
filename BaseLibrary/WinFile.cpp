@@ -25,6 +25,8 @@
 //
 #include "pch.h"
 #include "WinFile.h"
+
+#include <atlconv.h>
 #include <fileapi.h>
 #include <handleapi.h>
 #include <shlwapi.h>
@@ -42,11 +44,10 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-// Do not complain about enum classes
-#pragma warning (disable: 26812)
-
 //////////////////////////////////////////////////////////////////////////
 //
+// HERE IS THE MOST IMPORTANT MAGIC!!
+// 
 // Not part of the public interface
 // Most optimized size for a modern OS to read disk blocks just once!
 // PAGESIZE (128 * 1024)
@@ -72,7 +73,7 @@ WinFile::WinFile(CString p_filename)
 {
 }
 
-// CTOR from another file pointer
+// CTOR from another WinFile
 WinFile::WinFile(WinFile& p_other)
 {
   *this = p_other;
@@ -308,7 +309,7 @@ WinFile::CreateDirectory()
   CString part = GetBaseDirectory(path);
   while(!part.IsEmpty())
   {
-    dirToBeOpened += "\\" + part;
+    dirToBeOpened += _T("\\") + part;
     if (!::CreateDirectory(dirToBeOpened.GetString(),nullptr))
     {
       m_error = ::GetLastError();
@@ -471,7 +472,7 @@ WinFile::DeleteToTrashcan(bool p_show /*= false*/,bool p_confirm /*= false*/)
 
   // Copy the filename for extra 0's after the name
   // so it becomes a list of just one (1) filename
-  TCHAR filelist   [MAX_PATH + 2];
+  TCHAR  filelist   [MAX_PATH + 2];
   memset(filelist,0,(MAX_PATH + 2) * sizeof(TCHAR));
   _tcscpy_s(filelist,MAX_PATH,m_filename.GetString());
 
@@ -627,7 +628,7 @@ WinFile::OpenAsSharedMemory(CString  p_name
   }
 
   // Extend the name for RDP sessions
-  p_name = (p_local ? "Local\\" : "Global\\") + p_name;
+  p_name = (p_local ? _T("Local\\") : _T("Global\\")) + p_name;
 
   // DO either a create of, or an open of an existing memory segment
   if(p_trycreate)
@@ -771,7 +772,7 @@ WinFile::ForgetFile()
 
 // Read a string (possibly with CR/LF to newline translation)
 bool
-WinFile::Read(CString& p_string)
+WinFile::Read(CString& p_string,uchar p_delim /*= '\n'*/)
 {
   std::string result;
   bool unicodeSkip(false);
@@ -810,7 +811,7 @@ WinFile::Read(CString& p_string)
     // Do the CR/LF to "\n" translation
     if(m_openMode & FFlag::open_trans_text)
     {
-      if(ch == '\n' || ch == '\r')
+      if(ch == p_delim || ch == '\r')
       {
         unicodeSkip = (m_encoding == Encoding::LE_UTF16) ||
                       (m_encoding == Encoding::BE_UTF16);
@@ -841,12 +842,12 @@ WinFile::Read(CString& p_string)
         continue;
       }
     }
-    if(ch == '\n' && m_encoding == Encoding::LE_UTF16)
+    if(ch == p_delim && m_encoding == Encoding::LE_UTF16)
     {
       // Read in trailing zero for a newline in this encoding
       result += (last = PageBufferRead());
     }
-    if(crstate && ch == '\n' && !last)
+    if(crstate && ch == p_delim && !last)
     {
       if(unicodeSkip)
       {
@@ -862,7 +863,7 @@ WinFile::Read(CString& p_string)
     }
 
     // See if we are ready reading the string
-    if(ch == '\n' && !last)
+    if(ch == p_delim && !last)
     {
       break;
     }
@@ -924,7 +925,7 @@ WinFile::TranslateInputBuffer(std::string& p_string)
     LPTSTR strbuf = result.GetBufferSetLength(clength);
     // Doing the conversion to MBCS
     clength = ::WideCharToMultiByte(GetACP(),0,(LPCWSTR) buffer,-1,reinterpret_cast<LPSTR>(strbuf),clength,NULL,NULL);
-    result.ReleaseBuffer(clength);
+    result.ReleaseBuffer();
     delete[] buffer;
     return result;
   }
@@ -964,7 +965,10 @@ WinFile::TranslateInputBuffer(std::string& p_string)
 #endif
 }
 
-// Convert Big-Endian (Blefuscu) to Little-Endian (Lilliput)
+// On input:  Convert Big-Endian (Blefuscu) to Little-Endian (Lilliput)
+// On output: Convert Little-Endian (Lilliput) to Big-Endian (Blefuscu)
+// MS-Windows = Intel architecture = Little-Endian (LE)
+// Mac-OS     = Motorola architecture = Big-Endian (BE)
 void
 WinFile::BlefuscuToLilliput(std::string& p_gulliver)
 {
@@ -1072,7 +1076,7 @@ WinFile::TranslateOutputBuffer(const CString& p_string)
 {
   if(p_string.IsEmpty())
   {
-    return "";
+    return std::string();
   }
   std::string result;
 
@@ -1196,12 +1200,8 @@ WinFile::Format(LPCTSTR p_format,...)
 bool
 WinFile::FormatV(LPCTSTR p_format,va_list p_list)
 {
-  // Getting a buffer of the correct length
-  int len = _vsctprintf(p_format,p_list) + 1;
-  PTCHAR buffer = new TCHAR[len];
-  // Formatting the parameters
-  _vstprintf_s(buffer,len,p_format,p_list);
-  // Adding to the string
+  CString buffer;
+  buffer.FormatV(p_format,p_list);
   bool result = Write(buffer);
   delete[] buffer;
   return result;
@@ -1810,7 +1810,7 @@ WinFile::SetFilenameInFolder(int p_folder,CString p_filename)
   }
   pShellMalloc->Release();
 
-  m_filename = special + CString("\\") + p_filename;
+  m_filename = special + CString(_T("\\")) + p_filename;
   return result;
 }
 
@@ -3014,6 +3014,251 @@ WinFile::ImplodeString(const CString& p_string,unsigned p_codepage)
   return result;
 }
 #endif
+
+//////////////////////////////////////////////////////////////////////////
+// 
+// STREAMING OPERATORS
+//
+//////////////////////////////////////////////////////////////////////////
+
+WinFile& 
+WinFile::operator<<(const TCHAR p_char)
+{
+  CString str(p_char);
+  Write(str);
+  return *this;
+}
+
+WinFile& 
+WinFile::operator<<(const short p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    Write(static_cast<void*>(const_cast<short*>(&p_num)),sizeof(short));
+  }
+  else
+  {
+    CString buf;
+    buf.Format(_T("%d"),(int) p_num);
+    Write(buf);
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator<<(const int p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    Write(static_cast<void*>(const_cast<int*>(&p_num)),sizeof(int));
+  }
+  else
+  {
+    CString buf;
+    buf.Format(_T("%d"),p_num);
+    Write(buf);
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator<<(const unsigned p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    Write(static_cast<void*>(const_cast<unsigned*>(&p_num)),sizeof(unsigned));
+  }
+  else
+  {
+    CString buf;
+    buf.Format(_T("%u"),p_num);
+    Write(buf);
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator<<(const INT64 p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    Write(static_cast<void*>(const_cast<INT64*>(&p_num)),sizeof(INT64));
+  }
+  else
+  {
+    CString buf;
+    buf.Format(_T("%I64d"),p_num);
+    Write(buf);
+  }
+  return *this;
+}
+
+
+WinFile&
+WinFile::operator<<(const float p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    Write(static_cast<void*>(const_cast<float*>(&p_num)),sizeof(short));
+  }
+  else
+  {
+    CString buf;
+    buf.Format(_T("%G"),(double)p_num);
+    Write(buf);
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator<<(const double p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    Write(static_cast<void*>(const_cast<double*>(&p_num)),sizeof(short));
+  }
+  else
+  {
+    CString buf;
+    buf.Format(_T("%G"),p_num);
+    Write(buf);
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator<<(const LPCTSTR p_string)
+{
+  CString string(p_string);
+  *this << string;
+  return *this;
+}
+
+WinFile&
+WinFile::operator<<(const CString& p_string)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    Write(static_cast<void*>(const_cast<PTCHAR>(p_string.GetString())),p_string.GetLength() * sizeof(TCHAR));
+  }
+  else
+  {
+    Write(p_string);
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(TCHAR& p_char)
+{
+  int read = 0;
+  Read(reinterpret_cast<void*>(&p_char),sizeof(TCHAR),read);
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(short& p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    int read = 0;
+    Read(reinterpret_cast<void*>(&p_num),sizeof(short),read);
+  }
+  else
+  {
+    m_error = ERROR_INVALID_FUNCTION;
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(int& p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    int read = 0;
+    Read(reinterpret_cast<void*>(&p_num),sizeof(int),read);
+  }
+  else
+  {
+    m_error = ERROR_INVALID_FUNCTION;
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(unsigned& p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    int read = 0;
+    Read(reinterpret_cast<void*>(&p_num),sizeof(unsigned),read);
+  }
+  else
+  {
+    m_error = ERROR_INVALID_FUNCTION;
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(INT64& p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    int read = 0;
+    Read(reinterpret_cast<void*>(&p_num),sizeof(INT64),read);
+  }
+  else
+  {
+    m_error = ERROR_INVALID_FUNCTION;
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(float& p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    int read = 0;
+    Read(reinterpret_cast<void*>(&p_num),sizeof(float),read);
+  }
+  else
+  {
+    m_error = ERROR_INVALID_FUNCTION;
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(double& p_num)
+{
+  if(m_openMode & open_trans_binary)
+  {
+    int read = 0;
+    Read(reinterpret_cast<void*>(&p_num),sizeof(double),read);
+  }
+  else
+  {
+    m_error = ERROR_INVALID_FUNCTION;
+  }
+  return *this;
+}
+
+WinFile&
+WinFile::operator>>(CString& p_string)
+{
+  if(m_openMode & open_trans_text)
+  {
+    Read(p_string);
+  }
+  else
+  {
+    m_error = ERROR_INVALID_FUNCTION;
+  }
+  return *this;
+}
 
 //////////////////////////////////////////////////////////////////////////
 //

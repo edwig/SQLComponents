@@ -230,3 +230,69 @@ bool SplitArgument(int& p_pos,const CString& p_data,TCHAR p_splitter,CString& p_
   p_pos = len;
   return true;
 }
+
+XString GetStringFromClipboard(HWND p_wnd /*=NULL*/)
+{
+#ifdef UNICODE
+  UINT format = CF_UNICODETEXT;
+#else
+  UINT format = CF_TEXT;
+#endif
+
+  XString string;
+  if(OpenClipboard(p_wnd))
+  {
+    HANDLE glob = GetClipboardData(format);
+    if(glob)
+    {
+      LPCTSTR text = (LPCTSTR) GlobalLock(glob);
+      string = text;
+      GlobalUnlock(glob);
+
+    }
+    CloseClipboard();
+  }
+  return string;
+}
+
+bool PutStringToClipboard(XString p_string,HWND p_wnd /*=NULL*/,bool p_append /*=false*/)
+{
+  bool result = false;
+#ifdef UNICODE
+  UINT format = CF_UNICODETEXT;
+#else
+  UINT format = CF_TEXT;
+#endif
+
+  if(OpenClipboard(p_wnd))
+  {
+    // Put the text in a global GMEM_MOVABLE memory handle
+    size_t size = ((size_t) p_string.GetLength() + 1) * sizeof(TCHAR);
+    HGLOBAL memory = GlobalAlloc(GHND,size);
+    if(memory)
+    {
+      void* data = GlobalLock(memory);
+      if(data)
+      {
+        _tcsncpy_s((LPTSTR) data,size,(LPCTSTR) p_string.GetString(),size);
+      }
+      else
+      {
+        GlobalFree(memory);
+        return false;
+      }
+
+      // Set the text on the clipboard
+      // and transfer ownership of the memory segment
+      if(!p_append)
+      {
+        EmptyClipboard();
+      }
+      SetClipboardData(format,memory);
+      GlobalUnlock(memory);
+      result = true;
+    }
+    CloseClipboard();
+  }
+  return result;
+}

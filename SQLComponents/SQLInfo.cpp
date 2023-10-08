@@ -43,7 +43,7 @@ static char THIS_FILE[] = __FILE__;
 namespace SQLComponents
 {
 
-// Used for metasearches
+// Used for meta searches
 #define META_SEARCH_LEN 10
 // This macro is used for synchronous ODBC calls
 #define ODBC_CALL_ONCE(SQLFunc) \
@@ -591,7 +591,7 @@ SQLInfo::ReadingDataTypes()
         dataLen =0;
 
         // DATA SOURCE DEPENDENT TYPE NAME. USE FOR CREATE TABLE
-        if(SQLGetData(handle,1,SQL_C_CHAR,buffer,5120 * sizeof(TCHAR),&dataLen) == SQL_SUCCESS)
+        if(SQLGetData(handle,1,SQL_C_TCHAR,buffer,5120 * sizeof(TCHAR),&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) 
           {
@@ -624,19 +624,19 @@ SQLInfo::ReadingDataTypes()
         }
         // LITERAL PREFIX FOR ODBC DRIVER, like {ts' for timestamp
         buffer[0] = 0;
-        if(::SQLGetData(handle,4,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
+        if(::SQLGetData(handle,4,SQL_C_TCHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_literal_prefix = buffer;
         }
         // LITERAL SUFFIX FOR ODBC DRIVER, like '} for timestamp
         buffer[0] = 0;
-        if(::SQLGetData(handle,5,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
+        if(::SQLGetData(handle,5,SQL_C_TCHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_literal_suffix = buffer;
         }
         // HOW TO CREATE PARAMETERS, like "(precision,scale)"
         buffer[0] = 0;
-        if(::SQLGetData(handle,6,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
+        if(::SQLGetData(handle,6,SQL_C_TCHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_create_params = buffer;
         }
@@ -680,7 +680,7 @@ SQLInfo::ReadingDataTypes()
         // Local type name for display on UI's (not in DDL!)
         ti->m_local_type_name = buffer;
         buffer[0] = 0;
-        if(::SQLGetData(handle,13,SQL_C_CHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
+        if(::SQLGetData(handle,13,SQL_C_TCHAR,buffer,5120,&dataLen) == SQL_SUCCESS)
         {
           if(dataLen > 0) ti->m_local_type_name = buffer;
         }
@@ -1473,11 +1473,11 @@ SQLInfo::MakeInfoTableTable(MTableMap& p_tables
                           ,stype   ? SQL_NTS : 0 )); // Table types length
   if(m_retCode == SQL_SUCCESS)
   {
-     SQLBindCol(m_hstmt, 1, SQL_C_CHAR,szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
-     SQLBindCol(m_hstmt, 2, SQL_C_CHAR,szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
-     SQLBindCol(m_hstmt, 3, SQL_C_CHAR,szTableName,  SQL_MAX_BUFFER, &cbTableName);
-     SQLBindCol(m_hstmt, 4, SQL_C_CHAR,szTableType,  SQL_MAX_BUFFER, &cbTableType);
-     SQLBindCol(m_hstmt, 5, SQL_C_CHAR,szRemarks,  2*SQL_MAX_BUFFER, &cbRemarks);
+     SQLBindCol(m_hstmt, 1, SQL_C_TCHAR,szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
+     SQLBindCol(m_hstmt, 2, SQL_C_TCHAR,szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
+     SQLBindCol(m_hstmt, 3, SQL_C_TCHAR,szTableName,  SQL_MAX_BUFFER, &cbTableName);
+     SQLBindCol(m_hstmt, 4, SQL_C_TCHAR,szTableType,  SQL_MAX_BUFFER, &cbTableType);
+     SQLBindCol(m_hstmt, 5, SQL_C_TCHAR,szRemarks,  2*SQL_MAX_BUFFER, &cbRemarks);
      while(true)
      {
        m_retCode = SqlFetch(m_hstmt);
@@ -1629,24 +1629,24 @@ SQLInfo::MakeInfoTableColumns(MColumnMap& p_columns
                            ,column  ? SQL_NTS : 0)); // Column name length
   if(m_retCode == SQL_SUCCESS)
   {
-     SQLBindCol(m_hstmt, 1, SQL_C_CHAR,   szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
-     SQLBindCol(m_hstmt, 2, SQL_C_CHAR,   szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
-     SQLBindCol(m_hstmt, 3, SQL_C_CHAR,   szTableName,  SQL_MAX_BUFFER, &cbTableName);
-     SQLBindCol(m_hstmt, 4, SQL_C_CHAR,   szColumnName, SQL_MAX_BUFFER, &cbColumnName);
-     SQLBindCol(m_hstmt, 5, SQL_C_SHORT, &DataType,     2,              &cbDataType);
-     SQLBindCol(m_hstmt, 6, SQL_C_CHAR,   szTypeName,   SQL_MAX_BUFFER, &cbTypeName);
-     SQLBindCol(m_hstmt, 7, SQL_C_SLONG, &Precision,    4,              &cbPrecision);
-     SQLBindCol(m_hstmt, 8, SQL_C_SLONG, &Length,       4,              &cbLength);
-     SQLBindCol(m_hstmt, 9, SQL_C_SSHORT,&Scale,        2,              &cbScale);
-     SQLBindCol(m_hstmt,10, SQL_C_SHORT, &NumRadix,     2,              &cbNumRadix);
-     SQLBindCol(m_hstmt,11, SQL_C_SSHORT,&Nullable,     2,              &cbNullable);
-     SQLBindCol(m_hstmt,12, SQL_C_CHAR,   szRemarks,  2*SQL_MAX_BUFFER, &cbRemarks);
-     SQLBindCol(m_hstmt,13, SQL_C_CHAR,   szDefault,  2*SQL_MAX_BUFFER, &cbDefault);
-     SQLBindCol(m_hstmt,14, SQL_C_SHORT, &DataType3,    2,              &cbDataType3);
-     SQLBindCol(m_hstmt,15, SQL_C_SHORT, &TypeSub,      2,              &cbTypeSub);
-     SQLBindCol(m_hstmt,16, SQL_C_SLONG, &OctetLength,  4,              &cbOctetLength);
-     SQLBindCol(m_hstmt,17, SQL_C_SLONG, &Position,     4,              &cbPosition);
-     SQLBindCol(m_hstmt,18, SQL_C_CHAR,  &szNullable,   SQL_MAX_BUFFER, &cbIsNullable);
+     SQLBindCol(m_hstmt, 1, SQL_C_TCHAR,   szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
+     SQLBindCol(m_hstmt, 2, SQL_C_TCHAR,   szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
+     SQLBindCol(m_hstmt, 3, SQL_C_TCHAR,   szTableName,  SQL_MAX_BUFFER, &cbTableName);
+     SQLBindCol(m_hstmt, 4, SQL_C_TCHAR,   szColumnName, SQL_MAX_BUFFER, &cbColumnName);
+     SQLBindCol(m_hstmt, 5, SQL_C_SHORT,  &DataType,     2,              &cbDataType);
+     SQLBindCol(m_hstmt, 6, SQL_C_TCHAR,   szTypeName,   SQL_MAX_BUFFER, &cbTypeName);
+     SQLBindCol(m_hstmt, 7, SQL_C_SLONG,  &Precision,    4,              &cbPrecision);
+     SQLBindCol(m_hstmt, 8, SQL_C_SLONG,  &Length,       4,              &cbLength);
+     SQLBindCol(m_hstmt, 9, SQL_C_SSHORT, &Scale,        2,              &cbScale);
+     SQLBindCol(m_hstmt,10, SQL_C_SHORT,  &NumRadix,     2,              &cbNumRadix);
+     SQLBindCol(m_hstmt,11, SQL_C_SSHORT, &Nullable,     2,              &cbNullable);
+     SQLBindCol(m_hstmt,12, SQL_C_TCHAR,   szRemarks,  2*SQL_MAX_BUFFER, &cbRemarks);
+     SQLBindCol(m_hstmt,13, SQL_C_TCHAR,   szDefault,  2*SQL_MAX_BUFFER, &cbDefault);
+     SQLBindCol(m_hstmt,14, SQL_C_SHORT,  &DataType3,    2,              &cbDataType3);
+     SQLBindCol(m_hstmt,15, SQL_C_SHORT,  &TypeSub,      2,              &cbTypeSub);
+     SQLBindCol(m_hstmt,16, SQL_C_SLONG,  &OctetLength,  4,              &cbOctetLength);
+     SQLBindCol(m_hstmt,17, SQL_C_SLONG,  &Position,     4,              &cbPosition);
+     SQLBindCol(m_hstmt,18, SQL_C_TCHAR,  &szNullable,   SQL_MAX_BUFFER, &cbIsNullable);
 
      while(true)
      {
@@ -1772,12 +1772,12 @@ SQLInfo::MakeInfoTablePrimary(MPrimaryMap& p_primaries,XString& p_errors,XString
                                ));
   if(m_retCode == SQL_SUCCESS)
   {
-     SQLBindCol(m_hstmt, 1, SQL_C_CHAR,  szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
-     SQLBindCol(m_hstmt, 2, SQL_C_CHAR,  szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
-     SQLBindCol(m_hstmt, 3, SQL_C_CHAR,  szTableName,  SQL_MAX_BUFFER, &cbTableName);
-     SQLBindCol(m_hstmt, 4, SQL_C_CHAR,  szColumnName, SQL_MAX_BUFFER, &cbColumnName);
-     SQLBindCol(m_hstmt, 5, SQL_C_SSHORT,&KeySeq,      0,              &cbKeySeq);
-     SQLBindCol(m_hstmt, 6, SQL_C_CHAR,  szPkName,     SQL_MAX_BUFFER, &cbPkName);
+     SQLBindCol(m_hstmt, 1, SQL_C_TCHAR,  szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
+     SQLBindCol(m_hstmt, 2, SQL_C_TCHAR,  szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
+     SQLBindCol(m_hstmt, 3, SQL_C_TCHAR,  szTableName,  SQL_MAX_BUFFER, &cbTableName);
+     SQLBindCol(m_hstmt, 4, SQL_C_TCHAR,  szColumnName, SQL_MAX_BUFFER, &cbColumnName);
+     SQLBindCol(m_hstmt, 5, SQL_C_SSHORT, &KeySeq,      0,              &cbKeySeq);
+     SQLBindCol(m_hstmt, 6, SQL_C_TCHAR,  szPkName,     SQL_MAX_BUFFER, &cbPkName);
      while(true)
      {
        m_retCode = SqlFetch(m_hstmt);
@@ -1909,20 +1909,20 @@ SQLInfo::MakeInfoTableForeign(MForeignMap& p_foreigns
                                ));
   if(m_retCode == SQL_SUCCESS)
   {
-     SQLBindCol(m_hstmt, 1, SQL_C_CHAR, szPKCatalogName,SQL_MAX_BUFFER, &cbPKCatalogName);
-     SQLBindCol(m_hstmt, 2, SQL_C_CHAR, szPKSchemaName, SQL_MAX_BUFFER, &cbPKSchemaName);
-     SQLBindCol(m_hstmt, 3, SQL_C_CHAR, szPKTableName,  SQL_MAX_BUFFER, &cbPKTableName);
-     SQLBindCol(m_hstmt, 4, SQL_C_CHAR, szPKColumnName, SQL_MAX_BUFFER, &cbPKColumnName);
-     SQLBindCol(m_hstmt, 5, SQL_C_CHAR, szFKCatalogName,SQL_MAX_BUFFER, &cbFKCatalogName);
-     SQLBindCol(m_hstmt, 6, SQL_C_CHAR, szFKSchemaName, SQL_MAX_BUFFER, &cbFKSchemaName);
-     SQLBindCol(m_hstmt, 7, SQL_C_CHAR, szFKTableName,  SQL_MAX_BUFFER, &cbFKTableName);
-     SQLBindCol(m_hstmt, 8, SQL_C_CHAR, szFKColumnName, SQL_MAX_BUFFER, &cbFKColumnName);
-     SQLBindCol(m_hstmt, 9, SQL_C_SSHORT,&KeySeq,       0,              &cbKeySeq);
-     SQLBindCol(m_hstmt,10, SQL_C_SSHORT,&UpdateRule,   0,              &cbUpdateRule);
-     SQLBindCol(m_hstmt,11, SQL_C_SSHORT,&DeleteRule,   0,              &cbDeleteRule);
-     SQLBindCol(m_hstmt,12, SQL_C_CHAR, szFKKeyName,    SQL_MAX_BUFFER, &cbFKKeyName);
-     SQLBindCol(m_hstmt,13, SQL_C_CHAR, szPKKeyName,    SQL_MAX_BUFFER, &cbPKKeyName);
-     SQLBindCol(m_hstmt,14, SQL_C_SSHORT,&Deferrab,     0,              &cbDeferrab);
+     SQLBindCol(m_hstmt, 1, SQL_C_TCHAR, szPKCatalogName,SQL_MAX_BUFFER, &cbPKCatalogName);
+     SQLBindCol(m_hstmt, 2, SQL_C_TCHAR, szPKSchemaName, SQL_MAX_BUFFER, &cbPKSchemaName);
+     SQLBindCol(m_hstmt, 3, SQL_C_TCHAR, szPKTableName,  SQL_MAX_BUFFER, &cbPKTableName);
+     SQLBindCol(m_hstmt, 4, SQL_C_TCHAR, szPKColumnName, SQL_MAX_BUFFER, &cbPKColumnName);
+     SQLBindCol(m_hstmt, 5, SQL_C_TCHAR, szFKCatalogName,SQL_MAX_BUFFER, &cbFKCatalogName);
+     SQLBindCol(m_hstmt, 6, SQL_C_TCHAR, szFKSchemaName, SQL_MAX_BUFFER, &cbFKSchemaName);
+     SQLBindCol(m_hstmt, 7, SQL_C_TCHAR, szFKTableName,  SQL_MAX_BUFFER, &cbFKTableName);
+     SQLBindCol(m_hstmt, 8, SQL_C_TCHAR, szFKColumnName, SQL_MAX_BUFFER, &cbFKColumnName);
+     SQLBindCol(m_hstmt, 9, SQL_C_SSHORT, &KeySeq,       0,              &cbKeySeq);
+     SQLBindCol(m_hstmt,10, SQL_C_SSHORT, &UpdateRule,   0,              &cbUpdateRule);
+     SQLBindCol(m_hstmt,11, SQL_C_SSHORT, &DeleteRule,   0,              &cbDeleteRule);
+     SQLBindCol(m_hstmt,12, SQL_C_TCHAR, szFKKeyName,    SQL_MAX_BUFFER, &cbFKKeyName);
+     SQLBindCol(m_hstmt,13, SQL_C_TCHAR, szPKKeyName,    SQL_MAX_BUFFER, &cbPKKeyName);
+     SQLBindCol(m_hstmt,14, SQL_C_SSHORT, &Deferrab,     0,              &cbDeferrab);
      while(true)
      {
        m_retCode = SqlFetch(m_hstmt);
@@ -2045,18 +2045,18 @@ SQLInfo::MakeInfoTableStatistics(MIndicesMap& p_statistics
                               ,SQL_QUICK));    // Make sure we get the right Cardinality and Pages (SQL_ENSURE)
   if(m_retCode == SQL_SUCCESS)
   {
-    SQLBindCol(m_hstmt, 1, SQL_C_CHAR,   szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
-    SQLBindCol(m_hstmt, 2, SQL_C_CHAR,   szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
-    SQLBindCol(m_hstmt, 3, SQL_C_CHAR,   szTableName,  SQL_MAX_BUFFER, &cbTableName);
-    SQLBindCol(m_hstmt, 4, SQL_C_SSHORT,&NonUnique,    0,              &cbNonUnique);
-    SQLBindCol(m_hstmt, 6, SQL_C_CHAR,   szIndexName,  SQL_MAX_BUFFER, &cbIndexName);
-    SQLBindCol(m_hstmt, 7, SQL_C_SSHORT,&IndexType,    0,              &cbIndexType);
-    SQLBindCol(m_hstmt, 8, SQL_C_SSHORT,&OrdinalPos,   0,              &cbOrdinalPos);
-    SQLBindCol(m_hstmt, 9, SQL_C_CHAR,   szColumnName, SQL_MAX_BUFFER, &cbColumnName);
-    SQLBindCol(m_hstmt,10, SQL_C_CHAR,  &AscDesc,      2,              &cbAscDesc);
-    SQLBindCol(m_hstmt,11, SQL_C_LONG,  &Cardinality,  0,              &cbCardinality);
-    SQLBindCol(m_hstmt,12, SQL_C_LONG,  &Pages,        0,              &cbPages);
-    SQLBindCol(m_hstmt,13, SQL_C_CHAR,   szFilter,     SQL_MAX_BUFFER, &cbFilter);
+    SQLBindCol(m_hstmt, 1, SQL_C_TCHAR,   szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
+    SQLBindCol(m_hstmt, 2, SQL_C_TCHAR,   szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
+    SQLBindCol(m_hstmt, 3, SQL_C_TCHAR,   szTableName,  SQL_MAX_BUFFER, &cbTableName);
+    SQLBindCol(m_hstmt, 4, SQL_C_SSHORT, &NonUnique,    0,              &cbNonUnique);
+    SQLBindCol(m_hstmt, 6, SQL_C_TCHAR,   szIndexName,  SQL_MAX_BUFFER, &cbIndexName);
+    SQLBindCol(m_hstmt, 7, SQL_C_SSHORT, &IndexType,    0,              &cbIndexType);
+    SQLBindCol(m_hstmt, 8, SQL_C_SSHORT, &OrdinalPos,   0,              &cbOrdinalPos);
+    SQLBindCol(m_hstmt, 9, SQL_C_TCHAR,   szColumnName, SQL_MAX_BUFFER, &cbColumnName);
+    SQLBindCol(m_hstmt,10, SQL_C_TCHAR,  &AscDesc,      2,              &cbAscDesc);
+    SQLBindCol(m_hstmt,11, SQL_C_TCHAR,  &Cardinality,  0,              &cbCardinality);
+    SQLBindCol(m_hstmt,12, SQL_C_TCHAR,  &Pages,        0,              &cbPages);
+    SQLBindCol(m_hstmt,13, SQL_C_TCHAR,   szFilter,     SQL_MAX_BUFFER, &cbFilter);
     while(true)
     {
       m_retCode = SqlFetch(m_hstmt);
@@ -2177,9 +2177,9 @@ SQLInfo::MakeInfoTableSpecials(MSpecialsMap& p_specials
   if(m_retCode == SQL_SUCCESS)
   {
      SQLBindCol(m_hstmt, 1, SQL_C_SSHORT,&Scope,      0,              &cbScope);
-     SQLBindCol(m_hstmt, 2, SQL_C_CHAR,  szColumnName,SQL_MAX_BUFFER, &cbColumnName);
+     SQLBindCol(m_hstmt, 2, SQL_C_TCHAR, szColumnName,SQL_MAX_BUFFER, &cbColumnName);
      SQLBindCol(m_hstmt, 3, SQL_C_SHORT, &DataType,   0,              &cbDataType);
-     SQLBindCol(m_hstmt, 4, SQL_C_CHAR,  szTypeName,  SQL_MAX_BUFFER, &cbTypeName);
+     SQLBindCol(m_hstmt, 4, SQL_C_TCHAR, szTypeName,  SQL_MAX_BUFFER, &cbTypeName);
      SQLBindCol(m_hstmt, 5, SQL_C_LONG,  &ColumnSize, 0,              &cbColumnSize);
      SQLBindCol(m_hstmt, 6, SQL_C_LONG,  &BufferSize, 0,              &cbBufferSize);
      SQLBindCol(m_hstmt, 7, SQL_C_SHORT, &DecDigits,  0,              &cbDecDigits);
@@ -2280,13 +2280,13 @@ SQLInfo::MakeInfoTablePrivileges(MPrivilegeMap& p_privileges
                                    ));
   if(m_retCode == SQL_SUCCESS)
   {
-     SQLBindCol(m_hstmt, 1, SQL_C_CHAR, szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
-     SQLBindCol(m_hstmt, 2, SQL_C_CHAR, szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
-     SQLBindCol(m_hstmt, 3, SQL_C_CHAR, szTableName,  SQL_MAX_BUFFER, &cbTableName);
-     SQLBindCol(m_hstmt, 4, SQL_C_CHAR, szGrantor,    SQL_MAX_BUFFER, &cbGrantor);
-     SQLBindCol(m_hstmt, 5, SQL_C_CHAR, szGrantee,    SQL_MAX_BUFFER, &cbGrantee);
-     SQLBindCol(m_hstmt, 6, SQL_C_CHAR, szPrivilege,  SQL_MAX_BUFFER, &cbPrivilege);
-     SQLBindCol(m_hstmt, 7, SQL_C_CHAR, szGrantable,  SQL_MAX_BUFFER, &cbGrantable);
+     SQLBindCol(m_hstmt, 1, SQL_C_TCHAR, szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
+     SQLBindCol(m_hstmt, 2, SQL_C_TCHAR, szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
+     SQLBindCol(m_hstmt, 3, SQL_C_TCHAR, szTableName,  SQL_MAX_BUFFER, &cbTableName);
+     SQLBindCol(m_hstmt, 4, SQL_C_TCHAR, szGrantor,    SQL_MAX_BUFFER, &cbGrantor);
+     SQLBindCol(m_hstmt, 5, SQL_C_TCHAR, szGrantee,    SQL_MAX_BUFFER, &cbGrantee);
+     SQLBindCol(m_hstmt, 6, SQL_C_TCHAR, szPrivilege,  SQL_MAX_BUFFER, &cbPrivilege);
+     SQLBindCol(m_hstmt, 7, SQL_C_TCHAR, szGrantable,  SQL_MAX_BUFFER, &cbGrantable);
      while(true)
      {
        m_retCode = SqlFetch(m_hstmt);
@@ -2395,14 +2395,14 @@ SQLInfo::MakeInfoColumnPrivileges(MPrivilegeMap&  p_privileges
                                    ));
   if(m_retCode == SQL_SUCCESS)
   {
-     SQLBindCol(m_hstmt, 1, SQL_C_CHAR, szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
-     SQLBindCol(m_hstmt, 2, SQL_C_CHAR, szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
-     SQLBindCol(m_hstmt, 3, SQL_C_CHAR, szTableName,  SQL_MAX_BUFFER, &cbTableName);
-     SQLBindCol(m_hstmt, 4, SQL_C_CHAR, szColumnName, SQL_MAX_BUFFER, &cbColumnName);
-     SQLBindCol(m_hstmt, 5, SQL_C_CHAR, szGrantor,    SQL_MAX_BUFFER, &cbGrantor);
-     SQLBindCol(m_hstmt, 6, SQL_C_CHAR, szGrantee,    SQL_MAX_BUFFER, &cbGrantee);
-     SQLBindCol(m_hstmt, 7, SQL_C_CHAR, szPrivilege,  SQL_MAX_BUFFER, &cbPrivilege);
-     SQLBindCol(m_hstmt, 8, SQL_C_CHAR, szGrantable,  SQL_MAX_BUFFER, &cbGrantable);
+     SQLBindCol(m_hstmt, 1, SQL_C_TCHAR, szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
+     SQLBindCol(m_hstmt, 2, SQL_C_TCHAR, szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
+     SQLBindCol(m_hstmt, 3, SQL_C_TCHAR, szTableName,  SQL_MAX_BUFFER, &cbTableName);
+     SQLBindCol(m_hstmt, 4, SQL_C_TCHAR, szColumnName, SQL_MAX_BUFFER, &cbColumnName);
+     SQLBindCol(m_hstmt, 5, SQL_C_TCHAR, szGrantor,    SQL_MAX_BUFFER, &cbGrantor);
+     SQLBindCol(m_hstmt, 6, SQL_C_TCHAR, szGrantee,    SQL_MAX_BUFFER, &cbGrantee);
+     SQLBindCol(m_hstmt, 7, SQL_C_TCHAR, szPrivilege,  SQL_MAX_BUFFER, &cbPrivilege);
+     SQLBindCol(m_hstmt, 8, SQL_C_TCHAR, szGrantable,  SQL_MAX_BUFFER, &cbGrantable);
      while(true)
      {
        m_retCode = SqlFetch(m_hstmt);
@@ -2518,14 +2518,14 @@ SQLInfo::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
                                 ,procedure ? SQL_NTS : 0));
   if(m_retCode == SQL_SUCCESS)
   {
-    SQLBindCol(m_hstmt, 1, SQL_C_CHAR,  szCatalogName,   SQL_MAX_BUFFER, &cbCatalogName);
-    SQLBindCol(m_hstmt, 2, SQL_C_CHAR,  szSchemaName,    SQL_MAX_BUFFER, &cbSchemaName);
-    SQLBindCol(m_hstmt, 3, SQL_C_CHAR,  szProcedureName, SQL_MAX_BUFFER, &cbProcedureName);
-    SQLBindCol(m_hstmt, 4, SQL_C_SSHORT,&NumInputParams, 0,              &cbNumInputParams);
-    SQLBindCol(m_hstmt, 5, SQL_C_SSHORT,&NumOutputParams,0,              &cbNumOutputParams);
-    SQLBindCol(m_hstmt, 6, SQL_C_SSHORT,&NumResultSets,  0,              &cbNumResultSets);
-    SQLBindCol(m_hstmt, 7, SQL_C_CHAR,  szRemarks,     2*SQL_MAX_BUFFER, &cbRemarks);
-    SQLBindCol(m_hstmt, 8, SQL_C_SSHORT,&ProcedureType,  0,              &cbProcedureType);
+    SQLBindCol(m_hstmt, 1, SQL_C_TCHAR,  szCatalogName,   SQL_MAX_BUFFER, &cbCatalogName);
+    SQLBindCol(m_hstmt, 2, SQL_C_TCHAR,  szSchemaName,    SQL_MAX_BUFFER, &cbSchemaName);
+    SQLBindCol(m_hstmt, 3, SQL_C_TCHAR,  szProcedureName, SQL_MAX_BUFFER, &cbProcedureName);
+    SQLBindCol(m_hstmt, 4, SQL_C_SSHORT, &NumInputParams, 0,              &cbNumInputParams);
+    SQLBindCol(m_hstmt, 5, SQL_C_SSHORT, &NumOutputParams,0,              &cbNumOutputParams);
+    SQLBindCol(m_hstmt, 6, SQL_C_SSHORT, &NumResultSets,  0,              &cbNumResultSets);
+    SQLBindCol(m_hstmt, 7, SQL_C_TCHAR,  szRemarks,     2*SQL_MAX_BUFFER, &cbRemarks);
+    SQLBindCol(m_hstmt, 8, SQL_C_SSHORT, &ProcedureType,  0,              &cbProcedureType);
     while(true)
     {
       m_retCode = SqlFetch(m_hstmt);
@@ -2658,25 +2658,25 @@ SQLInfo::MakeInfoPSMParameters(MParameterMap& p_parameters
                                     ,column   ,0)); // All columns
   if(m_retCode == SQL_SUCCESS)
   {
-    SQLBindCol(m_hstmt, 1, SQL_C_CHAR, szCatalogName,  SQL_MAX_BUFFER, &cbCatalogName);
-    SQLBindCol(m_hstmt, 2, SQL_C_CHAR, szSchemaName,   SQL_MAX_BUFFER, &cbSchemaName);
-    SQLBindCol(m_hstmt, 3, SQL_C_CHAR, szProcedureName,SQL_MAX_BUFFER, &cbProcedureName);
-    SQLBindCol(m_hstmt, 4, SQL_C_CHAR, szColumnName,   SQL_MAX_BUFFER, &cbColumnName);
-    SQLBindCol(m_hstmt, 5, SQL_C_SSHORT,&ColumnType,   0,              &cbColumnType);
-    SQLBindCol(m_hstmt, 6, SQL_C_SSHORT,&DataType,     0,              &cbDataType);
-    SQLBindCol(m_hstmt, 7, SQL_C_CHAR, szTypeName,     SQL_MAX_BUFFER, &cbTypeName);
-    SQLBindCol(m_hstmt, 8, SQL_C_LONG,  &ColumnSize,   0,              &cbColumnSize);
-    SQLBindCol(m_hstmt, 9, SQL_C_LONG,  &BufferSize,   0,              &cbBufferSize);
-    SQLBindCol(m_hstmt,10, SQL_C_SSHORT,&DecimalDigits,0,              &cbDecimalDigits);
-    SQLBindCol(m_hstmt,11, SQL_C_SSHORT,&Radix,        0,              &cbRadix);
-    SQLBindCol(m_hstmt,12, SQL_C_SSHORT,&Nullable,     0,              &cbNullable);
-    SQLBindCol(m_hstmt,13, SQL_C_CHAR, szRemarks,     2*SQL_MAX_BUFFER,&cbRemarks);
-    SQLBindCol(m_hstmt,14, SQL_C_CHAR, szDefaultValue,2*SQL_MAX_BUFFER,&cbDefaultValue);
-    SQLBindCol(m_hstmt,15, SQL_C_SSHORT,&DataType3,    2,              &cbDataType3);
-    SQLBindCol(m_hstmt,16, SQL_C_SSHORT,&SubType,      2,              &cbSubType);
-    SQLBindCol(m_hstmt,17, SQL_C_LONG,  &OctetLength,  4,              &cbOctetLength);
-    SQLBindCol(m_hstmt,18, SQL_C_LONG,  &OrdinalPos,   0,              &cbOrdinalPos);
-    SQLBindCol(m_hstmt,19, SQL_C_CHAR, szIsNullable,   10,             &cbIsNullable);
+    SQLBindCol(m_hstmt, 1, SQL_C_TCHAR, szCatalogName,  SQL_MAX_BUFFER, &cbCatalogName);
+    SQLBindCol(m_hstmt, 2, SQL_C_TCHAR, szSchemaName,   SQL_MAX_BUFFER, &cbSchemaName);
+    SQLBindCol(m_hstmt, 3, SQL_C_TCHAR, szProcedureName,SQL_MAX_BUFFER, &cbProcedureName);
+    SQLBindCol(m_hstmt, 4, SQL_C_TCHAR, szColumnName,   SQL_MAX_BUFFER, &cbColumnName);
+    SQLBindCol(m_hstmt, 5, SQL_C_SSHORT, &ColumnType,   0,              &cbColumnType);
+    SQLBindCol(m_hstmt, 6, SQL_C_SSHORT, &DataType,     0,              &cbDataType);
+    SQLBindCol(m_hstmt, 7, SQL_C_TCHAR, szTypeName,     SQL_MAX_BUFFER, &cbTypeName);
+    SQLBindCol(m_hstmt, 8, SQL_C_LONG,   &ColumnSize,   0,              &cbColumnSize);
+    SQLBindCol(m_hstmt, 9, SQL_C_LONG,   &BufferSize,   0,              &cbBufferSize);
+    SQLBindCol(m_hstmt,10, SQL_C_SSHORT, &DecimalDigits,0,              &cbDecimalDigits);
+    SQLBindCol(m_hstmt,11, SQL_C_SSHORT, &Radix,        0,              &cbRadix);
+    SQLBindCol(m_hstmt,12, SQL_C_SSHORT, &Nullable,     0,              &cbNullable);
+    SQLBindCol(m_hstmt,13, SQL_C_TCHAR ,szRemarks,     2*SQL_MAX_BUFFER,&cbRemarks);
+    SQLBindCol(m_hstmt,14, SQL_C_TCHAR, szDefaultValue,2*SQL_MAX_BUFFER,&cbDefaultValue);
+    SQLBindCol(m_hstmt,15, SQL_C_SSHORT, &DataType3,    2,              &cbDataType3);
+    SQLBindCol(m_hstmt,16, SQL_C_SSHORT, &SubType,      2,              &cbSubType);
+    SQLBindCol(m_hstmt,17, SQL_C_LONG,   &OctetLength,  4,              &cbOctetLength);
+    SQLBindCol(m_hstmt,18, SQL_C_LONG,   &OrdinalPos,   0,              &cbOrdinalPos);
+    SQLBindCol(m_hstmt,19, SQL_C_TCHAR, szIsNullable,   10,             &cbIsNullable);
     while(true)
     {
       m_retCode = SqlFetch(m_hstmt);
@@ -2859,10 +2859,10 @@ SQLInfo::MakeInfoMetaTypes(MMetaMap& p_objects,XString& p_errors,int p_type)
                           ,stype   ? SQL_NTS : 0 )); // Table types length
   if(m_retCode == SQL_SUCCESS)
   {
-    SqlBindCol(m_hstmt, 1, SQL_C_CHAR,szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
-    SqlBindCol(m_hstmt, 2, SQL_C_CHAR,szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
-    SqlBindCol(m_hstmt, 4, SQL_C_CHAR,szTableType,  SQL_MAX_BUFFER, &cbTableType);
-    SqlBindCol(m_hstmt, 5, SQL_C_CHAR,szRemarks,    SQL_MAX_BUFFER, &cbRemarks);
+    SqlBindCol(m_hstmt, 1, SQL_C_TCHAR,szCatalogName,SQL_MAX_BUFFER, &cbCatalogName);
+    SqlBindCol(m_hstmt, 2, SQL_C_TCHAR,szSchemaName, SQL_MAX_BUFFER, &cbSchemaName);
+    SqlBindCol(m_hstmt, 4, SQL_C_TCHAR,szTableType,  SQL_MAX_BUFFER, &cbTableType);
+    SqlBindCol(m_hstmt, 5, SQL_C_TCHAR,szRemarks,    SQL_MAX_BUFFER, &cbRemarks);
 
     std::map<XString,XString> found;
     while(true)
