@@ -2292,6 +2292,8 @@ SQLInfoSQLServer::GetCATALOGViewDrop(XString p_schema,XString p_viewname,XString
 XString
 SQLInfoSQLServer::GetCATALOGTablePrivileges(XString& p_schema,XString& p_tablename) const
 {
+  bool pattern = p_tablename.Find('%') >= 0;
+
   CString sql = _T("SELECT db_name() AS table_catalog\n")
                 _T("      ,s.name    AS table_schema\n")
                 _T("      ,o.name    AS table_name\n")
@@ -2316,7 +2318,7 @@ SQLInfoSQLServer::GetCATALOGTablePrivileges(XString& p_schema,XString& p_tablena
   }
   if(!p_tablename.IsEmpty())
   {
-    sql += _T("   AND o.name = '") + p_tablename + _T("'\n");
+    sql += XString(_T("   AND o.name ")) + (pattern ? _T("LIKE '") : _T("= '")) + p_tablename + _T("'\n");
   }
   sql += _T(" ORDER BY 1,2,3,4,5");
   return sql;
