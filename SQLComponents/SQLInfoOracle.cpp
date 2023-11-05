@@ -2082,6 +2082,7 @@ SQLInfoOracle::GetCATALOGTablePrivileges(XString& p_schema,XString& p_tablename)
 {
   p_schema.MakeUpper();
   p_tablename.MakeUpper();
+  bool pattern = p_tablename.Find('%') > 0;
 
   XString sql = _T("SELECT sys_context('USERENV','DB_NAME') AS table_catalog\n")
                 _T("      ,pri.table_schema\n")
@@ -2100,24 +2101,28 @@ SQLInfoOracle::GetCATALOGTablePrivileges(XString& p_schema,XString& p_tablename)
   if(!p_tablename.IsEmpty())
   {
     sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
-    sql += _T("table_name = '") + p_tablename + _T("'\n");
+    sql += XString(_T("table_name ")) + (pattern ? _T("LIKE '") : _T("= '")) + p_tablename + _T("'\n");
   }
 
   // Add owner privileges in the form of a union with the mapping
-  if(!p_schema.IsEmpty() && !p_tablename.IsEmpty())
+  if(!pattern)
   {
-    sql.AppendFormat(_T("UNION\n")
-                     _T("SELECT sys_context('USERENV','DB_NAME')\n")
-                     _T("      ,'%s'\n")
-                     _T("      ,'%s'\n")
-                     _T("      ,'_SYSTEM'\n")
-                     _T("      ,'%s'\n")
-                     _T("      ,name\n")
-                     _T("      ,'YES'\n")
-                     _T("  FROM table_privilege_map\n")
-                    ,p_schema   .GetString()
-                    ,p_tablename.GetString()
-                    ,p_schema   .GetString());
+    // Add owner privileges in the form of a union with the mapping
+    if(!p_schema.IsEmpty() && !p_tablename.IsEmpty())
+    {
+      sql.AppendFormat(_T("UNION\n")
+                       _T("SELECT sys_context('USERENV','DB_NAME')\n")
+                       _T("      ,'%s'\n")
+                       _T("      ,'%s'\n")
+                       _T("      ,'_SYSTEM'\n")
+                       _T("      ,'%s'\n")
+                       _T("      ,name\n")
+                       _T("      ,'YES'\n")
+                       _T("  FROM table_privilege_map\n")
+                       ,p_schema.GetString()
+                       ,p_tablename.GetString()
+                       ,p_schema.GetString());
+    }
   }
   // Special order
   sql += _T(" ORDER BY 1,2,3,5,6,4");
