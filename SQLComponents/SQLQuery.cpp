@@ -655,9 +655,8 @@ SQLQuery::DoSQLStatement(const XString& p_statement)
   if(m_database && m_database->WilLog())
   {
     logging = true;
-    m_database->LogPrint(_T("[Database query]\n"));
-    m_database->LogPrint(statement.GetString());
-    m_database->LogPrint(_T("\n"));
+    XString log = "[Database query]\n" + statement + "\n";
+    m_database->LogPrint(log);
   }
 
   // The Oracle 10.2.0.3.0 ODBC Driver - and later versions - contain a bug
