@@ -61,7 +61,7 @@ bcd AsBcd(XString p_string)
   return num;
 }
 
-int SplitString(XString p_string,std::vector<XString>& p_vector,char p_separator /*= ','*/,bool p_trim /*=false*/)
+int SplitString(XString p_string,std::vector<XString>& p_vector,TCHAR p_separator /*= ','*/,bool p_trim /*=false*/)
 {
   p_vector.clear();
   int pos = p_string.Find(p_separator);

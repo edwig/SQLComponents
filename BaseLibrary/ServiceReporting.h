@@ -42,6 +42,6 @@
 // Products service name is in this global variable
 extern TCHAR g_svcname[];
 
-void  SvcReportSuccessEvent(PTSTR p_message);
-void  SvcReportInfoEvent (bool p_doFormat,PTSTR p_message,...);
-void  SvcReportErrorEvent(int p_module,bool p_doFormat,PTSTR p_function,PTSTR p_message, ...);
+void  SvcReportSuccessEvent(LPCTSTR p_message);
+void  SvcReportInfoEvent (bool p_doFormat,LPCTSTR p_message,...);
+void  SvcReportErrorEvent(int p_module,bool p_doFormat,LPCTSTR p_function,LPCTSTR p_message, ...);

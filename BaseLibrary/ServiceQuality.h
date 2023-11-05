@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-// SourceFile: AutoCritical.h
+// SourceFile: ServiceQuality.h
 //
-// BaseLibrary: Indispensable general objects and functions
+// Marlin Server: Internet server/client
 // 
 // Copyright (c) 2014-2022 ir. W.E. Huisman
 // All rights reserved
@@ -26,76 +26,47 @@
 // THE SOFTWARE.
 //
 #pragma once
+#include <map>
 
-class Critical
+class QualityOption
 {
 public:
-  Critical();
- ~Critical();
+  QualityOption() = default;
 
-  void Lock();
-  bool TryLock();
-  void Unlock();
-
-private:
-  CRITICAL_SECTION m_critical;
+  XString m_field;
+  int     m_percent { 100 };
+  // Extra option extension.
+  // Beware: Accomodates only one (1) extension!
+  XString m_extension;
+  XString m_value;
 };
 
-// New type critical section recursive mutex lock
-class CritSection
+using QOptionMap = std::map<int,QualityOption>;
+
+//////////////////////////////////////////////////////////////////////////
+//
+// Parsing the following HTTP headers:
+// Accept               type/subtype;q=1;level=n, */*
+// Accept-charset       charset;q=1, *
+// Accept-encoding      encoding;q=0.5, *;q=0
+// Accept-language      ln, en-gb;q=0.8 en-us;q=0.9, *
+//
+class ServiceQuality
 {
 public:
-  explicit CritSection(Critical& p_section) : m_section(&p_section)
-  {
-    p_section.Lock();
-  }
+  explicit ServiceQuality(XString p_header);
+ ~ServiceQuality() = default;
 
-  ~CritSection()
-  {
-    m_section->Unlock();
-  }
+  // Request options from the HTTP header in order of preference. Starts with 0.
+  QualityOption* GetOptionByPreference(int p_preference);
+  XString        GetStringByPreference(int p_preference);
+  // Find if a option is acceptable
+  int            GetPreferenceByName(XString p_name);
+
 private:
-  Critical* m_section;
-};
+  // Parsing the incoming header
+  void ParseHeader(XString p_header);
+  void ParseOption(XString p_option);
 
-// Old type of critical section
-class AutoCritSec
-{
-public:
-  explicit AutoCritSec(CRITICAL_SECTION* section) : m_section(section)
-  {
-    EnterCriticalSection(m_section);
-  }
-  ~AutoCritSec()
-  {
-    LeaveCriticalSection(m_section);
-  }
-  void Unlock() { LeaveCriticalSection(m_section); };
-  void Relock() { EnterCriticalSection(m_section); };
-private:
-  CRITICAL_SECTION* m_section;
+  QOptionMap m_options;
 };
-
-class AutoTrySection
-{
-public:
-  explicit AutoTrySection(CRITICAL_SECTION* section) : m_section(section)
-  {
-    m_succeeded = TryEnterCriticalSection(m_section) != 0;
-  }
-  ~AutoTrySection()
-  {
-    if(m_succeeded)
-    {
-      LeaveCriticalSection(m_section);
-    }
-  }
-  bool HasLock()
-  {
-    return m_succeeded;
-  }
-private:
-  bool              m_succeeded;
-  CRITICAL_SECTION* m_section;
-};
-

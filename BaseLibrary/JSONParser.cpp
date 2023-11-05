@@ -84,7 +84,10 @@ JSONParser::ParseMessage(XString& p_message,bool& p_whitespace,Encoding p_encodi
   Encoding charset = Encoding::Default;
   unsigned int skip = 0;
   BOMOpenResult bomResult = WinFile::DefuseBOM((const unsigned char*)m_pointer,charset,skip);
-
+  if(bomResult == BOMOpenResult::NoString)
+  {
+    return;
+  }
   if(bomResult != BOMOpenResult::NoEncoding)
   {
     if(charset != Encoding::UTF8)

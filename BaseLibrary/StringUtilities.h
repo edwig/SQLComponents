@@ -37,7 +37,7 @@ int     AsInteger(XString p_string);
 double  AsDouble(XString p_string);
 bcd     AsBcd(XString p_string);
 
-int     SplitString(XString p_string,std::vector<XString>& p_vector,char p_separator = ',',bool p_trim = false);
+int     SplitString(XString p_string,std::vector<XString>& p_vector,TCHAR p_separator = _T(','),bool p_trim = false);
 void    NormalizeLineEndings(XString& p_string);
 
 // Find the position of the matching bracket

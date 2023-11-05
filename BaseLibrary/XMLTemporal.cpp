@@ -644,7 +644,7 @@ XMLDate::SetMJD()
 //////////////////////////////////////////////////////////////////////////
 
 XMLTimestamp::XMLTimestamp()
-             :XMLTemporal("")
+             :XMLTemporal(_T(""))
 {
 }
 
@@ -714,7 +714,7 @@ XMLTimestamp::ParseMoment(XString p_value)
   }
   // It's a date only
   XMLDate date(string);
-  XMLTime time("");
+  XMLTime time(_T(""));
   SetTimestamp(date.Year(),date.Month(),date.Day(),
                time.Hour(),time.Minute(),time.Second());
 

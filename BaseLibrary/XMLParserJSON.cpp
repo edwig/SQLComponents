@@ -124,7 +124,7 @@ XMLParserJSON::ParseLevel(XMLElement* p_element,JSONvalue& p_value,XString p_arr
                                       {
                                         if(m_soap || m_rootFound)
                                         {
-                                          element = m_soap->AddElement(p_element,pair.m_name,XDT_String,"");
+                                          element = m_soap->AddElement(p_element,pair.m_name,XDT_String,_T(""));
                                         }
                                         else
                                         {

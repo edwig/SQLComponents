@@ -126,16 +126,16 @@ public:
   explicit SOAPMessage(XString&    p_namespace
                       ,XString&    p_soapAction
                       ,SoapVersion p_version = SoapVersion::SOAP_12
-                      ,XString     p_url     = ""
+                      ,XString     p_url     = _T("")
                       ,bool        p_secure  = false
-                      ,XString     p_server  = ""
+                      ,XString     p_server  = _T("")
                       ,int         p_port    = INTERNET_DEFAULT_HTTP_PORT
-                      ,XString     p_absPath = "");
+                      ,XString     p_absPath = _T(""));
   // DTOR
   virtual ~SOAPMessage();
 
   // Reset parameters, transforming it in an answer, preferable in our namespace
-  virtual void    Reset(ResponseType p_responseType = ResponseType::RESP_ACTION_NAME,XString p_namespace = "");
+  virtual void    Reset(ResponseType p_responseType = ResponseType::RESP_ACTION_NAME,XString p_namespace = _T(""));
   // Parse incoming message to members
   virtual void    ParseMessage(XString& p_message);
   // Parse incoming soap as new body of the message
@@ -173,7 +173,7 @@ public:
   bool            SetPreserveWhitespace(bool p_preserve = true);
   // Set the cookies
   void            SetCookie(Cookie& p_cookie);
-  void            SetCookie(XString p_name,XString p_value,XString p_metadata = "",bool p_secure = false);
+  void            SetCookie(XString p_name,XString p_value,XString p_metadata = _T(""),bool p_secure = false);
   void            SetCookies(const Cookies& p_cookies);
   // Set request Handle
   void            SetRequestHandle(HTTP_OPAQUE_ID p_request);
@@ -191,7 +191,7 @@ public:
   void            SetPassword(const XString& p_password);
   void            SetTokenNonce(XString p_nonce);
   void            SetTokenCreated(XString p_created);
-  bool            SetTokenProfile(XString p_user,XString p_password,XString p_created,XString p_nonce = "");
+  bool            SetTokenProfile(XString p_user,XString p_password,XString p_created,XString p_nonce = _T(""));
   // Set security access token
   void            SetAccessToken(HANDLE p_token);
   // Set senders address
@@ -250,8 +250,8 @@ public:
   XString         GetAcceptEncoding() const;
   // Get the cookies
   Cookie*         GetCookie(unsigned p_ind);
-  XString         GetCookie(unsigned p_ind = 0, XString p_metadata = "");
-  XString         GetCookie(XString p_name = "",XString p_metadata = "");
+  XString         GetCookie(unsigned p_ind = 0,     XString p_metadata = _T(""));
+  XString         GetCookie(XString p_name = _T(""),XString p_metadata = _T(""));
   const Cookies&  GetCookies() const;
   // Get URL destination
   XString         GetURL() const;

@@ -684,6 +684,7 @@ JSONMessage::JSONMessage(HTTPMessage* p_message)
   m_password       = p_message->GetPassword();
   m_headers        =*p_message->GetHeaderMap();
   m_verb           = p_message->GetVerb();
+  m_sendUnicode    = p_message->GetSendUnicode();
   m_incoming       = (p_message->GetCommand() != HTTPCommand::http_response);
 
   // Duplicate all cookies
@@ -765,6 +766,7 @@ JSONMessage::JSONMessage(SOAPMessage* p_message)
   m_acceptEncoding  = p_message->GetAcceptEncoding();
   m_user            = p_message->GetUser();
   m_password        = p_message->GetPassword();
+  m_sendUnicode     = p_message->GetSendUnicode();
   m_headers         =*p_message->GetHeaderMap();
 
   // Duplicate all cookies
@@ -823,7 +825,7 @@ JSONMessage::ConstructFromRawBuffer(uchar* p_buffer,unsigned p_length,XString p_
     int uni = IS_TEXT_UNICODE_UNICODE_MASK;  // Intel/AMD processors + BOM
     if(IsTextUnicode(p_buffer,(int) p_length,&uni))
     {
-      if(TryConvertWideString(p_buffer,(int) p_length,p_charset,message,m_sendBOM))
+      if(TryConvertWideString(p_buffer,(int) p_length,_T(""),message,m_sendBOM))
       {
         // Will answer as 16 bits Unicode
         m_sendUnicode = true;
@@ -1055,9 +1057,9 @@ JSONMessage::GetJsonMessage(Encoding p_encoding /*=Encoding::UTF8*/) const
 XString 
 JSONMessage::GetJsonMessageWithBOM(Encoding p_encoding /*=Encoding::UTF8*/) const
 {
-  if(m_sendBOM)
+  if(m_sendBOM && p_encoding == Encoding::UTF8)
   {
-    return ConstructBOM(p_encoding) + GetJsonMessage(p_encoding);
+    return ConstructBOMUTF8() + GetJsonMessage(p_encoding);
   }
   return GetJsonMessage(p_encoding);
 }

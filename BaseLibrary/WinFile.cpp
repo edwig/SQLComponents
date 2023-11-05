@@ -25,6 +25,7 @@
 //
 #include "pch.h"
 #include "WinFile.h"
+#include "CrackURL.h"
 
 #include <atlconv.h>
 #include <fileapi.h>
@@ -65,18 +66,21 @@ static DWORD PAGESIZE = (128 * 1024);
 // All member initializations are done in the interface definition
 WinFile::WinFile()
 {
+  InitializeCriticalSection(&m_fileaccess);
 }
 
 // CTOR from a filename
 WinFile::WinFile(CString p_filename)
         :m_filename(p_filename)
 {
+  InitializeCriticalSection(&m_fileaccess);
 }
 
 // CTOR from another WinFile
 WinFile::WinFile(WinFile& p_other)
 {
   *this = p_other;
+  InitializeCriticalSection(&m_fileaccess);
 }
 
 // DTOR
@@ -86,6 +90,8 @@ WinFile::~WinFile()
   Close();
   // Just to be sure if the closing went wrong
   PageBufferFree();
+  // Remove locking section
+  DeleteCriticalSection(&m_fileaccess);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -165,6 +171,9 @@ WinFile::Open(DWORD       p_flags    /*= winfile_read             */
     m_encoding = p_encoding;
   }
 
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   // Try to create/open the file
   m_file = CreateFile((LPCTSTR)m_filename.GetString()
                      ,access
@@ -235,6 +244,9 @@ WinFile::Close(bool p_flush /*= false*/)
     }
     return true;
   }
+
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
 
   // In case of a text file: flush our buffers
   PageBufferFlush();
@@ -630,6 +642,9 @@ WinFile::OpenAsSharedMemory(CString  p_name
   // Extend the name for RDP sessions
   p_name = (p_local ? _T("Local\\") : _T("Global\\")) + p_name;
 
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   // DO either a create of, or an open of an existing memory segment
   if(p_trycreate)
   {
@@ -753,6 +768,9 @@ WinFile::GrantFullAccess()
 void
 WinFile::ForgetFile()
 {
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   m_filename.Empty();
   m_file         = NULL;
   m_openMode     = FFlag::no_mode;
@@ -772,7 +790,7 @@ WinFile::ForgetFile()
 
 // Read a string (possibly with CR/LF to newline translation)
 bool
-WinFile::Read(CString& p_string,uchar p_delim /*= '\n'*/)
+WinFile::Read(XString& p_string,uchar p_delim /*= '\n'*/)
 {
   std::string result;
   bool unicodeSkip(false);
@@ -1004,6 +1022,9 @@ WinFile::Read(void* p_buffer,size_t p_bufsize,int& p_read)
     return false;
   }
 
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   DWORD read = 0;
   if(::ReadFile(m_file,p_buffer,(DWORD)p_bufsize,&read,nullptr) == 0)
   {
@@ -1165,12 +1186,20 @@ WinFile::Write(void* p_buffer,size_t p_bufsize)
     return false;
   }
 
-  // Not in conjunction with the STDIO like functions
-  // Only in binary mode! Do not use the backing page buffer
-  if (!(m_openMode & FFlag::open_trans_binary) || m_pageBuffer)
+  // See if we are opened in 'write' mode
+  if(!(m_openMode & FFlag::open_write))
   {
     m_error = ERROR_INVALID_FUNCTION;
     return false;
+  }
+
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
+  // Flush our page buffer (if any)
+  if(m_pageBuffer)
+  {
+    PageBufferFlush();
   }
 
   DWORD written = 0;
@@ -1227,6 +1256,9 @@ WinFile::Position() const
 
   LARGE_INTEGER move = { 0, 0 };
   LARGE_INTEGER pos  = { 0, 0 };
+
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
 
   if(::SetFilePointerEx(m_file, move, &pos, FILE_CURRENT) == 0)
   {
@@ -1285,6 +1317,9 @@ WinFile::Position(FSeek p_how,LONGLONG p_position /*= 0*/)
                               return (size_t) - 1;
   }
 
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   // Perform the file move
   if(::SetFilePointerEx(m_file,move,&pos,method) == 0)
   {
@@ -1313,6 +1348,9 @@ WinFile::Flush(bool p_all /*= false*/)
 
   // In case of a translate_text file: flush our buffers
   PageBufferFlush();
+
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
 
   // Do the flush
   if (::FlushFileBuffers(m_file) == 0)
@@ -1524,6 +1562,9 @@ WinFile::Lock(size_t p_begin,size_t p_length)
   DWORD lengthHigh = p_length >> 32;
 #endif
 
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   if(::LockFile(m_file,beginLow,beginHigh,lengthLow,lengthHigh) == 0)
   {
     m_error = ::GetLastError();
@@ -1556,6 +1597,9 @@ WinFile::UnLock(size_t p_begin,size_t p_length)
   DWORD lengthLow  = p_length  & 0x0FFFFFFFF;
   DWORD lengthHigh = p_length >> 32;
 #endif
+
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
 
   if(::UnlockFile(m_file,beginLow,beginHigh,lengthLow,lengthHigh) == 0)
   {
@@ -1814,10 +1858,21 @@ WinFile::SetFilenameInFolder(int p_folder,CString p_filename)
   return result;
 }
 
+bool
+WinFile::SetFilenameFromResource(CString p_resource)
+{
+  m_filename = FileNameFromResourceName(p_resource);
+  return !m_filename.IsEmpty();
+}
+
+
 // Set the file handle, but only if the file was not (yet) opened
 bool
 WinFile::SetFileHandle(HANDLE p_handle)
 {
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   if(m_file == nullptr)
   {
     m_file = p_handle;
@@ -1834,6 +1889,9 @@ WinFile::SetFileAttribute(FAttributes p_attribute, bool p_set)
 
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     BY_HANDLE_FILE_INFORMATION info;
     if (::GetFileInformationByHandle(m_file,&info))
     {
@@ -1919,6 +1977,9 @@ WinFile::SetFileTimeCreated(FILETIME p_created)
   // See if file is open
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     if(::SetFileTime(m_file,&p_created,nullptr,nullptr))
     {
       return true;
@@ -1941,6 +2002,9 @@ WinFile::SetFileTimeModified(FILETIME p_modified)
   // See if file is open
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     if(::SetFileTime(m_file,nullptr,nullptr,&p_modified))
     {
       return true;
@@ -1963,6 +2027,9 @@ WinFile::SetFileTimeAccessed(FILETIME p_accessed)
   // See if file is open
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     if(::SetFileTime(m_file,nullptr,&p_accessed,nullptr))
     {
       return true;
@@ -2168,6 +2235,9 @@ WinFile::GetFileSize() const
   // Try by opened file
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     LARGE_INTEGER size = { 0, 0 };
     if(::GetFileSizeEx(m_file,&size))
     {
@@ -2222,6 +2292,9 @@ WinFile::GetIsAtEnd() const
   // Getting the 'real' file size
   size_t size = GetFileSize();
 
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
+
   // Getting the file position while reading pages, or reading binaries
   // Zero bytes removed from the current position, gets the position
   LARGE_INTEGER move = {0, 0};
@@ -2231,7 +2304,7 @@ WinFile::GetIsAtEnd() const
     m_error = ::GetLastError();
     return true;
   }
-  size_t cpos = pos.QuadPart;
+  size_t cpos = (size_t) pos.QuadPart;
 
   // See if something went wrong
   if(size == (size_t)-1 || cpos == (size_t)-1)
@@ -2357,6 +2430,9 @@ WinFile::GetFileTimeCreated()
   // See if file is open
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     if(::GetFileTime(m_file,&creation,nullptr,nullptr))
     {
       // Use: FileTimeToSystemTime to break down!
@@ -2383,6 +2459,9 @@ WinFile::GetFileTimeModified()
 
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     if(::GetFileTime(m_file,nullptr,nullptr,&modification))
     {
       // Use: FileTimeToSystemTime to break down!
@@ -2410,6 +2489,9 @@ WinFile::GetFileTimeAccessed()
 
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     if(::GetFileTime(m_file,nullptr,&readtime,nullptr))
     {
       // Use: FileTimeToSystemTime to break down!
@@ -2478,6 +2560,9 @@ WinFile::GetFileAttribute(FAttributes p_attribute)
 
   if(m_file)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     BY_HANDLE_FILE_INFORMATION info;
     if(::GetFileInformationByHandle(m_file,&info))
     {
@@ -2793,6 +2878,16 @@ WinFile::LegalDirectoryName(CString p_name,bool p_extensionAllowed /*= true*/)
   return name;
 }
 
+// Create a file name from an HTTP resource name
+CString
+WinFile::FileNameFromResourceName(CString p_resource)
+{
+  CString filename = CrackedURL::DecodeURLChars(p_resource);
+  filename.Replace(_T('/'),_T('\\'));
+  filename.Replace(_T("\\\\"),_T("\\"));
+  return filename;
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // PRIVATE OPERATIONS
@@ -2884,6 +2979,40 @@ WinFile::ResolveSpecialChars(CString& p_value)
   return total;
 }
 
+// Encode a filename in special characters
+int
+WinFile::EncodeSpecialChars(XString& p_value)
+{
+  int total = 0;
+
+  int pos = 0;
+  while(pos < p_value.GetLength())
+  {
+    TCHAR ch = p_value.GetAt(pos);
+    if(!_istalnum(ch) && ch != '/')
+    {
+      // Encoding in 2 chars HEX
+      XString hexstring;
+      hexstring.Format(_T("%%%2.2X"),ch);
+
+      // Take left and right of the special char
+      XString left = p_value.Left(pos);
+      XString right = p_value.Mid(pos + 1);
+
+      // Create a new value with the encoded char in it
+      p_value = left + hexstring + right;
+
+      // Next position + 1 conversion done
+      pos += 2;
+      ++total;
+    }
+    // Look at next character
+    ++pos;
+  }
+
+  return total;
+}
+
 // Getting the first (base) directory
 CString
 WinFile::GetBaseDirectory(CString& p_path)
@@ -2913,7 +3042,167 @@ WinFile::GetBaseDirectory(CString& p_path)
   return result;
 }
 
-  // Check for Unicode UTF-16 in the buffer
+// Reduce file path name for RE-BASE of directories
+// IN:  C:\direct1\direct2\direct3\..\..\direct4 
+// OUT: C:\direct1\direct4
+XString
+WinFile::ReduceDirectoryPath(XString& path)
+{
+  TCHAR buffer[_MAX_PATH+1] = _T("");
+  _tcsncpy_s(buffer,path.GetString(),_MAX_PATH);
+  bool foundReduction = true;
+
+  while(foundReduction)
+  {
+    // Drop out if we find nothing;
+    foundReduction = false;
+
+    LPTSTR pnt1 = buffer;
+
+    while(*pnt1 && *pnt1!='\\' && *pnt1!='/') ++pnt1;
+    if(!*pnt1++)
+    {
+      // Not one directory separator
+      return path;
+    }
+    LPTSTR pnt3 = pnt1;
+    while(*pnt1 && *pnt1!='\\' && *pnt1!='/') ++pnt1;
+    if(!*pnt1++)
+    {
+      // Not a second directory separator
+      return path;
+    }
+    LPTSTR pnt2 = pnt1;
+    while(*pnt1 && *pnt1!='\\' && *pnt1!='/') ++pnt1;
+    while(*pnt1)
+    {
+      ++pnt1;
+      // IN:  C:\direct1\direct2\direct3\..\..\direct4\
+      //         |       |       |
+      //      pnt3    pnt2    pnt1
+      if(_tcsncmp(pnt2,_T("..\\"),3)==0 || _tcsncmp(pnt2,_T("../"),3)==0)
+      {
+        // Space between pnt2 and pnt1 = \..\
+        // IN:  C:\direct1\direct2\direct3\..\..\direct4\
+        //                         |       |  |
+        //                      pnt3    pnt2  pnt1
+
+        // REDUCTION
+        size_t len = _MAX_PATH - (pnt3 - buffer);
+        _tcscpy_s(pnt3,len,pnt1);
+
+        // At least one more loop
+        foundReduction = true;
+        // Return to the top!!
+        break;
+      }
+      // Next level of directories
+      pnt3 = pnt2;
+      pnt2 = pnt1;
+      while(*pnt1 && *pnt1!='\\' && *pnt1!='/') ++pnt1;
+    }
+  }
+  return buffer;
+}
+
+// Makes a relative pathname from an absolute one
+// Absolute: "file:///C:/aaa/bbb/ccc/ddd/eee/file.ext"
+// Base    : "file:///C:/aaa/bbb/ccc/rrr/qqq/"
+// output
+// Relative: "../../ddd/eee/file.ext"
+bool
+WinFile::MakeRelativePathname(const XString& p_base
+                             ,const XString& p_absolute
+                             ,      XString& p_relative)
+{
+  p_relative = _T("");
+  XString base     = StripFileProtocol(p_base);
+  XString absolute = StripFileProtocol(p_absolute);
+
+  // Special case: no filename
+  if(absolute.IsEmpty())
+  {
+    return true;
+  }
+  // Special case: base is empty. Cannot make it relative
+  // This is a programming error
+  if(base.IsEmpty())
+  {
+    return false;
+  }
+  // Make all directory separators the same
+  base.Replace('\\','/');
+  absolute.Replace('\\','/');
+
+  // Special case: only a filename, make it relative to the 'this' directory
+  if(absolute.Find('/') < 0)
+  {
+    // Cannot use this in *.HHP projects!
+    // p_relative = XString("./") + absolute;
+    p_relative = absolute;
+    return true;
+  }
+  // Special case: already a relative path
+  if(absolute.GetAt(0) == '.')
+  {
+    p_relative = absolute;
+    return true;
+  }
+  // Find the path-parts that are common to both names
+  // We can eliminate these parts
+  bool notCompatible = true;
+  int  pos = absolute.Find('/');
+  while(pos >= 0)
+  {
+    XString left_base = base.Left(pos);
+    XString left_abso = absolute.Left(pos);
+    if(left_base.CompareNoCase(left_abso))
+    {
+      // Stop here. Pathnames are different from here.
+      break;
+    }
+    // Eliminate this part
+    base = base.Mid(pos + 1);
+    absolute = absolute.Mid(pos + 1);
+    // Did at least one elimination
+    notCompatible = false;
+    // Find next position
+    pos = absolute.Find('/');
+  }
+  if(notCompatible)
+  {
+    // Pathnames are not compatible. i.e. are on another filesystem
+    // or on another protocol or ....
+    return false;
+  }
+  // Find the path-parts that are different
+  // We can substitute these with "../" parts.
+  // This is what we have left:
+  // Absolute: "ddd/eee/file.ext"
+  // Base    : "rrr/qqq/"
+  pos = base.Find('/');
+  while(pos >= 0)
+  {
+    absolute = XString(_T("../")) + absolute;
+    base = base.Mid(pos + 1);
+    pos  = base.Find('/');
+  }
+  p_relative = absolute;
+
+  // Relative path is complete.
+  // Now warn for files outside the project
+  if(p_relative.GetLength() > 1)
+  {
+    if(p_relative.Left(2) != _T(".."))
+    {
+      // Did not succeed to make a relative path
+      return false;
+    }
+  }
+  return true;
+}
+
+// Check for Unicode UTF-16 in the buffer
 bool
 WinFile::IsTextUnicodeUTF16(const uchar* p_pointer,size_t p_length)
 {
@@ -3318,6 +3607,9 @@ WinFile::PageBufferRead()
     // if reading AND writing, flush buffer back to disk
     if(m_openMode & FFlag::open_write)
     {
+      // Acquire a file access lock
+      AutoCritSec lock(&m_fileaccess);
+
       DWORD write = 0;
       DWORD size = (DWORD)((size_t)m_pagePointer - (size_t)m_pageBuffer);
       if (::WriteFile(m_file, m_pageBuffer, size, &write, nullptr) == 0)
@@ -3337,6 +3629,9 @@ WinFile::PageBufferRead()
     {
       // OPTIMIZE READ FOREWARD!!
       // Read-in one buffer
+      // Acquire a file access lock
+      AutoCritSec lock(&m_fileaccess);
+
       DWORD size = 0;
       if(::ReadFile(m_file,m_pageBuffer,(DWORD)PAGESIZE,&size,nullptr) == 0)
       {
@@ -3394,6 +3689,9 @@ WinFile::PageBufferWrite(uchar ch)
   // afterwards we reset the file pointer so we can fill the buffer again
   if(m_pagePointer == m_pageTop)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     DWORD write = 0;
     DWORD size = (DWORD)((size_t)m_pagePointer - (size_t)m_pageBuffer);
     if (::WriteFile(m_file,m_pageBuffer,size,&write,nullptr) == 0)
@@ -3420,6 +3718,9 @@ WinFile::PageBufferReadForeward(bool p_scanBom)
   // if read-and-write: read in first page and reset FPOS
   if (m_openMode & FFlag::open_read)
   {
+    // Acquire a file access lock
+    AutoCritSec lock(&m_fileaccess);
+
     DWORD size = 0;
     if(::ReadFile(m_file,m_pageBuffer,PAGESIZE,&size,nullptr) == 0)
     {
@@ -3465,6 +3766,9 @@ WinFile::PageBufferFlush()
   {
     return true;
   }
+
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
 
   // Write the valid amount in the file buffer
   DWORD written = 0;
@@ -3518,6 +3822,9 @@ WinFile::PageBufferAdjust(bool p_beginning /*= false*/) const
   LARGE_INTEGER move = { 0, 0 };
   LARGE_INTEGER pos  = { 0, 0 };
   move.QuadPart = distance;
+
+  // Acquire a file access lock
+  AutoCritSec lock(&m_fileaccess);
 
   // Perform the file move
   if(::SetFilePointerEx(m_file,move,&pos,FILE_CURRENT) == 0)

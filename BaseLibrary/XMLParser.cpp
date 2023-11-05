@@ -56,7 +56,7 @@ XMLParser::PrintXmlString(const XString& p_string,bool p_utf8 /*=false*/)
   if(p_utf8)
   {
     // Now encode MBCS to UTF-8 without a BOM
-    uncoded = EncodeStringForTheWire(uncoded,"utf-8");
+    uncoded = EncodeStringForTheWire(uncoded,_T("utf-8"));
   }
 
   _TUCHAR* pointer = (_TUCHAR*)uncoded.GetString();
@@ -398,16 +398,7 @@ XMLParser::ParseDeclaration()
       }
       else if(value.Left(6).CompareNoCase(_T("utf-16")) == 0)
       {
-        // Works for "UTF-16", "UTF-16LE" and "UTF-16BE" as of RFC 2781
-        // Although one should only specify "utf-16" without the endianess
-#ifdef UNICODE
-        m_message->m_encoding = Encoding::LE_UTF16;
-#else
-        if(m_message->GetEncoding() != Encoding::LE_UTF16)
-        {
-          SetError(XmlError::XE_UnknownEncoding,"UTF-16 Encoding can only be read from files!");
-        }
-#endif
+        m_message->SetSendUnicode(true);
       }
       else
       {

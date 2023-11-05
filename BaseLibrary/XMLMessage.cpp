@@ -974,7 +974,7 @@ XMLMessage::GetElement(XMLElement* p_elem,XString p_name)
       return map[ind]->GetValue();
     }
   }
-  return "";
+  return _T("");
 }
 
 int      
@@ -1353,11 +1353,13 @@ XMLMessage::FindElementByAttribute(XMLElement* p_element, XString p_attribute, X
   return nullptr;
 }
 
-void
+Encoding
 XMLMessage::SetEncoding(Encoding p_encoding)
 {
+  Encoding previous = m_encoding;
   m_encoding    = p_encoding;
   m_sendUnicode = (p_encoding == Encoding::LE_UTF16);
+  return previous;
 }
 
 // Set sending in Unicode

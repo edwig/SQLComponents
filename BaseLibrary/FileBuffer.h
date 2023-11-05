@@ -81,6 +81,7 @@ public:
   // Add buffer part
   void    AddBuffer(uchar* p_buffer,size_t p_length);
   void    AddBufferCRLF(uchar* p_buffer,size_t p_length);
+  void    AddStringToBuffer(XString p_string,XString p_charset,bool p_crlf = true);
   // Allocate a one-buffer block
   bool    AllocateBuffer(size_t p_length);
 
