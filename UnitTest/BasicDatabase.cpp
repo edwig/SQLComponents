@@ -425,7 +425,7 @@ namespace DatabaseUnitTest
             bcd    field2 = query[2];
 
             XString msg;
-            msg.Format(_T("Field 1 [%.4f] Field 2 [%s]"),field1,field2.AsString());
+            msg.Format(_T("Field 1 [%.4f] Field 2 [%s]"),field1,field2.AsString().GetString());
             Logger::WriteMessage(msg);
           }
           number_of_tests++;
@@ -598,21 +598,21 @@ namespace DatabaseUnitTest
     void ReportString(XString p_prompt,XString p_info)
     {
       XString text;
-      text.Format(_T("%s %s"),p_prompt,p_info);
+      text.Format(_T("%s %s"),p_prompt.GetString(),p_info.GetString());
       Logger::WriteMessage(text);
     }
 
     void ReportBoolean(XString p_prompt,bool p_info)
     {
       XString text;
-      text.Format(_T("%s %s"),p_prompt,p_info ? _T("true") : _T("false"));
+      text.Format(_T("%s %s"),p_prompt.GetString(),p_info ? _T("true") : _T("false"));
       Logger::WriteMessage(text);
     }
 
     void ReportLong(XString p_prompt,long p_info)
     {
       XString text;
-      text.Format(_T("%s %d"),p_prompt,p_info);
+      text.Format(_T("%s %d"),p_prompt.GetString(),p_info);
       Logger::WriteMessage(text);
     }
 

@@ -170,7 +170,7 @@ namespace DatabaseUnitTest
           XString text;
           text.Format(_T("Primary key %d: %s")
                       ,primary.m_columnPosition
-                      ,primary.m_columnName);
+                      ,primary.m_columnName.GetString());
           Logger::WriteMessage(text);
           number_of_tests++;
         }
@@ -255,7 +255,7 @@ namespace DatabaseUnitTest
         number_of_tests++;
         for(auto& trigger : triggers)
         {
-          line.Format(_T("Trigger: [%d] %s"),trigger.m_position,trigger.m_triggerName);
+          line.Format(_T("Trigger: [%d] %s"),trigger.m_position,(trigger.m_triggerName).GetString());
           Logger::WriteMessage(line);
 
           line.Format(_T("Trigger fires: %s"),trigger.m_before ? _T("before") : _T("after"));
@@ -271,7 +271,7 @@ namespace DatabaseUnitTest
           line.Format(_T("Trigger DML SELECT: %s"),trigger.m_select ? _T("yes") : _T("no"));
           Logger::WriteMessage(line);
 
-          line.Format(_T("Trigger source: %s"),trigger.m_source);
+          line.Format(_T("Trigger source: %s"),trigger.m_source.GetString());
           Logger::WriteMessage(line);
           number_of_tests++;
         }
@@ -295,9 +295,9 @@ namespace DatabaseUnitTest
         {
           XString line;
           line.Format(_T("Table privilege: %s was granted %s by %s")
-                     ,priv.m_grantee
-                     ,priv.m_privilege
-                     ,priv.m_grantor);
+                     ,priv.m_grantee.GetString()
+                     ,priv.m_privilege.GetString()
+                     ,priv.m_grantor.GetString());
           Logger::WriteMessage(line);
           number_of_tests++;
         }

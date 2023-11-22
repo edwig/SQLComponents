@@ -144,6 +144,14 @@ SQLInfoOracle::GetRDBMSSupportsODBCCallEscapes() const
   return true;
 }
 
+// Supports the ODBC call procedure with named parameters
+bool
+SQLInfoOracle::GetRDBMSSupportsODBCCallNamedParameters() const
+{
+  // Must use the "paramname => value [,...]" convention !!
+  return false;
+}
+
 // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
 bool
 SQLInfoOracle::GetRDBMSSupportsDatatypeTime() const
@@ -610,6 +618,13 @@ XString
 SQLInfoOracle::GetSQLDDLIdentifier(XString p_identifier) const
 {
   return p_identifier;
+}
+
+// Get the name of a temp table (local temporary or global temporary)
+XString
+SQLInfoOracle::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool /*p_local*/) const
+{
+  return p_tablename;
 }
 
 // Changes to parameters before binding to an ODBC HSTMT handle

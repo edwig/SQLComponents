@@ -81,6 +81,9 @@ public:
   // Supports the ODBC escape sequence {[?=] CALL procedure (?,?,?)}
   bool    GetRDBMSSupportsODBCCallEscapes() const override;
 
+  // Supports the ODBC call procedure with named parameters
+  bool    GetRDBMSSupportsODBCCallNamedParameters() const;
+
   // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
   bool    GetRDBMSSupportsDatatypeTime() const override;
 
@@ -215,6 +218,9 @@ public:
 
   // Makes an catalog identifier string (possibly quoted on both sides)
   virtual XString GetSQLDDLIdentifier(XString p_identifier) const override;
+
+  // Get the name of a temp table (local temporary or global temporary)
+  XString GetTempTablename(XString p_schema,XString p_tablename,bool p_local) const override;
 
   // Changes to parameters before binding to an ODBC HSTMT handle
   void DoBindParameterFixup(SQLSMALLINT& p_sqlDatatype,SQLULEN& p_columnSize,SQLSMALLINT& p_scale,SQLLEN& p_bufferSize,SQLLEN* p_indicator) const override;
@@ -436,7 +442,7 @@ public:
 
 private:
   // Adjust catalog for temporary objects
-  // XString GetCatalogAndSchema(XString& p_schema,XString p_table);
+  XString GetCatalogAndSchema(XString& p_schema,XString& p_table) const;
 
   bool m_useSequences { true };
 };

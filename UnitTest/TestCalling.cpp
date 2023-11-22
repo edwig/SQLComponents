@@ -158,7 +158,7 @@ namespace DatabaseUnitTest
       q2.SetParameter(0,bcd(),P_SQL_PARAM_OUTPUT);
       q2.GetParameter(0)->SetNumericPrecisionScale(18,2);
       var* res = q2.DoSQLCall(g_schema,_T("getdecimal"),_T("345.99"));
-      text.Format(_T("Result of GETDECIMAL '345.99' = [%s]"),res->GetAsBCD().AsString());
+      text.Format(_T("Result of GETDECIMAL '345.99' = [%s]"),res->GetAsBCD().AsString().GetString());
       Logger::WriteMessage(text);
       Assert::AreEqual(_T("345.99"),res->GetAsBCD().AsString());
       number_of_tests++;
@@ -175,7 +175,7 @@ namespace DatabaseUnitTest
 
       bcd number = res->GetAsBCD();
       XString restext = q2.GetParameter(2)->GetAsChar();
-      text.Format(_T("Result of MULTINOUT: [%s] [%s]\n"),number.AsString(),restext.GetString());
+      text.Format(_T("Result of MULTINOUT: [%s] [%s]\n"),number.AsString().GetString(),(LPCTSTR)restext);
       Logger::WriteMessage(text);
 
       Assert::AreEqual(77.88,number.AsDouble());
@@ -185,6 +185,42 @@ namespace DatabaseUnitTest
 
       trans.Commit();
       number_of_tests++;
+    }
+
+    TEST_METHOD(TestNamedParameters)
+    {
+      // SQL-Server test database where my 'bignumber' procedure resides
+      // See: UnitTest\Scripts\SQL_Server_NamedParameters.sql
+      // Create in a SQL-Server database of your choice
+      g_dsn      = _T("srnd01");
+      g_user     = _T("sa");
+      g_password = _T("altijd");
+
+      Logger::WriteMessage("Testing the 'calling procedure with named parameters' functionality");
+        
+      InitSQLComponents();
+      OpenDatabase();
+
+      {
+        SQLQuery query(m_database);
+        query.SetParameter(1,(int) 8);
+        query.SetParameter(2,(int) 4);
+        query.SetParameterName(1,_T("tenthousand"));
+        query.SetParameterName(2,_T("tennumbers"));
+        SQLVariant* result = query.DoSQLCall(_T(""),_T("bignumber"),true);
+        CString resstring;
+        if(result)
+        {
+          result->GetAsString(resstring);
+        }
+        Assert::AreEqual(_T("80040"),resstring.GetString());
+      }
+      CloseDatabase();
+
+      // Reset to previous settings for other tests
+      g_dsn      = _T("testing");
+      g_user     = _T("sysdba");
+      g_password = _T("altijd");
     }
 
   private:

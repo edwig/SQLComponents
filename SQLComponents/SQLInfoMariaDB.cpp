@@ -134,6 +134,13 @@ SQLInfoMariaDB::GetRDBMSSupportsODBCCallEscapes() const
   return true;
 }
 
+// Supports the ODBC call procedure with named parameters
+bool
+SQLInfoMariaDB::GetRDBMSSupportsODBCCallNamedParameters() const
+{
+  return true;
+}
+
 // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
 bool
 SQLInfoMariaDB::GetRDBMSSupportsDatatypeTime() const
@@ -611,6 +618,13 @@ XString
 SQLInfoMariaDB::GetSQLDDLIdentifier(XString p_identifier) const
 {
   return p_identifier;
+}
+
+// Get the name of a temp table (local temporary or global temporary)
+XString
+SQLInfoMariaDB::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool /*p_local*/) const
+{
+  return p_tablename;
 }
 
 // Changes to parameters before binding to an ODBC HSTMT handle

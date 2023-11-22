@@ -3,6 +3,14 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.3
 ===== Released since: 06-09-2023 =====
 ======================================
 
+Version 2.3.x of xx-xx-xxxx
+---------------------------
+1)  You can now use named parameters in the call to SQLQuery.DoODBCCall
+    to call a stored procedure or function.
+    This works at least in the Oracle and SQL-Server RDBMS'es
+    For an example see the unittest in "TestCalling::TestNamedParameters"
+    Even return values from a stored procedure are possible.
+
 Version 2.3.0 of 06-09-2023
 ---------------------------
 1)  Library is now fully Unicode compliant
