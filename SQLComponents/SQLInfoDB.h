@@ -248,6 +248,10 @@ public:
   // Transform query to select top <n> rows
   virtual XString GetSQLTopNRows(XString p_sql,int p_top,int p_skip = 0) const = 0;
 
+  // Expand a SELECT with an 'FOR UPDATE' lock clause
+  virtual XString GetSelectForUpdateTableClause(unsigned p_lockWaitTime) const = 0;
+  virtual XString GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const = 0;
+
   // Query to perform a keep alive ping
   virtual XString GetPing() const = 0;
 

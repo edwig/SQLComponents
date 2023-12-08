@@ -184,6 +184,10 @@ public:
   // Transform query to select top <n> rows
   XString GetSQLTopNRows(XString p_sql,int p_top,int p_skip = 0) const override;
 
+  // Expand a SELECT with an 'FOR UPDATE' lock clause
+  XString GetSelectForUpdateTableClause(unsigned p_lockWaitTime) const;
+  XString GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const;
+
   // Query to perform a keep alive ping
   XString GetPing() const override;
 

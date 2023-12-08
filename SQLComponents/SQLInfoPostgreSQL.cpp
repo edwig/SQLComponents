@@ -418,6 +418,24 @@ SQLInfoPostgreSQL::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) co
   return p_sql;
 }
 
+// Expand a SELECT with an 'FOR UPDATE' lock clause
+XString
+SQLInfoPostgreSQL::GetSelectForUpdateTableClause(unsigned /*p_lockWaitTime*/) const
+{
+  return "";
+}
+
+XString
+SQLInfoPostgreSQL::GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const
+{
+  XString sql = p_select + "\nFOR UPDATE";
+  if(!p_lockWaitTime)
+  {
+    sql += " SKIP LOCKED";
+  }
+  return sql;
+}
+
 // Query to perform a keep alive ping
 XString
 SQLInfoPostgreSQL::GetPing() const

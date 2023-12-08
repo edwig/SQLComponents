@@ -10,6 +10,14 @@ Version 2.3.x of xx-xx-xxxx
     This works at least in the Oracle and SQL-Server RDBMS'es
     For an example see the unittest in "TestCalling::TestNamedParameters"
     Even return values from a stored procedure are possible.
+2)  Added the possiblity to get a 'SELECT FOR UPDATE' lock on a record
+    For correct use: there are two extra SQLInfoDB methods:
+    - GetSelectForUpdateTableClause(unsigned p_lockWaitTime) const;
+    - GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const;
+    These are used in the 'Open' method of the SQLDataSet.
+    When generating your own SQL: Refer to te uses of these
+    The first is used for an extra clause in the 'FROM <table>' part
+    The second is used on the total sql string!
 
 Version 2.3.0 of 06-09-2023
 ---------------------------

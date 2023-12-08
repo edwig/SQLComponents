@@ -542,6 +542,19 @@ SQLInfoMariaDB::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) const
   return p_sql;
 }
 
+// Expand a SELECT with an 'FOR UPDATE' lock clause
+XString
+SQLInfoMariaDB::GetSelectForUpdateTableClause(unsigned /*p_lockWaitTime*/) const
+{
+  return "";
+}
+
+XString
+SQLInfoMariaDB::GetSelectForUpdateTrailer(XString p_select,unsigned /*p_lockWaitTime*/) const
+{
+  return p_select + "\nFOR UPDATE";
+}
+
 // Query to perform a keep alive ping
 XString
 SQLInfoMariaDB::GetPing() const

@@ -533,6 +533,28 @@ SQLInfoOracle::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) const
   return p_sql;
 }
 
+// Expand a SELECT with an 'FOR UPDATE' lock clause
+XString
+SQLInfoOracle::GetSelectForUpdateTableClause(unsigned /*p_lockWaitTime*/) const
+{
+  return "";
+}
+
+XString
+SQLInfoOracle::GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const
+{
+  XString sql = p_select + "\nFOR UPDATE";
+  if(p_lockWaitTime)
+  {
+    sql.AppendFormat(" WAIT %d",p_lockWaitTime);
+  }
+  else
+  {
+    sql += " SKIP LOCKED";
+  }
+  return sql;
+}
+
 // Query to perform a keep alive ping
 XString
 SQLInfoOracle::GetPing() const

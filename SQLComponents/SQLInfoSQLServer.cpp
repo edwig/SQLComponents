@@ -579,6 +579,25 @@ SQLInfoSQLServer::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) con
   return p_sql;
 }
 
+// Expand a SELECT with an 'FOR UPDATE' lock clause
+XString
+SQLInfoSQLServer::GetSelectForUpdateTableClause(unsigned p_lockWaitTime) const
+{
+  XString clause(" WITH (ROWLOCK,UPDLOCK");
+  if(p_lockWaitTime == 0)
+  {
+    clause += ",READPAST";
+  }
+  clause += ")";
+  return clause;
+}
+
+XString
+SQLInfoSQLServer::GetSelectForUpdateTrailer(XString p_select,unsigned /*p_lockWaitTime*/) const
+{
+  return p_select + "\nFOR UPDATE";
+}
+
 // Query to perform a keep alive ping
 XString
 SQLInfoSQLServer::GetPing() const

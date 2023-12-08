@@ -402,6 +402,19 @@ SQLInfoGenericODBC::GetSQLTopNRows(XString p_sql,int /*p_top*/,int /*p_skip = 0*
   return p_sql;
 }
 
+// Expand a SELECT with an 'FOR UPDATE' lock clause
+XString
+SQLInfoGenericODBC::GetSelectForUpdateTableClause(unsigned /*p_lockWaitTime*/) const
+{
+  return "";
+}
+
+XString
+SQLInfoGenericODBC::GetSelectForUpdateTrailer(XString p_select,unsigned /*p_lockWaitTime*/) const
+{
+  return p_select + "\nFOR UPDATE";
+}
+
 // Query to perform a keep alive ping
 XString
 SQLInfoGenericODBC::GetPing() const

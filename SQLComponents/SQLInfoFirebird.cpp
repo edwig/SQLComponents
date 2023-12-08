@@ -519,6 +519,24 @@ SQLInfoFirebird::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) cons
   return p_sql;
 }
 
+// Expand a SELECT with an 'FOR UPDATE' lock clause
+XString
+SQLInfoFirebird::GetSelectForUpdateTableClause(unsigned /*p_lockWaitTime*/) const
+{
+  return "";
+}
+
+XString
+SQLInfoFirebird::GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const
+{
+  XString sql = p_select + "\nFOR UPDATE";
+  if(p_lockWaitTime)
+  {
+    sql += "\nWITH LOCK";
+  }
+  return sql;
+}
+
 // Query to perform a keep alive ping
 XString
 SQLInfoFirebird::GetPing() const
