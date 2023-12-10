@@ -10,6 +10,7 @@
 .suo/
 
 # Project specific files
+Backups/
 binDebug_x64/
 binDebug_win32/
 binRelease_x64/
