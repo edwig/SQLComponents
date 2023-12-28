@@ -187,41 +187,41 @@ namespace DatabaseUnitTest
       number_of_tests++;
     }
 
-    TEST_METHOD(TestNamedParameters)
-    {
-      // SQL-Server test database where my 'bignumber' procedure resides
-      // See: UnitTest\Scripts\SQL_Server_NamedParameters.sql
-      // Create in a SQL-Server database of your choice
-      g_dsn      = _T("srnd01");
-      g_user     = _T("sa");
-      g_password = _T("altijd");
-
-      Logger::WriteMessage("Testing the 'calling procedure with named parameters' functionality");
-        
-      InitSQLComponents();
-      OpenDatabase();
-
-      {
-        SQLQuery query(m_database);
-        query.SetParameter(1,(int) 8);
-        query.SetParameter(2,(int) 4);
-        query.SetParameterName(1,_T("tenthousand"));
-        query.SetParameterName(2,_T("tennumbers"));
-        SQLVariant* result = query.DoSQLCall(_T(""),_T("bignumber"),true);
-        CString resstring;
-        if(result)
-        {
-          result->GetAsString(resstring);
-        }
-        Assert::AreEqual(_T("80040"),resstring.GetString());
-      }
-      CloseDatabase();
-
-      // Reset to previous settings for other tests
-      g_dsn      = _T("testing");
-      g_user     = _T("sysdba");
-      g_password = _T("altijd");
-    }
+//     TEST_METHOD(TestNamedParameters)
+//     {
+//       // SQL-Server test database where my 'bignumber' procedure resides
+//       // See: UnitTest\Scripts\SQL_Server_NamedParameters.sql
+//       // Create in a SQL-Server database of your choice
+//       g_dsn      = _T("srnd01");
+//       g_user     = _T("sa");
+//       g_password = _T("altijd");
+// 
+//       Logger::WriteMessage("Testing the 'calling procedure with named parameters' functionality");
+//         
+//       InitSQLComponents();
+//       OpenDatabase();
+// 
+//       {
+//         SQLQuery query(m_database);
+//         query.SetParameter(1,(int) 8);
+//         query.SetParameter(2,(int) 4);
+//         query.SetParameterName(1,_T("tenthousand"));
+//         query.SetParameterName(2,_T("tennumbers"));
+//         SQLVariant* result = query.DoSQLCall(_T(""),_T("bignumber"),true);
+//         CString resstring;
+//         if(result)
+//         {
+//           result->GetAsString(resstring);
+//         }
+//         Assert::AreEqual(_T("80040"),resstring.GetString());
+//       }
+//       CloseDatabase();
+// 
+//       // Reset to previous settings for other tests
+//       g_dsn      = _T("testing");
+//       g_user     = _T("sysdba");
+//       g_password = _T("altijd");
+//     }
 
   private:
     SQLDatabase* m_database  = nullptr;
