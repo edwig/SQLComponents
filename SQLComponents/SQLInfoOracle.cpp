@@ -198,8 +198,8 @@ void
 SQLInfoOracle::GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& p_scale) const
 {
   // ORACLE SPECIFIC CHECKS
-  if(p_precision == NUMERIC_MAX_PRECISION &&
-     p_scale     == NUMERIC_MIN_SCALE)
+  if(p_precision == (SQLULEN)     NUMERIC_MAX_PRECISION &&
+     p_scale     == (SQLSMALLINT) NUMERIC_MIN_SCALE)
   {
     p_scale = NUMERIC_DEFAULT_SCALE;
   }
@@ -208,7 +208,7 @@ SQLInfoOracle::GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& 
   // GENERAL CHECKS
 
   // Max precision for numerics is 38
-  if(p_precision > NUMERIC_MAX_PRECISION)
+  if(p_precision > (SQLULEN) NUMERIC_MAX_PRECISION)
   {
     p_precision = NUMERIC_MAX_PRECISION;
   }
@@ -227,7 +227,7 @@ SQLInfoOracle::GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLINT& 
   }
 
   // Scale MUST be smaller than the precision
-  if(p_scale >= p_precision)
+  if(p_scale >= (SQLSMALLINT) p_precision)
   {
     p_scale = (SQLSMALLINT) (p_precision - 1);
   }

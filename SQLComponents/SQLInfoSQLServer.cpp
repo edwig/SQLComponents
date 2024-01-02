@@ -204,7 +204,7 @@ SQLInfoSQLServer::GetRDBMSNumericPrecisionScale(SQLULEN& p_precision, SQLSMALLIN
   }
 
   // Scale MUST be smaller than the precision
-  if(p_scale >= p_precision)
+  if(p_scale >= (SQLSMALLINT) p_precision)
   {
     p_scale = (SQLSMALLINT) (p_precision - 1);
   }
@@ -1057,17 +1057,18 @@ SQLInfoSQLServer::GetCATALOGTemptableCreate(XString p_schema,XString p_tablename
 XString 
 SQLInfoSQLServer::GetCATALOGTemptableIntoTemp(XString p_schema,XString p_tablename,XString p_select) const
 {
-  return _T("INSERT INTO #") + p_tablename + _T("\n") + p_select;
+  return _T("INSERT INTO #") + p_schema + _T(".") + p_tablename + _T("\n") + p_select;
 }
 
 XString 
 SQLInfoSQLServer::GetCATALOGTemptableDrop(XString p_schema,XString p_tablename) const
 {
-  return _T("DELETE FROM #")    + p_tablename + _T(";\n")
+  XString tablename = p_schema + _T(".") + p_tablename;
+  return _T("DELETE FROM #")    + tablename + _T(";\n")
          _T("<@>\n")
-         _T("TRUNCATE TABLE #") + p_tablename + _T(";\n")
+         _T("TRUNCATE TABLE #") + tablename + _T(";\n")
          _T("<@>\n")
-         _T("DROP TABLE #")     + p_tablename + _T(";\n");
+         _T("DROP TABLE #")     + tablename + _T(";\n");
 }
 
 //////////////////////////////////////////////////////////////////////////

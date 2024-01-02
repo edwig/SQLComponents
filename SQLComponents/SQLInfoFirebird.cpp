@@ -542,7 +542,7 @@ XString
 SQLInfoFirebird::GetPing() const
 {
   // Not implemented yet
-  return "SELECT current_timestamp FROM rdb$database";
+  return "SELECT CAST('now' AS timestamp) FROM rdb$database";
 }
 
 //////////////////////////////////////////////////////////////////////////
