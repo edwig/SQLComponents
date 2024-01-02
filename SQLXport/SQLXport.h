@@ -2,7 +2,7 @@
 //
 // File: XPort.h
 //
-// Copyright (c) 1998-2023 ir. W.E. Huisman
+// Copyright (c) 1998-2024 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
@@ -28,8 +28,8 @@
 using namespace SQLComponents;
 
 #define XPORT_VERSION "1.0"          // **MUST** be in format x.y (3 chars, 2 digits)
-#define XPORT_DATE    "16-06-2023"
-#define XPORT_YEAR    "2023"
+#define XPORT_DATE    "02-01-2024"
+#define XPORT_YEAR    "2024"
 
 void xputs (const TCHAR* p_string);
 void xerror(const TCHAR* p_format,...);
