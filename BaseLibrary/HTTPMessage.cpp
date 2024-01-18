@@ -398,17 +398,21 @@ HTTPMessage::~HTTPMessage()
 
 // Recycle the object for usage in a return message
 void
-HTTPMessage::Reset()
+HTTPMessage::Reset(bool p_resetURL /*=false*/)
 {
   m_command       = HTTPCommand::http_response;
   m_status        = HTTP_STATUS_OK;
   m_ifmodified    = false;
   memset(&m_systemtime,0,sizeof(SYSTEMTIME));
 
-  // Reset resulting cracked URL;
-  m_cracked.Reset();
+  // Reset resulting cracked URL
+  if(p_resetURL)
+  {
+    m_url.Empty();
+    m_cracked.Reset();
+  }
+
   // Resetting members
-  m_url.Empty();
   m_user.Empty();
   m_password.Empty();
   m_buffer.Reset();

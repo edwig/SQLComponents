@@ -3,7 +3,7 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.3
 ===== Released since: 06-09-2023 =====
 ======================================
 
-Version 2.3.x of xx-xx-xxxx
+Version 2.3.1 of 18-01-2024
 ---------------------------
 1)  You can now use named parameters in the call to SQLQuery.DoODBCCall
     to call a stored procedure or function.
@@ -18,6 +18,18 @@ Version 2.3.x of xx-xx-xxxx
     When generating your own SQL: Refer to te uses of these
     The first is used for an extra clause in the 'FROM <table>' part
     The second is used on the total sql string!
+3)  The method "SQLInterval::AsDatabaseDouble()" (returning double) has been replaced
+    by a new method "SQLInterval::AsDatabaseNumber()" which now in its turn returns
+    a 'bcd' number. Please adjust your application accordingly
+4)  In the "SQLInterval" class the method 'double AsDatabaseDouble()' 
+    is replaced by 'bcd AsDatabaseNumber()'
+5)  In the "VariantFormat" class a number of methods have changed and added. These are:
+    - 'SetCurrentDate has been renamed to 'SetCurrentDateAndTime'
+    - 'StrValutaNLOmzetten' has been renamed to 'RemoveValutaEuro'
+    - 'StrValutaAMOmzetten' has been renamed to 'RemoveValutaDollar'
+    - 'double StringDoubleValue' has been changed to 'bcd StringDecimalValue'
+    - There is a new method to format the variant as an interval constant named
+      'XString FormatVariantAsInterval(SQLDatabase*)'
 
 Version 2.3.0 of 06-09-2023
 ---------------------------

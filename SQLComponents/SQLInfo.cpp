@@ -2771,7 +2771,7 @@ SQLInfo::NativeSQL(HDBC hdbc,XString& sqlCommand)
     if(retLen >= 0 && retLen <= buflen)
     {
       buffer[retLen] = 0;
-      XString result(reinterpret_cast<char*>(buffer));
+      XString result(reinterpret_cast<LPCTSTR>(buffer));
       delete[] buffer;
       return result;
     }

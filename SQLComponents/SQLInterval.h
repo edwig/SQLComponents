@@ -105,7 +105,7 @@ public:
   int     GetFractionPart() const;
   XString GetTypeAsString() const;
 
-  double  AsDatabaseDouble() const;
+  bcd     AsDatabaseNumber() const;
   XString AsString(bool p_withFraction = false) const;
   XString AsXMLString(bool p_withFraction = false) const;
   XString AsXMLDuration() const;

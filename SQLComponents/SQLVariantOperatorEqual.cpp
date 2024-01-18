@@ -1180,7 +1180,7 @@ bool
 static SQL_OperIntYMEqualsIntYM(const SQLVariant& p_left,const SQLVariant& p_right)
 {
   // Relies on the calculation of months in SQLInterval
-  return p_left.GetAsSQLInterval().AsDatabaseDouble() == p_right.GetAsSQLInterval().AsDatabaseDouble();
+  return p_left.GetAsSQLInterval().AsDatabaseNumber() == p_right.GetAsSQLInterval().AsDatabaseNumber();
 }
 
 // TYPE == INTERVAL_DAY_SECOND
@@ -1189,7 +1189,7 @@ bool
 static SQL_OperIntDSEqualsIntDS(const SQLVariant& p_left,const SQLVariant& p_right)
 {
   // Relies on the calculation of seconds in SQLInterval
-  return p_left.GetAsSQLInterval().AsDatabaseDouble() == p_right.GetAsSQLInterval().AsDatabaseDouble();
+  return p_left.GetAsSQLInterval().AsDatabaseNumber() == p_right.GetAsSQLInterval().AsDatabaseNumber();
 }
 
 // OPERATOR ARRAY

@@ -88,21 +88,21 @@ namespace DatabaseUnitTest
       SQLVariantFormat form(number);
       XString str;
 
-      str = _T("EUR. 45");  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("45 EUR.");  form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("E. 45");    form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("E 45");     form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("45 E.");    form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("45 E");     form.StrValutaNLOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("EUR. 45");  form.RemoveValutaEuro(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 EUR.");  form.RemoveValutaEuro(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("E. 45");    form.RemoveValutaEuro(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("E 45");     form.RemoveValutaEuro(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 E.");    form.RemoveValutaEuro(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 E");     form.RemoveValutaEuro(str,true);  Assert::AreEqual(_T("45"),str);
 
-      str = _T("E. 3.145,12"); form.StrValutaNLOmzetten(str,false); Assert::AreEqual(_T("3145.12"),str);
+      str = _T("E. 3.145,12"); form.RemoveValutaEuro(str,false); Assert::AreEqual(_T("3145.12"),str);
 
-      str = _T("$. 45");    form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("$ 45");     form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("45 $.");    form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
-      str = _T("45 $");     form.StrValutaAMOmzetten(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("$. 45");    form.RemoveValutaDollar(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("$ 45");     form.RemoveValutaDollar(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 $.");    form.RemoveValutaDollar(str,true);  Assert::AreEqual(_T("45"),str);
+      str = _T("45 $");     form.RemoveValutaDollar(str,true);  Assert::AreEqual(_T("45"),str);
 
-      str = _T("$. 3,145.12"); form.StrValutaAMOmzetten(str,false); Assert::AreEqual(_T("3145,12"),str);
+      str = _T("$. 3,145.12"); form.RemoveValutaDollar(str,false); Assert::AreEqual(_T("3145,12"),str);
 
       number_of_tests += 12;
     }
@@ -115,11 +115,11 @@ namespace DatabaseUnitTest
       SQLVariantFormat form(number);
       XString str;
 
-      form.SetFormat(_T("1234.5678"));      Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat(_T("1234,5678"));      Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat(_T("1.234,5678"));     Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat(_T("1,234.5678"));     Assert::AreEqual(1234.5678,form.StringDoubleValue());
-      form.SetFormat(_T("1.2345678E+03"));  Assert::AreEqual(1234.5678,form.StringDoubleValue());
+      form.SetFormat(_T("1234.5678"));      Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
+      form.SetFormat(_T("1234,5678"));      Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
+      form.SetFormat(_T("1.234,5678"));     Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
+      form.SetFormat(_T("1,234.5678"));     Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
+      form.SetFormat(_T("1.2345678E+03"));  Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
 
       number_of_tests += 5;
     }
@@ -131,7 +131,7 @@ namespace DatabaseUnitTest
       var number;
       SQLVariantFormat form(number);
       SQLTimestamp today = SQLTimestamp::CurrentTimestamp();
-      form.SetCurrentDate();
+      form.SetCurrentDateAndTime();
 
       XString format1 = form.GetFormat();
       XString format2 = today.AsXMLString();
@@ -144,7 +144,7 @@ namespace DatabaseUnitTest
       number_of_tests++;
 
       // Try doing it twice
-      form.SetCurrentDate();
+      form.SetCurrentDateAndTime();
 
       // Test resetting the value
       form.ResetValue();
