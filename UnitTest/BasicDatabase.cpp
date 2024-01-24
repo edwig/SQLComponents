@@ -974,14 +974,14 @@ namespace DatabaseUnitTest
                            ,_T("SELECT dateadd (12 second to timestamp { ts '2023-12-31 23:59:54'}) FROM rdb$database")
                            ,_T("2024-01-01 00:00:06")
                            ,_T("SELECT dateadd (12 second to timestamp '2023-12-31 23:59:54') FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function ASCII")
-//                            ,_T("SELECT {fn ASCII('ab')} FROM rdb$database")
-//                            ,_T("65")
-//                            ,_T("SELECT ASCII_VAL('ab') FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function CHAR")
-//                            ,_T("SELECT {fn CHAR(65)} FROM rdb$database")
-//                            ,_T("A")
-//                            ,_T("SELECT ASCII_CHAR(65) FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function ASCII")
+                           ,_T("SELECT {fn ASCII('A')} FROM rdb$database")
+                           ,_T("65")
+                           ,_T("SELECT ASCII_VAL('A') FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function CHAR")
+                           ,_T("SELECT {fn CHAR(65)} FROM rdb$database")
+                           ,_T("A")
+                           ,_T("SELECT ASCII_CHAR(65) FROM rdb$database"));
         TestEscapeCodes(dbs,_T("Function BIT_LENGTH")
                            ,_T("SELECT {fn BIT_LENGTH('monkey-tree')} FROM rdb$database")
                            ,_T("88")
@@ -994,26 +994,26 @@ namespace DatabaseUnitTest
                            ,_T("SELECT {fn CHARACTER_LENGTH('monkey-tree')} FROM rdb$database")
                            ,_T("11")
                            ,_T("SELECT CHARACTER_LENGTH('monkey-tree') FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function CONCAT")
-//                            ,_T("SELECT {fn CONCAT('monkey','tree')} FROM rdb$database")
-//                            ,_T("monkeytree")
-//                            ,_T("SELECT 'monkey' || 'tree') FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function INSERT")
-//                            ,_T("SELECT {fn INSERT('monkey-tree',7,1,' in a')} FROM rdb$database")
-//                            ,_T("monkey in a tree")
-//                            ,_T("SELECT overlay('monkey-tree' PLACING ' in a ' FROM 7 FOR 1) FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function CONCAT")
+                           ,_T("SELECT {fn CONCAT('monkey','tree')} FROM rdb$database")
+                           ,_T("monkeytree")
+                           ,_T("SELECT 'monkey'||'tree' FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function INSERT")
+                           ,_T("SELECT {fn INSERT('monkey-tree',7,1,' in a ')} FROM rdb$database")
+                           ,_T("monkey in a tree")
+                           ,_T("SELECT OVERLAY('monkey-tree' PLACING ' in a ' FROM 7 FOR 1) FROM rdb$database"));
         TestEscapeCodes(dbs,_T("Function LCASE")
                            ,_T("SELECT {fn LCASE('MONKEY')} FROM rdb$database")
                            ,_T("monkey")
                            ,_T("SELECT LOWER('MONKEY') FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function LOCATE")
-//                            ,_T("SELECT {fn LOCATE('monkey in a tree','in')} FROM rdb$database")
-//                            ,_T("8")
-//                            ,_T("SELECT POSITION('in','monkey in a tree') FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function LTRIM")
-//                            ,_T("SELECT {fn LTRIM('  monkey')} FROM rdb$database")
-//                            ,_T("monkey")
-//                            ,_T("SELECT TRIM(LEADING FROM '  monkey') FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function LOCATE")
+                           ,_T("SELECT {fn LOCATE('in','monkey in a tree')} FROM rdb$database")
+                           ,_T("8")
+                           ,_T("SELECT POSITION('in','monkey in a tree') FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function LTRIM")
+                           ,_T("SELECT {fn LTRIM('  monkey')} FROM rdb$database")
+                           ,_T("monkey")
+                           ,_T("SELECT TRIM(LEADING FROM '  monkey') FROM rdb$database"));
         TestEscapeCodes(dbs,_T("Function OCTET_LENGTH")
                            ,_T("SELECT {fn OCTET_LENGTH('monkey-tree')} FROM rdb$database")
                            ,_T("11")
@@ -1030,34 +1030,26 @@ namespace DatabaseUnitTest
                            ,_T("SELECT {fn RIGHT('monkey-tree',4)} FROM rdb$database")
                            ,_T("tree")
                            ,_T("SELECT RIGHT('monkey-tree',4) FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function RTRIM")
-//                            ,_T("SELECT {fn RTRIM('monkey  ')} FROM rdb$database")
-//                            ,_T("monkey")
-//                            ,_T("SELECT TRIM(TRAILING FROM 'monkey  ') FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function RTRIM")
+                           ,_T("SELECT {fn RTRIM('monkey  ')} FROM rdb$database")
+                           ,_T("monkey")
+                           ,_T("SELECT TRIM(TRAILING FROM 'monkey  ') FROM rdb$database"));
 //         TestEscapeCodes(dbs,_T("Function SPACE")
 //                            ,_T("SELECT {fn SPACE(8)} FROM rdb$database")
 //                            ,_T("        ")
 //                            ,_T("SELECT RPAD(' ',7) FROM rdb$database"));
-
-// WORKS ONLY WITH NEW 3.03 ODBC driver !!!
-//         TestEscapeCodes(dbs,_T("Function SUBSTRING")
-//                            ,_T("SELECT {fn SUBSTRING('monkey-tree',4,3)} FROM rdb$database")
-//                            ,_T("key")
-//                            ,_T("SELECT SUBSTRING('monkey-tree' FROM 4 FOR 3) FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function SUBSTRING")
-//                            ,_T("SELECT {fn SUBSTRING('monkey-{}''tree',4,3)} FROM rdb$database")
-//                            ,_T("key")
-//                            ,_T("SELECT SUBSTRING('monkey-{}''tree' FROM 4 FOR 3) FROM rdb$database"));
-
-
+        TestEscapeCodes(dbs,_T("Function SUBSTRING")
+                           ,_T("SELECT {fn SUBSTRING('monkey-tree',4,3)} FROM rdb$database")
+                           ,_T("key")
+                           ,_T("SELECT SUBSTRING('monkey-tree' FROM 4 FOR 3) FROM rdb$database"));
+        TestEscapeCodes(dbs,_T("Function SUBSTRING")
+                           ,_T("SELECT {fn SUBSTRING('monkey-{}''tree',4,3)} FROM rdb$database")
+                           ,_T("key")
+                           ,_T("SELECT SUBSTRING('monkey-{}''tree' FROM 4 FOR 3) FROM rdb$database"));
         TestEscapeCodes(dbs,_T("Function UCASE")
                            ,_T("SELECT {fn UCASE('monkey')} FROM rdb$database")
                            ,_T("MONKEY")
                            ,_T("SELECT UPPER('monkey') FROM rdb$database"));
-//         TestEscapeCodes(dbs,_T("Function LIKE ESCAPE")
-//                            ,_T("SELECT COUNT(*) FROM DETAILS WHERE description LIKE '%lin\\e%' {ESCAPE '\\'}")
-//                            ,_T("9")
-//                            ,_T("SELECT COUNT(*) FROM DETAILS WHERE description LIKE '%lin\\e%' ESCAPE '\\'"));
 
         trans.Commit();
 
@@ -1065,6 +1057,7 @@ namespace DatabaseUnitTest
         // Function: DIFFERENCE
         // Function: REPEAT
         // Function: SOUNDEX
+        // Function: LIKE (but there is SIMILAR!)
       }
       dbs.Close();
     }
