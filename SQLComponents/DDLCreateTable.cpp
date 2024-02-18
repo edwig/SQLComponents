@@ -116,17 +116,15 @@ DDLCreateTable::GetViewStatements(XString p_viewname)
 bool
 DDLCreateTable::SaveDDL(XString p_filename)
 {
-  FILE* file = nullptr;
-  _tfopen_s(&file,p_filename,_T("w"));
-  if(file)
+  WinFile file(p_filename);
+  if(file.Open(winfile_write,FAttributes::attrib_none,Encoding::UTF8))
   {
     for(auto& ddl : m_statements)
     {
-      ddl += ";\n";
-      _fputts(ddl,file);
+      ddl += _T(";\n");
+      file.Write(ddl);
     }
-    fclose(file);
-    return true;
+    return file.Close();
   }
   return false;
 }
