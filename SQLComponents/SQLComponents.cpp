@@ -30,9 +30,9 @@
 
 namespace SQLComponents
 {
-  bool  g_SQLComponentsInitialized = false;
-  bool  g_SQLComponentsInServer    = false;
-  char* g_SQLSessionInitialization [SQLCOMP_MAX_SESS_DATABASES][SQLCOMP_MAX_SESS_SETTINGS] = { 0 };
+  bool   g_SQLComponentsInitialized = false;
+  bool   g_SQLComponentsInServer    = false;
+  PTCHAR g_SQLSessionInitialization [SQLCOMP_MAX_SESS_DATABASES][SQLCOMP_MAX_SESS_SETTINGS] = { 0 };
 
   // Initialization of the SQLComponents library
   void InitSQLComponents(Language p_language,bool p_inServer /*= false*/)
@@ -79,14 +79,14 @@ namespace SQLComponents
   }
 
   // Accept up to SQLCOMP_MAX_SESS_SETTINGS for a new SQLDatabase connection
-  bool SQLSetSessionInitialisation(DatabaseType p_type,int p_number,const char* p_statement)
+  bool SQLSetSessionInitialisation(DatabaseType p_type,int p_number,LPCTSTR p_statement)
   {
     int type = (int)p_type;
     if(type >= 0 && type < SQLCOMP_MAX_SESS_DATABASES)
     {
       if(p_number >= 0 && p_number < SQLCOMP_MAX_SESS_SETTINGS)
       {
-        g_SQLSessionInitialization[type][p_number] = const_cast<char*>(p_statement);
+        g_SQLSessionInitialization[type][p_number] = const_cast<PTCHAR>(p_statement);
         return true;
       }
     }

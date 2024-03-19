@@ -409,7 +409,7 @@ SQLDatabase::SetConnectionInitialisations()
     SQLQuery query(this);
     for(int index = 0;index < SQLCOMP_MAX_SESS_SETTINGS;++index)
     {
-      char* sql = g_SQLSessionInitialization[m_rdbmsType][index];
+      PTCHAR sql = g_SQLSessionInitialization[m_rdbmsType][index];
       if(sql)
       {
         query.DoSQLStatementNonQuery(sql);

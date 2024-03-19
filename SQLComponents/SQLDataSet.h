@@ -162,7 +162,7 @@ public:
   // Set FROM selection of several tables (more than one!)
   virtual void SetFromTables(XString p_from);
   // Set FROM  primary table (for updates)
-  virtual void SetPrimaryTable(XString p_schema, XString p_tableName, XString p_alias = "");
+  virtual void SetPrimaryTable(XString p_schema, XString p_tableName, XString p_alias = _T(""));
   // Set WHERE condition by hand
   virtual void SetWhereCondition(XString p_condition);
   // Set WHERE filters for a query
