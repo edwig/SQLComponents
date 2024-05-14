@@ -368,7 +368,7 @@ SQLVariantFormat::IsWinNumber(const XString p_string
 }
 
 bcd
-SQLVariantFormat::StringDecimalValue()
+SQLVariantFormat::StringDecimalValue(CString& p_error)
 {
   bcd result;
   ::InitValutaString();
@@ -415,7 +415,17 @@ SQLVariantFormat::StringDecimalValue()
             else
             {
               // Cross our fingers and hope to die!!
-              result = bcd(waarde);
+              try
+              {
+                result = bcd(waarde);
+              }
+              catch(StdException& ex)
+              {
+                p_error  = ex.GetErrorMessage();
+                p_error += " : ";
+                p_error += waarde;
+                result.Zero();
+              }
             }
           }
         }
@@ -914,7 +924,8 @@ SQLVariantFormat::FormatNumber(XString p_format,bool p_currency)
     }
   }
   // Converting number variants. Also "123,4500000" to "123.45"
-  bcd value = StringDecimalValue();
+  XString error;
+  bcd value = StringDecimalValue(error);
   number = value.AsString(bcd::Format::Bookkeeping,false,SQLNUM_MAX_PREC / 2);
 
   if(p_format.IsEmpty())

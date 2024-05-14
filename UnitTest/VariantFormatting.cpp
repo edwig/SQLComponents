@@ -114,12 +114,18 @@ namespace DatabaseUnitTest
       var number(1);
       SQLVariantFormat form(number);
       XString str;
+      XString error;
 
-      form.SetFormat(_T("1234.5678"));      Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
-      form.SetFormat(_T("1234,5678"));      Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
-      form.SetFormat(_T("1.234,5678"));     Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
-      form.SetFormat(_T("1,234.5678"));     Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
-      form.SetFormat(_T("1.2345678E+03"));  Assert::AreEqual(1234.5678,form.StringDecimalValue().AsDouble());
+      form.SetFormat(_T("1234.5678"));      Assert::AreEqual(1234.5678,form.StringDecimalValue(error).AsDouble());
+      Assert::IsTrue(error.IsEmpty());
+      form.SetFormat(_T("1234,5678"));      Assert::AreEqual(1234.5678,form.StringDecimalValue(error).AsDouble());
+      Assert::IsTrue(error.IsEmpty());
+      form.SetFormat(_T("1.234,5678"));     Assert::AreEqual(1234.5678,form.StringDecimalValue(error).AsDouble());
+      Assert::IsTrue(error.IsEmpty());
+      form.SetFormat(_T("1,234.5678"));     Assert::AreEqual(1234.5678,form.StringDecimalValue(error).AsDouble());
+      Assert::IsTrue(error.IsEmpty());
+      form.SetFormat(_T("1.2345678E+03"));  Assert::AreEqual(1234.5678,form.StringDecimalValue(error).AsDouble());
+      Assert::IsTrue(error.IsEmpty());
 
       number_of_tests += 5;
     }

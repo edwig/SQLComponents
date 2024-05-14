@@ -7,6 +7,8 @@ Version 2.3.2 of XX-XX-XXXX
 ---------------------------
 1)  SQLVariant::GetAsChar() now no longer returns a XString, but a TCHAR*
     in order to return correct string literals from the ODBC driver
+2)  Fix for SQLVariantFormat::StringDecimalValue in case a string does not
+    contain a number and cannot be converted to a bcd number
 
 Version 2.3.1 of 18-01-2024
 ---------------------------

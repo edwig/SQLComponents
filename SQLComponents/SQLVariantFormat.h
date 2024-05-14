@@ -59,7 +59,7 @@ public:
   // Converting American $ values to dutch values
   int         RemoveValutaDollar(XString& p_string,bool p_enkelValuta);
   // Value of a string as a double
-  bcd         StringDecimalValue();
+  bcd         StringDecimalValue(XString& p_error);
   // Format according to user interface
   int         FormatNumber(XString p_format,bool p_currency);
   // Do math on dates
