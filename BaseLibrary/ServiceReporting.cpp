@@ -27,6 +27,7 @@
 //
 #include "pch.h"
 #include "ServiceReporting.h"
+#include "EventLogRegistration.h"
 #include "AutoCritical.h"
 #include "GetLastErrorAsString.h"
 #include "Alert.h"
@@ -44,7 +45,7 @@ static char THIS_FILE[] = __FILE__;
 
 PTCHAR           g_eventBuffer = nullptr;
 CRITICAL_SECTION g_eventBufferLock;
-TCHAR            g_svcname[SERVICE_NAME_LENGTH];
+TCHAR            g_svcname[SERVICE_NAME_LENGTH] = "";
 
 static void
 SvcFreeEventBuffer()

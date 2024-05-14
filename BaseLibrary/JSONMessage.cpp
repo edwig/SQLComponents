@@ -350,7 +350,7 @@ JSONvalue::Add(JSONpair& p_value)
 }
 
 XString
-JSONvalue::GetAsJsonString(bool p_white,Encoding p_encoding,unsigned p_level /*=0*/)
+JSONvalue::GetAsJsonString(bool p_white,Encoding p_encoding /*=Encoding::Default*/, unsigned p_level /*=0*/)
 {
   XString result;
   XString separ,less;
@@ -453,6 +453,67 @@ JSONvalue::operator[](XString p_name)
     }
   }
   throw StdException(_T("JSON object index not found!"));
+}
+
+void
+JSONvalue::JsonReplace(XString p_namePattern,XString p_tofind,XString p_replace,int& p_number,bool p_caseSensitive)
+{
+  switch(m_type)
+  {
+    case JsonType::JDT_object: JsonReplaceObject(p_namePattern,p_tofind,p_replace,p_number,p_caseSensitive); 
+                               break;
+    case JsonType::JDT_array:  JsonReplaceArray (p_namePattern,p_tofind,p_replace,p_number,p_caseSensitive);
+                               break;
+    default:                   // NOTHING TO DO!
+                               break;
+  }
+}
+
+void
+JSONvalue::JsonReplaceObject(XString p_namePattern,XString p_tofind,XString p_replace,int& p_number,bool p_caseSensitive /*=true*/)
+{
+  for(auto& pair : m_object)
+  {
+    switch(pair.GetDataType())
+    {
+      case JsonType::JDT_string:  if(pair.m_name.Find(p_namePattern) >= 0)
+                                  {
+                                    XString value = pair.m_value.GetString();
+                                    if(!p_caseSensitive)
+                                    {
+                                      value.MakeLower();
+                                    }
+                                    int pos = value.Find(p_tofind);
+                                    if(pos >= 0)
+                                    {
+                                      XString replacement = value.Left(pos);
+                                      replacement += p_replace;
+                                      replacement += value.Mid(pos + p_tofind.GetLength());
+                                      pair.m_value.SetValue(replacement);
+                                      ++p_number;
+                                    }
+                                  }
+                                  break;
+      case JsonType::JDT_object:  [[fallthrough]];
+      case JsonType::JDT_array:   pair.m_value.JsonReplace(p_namePattern,p_tofind,p_replace,p_number,p_caseSensitive);
+                                  break;
+      default:                    // DO NOTHING
+                                  break;
+    }
+  }
+}
+
+void
+JSONvalue::JsonReplaceArray(XString p_namePattern,XString p_tofind,XString p_replace,int& p_number,bool p_caseSensitive /*=true*/)
+{
+  for(auto& value : m_array)
+  {
+    if(value.GetDataType() == JsonType::JDT_object ||
+       value.GetDataType() == JsonType::JDT_array  )
+    {
+      value.JsonReplace(p_namePattern,p_tofind,p_replace,p_number,p_caseSensitive);
+    }
+  }
 }
 
 // JSONvalues can be stored elsewhere. Use the reference mechanism to add/drop references
@@ -578,7 +639,7 @@ JSONMessage::JSONMessage(XString p_message)
 }
 
 // XTOR: From an internal string with explicit space and encoding
-JSONMessage::JSONMessage(XString p_message,bool p_whitespace,Encoding p_encoding)
+JSONMessage::JSONMessage(XString p_message,bool p_whitespace,Encoding p_encoding /*=Encoding::Default*/)
 {
   AddReference();
 
@@ -1409,6 +1470,26 @@ JSONMessage::AddNamedObject(XString p_name,const JSONobject& p_object,bool p_for
   return false;
 }
 
+// Start point of a JSON replace
+// Searches for JSONpair's that have a matching name pattern
+// p_namePattern   -> Must be found within a JSON name of a pair
+// p_toFind        -> Text to find in the value part of the pair
+// p_replace       -> Found text will be replaced by this text
+// p_caseSensitive -> Replacement find is (not) case sensitve
+int
+JSONMessage::JsonReplace(XString p_namePattern,XString p_tofind,XString p_replace,bool p_caseSensitive /*=true*/)
+{
+  int number = 0;
+  if(m_value)
+  {
+    if(!p_caseSensitive)
+    {
+      p_tofind.MakeLower();
+    }
+    m_value->JsonReplace(p_namePattern,p_tofind,p_replace,number,p_caseSensitive);
+  }
+  return number;
+}
 
 #pragma region References
 

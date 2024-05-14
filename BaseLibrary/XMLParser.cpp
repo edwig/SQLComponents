@@ -385,10 +385,9 @@ XMLParser::ParseDeclaration()
     }
     else if(attributeName.Compare(_T("encoding")) == 0)
     {
-      m_message->m_encoding = Encoding::Default;
       if(value.CompareNoCase(_T("utf-8")) == 0)
       {
-        if(m_message->GetEncoding() != Encoding::Default)
+        if(m_message->GetEncoding() != Encoding::UTF8)
         {
           // UTF-8 Not detected earlier by WinFile or by Byte-Order-Mark
           // So we choose to believe the header and scan for UTF-8 anyhow
@@ -399,6 +398,7 @@ XMLParser::ParseDeclaration()
       else if(value.Left(6).CompareNoCase(_T("utf-16")) == 0)
       {
         m_message->SetSendUnicode(true);
+        m_message->m_encoding = Encoding::LE_UTF16;
       }
       else
       {
@@ -412,7 +412,7 @@ XMLParser::ParseDeclaration()
         {
           XString message;
           message.Format(_T("Unknown XML character encoding: %s"),value.GetString());
-          SetError(XmlError::XE_UnknownEncoding,message.GetString());
+          SetError(XmlError::XE_NoError,message.GetString(),false);
         }
       }
     }

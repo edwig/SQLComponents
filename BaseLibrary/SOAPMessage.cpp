@@ -371,13 +371,17 @@ SOAPMessage::ConstructFromRawBuffer(uchar* p_buffer,unsigned p_length,XString p_
       message = p_buffer;
     }
   }
-  else if(!p_charset.IsEmpty())
+  else 
   {
+    if(p_charset.IsEmpty())
+    {
+      p_charset = "utf-8";
+    }
+    if(p_charset.CompareNoCase("utf-8") == 0)
+    {
+      m_encoding = Encoding::UTF8;
+    }
     message = DecodeStringFromTheWire(XString(p_buffer),p_charset);
-  }
-  else
-  {
-    message = p_buffer;
   }
 #endif
   return message;
@@ -2468,6 +2472,7 @@ SOAPMessage::SetTokenProfile(XString p_user,XString p_password,XString p_created
 {
   XString namesp(NAMESPACE_SECEXT);
   XString secure(NAMESPACE_SECURITY);
+  XString unametoken(NAMESPACE_UNAMETOKEN);
   XString empty;
 
   XMLElement* header = FindElement(_T("Header"), false);
@@ -2507,9 +2512,15 @@ SOAPMessage::SetTokenProfile(XString p_user,XString p_password,XString p_created
     Crypto crypt;
     // Password text = Base64(SHA1(nonce + created + password))
     XString combined = p_nonce + p_created + p_password;
+
+    #ifdef _UNICODE
+    std::string basic = WinFile().TranslateOutputBuffer(combined);
+    XString password = crypt.Digest(basic.c_str(), basic.length(), CALG_SHA1);
+    #else
     XString password = crypt.Digest(combined.GetString(),combined.GetLength(),CALG_SHA1);
+    #endif
     passwd->SetValue(password);
-    SetAttribute(passwd,_T("Type"),namesp + _T("#PasswordDigest"));
+    SetAttribute(passwd,_T("Type"),unametoken + _T("#PasswordDigest"));
 
     XMLElement* nonce = FindElement(token,_T("Nonce"),false);
     if(!nonce)
@@ -2517,7 +2528,13 @@ SOAPMessage::SetTokenProfile(XString p_user,XString p_password,XString p_created
       nonce = AddElement(token,_T("wsse:Nonce"),XDT_String,"");
     }
     Base64 base;
+
+    #ifdef _UNICODE
+    basic = WinFile().TranslateOutputBuffer(p_nonce);
+    nonce->SetValue(base.Encrypt((BYTE*)basic.c_str(), (int)basic.length()));
+    #else
     nonce->SetValue(base.Encrypt(p_nonce));
+    #endif
     SetAttribute(nonce,_T("EncodingType"),secure + _T("#Base64Binary"));
   }
   else
