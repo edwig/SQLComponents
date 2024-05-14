@@ -1053,17 +1053,14 @@ SQLVariant::GetDataSize() const
 //////////////////////////////////////////////////////////////////////////
 
 // Here for backward compatibility reasons!!
-XString
+TCHAR*
 SQLVariant::GetAsChar() const
 {
-  XString result;
-
   if(m_indicator == SQL_NULL_DATA)
   {
-    return result;
+    return (TCHAR*)_T("");
   }
-  GetAsString(result);
-  return result;
+  return (TCHAR*)m_data.m_dataCHAR;
 }
 
 XString

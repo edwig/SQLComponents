@@ -3,6 +3,11 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.3
 ===== Released since: 06-09-2023 =====
 ======================================
 
+Version 2.3.2 of XX-XX-XXXX
+---------------------------
+1)  SQLVariant::GetAsChar() now no longer returns a XString, but a TCHAR*
+    in order to return correct string literals from the ODBC driver
+
 Version 2.3.1 of 18-01-2024
 ---------------------------
 1)  You can now use named parameters in the call to SQLQuery.DoODBCCall
