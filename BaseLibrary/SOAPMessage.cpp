@@ -706,7 +706,16 @@ void
 SOAPMessage::SetURL(const XString& p_url)
 {
   m_url = p_url;
-  m_cracked.CrackURL(p_url);
+
+  CrackedURL url;
+  if(url.CrackURL(p_url))
+  {
+    m_cracked = url;
+  }
+  else
+  {
+    m_cracked.m_valid = false;
+  }
 }
 
 // URL without user/password
@@ -1627,8 +1636,12 @@ SOAPMessage::Url2SoapParameters(const CrackedURL& p_url)
   CreateParametersObject();
 
   WinFile part(p_url.m_path);
-  XString action = part.GetFilenamePartFilename();
-
+  XString action = part.GetFilenamePartBasename();
+  XString extens = part.GetFilenamePartExtension();
+  if(!extens.IsEmpty() && !isalpha(extens.GetAt(0)))
+  {
+    action = "Doc_" + action;
+  }
   SetSoapAction(action);
   SetParameterObject(action);
 
