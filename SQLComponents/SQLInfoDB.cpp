@@ -629,7 +629,7 @@ SQLInfoDB::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
 
     qry.DoSQLStatement(sql);
     
-    if(qry.GetNumberOfColumns() == 3)
+    if(qry.GetNumberOfColumns() == 4)
     {
       // Name only
       while(qry.GetRecord())
