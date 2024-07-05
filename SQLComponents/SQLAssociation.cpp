@@ -228,7 +228,7 @@ SQLAssociation::FollowToMaster()
 // Find a record-set of details
 // Caller must 'delete' the RecordSet
 RecordSet*
-SQLAssociation::FollowToDetails()
+SQLAssociation::FollowToDetails(bool p_all /*=true*/)
 {
   // Check if we can do the update
   if(!BasicChecks())
@@ -237,7 +237,11 @@ SQLAssociation::FollowToDetails()
   }
 
   // Create filter-set and add to the detail
-  m_detail->ResetFilters();
+  // If we want all records, reset the filters
+  if(p_all)
+  {
+    m_detail->ResetFilters();
+  }
   for(unsigned ind = 0;ind < m_assocs.size();++ind)
   {
     SQLFilter filter(m_assocs[ind]->m_foreign,OP_Equal,m_assocs[ind]->m_value);
