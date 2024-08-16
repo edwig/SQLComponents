@@ -200,7 +200,7 @@ SQLAssociation::GetSQLCondition()
 
 
 SQLRecord*
-SQLAssociation::FollowToMaster()
+SQLAssociation::FollowToMaster(bool p_all /*=true*/)
 {
   // Check if we can do the update
   if(!BasicChecks())
@@ -209,7 +209,11 @@ SQLAssociation::FollowToMaster()
   }
 
   // Create filter-set and add to the master
-  m_master->ResetFilters();
+  // If we want all records, reset the filters
+  if(p_all)
+  {
+    m_master->ResetFilters();
+  }
   for(unsigned ind = 0;ind < m_assocs.size();++ind)
   {
     SQLFilter filter(m_assocs[ind]->m_primary,OP_Equal,m_assocs[ind]->m_value);

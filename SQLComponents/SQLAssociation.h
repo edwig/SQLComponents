@@ -50,7 +50,7 @@ public:
  ~SQLAssociation();
 
   // ACTIONS
-  SQLRecord* FollowToMaster();
+  SQLRecord* FollowToMaster (bool p_all = true);
   RecordSet* FollowToDetails(bool p_all = true);
 
   // SETTERS
