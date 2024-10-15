@@ -1144,8 +1144,9 @@ SQLQuery::LogParameter(int p_column,const SQLVariant* p_parameter)
   }
   XString text,name,value;
   p_parameter->GetAsString(value);
-  text.Format(_T("Parameter %d: %s"),p_column,value.GetString());
-  GetColumnName(p_parameter->GetColumnNumber(),name);
+  int column = p_parameter->GetColumnNumber();
+  text.Format(_T("Parameter %d: %s"),column,value.GetString());
+  GetColumnName(column,name);
   if(!name.IsEmpty())
   {
     text += _T(" name: ") + name;

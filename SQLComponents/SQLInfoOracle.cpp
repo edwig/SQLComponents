@@ -2786,8 +2786,10 @@ SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,XString& p_schema,XStr
   sql += _T("); END; END;");
 
   // Add parameter 0 as result parameter
-  p_query->SetParameter(0,0);
-
+  if(p_query->GetParameter(0) == nullptr)
+  {
+    p_query->SetParameter(0,0);
+  }
   // Now find the result
   p_query->DoSQLStatement(sql);
   return p_query->GetParameter(0);
