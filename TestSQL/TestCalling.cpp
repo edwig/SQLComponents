@@ -100,7 +100,7 @@ void TestCalling()
 
       int status = 0;
       bcd number = q2.GetParameter(0)->GetAsBCD();
-      XString text = q2.GetParameter(2)->GetAsChar();
+      XString text = q2.GetParameter(2)->GetAsString();
       _tprintf(_T("Result of MULTINOUT = status:%d [%s] [%s]\n"),status,number.AsString().GetString(),text.GetString());
 
       trans.Commit();

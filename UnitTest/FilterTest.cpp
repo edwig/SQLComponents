@@ -100,7 +100,7 @@ namespace OperatorUnitTest
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
-      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant.GetAsString();
 
       Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -112,7 +112,7 @@ namespace OperatorUnitTest
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant);
       filter.Negate();
-      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant.GetAsString();
 
       Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -128,8 +128,8 @@ namespace OperatorUnitTest
       SQLQuery query;
       SQLFilter filter(p_field,p_oper,&p_variant1);
       filter.AddValue(&p_variant2);
-      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant1.GetAsChar();
-      condition += XString(_T(" : ")) + p_variant2.GetAsChar();
+      XString condition = filter.GetSQLFilter(query) + _T(" : ") + p_variant1.GetAsString();
+      condition += XString(_T(" : ")) + p_variant2.GetAsString();
 
       Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());
@@ -155,10 +155,10 @@ namespace OperatorUnitTest
       filter.AddValue(&p_variant3);
       filter.AddValue(&p_variant4);
       XString condition = filter.GetSQLFilter(query);
-      condition += XString(_T(" : ")) + p_variant1.GetAsChar();
-      condition += XString(_T(" : ")) + p_variant2.GetAsChar();
-      condition += XString(_T(" : ")) + p_variant3.GetAsChar();
-      condition += XString(_T(" : ")) + p_variant4.GetAsChar();
+      condition += XString(_T(" : ")) + p_variant1.GetAsString();
+      condition += XString(_T(" : ")) + p_variant2.GetAsString();
+      condition += XString(_T(" : ")) + p_variant3.GetAsString();
+      condition += XString(_T(" : ")) + p_variant4.GetAsString();
 
       Logger::WriteMessage(_T("Filter: ") + condition);
       Assert::AreEqual(p_expect.GetString(),condition.GetString());

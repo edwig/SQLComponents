@@ -174,7 +174,7 @@ namespace DatabaseUnitTest
       res = q2.DoSQLCall(g_schema,_T("multinout"),true);
 
       bcd number = res->GetAsBCD();
-      XString restext = q2.GetParameter(2)->GetAsChar();
+      XString restext = q2.GetParameter(2)->GetAsString();
       text.Format(_T("Result of MULTINOUT: [%s] [%s]\n"),number.AsString().GetString(),(LPCTSTR)restext);
       Logger::WriteMessage(text);
 

@@ -75,7 +75,7 @@ SelectNULL(SQLDatabase* p_dbs)
     {
       int orgID = query.GetColumn(1)->GetAsSLong();
       int slID  = query.GetColumn(2)->GetAsSLong();
-      XString oms = query.GetColumn(3)->GetAsChar();
+      XString oms = query.GetColumn(3)->GetAsString();
       SQLVariant* var = query.GetColumn(3);
 
       _tprintf(_T("Description: %s\n"),oms.GetString());

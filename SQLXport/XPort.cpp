@@ -963,7 +963,7 @@ XPort::GetDefineSQLProcedure(XString p_procedure)
     query.DoSQLStatement(sql);
     while(query.GetRecord())
     {
-      create += query.GetColumn(3)->GetAsChar();
+      create += query.GetColumn(3)->GetAsString();
     }
   }
   catch(StdException& ex)
@@ -992,7 +992,7 @@ XPort::GetDefineSQLSynonym(XString p_synonym)
     query.DoSQLStatement(sql);
     if(query.GetRecord())
     {
-      XString definition = query.GetColumn(4)->GetAsChar();
+      XString definition = query.GetColumn(4)->GetAsString();
       create = m_database.GetSQLInfoDB()->GetCATALOGSynonymCreate(m_schema,p_synonym,definition);
     }
   }
@@ -1093,7 +1093,7 @@ XPort::WriteTableAccessRights(XString p_object,int& p_count)
     {
       XString grantee   = query[5];
       XString privilege = query[6];
-      bool    grantable = _tcsicmp(query[7].GetAsChar(),_T("YES")) == 0;
+      bool    grantable = _tcsicmp(query[7].GetAsString(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
@@ -1132,7 +1132,7 @@ XPort::WriteColumnAccessRights(XString p_object,int& p_count)
     {
       XString grantee   = query[6];
       XString privilege = query[7];
-      bool    grantable = _tcsicmp(query[8].GetAsChar(),_T("YES")) == 0;
+      bool    grantable = _tcsicmp(query[8].GetAsString(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
@@ -1170,7 +1170,7 @@ XPort::WriteProcedureAccessRights(XString p_object,int& p_count)
     {
       XString grantee   = query[5];
       XString privilege = query[6];
-      bool    grantable = _tcsicmp(query[7].GetAsChar(),_T("YES")) == 0;
+      bool    grantable = _tcsicmp(query[7].GetAsString(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
@@ -1214,7 +1214,7 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
     {
       XString privilege = query[4];
       XString grantee   = query[5];
-      bool    grantable = _tcsicmp(query[6].GetAsChar(),_T("YES")) == 0;
+      bool    grantable = _tcsicmp(query[6].GetAsString(),_T("YES")) == 0;
 
       XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_sequence,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
