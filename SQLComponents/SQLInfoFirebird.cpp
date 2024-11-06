@@ -449,6 +449,12 @@ SQLInfoFirebird::GetSQLGenerateSerial(XString p_table) const
   return _T("SELECT (next value for ") + p_table + _T("_seq) FROM RDB$DATABASE");
 }
 
+XString
+SQLInfoFirebird::GetSQLGenerateSequence(XString p_sequence) const
+{
+  return _T("SELECT (next value for ") + p_sequence + _T(") FROM RDB$DATABASE");
+}
+
 // Gets the construction / select for the resulting effective generated serial
 XString
 SQLInfoFirebird::GetSQLEffectiveSerial(XString p_identity) const
@@ -620,7 +626,7 @@ SQLInfoFirebird::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool 
 
 // Changes to parameters before binding to an ODBC HSTMT handle
 void
-SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*p_columnSize*/,SQLSMALLINT& /*p_scale*/,SQLLEN& /*p_bufferSize*/,SQLLEN* /*p_indicator*/) const
+SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/,SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*p_columnSize*/,SQLSMALLINT& /*p_scale*/,SQLLEN& /*p_bufferSize*/,SQLLEN* /*p_indicator*/) const
 {
 }
 
@@ -2903,7 +2909,7 @@ SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,XString& /*p_schema*/,XString& p_pr
 
 // Calling a stored function with named parameters, returning a value
 SQLVariant*
-SQLInfoFirebird::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,XString& /*p_schema*/,XString& /*p_procedure*/)
+SQLInfoFirebird::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,XString& /*p_schema*/,XString& /*p_procedure*/,bool /*p_function = true*/)
 {
   return nullptr;
 }

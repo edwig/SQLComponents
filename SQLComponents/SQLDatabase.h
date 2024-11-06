@@ -234,7 +234,7 @@ public:
   XString        GetSQLDateString        (int p_day, int p_month, int p_year);
   XString        GetCurrentTimestampQualifier();
   XString        GetSQL_NewSerial(XString p_table,XString p_sequence);
-  XString        GetSQL_GenerateSerial(XString p_table);
+  XString        GetSQL_GenerateSerial(XString p_table,XString p_sequence = _T(""));
   int            GetSQL_EffectiveSerial(XString p_oid_string);
   XString        GetTimestampAsString(const SQLTimestamp& p_timestamp);
   XString        GetTimestampAsBoundString();

@@ -68,6 +68,7 @@ public:
   XString     GetCondition();
 
   // Functions
+  void        AddField(XString p_field,SQLVariant& p_value);
   void        AddValue(SQLVariant* p_val,bool p_replace = false);
   // Operators
   SQLPrimaryKey& operator=(const SQLPrimaryKey& p_other);

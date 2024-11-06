@@ -639,6 +639,7 @@ SQLInfoDB::MakeInfoPSMProcedures(MProcedureMap&  p_procedures
         proc.m_catalogName   = qry.GetColumn(1)->GetAsString();
         proc.m_schemaName    = qry.GetColumn(2)->GetAsString();
         proc.m_procedureName = qry.GetColumn(3)->GetAsString();
+        proc.m_procedureType = qry.GetColumn(4)->GetAsSLong();
 
         p_procedures.push_back(proc);
       }

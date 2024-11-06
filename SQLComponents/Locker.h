@@ -60,7 +60,8 @@ public:
   {
     if(m_toBeLocked)
     {
-      if(++m_locked == 1)
+      InterlockedIncrement(&m_locked);
+      if(m_locked == 1)
       {
         m_toBeLocked->Acquire(p_timeout);
       }
@@ -70,13 +71,14 @@ public:
   {
     if(m_toBeLocked)
     {
-      if(--m_locked == 0)
+      InterlockedDecrement(&m_locked);
+      if(m_locked <= 0)
       {
         m_toBeLocked->Release();
       }
     }
   }
 private:
-  TC* m_toBeLocked; // Pointer to template class
-  int m_locked;     // int, not unsigned (when there are to much Releases)
+  TC*  m_toBeLocked; // Pointer to template class
+  long m_locked;     // int, not unsigned (when there are to much Releases)
 };

@@ -234,6 +234,8 @@ public:
   XString      GetPrimaryAlias();
   // Getting the sequence name
   XString      GetSequenceName();
+  // Last inserted serial by our generator or sequence
+  XString      GetLastInsertedSerial();
   // Getting the query settings
   XString      GetSelection();
   XString      GetFromTables();
@@ -298,7 +300,7 @@ protected:
 
   XString      GetSQLDelete  (SQLQuery* p_query,const SQLRecord* p_record);
   XString      GetSQLUpdate  (SQLQuery* p_query,const SQLRecord* p_record);
-  XString      GetSQLInsert  (SQLQuery* p_query,const SQLRecord* p_record,XString& p_serial);
+  XString      GetSQLInsert  (SQLQuery* p_query,const SQLRecord* p_record);
   XString      GetWhereClause(SQLQuery* p_query,const SQLRecord* p_record,int& p_parameter);
 
   // Base class data of the dataset
@@ -338,6 +340,7 @@ protected:
   TypenMap     m_types;
   RecordSet    m_records;
   ObjectMap    m_objects;
+  XString      m_serial;
   // Maximum query timing
   int          m_queryTime { 0 };
   ULONG64      m_frequency { 0 };
@@ -525,6 +528,12 @@ inline void
 SQLDataSet::SetLockWaitTime(unsigned p_wait)
 {
   m_lockWaitTime = p_wait;
+}
+
+inline XString
+SQLDataSet::GetLastInsertedSerial()
+{
+  return m_serial;
 }
 
 inline void

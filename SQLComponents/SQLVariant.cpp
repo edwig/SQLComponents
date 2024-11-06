@@ -527,7 +527,8 @@ SQLVariant::IsNumericType() const
     case SQL_C_UTINYINT:  // Fall through
     case SQL_C_SBIGINT:   // Fall through
     case SQL_C_UBIGINT:   // Fall through
-    case SQL_C_NUMERIC:   return true;
+    case SQL_C_NUMERIC:   // Fall through
+    case SQL_DECIMAL:     return true;
     default:              return false;
   }
 }
@@ -675,7 +676,7 @@ SQLVariant::SetDataTypeDate()
 void    
 SQLVariant::SetNumericPrecisionScale(int p_precision,int p_scale)
 {
-  if(m_datatype != SQL_C_NUMERIC)
+  if(m_datatype != SQL_C_NUMERIC && m_sqlDatatype != SQL_DECIMAL)
   {
     return;
   }
@@ -827,6 +828,7 @@ SQLVariant::GetAsString(XString& result) const
                                           break;
     case SQL_C_UBIGINT:                   result.Format(_T("%I64u"),m_data.m_dataUBIGINT);
                                           break;
+    case SQL_DECIMAL:                     // Fall through
     case SQL_C_NUMERIC:                   { bcd num(&m_data.m_dataNUMERIC);
                                             result = num.AsString(bcd::Format::Bookkeeping,false,0);
                                           }
@@ -967,6 +969,7 @@ SQLVariant::GetDataPointer() const
                                           break;
     case SQL_C_UBIGINT:                   data = reinterpret_cast<const void*>(&m_data.m_dataUBIGINT);
                                           break;
+    case SQL_DECIMAL:                     // Fall through
     case SQL_C_NUMERIC:                   data = reinterpret_cast<const void*>(&m_data.m_dataNUMERIC);
                                           break;
     case SQL_C_GUID:                      data = reinterpret_cast<const void*>(&m_data.m_dataGUID);
@@ -1021,6 +1024,7 @@ SQLVariant::GetDataSize() const
     case SQL_C_UTINYINT:                  return sizeof(unsigned char);
     case SQL_C_SBIGINT:                   // Fall through
     case SQL_C_UBIGINT:                   return sizeof(SQLBIGINT);
+    case SQL_DECIMAL:                     // Fall through
     case SQL_C_NUMERIC:                   return sizeof(SQL_NUMERIC_STRUCT);
     case SQL_C_GUID:                      return sizeof(SQLGUID);
     case SQL_C_DATE:                      // Fall through
@@ -1127,6 +1131,7 @@ SQLVariant::GetAsSShort() const
     case SQL_C_UTINYINT: return (short)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SQL_BIGINTToShort(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return SQL_UBIGINTToShort(m_data.m_dataUBIGINT);
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return SQL_SLongToShort(num.AsLong());
                          }
@@ -1184,6 +1189,7 @@ SQLVariant::GetAsUShort() const
     case SQL_C_UTINYINT: return (unsigned short)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SQL_BIGINTToUShort(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return SQL_UBIGINTToUShort(m_data.m_dataUBIGINT);
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return SQL_SLongToUShort(num.AsLong());
                          }
@@ -1242,6 +1248,7 @@ SQLVariant::GetAsSLong() const
     case SQL_C_UTINYINT: return (long)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SQL_BIGINTToLong(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return SQL_UBIGINTToLong(m_data.m_dataUBIGINT);
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsLong();
                          }
@@ -1300,6 +1307,7 @@ SQLVariant::GetAsULong() const
     case SQL_C_UTINYINT: return (unsigned long)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SQL_BIGINTToULong(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return SQL_UBIGINTToULong(m_data.m_dataUBIGINT);
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return SQL_BIGINTToULong(num.AsInt64());
                          }
@@ -1358,6 +1366,7 @@ SQLVariant::GetAsFloat() const
     case SQL_C_UTINYINT: return (float)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return (float)m_data.m_dataSBIGINT;
     case SQL_C_UBIGINT:  return (float)m_data.m_dataUBIGINT;
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC); 
                            return (float)num.AsDouble();
                          }
@@ -1415,6 +1424,7 @@ SQLVariant::GetAsDouble() const
     case SQL_C_UTINYINT: return (double)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return (double)m_data.m_dataSBIGINT;
     case SQL_C_UBIGINT:  return (double)m_data.m_dataUBIGINT;
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsDouble();
                          }
@@ -1475,6 +1485,7 @@ SQLVariant::GetAsBit() const
     case SQL_C_UTINYINT: return m_data.m_dataUTINYINT != 0;
     case SQL_C_SBIGINT:  return m_data.m_dataSBIGINT  != 0L;
     case SQL_C_UBIGINT:  return m_data.m_dataUBIGINT  != 0L;
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsLong() != 0;
                          }
@@ -1536,6 +1547,7 @@ SQLVariant::GetAsSTinyInt() const
     case SQL_C_UTINYINT: return SQL_UTinyIntToTinyInt(m_data.m_dataUTINYINT);
     case SQL_C_SBIGINT:  return SQL_SBIGINTToTinyInt(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return SQL_UBIGINTToTinyInt(m_data.m_dataUBIGINT);
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return SQL_SLongToTinyInt(num.AsLong());
                          }
@@ -1597,6 +1609,7 @@ SQLVariant::GetAsUTinyInt() const
     case SQL_C_UTINYINT: return m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SQL_SBIGINTToUTinyInt(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return SQL_UBIGINTToUTinyInt(m_data.m_dataUBIGINT);
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return SQL_SLongToUTinyInt(num.AsLong());
                          }
@@ -1657,6 +1670,7 @@ SQLVariant::GetAsSBigInt() const
     case SQL_C_UTINYINT: return (SQLBIGINT)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return m_data.m_dataSBIGINT;
     case SQL_C_UBIGINT:  return SQL_UBIGINTToBIGINT(m_data.m_dataUBIGINT);
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsInt64();
                          }
@@ -1717,6 +1731,7 @@ SQLVariant::GetAsUBigInt() const
     case SQL_C_UTINYINT: return (SQLUBIGINT)m_data.m_dataUTINYINT;
     case SQL_C_SBIGINT:  return SQL_SBIGINTToUBIGINT(m_data.m_dataSBIGINT);
     case SQL_C_UBIGINT:  return m_data.m_dataUBIGINT;
+    case SQL_DECIMAL:    // Fall through
     case SQL_C_NUMERIC:  { bcd num(&m_data.m_dataNUMERIC);
                            return num.AsUInt64();
                          }

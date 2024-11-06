@@ -206,6 +206,16 @@ SQLPrimaryKey::GetCondition()
   return condition;
 }
 
+void 
+SQLPrimaryKey::AddField(XString p_field,SQLVariant& p_value)
+{
+  SQLVariant* value = new SQLVariant(p_value);
+
+  m_fields.push_back(p_field);
+  m_values.push_back(value);
+  m_status = PKStatus::PK_Created;
+}
+
 void
 SQLPrimaryKey::AddValue(SQLVariant* p_val,bool p_replace /*=false*/)
 {

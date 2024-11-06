@@ -372,6 +372,7 @@ SQLQuery::ReportQuerySpeed(LARGE_INTEGER p_start)
 void
 SQLQuery::InternalSetParameter(int p_num,SQLVariant* p_param,SQLParamType p_type /*=P_SQL_PARAM_INPUT*/)
 {
+  p_param->SetColumnNumber(p_num);
   p_param->SetParameterType(p_type);
   VarMap::iterator it = m_parameters.find(p_num);
   if(it == m_parameters.end())
@@ -1053,7 +1054,7 @@ SQLQuery::BindParameters()
     }
 
     // Fix max length parameters for some database types
-    m_database->GetSQLInfoDB()->DoBindParameterFixup(sqlDatatype,columnSize,scale,bufferSize,indicator);
+    m_database->GetSQLInfoDB()->DoBindParameterFixup(dataType,sqlDatatype,columnSize,scale,bufferSize,indicator);
 
     // Log what we bind here
     if(logging)
@@ -2086,7 +2087,7 @@ SQLQuery::DoSQLCall(XString p_schema,XString p_procedure,bool p_hasReturn /*=fal
     {
       return DoSQLCallODBCNamedParameters(p_schema,p_procedure,p_hasReturn);
     }
-    return m_database->GetSQLInfoDB()->DoSQLCallNamedParameters(this,p_schema,p_procedure);
+    return m_database->GetSQLInfoDB()->DoSQLCallNamedParameters(this,p_schema,p_procedure,p_hasReturn);
   }
 
   // Is we support standard ODBC, do that call
