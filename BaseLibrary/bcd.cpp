@@ -50,10 +50,12 @@
 #include <locale.h>
 #include <winnls.h>
 
+#ifdef _AFX
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
+#endif
 #endif
 
 // Theoretical maximum of numerical separators
@@ -2428,9 +2430,12 @@ bcd::AsLong() const
 
   // Adjust to exponent
   int exponent = 2 * bcdDigits - m_exponent - 1;
-  while(exponent--)
+  if(exponent > 0)
   {
-    result /= 10;
+    while(exponent--)
+    {
+      result /= 10;
+    }
   }
 
   // Take care of sign and over/under flows

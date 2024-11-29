@@ -34,10 +34,12 @@
 #include <strsafe.h>
 #include <io.h>
 
+#ifdef _AFX
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
+#endif
 #endif
 
 // Name of the event log category in the WMI
@@ -135,7 +137,7 @@ RegisterMessagesDllForService(XString p_serviceName,XString p_messageDLL,XString
                    0,                              // must be zero 
                    REG_EXPAND_SZ,                  // value type 
                    (LPBYTE) pathname.GetString(),  // pointer to value data 
-                   (DWORD)  pathname.GetLength())) // data size
+                   (DWORD)  pathname.GetLength() * sizeof(TCHAR))) // data size
   {
     p_error = _T("Could not set the logging \"EventMessageFile\" value.\n"); 
     RegCloseKey(hk); 
@@ -216,7 +218,10 @@ IsMessageDLLRegistered(XString p_serviceName)
   memset(szBuf,0,MAX_PATH);
   if(RegQueryValueEx(hk,_T("EventMessageFile"),NULL,&type,(LPBYTE)szBuf,(LPDWORD)&size) == ERROR_SUCCESS)
   {
-    result = true;
+    if(_taccess(szBuf,0) == 0)
+    {
+      result = true;
+    }
   }
   RegCloseKey(hk);
   return result;
