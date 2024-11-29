@@ -2149,8 +2149,14 @@ XString
 SQLInfoFirebird::GetPSMProcedureExists(XString /*p_schema*/, XString p_procedure) const
 {
   p_procedure.MakeUpper();
-  XString query = (_T("SELECT (SELECT COUNT(*) FROM rdb$functions  WHERE rdb$function_name  = '") + p_procedure + _T("')\n")
-                   _T("     + (SELECT COUNT(*) FROM rdb$procedures WHERE rdb$procedure_name = '") + p_procedure + _T("') as total\n")
+  XString query = (_T("SELECT (SELECT COUNT(*)\n")
+                   _T("  FROM rdb$functions\n")
+                   _T(" WHERE rdb$function_name  = '") + p_procedure + _T("')\n")
+                   _T("   AND rdb$function_type IS NOT NULL\n")
+                   _T("     + (SELECT COUNT(*)\n")
+                   _T("  FROM rdb$procedures\n")
+                   _T(" WHERE rdb$procedure_name = '") + p_procedure + _T("') as total\n")
+                   _T("   AND rdb$procedure_source IS NOT NULL\n")
                    _T("  FROM rdb$database"));
   return query;
 }
@@ -2159,25 +2165,27 @@ XString
 SQLInfoFirebird::GetPSMProcedureList(XString& p_schema) const
 {
   p_schema.MakeUpper();
-  XString sql1(_T("SELECT '' as catalog_name\n"
-                  "      ,trim(rdb$owner_name) as schema_name\n"
-                  "      ,trim(rdb$procedure_name)\n"
-                  "      ,1\n"
-                  "  FROM rdb$procedures pro\n"));
+  XString sql1(_T("SELECT '' as catalog_name\n")
+               _T("      ,trim(rdb$owner_name) as schema_name\n")
+               _T("      ,trim(rdb$procedure_name)\n")
+               _T("      ,1\n")
+               _T("  FROM rdb$procedures pro\n")
+               _T(" WHERE rdb$procedure_source IS NOT NULL\n"));
   if(!p_schema.IsEmpty())
   {
-    sql1 += _T(" WHERE pro.rdb$owner_name = '") + p_schema + _T("'\n");
+    sql1 += _T("   AND pro.rdb$owner_name = '") + p_schema + _T("'\n");
   }
 
-  XString sql2(_T("SELECT '' as catalog_name\n"
-                  "      ,trim(rdb$owner_name) as schema_name\n"
-                  "      ,trim(rdb$function_name)\n"
-                  "      ,2\n"
-                  "  FROM rdb$functions fun\n"));
+  XString sql2(_T("SELECT '' as catalog_name\n")
+               _T("      ,trim(rdb$owner_name) as schema_name\n")
+               _T("      ,trim(rdb$function_name)\n")
+               _T("      ,2\n")
+               _T("  FROM rdb$functions fun\n")
+               _T(" WHERE rdb$function_type IS NOT NULL\n"));
 
   if(!p_schema.IsEmpty())
   {
-    sql2 += _T(" WHERE fun.rdb$owner_name = '") + p_schema + _T("'\n");
+    sql2 += _T("   AND fun.rdb$owner_name = '") + p_schema + _T("'\n");
   }
 
   p_schema.Empty(); // Do not bind parameters
@@ -2189,54 +2197,56 @@ SQLInfoFirebird::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedur
 {
   p_schema.Empty(); // Do not bind as a parameter
   p_procedure.MakeUpper();
-  XString sql1(_T("SELECT '' as catalog_name\n"
-                "      ,trim(rdb$owner_name) as schema_name\n"
-                "      ,trim(rdb$procedure_name)\n"
-                "      ,(SELECT COUNT(*)\n"
-                "          FROM rdb$procedure_parameters par\n"
-                "         WHERE par.rdb$procedure_name = pro.rdb$procedure_name\n"
-                "           AND par.rdb$parameter_type = 0) as input_parameters\n"
-                "      ,(SELECT COUNT(*)\n"
-                "          FROM rdb$procedure_parameters par\n"
-                "         WHERE par.rdb$procedure_name = pro.rdb$procedure_name\n"
-                "           AND par.rdb$parameter_type = 1) as output_parameters\n"
-                "      ,(SELECT COUNT(*)\n"
-                "          FROM rdb$procedure_parameters par\n"
-                "         WHERE par.rdb$procedure_name = pro.rdb$procedure_name\n"
-                "           AND par.rdb$parameter_type = 1) as result_sets\n"
-                "      ,rdb$description\n"
-                "      ,1 as procedure_type\n" // SQL_PROCEDURE
-                "      ,rdb$procedure_source as source\n"
-                "  FROM rdb$procedures pro\n"));
+  XString sql1(_T("SELECT '' as catalog_name\n")
+               _T("      ,trim(rdb$owner_name) as schema_name\n")
+               _T("      ,trim(rdb$procedure_name)\n")
+               _T("      ,(SELECT COUNT(*)\n")
+               _T("          FROM rdb$procedure_parameters par\n")
+               _T("         WHERE par.rdb$procedure_name = pro.rdb$procedure_name\n")
+               _T("           AND par.rdb$parameter_type = 0) as input_parameters\n")
+               _T("      ,(SELECT COUNT(*)\n")
+               _T("          FROM rdb$procedure_parameters par\n")
+               _T("         WHERE par.rdb$procedure_name = pro.rdb$procedure_name\n")
+               _T("           AND par.rdb$parameter_type = 1) as output_parameters\n")
+               _T("      ,(SELECT COUNT(*)\n")
+               _T("          FROM rdb$procedure_parameters par\n")
+               _T("         WHERE par.rdb$procedure_name = pro.rdb$procedure_name\n")
+               _T("           AND par.rdb$parameter_type = 1) as result_sets\n")
+               _T("      ,rdb$description\n")
+               _T("      ,1 as procedure_type\n") // SQL_PROCEDURE
+               _T("      ,rdb$procedure_source as source\n")
+               _T("  FROM rdb$procedures pro\n")
+               _T(" WHERE rdb$procedures_source IS NOT NULL\n"));
 
-  XString sql2 (_T("SELECT '' as catalog_name\n"
-                "      ,trim(rdb$owner_name) as schema_name\n"
-                "      ,trim(rdb$function_name)\n"
-                "      ,(SELECT COUNT(*)\n"
-                "          FROM rdb$function_arguments arg\n"
-                "         WHERE fun.rdb$function_name = arg.rdb$function_name\n"
-                "           AND arg.rdb$argument_position > 0) as input_parameters\n"
-                "      ,(SELECT COUNT(*)\n"
-                "          FROM rdb$function_arguments arg\n"
-                "         WHERE fun.rdb$function_name = arg.rdb$function_name\n"
-                "           AND arg.rdb$argument_position = 0) as output_parameters\n"
-                "      ,(SELECT COUNT(*)\n"
-                "          FROM rdb$function_arguments arg\n"
-                "         WHERE fun.rdb$function_name = arg.rdb$function_name\n"
-                "           AND arg.rdb$argument_position > 0) as result_sets\n"
-                "      ,rdb$description\n"
-                "      ,2 as procedure_type\n" // SQL_FUNCTION
-                "      ,rdb$function_source as source\n"
-                "  FROM rdb$functions fun\n"));
+  XString sql2 (_T("SELECT '' as catalog_name\n")
+                _T("      ,trim(rdb$owner_name) as schema_name\n")
+                _T("      ,trim(rdb$function_name)\n")
+                _T("      ,(SELECT COUNT(*)\n")
+                _T("          FROM rdb$function_arguments arg\n")
+                _T("         WHERE fun.rdb$function_name = arg.rdb$function_name\n")
+                _T("           AND arg.rdb$argument_position > 0) as input_parameters\n")
+                _T("      ,(SELECT COUNT(*)\n")
+                _T("          FROM rdb$function_arguments arg\n")
+                _T("         WHERE fun.rdb$function_name = arg.rdb$function_name\n")
+                _T("           AND arg.rdb$argument_position = 0) as output_parameters\n")
+                _T("      ,(SELECT COUNT(*)\n")
+                _T("          FROM rdb$function_arguments arg\n")
+                _T("         WHERE fun.rdb$function_name = arg.rdb$function_name\n")
+                _T("           AND arg.rdb$argument_position > 0) as result_sets\n")
+                _T("      ,rdb$description\n")
+                _T("      ,2 as procedure_type\n") // SQL_FUNCTION
+                _T("      ,rdb$function_source as source\n")
+                _T("  FROM rdb$functions fun\n")
+                _T(" WHERE rdb$function_type IS NOT NULL\n"));
 
   if(!p_procedure.IsEmpty())
   {
     // Bind as 2 parameters.
     p_schema = p_procedure;
-    sql1 += _T(" WHERE rdb$procedure_name = ?\n");
-    sql2 += _T(" WHERE rdb$function_name  = ?\n");
+    sql1 += _T("   AND rdb$procedure_name = ?\n");
+    sql2 += _T("   AND rdb$function_name  = ?\n");
   }
-  return sql1 + _T(" UNION ALL\n") + sql2;
+  return sql1 + _T(" UNION ALL\n") + sql2 + _T(" ORDER BY 1,2,3");;
 }
 
 XString
@@ -2418,7 +2428,7 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                 "       END                                         as sql_data_type\n"
                 "      ,CAST(0 AS SMALLINT)                         as sql_datetime_sub\n"
                 "      ,fld.rdb$field_length / rdb$character_length as char_octet_length\n"
-                "      ,par.rdb$parameter_number + par.rdb$parameter_type as ordinal_position\n"
+                "      ,par.rdb$parameter_number + par.rdb$parameter_type + 1 as ordinal_position\n"
                 "      ,CASE (coalesce(par.rdb$null_flag,0,0)-1)*-1\n"
                 "            WHEN 0 THEN 'NO'\n"
                 "            WHEN 1 THEN 'YES'\n"
