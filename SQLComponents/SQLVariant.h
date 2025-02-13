@@ -150,7 +150,7 @@ public:
    int     FindDataTypeFromSQLType() const;
 
    // Access per type
-   TCHAR*               GetAsChar() const;
+   char*                GetAsChar() const;
    XString              GetAsString() const;
    void                 GetAsString(XString& p_result) const;
    void*                GetAsBinary() const;
@@ -273,7 +273,7 @@ public:
    // Cast operators
    operator bool();
    operator char();
-   operator LPCTSTR();
+   operator LPCSTR();
    operator uchar();
    operator short();
    operator unsigned short();

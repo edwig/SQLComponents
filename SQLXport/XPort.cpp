@@ -1053,8 +1053,11 @@ XPort::GetDefineRowInsert(XString p_table)
 {
   XString insert(_T("INSERT INTO "));
 
-  insert += m_schema;
-  insert += _T(".");
+  if(!m_schema.IsEmpty())
+  {
+    insert += m_schema;
+    insert += _T(".");
+  }
   insert += p_table;
   insert += _T("\n(");
 

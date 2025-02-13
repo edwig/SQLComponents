@@ -516,9 +516,9 @@ SQLVariant::operator uchar()
   return GetAsUTinyInt();
 }
 
-SQLVariant::operator LPCTSTR()
+SQLVariant::operator LPCSTR()
 {
-  return (LPCTSTR)GetAsChar();
+  return (LPCSTR)GetAsChar();
 }
 
 SQLVariant::operator short()
@@ -598,9 +598,7 @@ SQLVariant::operator SQLGuid()
 
 SQLVariant::operator XString()
 {
-  XString string;
-  GetAsString(string);
-  return string;
+  return GetAsString();
 }
 
 SQLVariant::operator bcd()

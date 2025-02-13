@@ -1446,6 +1446,12 @@ SQLDataSet::Synchronize(int p_mutationID /*=0*/,bool p_throw /*=false*/)
     // Nothing to do: all OK.
     return true;
   }
+  // Check preliminary conditions
+  if(m_primaryTableName.IsEmpty())
+  {
+    // Needs the primary table name of the dataset
+    return false;
+  }
   if(m_status & (SQL_Record_Deleted | SQL_Record_Updated))
   {
     if(!GetPrimaryKeyInfo()     ||    // Needs primary key info for doing updates/deletes

@@ -1235,7 +1235,7 @@ SQLDatabase::StartTransaction(SQLTransaction* p_transaction, bool p_startSubtran
         {
           SQLQuery rs(this);
           rs.DoSQLStatement(startSubtrans);
-          TRACE("Start transaction: %s\n",startSubtrans.GetString());
+          // TRACE("Start transaction: %s\n",startSubtrans.GetString());
         }
         catch(StdException& err)
         {

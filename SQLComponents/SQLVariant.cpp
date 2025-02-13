@@ -1057,14 +1057,16 @@ SQLVariant::GetDataSize() const
 //////////////////////////////////////////////////////////////////////////
 
 // Here for backward compatibility reasons!!
-TCHAR*
+// ONLY TO BE USED IN ANSI BUILDS !!!
+char*
 SQLVariant::GetAsChar() const
 {
   if(m_indicator == SQL_NULL_DATA)
   {
-    return (TCHAR*)_T("");
+    static char empty[1] = { 0 };
+    return empty;
   }
-  return (TCHAR*)m_data.m_dataCHAR;
+  return m_data.m_dataCHAR;
 }
 
 XString

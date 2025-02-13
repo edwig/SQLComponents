@@ -138,18 +138,6 @@ Parameters::CheckArguments()
     }
   }
 
-  if(!m_object.IsEmpty() && m_object.Find(',') > 0)
-  {
-    m_multiple = true;
-    MakeMultipleObjectQuery();
-  }
-
-//   if(!m_object.IsEmpty() && m_object.Find('%') > 0)
-//   {
-//     m_multiple = true;
-//     MakeMultipleObjectSelect();
-//   }
-
   if(m_export)
   {
     if(m_drop)
@@ -218,7 +206,6 @@ Parameters::Usage()
   xprintf(false, _T("/FILE:<filename>     Name of the file the export goes into/import comes from\n"));
   xprintf(false, _T("/SCHEMA:<schemaname> Name of the schema that's been exported (export only)\n"));
   xprintf(false, _T("/OBJECT:<objectname> Name of the object to be exported or imported\n"));
-  xprintf(false, _T("                     You can use multiple objects delimited by a ',' char\n"));
   xprintf(false, _T("/FILTER:<filter>     Extra filter to select data rows (export only)\n"));
   xprintf(false, _T("/PARAMS:<filename>   File with these parameters\n"));
   xprintf(false, _T("/DROP                Drop schema contents (import only)\n"));
@@ -341,51 +328,6 @@ Parameters::CloseLogfile()
 // PRIVATE
 //
 //////////////////////////////////////////////////////////////////////////
-
-void
-Parameters::MakeMultipleObjectQuery()
-{
-  XString objects(_T("IN ("));
-  int pos = m_object.Find(',');
-  int count = 0;
-
-  while(pos >= 0)
-  {
-    ++count;
-
-    // Find next object
-    XString first = m_object.Left(pos);
-    m_object = m_object.Mid(pos + 1);
-
-    // Put object in objects string
-    if(count > 1)
-    {
-      objects += _T(",");
-    }
-    objects += _T("\'");
-    objects += first;
-    objects += _T("\'");
-
-    // Find next delimiter
-    pos = m_object.Find(',');
-    if(pos < 0)
-    {
-      objects += _T(",\'") + m_object + _T("\'");
-    }
-  }
-  // Finalize
-  m_object = objects + _T(")");
-}
-
-void
-Parameters::MakeMultipleObjectSelect()
-{
-  XString objects(_T("LIKE '"));
-  objects += m_object;
-  objects += _T("'\n");
-
-  m_object = objects;
-}
 
 // See if the executable is renamed "import" or "export"
 // So we do not have to specify the direction

@@ -77,7 +77,6 @@ public:
   bool    m_stripDiacs { false };
   int     m_commitRange{ DATA_COMMIT_RANGE_DEFAULT };
   // Export options
-  bool    m_multiple   { false };
   bool    m_rows       { true  };
   bool    m_constraints{ true  };
   bool    m_source     { true  };
@@ -94,8 +93,6 @@ public:
   bool    m_noHang     { false   };
 
 private:
-  void MakeMultipleObjectQuery();
-  void MakeMultipleObjectSelect();
   void FindDirection();
   void ProcessOneParameter(XString p_parameter);
 };
