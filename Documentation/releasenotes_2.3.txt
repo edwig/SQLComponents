@@ -3,10 +3,13 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.3
 ===== Released since: 06-09-2023 =====
 ======================================
 
-Version 2.3.2 of XX-XX-XXXX
+Version 2.3.2 of 17-02-2025
 ---------------------------
-1)  SQLVariant::GetAsChar() now no longer returns a XString, but a TCHAR*
+1)  SQLVariant::GetAsChar() now no longer returns a XString, but a char*
     in order to return correct string literals from the ODBC driver
+    It's meant to be ONLY for ANSI builds, as it will not work in UNICODE builds
+    All instances of "GetAsChar()" in this library has been replaced with
+    calls to 'GetAsString()'
 2)  Fix for SQLVariantFormat::StringDecimalValue in case a string does not
     contain a number and cannot be converted to a bcd number
 
