@@ -1276,7 +1276,7 @@ SQLQuery::BindColumns()
     type = RebindColumn(type);
 
     // Bind columns up to the first long column
-    if(m_hasLongColumns == 0 || bcol < m_hasLongColumns)
+    if(!var->GetAtExec())
     {
       m_retCode = SQLBindCol(m_hstmt                    // statement handle
                              ,bcol                       // Column number
@@ -1284,7 +1284,7 @@ SQLQuery::BindColumns()
                              ,const_cast<SQLPOINTER>(var->GetDataPointer())      // Data pointer
                              ,size                       // Buffer length
                              ,var->GetIndicatorPointer() // Indicator address
-      );
+                            );
       if(!SQL_SUCCEEDED(m_retCode))
       {
         GetLastError(_T("Cannot bind to column. Error: "));
@@ -1297,7 +1297,7 @@ SQLQuery::BindColumns()
         BindColumnNumeric((SQLSMALLINT)bcol,var,SQL_RESULT_COL);
       }
     }
-    else
+    if(m_hasLongColumns && (bcol > m_hasLongColumns))
     {
       if(type == SQL_C_NUMERIC && 
          m_database && ((m_database->GetSQLInfoDB()->GetGetDataExtensions() & SQL_GD_BOUND) == 0) && 
