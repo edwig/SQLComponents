@@ -4,7 +4,7 @@
 //
 // BaseLibrary: Indispensable general objects and functions
 // 
-// Copyright (c) 2014-2024 ir. W.E. Huisman
+// Copyright (c) 2014-2025 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1191,6 +1191,12 @@ HTTPMessage::SetMultiPartBuffer(MultiPartBuffer* p_buffer)
 // HTTPMessages can be stored elsewhere. Use the reference mechanism to add/drop references
 // With the drop of the last reference, the object WILL destroy itself
 
+long
+HTTPMessage::GetReferences()
+{
+  return m_references;
+}
+
 void
 HTTPMessage::AddReference()
 {
@@ -1209,6 +1215,7 @@ HTTPMessage::DropReference()
     }
     catch(StdException&)
     {
+      return true;
     }
   }
   return false;

@@ -4,7 +4,7 @@
 //
 // BaseLibrary: Indispensable general objects and functions
 // 
-// Copyright (c) 2014-2024 ir. W.E. Huisman
+// Copyright (c) 2014-2025 ir. W.E. Huisman
 // All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -149,6 +149,7 @@ public:
   bool    GetLogRotation()                     { return m_rotate;     }
   int     GetKeepfiles()                       { return m_keepfiles;  }
   bool    GetBackgroundWriter()                { return m_useWriter;  }
+  HANDLE  GetBackgroundWriterThread()          { return m_logThread;  }
   int     GetCacheSize();
   int     GetCacheMaxSize();
 
