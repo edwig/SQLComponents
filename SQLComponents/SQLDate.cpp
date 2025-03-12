@@ -461,12 +461,6 @@ SQLDate::CalculateDate(const XString& p_datum)
     return true;
   }
 
-  // Check input if we should do any work
-  if(!AcceptableDateString(datum))
-  {
-    throw StdException(_T("Date has a wrong format"));
-  }
-
   // Test if we are properly initialized
   SQLComponentsInitialized();
 
@@ -527,6 +521,12 @@ SQLDate::CalculateDate(const XString& p_datum)
     int jaar  = 0;
     int maand = 0;
     int dag   = 0;
+
+    // Check input if we should do any work
+//     if(!AcceptableDateString(datum))
+//     {
+//       throw StdException(_T("Date has a wrong format"));
+//     }
 
     if(ShortDate(datum,jaar,maand,dag))
     {
