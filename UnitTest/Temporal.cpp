@@ -358,7 +358,7 @@ namespace DatabaseUnitTest
         SQLTimestamp  stamp(_T("28-02-2022 13:12:11.678"));
         CString expect     (_T("28-02-2022 13:12:11"));
         CString expectLocal(_T("2022-02-28T13:12:11.67800"));
-        CString expectUTC  (_T("2022-02-28T1:12:11.67800Z"));
+        CString expectUTC  (_T("2022-02-28T11:12:11.67800Z"));
         CString expectTZ   (_T("2022-02-28T13:12:11.68-02:00"));
 
         CString stampString = stamp.AsString();
@@ -432,6 +432,29 @@ namespace DatabaseUnitTest
       Assert::AreEqual(_T("octobre"),in_french);
 
       number_of_tests += 4;
+    }
+
+    TEST_METHOD(TimestampsUTC)
+    {
+      Logger::WriteMessage(_T("Test if UTC is correctly put in a string"));
+      InitSQLComponents();
+      SetDefaultSQLLanguage(LN_ENGLISH);
+
+      SQLTimestamp now = SQLTimestamp::CurrentTimestamp(true);
+      SQLTimestamp gmt = now;
+
+      XString nowString = now.AsXMLString();
+      XString gmtString = now.AsXMLStringUTC();
+      XString last = gmtString.Right(1);
+
+      Assert::AreNotEqual(nowString.GetString(),gmtString.GetString());
+      Assert::AreEqual(last.GetString(),_T("Z"));
+
+      SQLTimestamp back(gmtString);
+      XString localtime = back.AsXMLString();
+      Assert::AreEqual(nowString.GetString(),localtime.GetString());
+
+      number_of_tests += 3;
     }
 
   };
