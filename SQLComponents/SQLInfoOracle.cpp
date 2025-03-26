@@ -2853,7 +2853,7 @@ SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,XString& p_schema,XStr
     }
   }
   sql += _T(");\n  END;");
-  if(!p_procedure)
+  if(p_function)
   {
     sql += _T("\nEND;");
   }
