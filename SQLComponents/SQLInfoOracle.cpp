@@ -756,8 +756,11 @@ XString
 SQLInfoOracle::GetCATALOGDefaultCollation() const
 {
   XString nlslang;
-  nlslang.GetEnvironmentVariable(_T("NLS_LANG"));
-  return nlslang;
+  if(nlslang.GetEnvironmentVariable(_T("NLS_LANG")))
+  {
+    return nlslang;
+  }
+  return XString();
 }
 
 // Get SQL to check if a table already exists in the database
@@ -2853,7 +2856,7 @@ SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,XString& p_schema,XStr
     }
   }
   sql += _T(");\n  END;");
-  if(!p_procedure)
+  if(p_function)
   {
     sql += _T("\nEND;");
   }
