@@ -104,6 +104,8 @@ public:
     FillConnections(conn);
     conn.SaveConnectionsFile();
 
+    m_pool.ReadConnections();
+
     // Extra scope to test auto pointer
     {
       SQLAutoDBS dbs(m_pool,_T("MyConn"));
