@@ -169,7 +169,7 @@ namespace DatabaseUnitTest
     }
 
     // For DATASET tests
-    double TestAppend(SQLDatabase* p_dbs,int p_master)
+    bcd TestAppend(SQLDatabase* p_dbs,int p_master)
     {
       XString msg;
       Logger::WriteMessage("Testing the DataSet append function:");
@@ -235,7 +235,7 @@ namespace DatabaseUnitTest
       return info.m_sum;
     }
 
-    double ReadDetailSet(SQLDatabase* p_dbs,int p_master)
+    bcd ReadDetailSet(SQLDatabase* p_dbs,int p_master)
     {
       XString msg;
       SQLDataSet details(_T("detail"),p_dbs);
@@ -284,7 +284,7 @@ namespace DatabaseUnitTest
       return info.m_sum;
     }
 
-    double ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
+    double ReadMasterSet(SQLDatabase* p_dbs,int p_master,bcd p_amount)
     {
       XString msg;
       SQLDataSet master(_T("master"),p_dbs);
@@ -320,7 +320,7 @@ namespace DatabaseUnitTest
 
       // Change field
       SQLRecord* record = master.GetRecord(0);
-      SQLVariant var(p_amount);
+      SQLVariant var(&p_amount);
       record->ModifyField(fieldnum,&var,1);
       number_of_tests++;
 
@@ -357,8 +357,8 @@ namespace DatabaseUnitTest
           Logger::WriteMessage("Database opened.");
 
           long   master = 2;
-          double amount = 0.0;
-          double total  = 0.0;
+          bcd    amount;
+          bcd    total;
           amount = ReadDetailSet(&dbs,master);
           total  = ReadMasterSet(&dbs,master,amount);
 

@@ -32,7 +32,7 @@
 #define new DEBUG_NEW
 #endif
 
-double
+bcd
 TestAppend(SQLDatabase* p_dbs,int p_master)
 {
   _tprintf(_T("Testing the DataSet append function:\n"));
@@ -66,11 +66,14 @@ TestAppend(SQLDatabase* p_dbs,int p_master)
   details.Aggregate(column,info);
 
   _tprintf(_T("Aggregation of the field 'amount':\n")
-         _T("- sum  = %14.2f\n")
-         _T("- max  = %14.2f\n")
-         _T("- min  = %14.2f\n")
-         _T("- mean = %14.2f\n")
-         ,info.m_sum,info.m_max,info.m_min,info.m_mean);
+           _T("- sum  = %14.2f\n")
+           _T("- max  = %14.2f\n")
+           _T("- min  = %14.2f\n")
+           _T("- mean = %14.2f\n")
+           ,info.m_sum.AsDouble()
+           ,info.m_max.AsDouble()
+           ,info.m_min.AsDouble()
+           ,info.m_mean.AsDouble());
          
   _tprintf(_T("Testing the object cache\n"));
   SQLRecord* record = details.FindObjectRecord(8);       
@@ -81,7 +84,7 @@ TestAppend(SQLDatabase* p_dbs,int p_master)
 }
 
 
-double
+bcd
 ReadDetailSet(SQLDatabase* p_dbs,int p_master)
 {
   SQLDataSet details(_T("detail"),p_dbs);
@@ -115,16 +118,19 @@ ReadDetailSet(SQLDatabase* p_dbs,int p_master)
   details.Aggregate(column,info);
 
   _tprintf(_T("Aggregation of the field 'amount':\n")
-         _T("- sum  = %14.2f\n")
-         _T("- max  = %14.2f\n")
-         _T("- min  = %14.2f\n")
-         _T("- mean = %14.2f\n")
-        ,info.m_sum,info.m_max,info.m_min,info.m_mean);
+           _T("- sum  = %14.2f\n")
+           _T("- max  = %14.2f\n")
+           _T("- min  = %14.2f\n")
+           _T("- mean = %14.2f\n")
+           ,info.m_sum.AsDouble()
+           ,info.m_max.AsDouble()
+           ,info.m_min.AsDouble()
+           ,info.m_mean.AsDouble());
   return info.m_sum;
 }
 
 double
-ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
+ReadMasterSet(SQLDatabase* p_dbs,int p_master,bcd p_amount)
 {
   SQLDataSet master(_T("master"),p_dbs);
   master.SetPrimaryTable(_T(""),_T("master"));
@@ -153,7 +159,7 @@ ReadMasterSet(SQLDatabase* p_dbs,int p_master,double p_amount)
 
   // Change field
   SQLRecord* record = master.GetRecord(0);
-  SQLVariant var(p_amount);
+  SQLVariant var(&p_amount);
   record->ModifyField(fieldnum,&var,1);
 
   // TEST
@@ -186,8 +192,8 @@ TestDataSet()
       _tprintf(_T("Database opened.\n"));
 
       long   master = 2;
-      double amount = 0.0;
-      double total  = 0.0;
+      bcd    amount;
+      bcd    total;
       amount = ReadDetailSet(&dbs,master);
       total  = ReadMasterSet(&dbs,master,amount);
 
