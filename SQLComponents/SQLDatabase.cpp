@@ -116,7 +116,7 @@ SQLDatabase::Close()
   catch(...)
   {
     // Can go wrong in many places in the ODBC stack or the RDMBS drivers stack
-    LogPrint(_T("Closing the database\n"));
+    LogPrint(_T("Closing the database"));
   }
   // Empty parameter and column rebinding
   m_rebindParameters.clear();
@@ -743,7 +743,7 @@ SQLDatabase::RealDatabaseName()
   m_databaseName = databaseName;
   // Log the connection
   XString log;
-  log.Format(_T("Database connection at login => DATABASE: %s\n"),databaseName.GetString());
+  log.Format(_T("Database connection at login => DATABASE: %s"),databaseName.GetString());
   LogPrint(log);
   return result;
 }
@@ -944,7 +944,7 @@ SQLDatabase::FreeEnvHandle()
   if(Check(ret) == FALSE)
   {
     XString error = GetErrorString(0);
-    LogPrint(_T("Error at closing the database environment\n"));
+    LogPrint(_T("Error at closing the database environment"));
     LogPrint(error);
   }
   m_henv = SQL_NULL_HANDLE;
@@ -959,7 +959,7 @@ SQLDatabase::FreeDbcHandle()
   if(Check(ret) == FALSE)
   {
     XString error = GetErrorString(0);
-    LogPrint(_T("Error at closing the database\n"));
+    LogPrint(_T("Error at closing the database"));
     LogPrint(error);
   }
   // And free the handle
@@ -1178,7 +1178,7 @@ SQLDatabase::Check(INT nRetCode)
     case SQL_SUCCESS_WITH_INFO: if(WilLog())
                                 {
                                   XString error;
-                                  error.Format(_T("=> ODBC Success with info: %s\n"),GetErrorString().GetString());
+                                  error.Format(_T("=> ODBC Success with info: %s"),GetErrorString().GetString());
                                   LogPrint(error);
                                 }
     case SQL_SUCCESS:           // Fall through
@@ -1479,7 +1479,7 @@ SQLDatabase::CloseAllTransactions()
   if(Check(ret) == FALSE)
   {
     XString error = GetErrorString(0);
-    LogPrint(_T("Error in rollback at closing the database\n"));
+    LogPrint(_T("Error in rollback at closing the database"));
     LogPrint(error);
   }
 }
