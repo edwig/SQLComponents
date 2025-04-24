@@ -123,7 +123,7 @@ private:
   // Constructing the default operand
   void        ConstructOperand(XString& p_sql,SQLQuery& p_query);
   // Constructing the LIKE clause
-  void        ConstructLike(XString& p_sql);
+  void        ConstructLike(XString& p_sql,SQLQuery& p_query);
   // Constructing the IN clause
   void        ConstructIN(XString& p_sql,SQLQuery& p_query);
   // Constructing the BETWEEN clause
