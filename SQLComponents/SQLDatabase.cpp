@@ -698,6 +698,11 @@ SQLDatabase::RealDatabaseName()
     databaseName.ReleaseBuffer();
     m_namingMethod = _T("ODBC server name");
   }
+  // Find Firebird IP database
+  if(databaseName.Find(_T(":")) >= 0)
+  {
+    databaseName = databaseName.Mid(databaseName.Find(_T(":")) + 1);
+  }
   // Strip physical name for text sources 
   // Such as: DB3, FoxBase, Firebird, MS-Access, MS-Excel, PostgreSQL
   if(databaseName.Find(_T(".")) >= 0)
