@@ -70,8 +70,8 @@ namespace OperatorUnitTest
       TestFilter(_T("fieldname"),OP_SmallerEqual,valNumber,_T("fieldname <= ? : 123"));
 
       TestFilter(_T("fieldname"),OP_IsNULL,    valText,_T("fieldname IS NULL : Text"));
-      TestFilter(_T("fieldname"),OP_LikeBegin, valText,_T("fieldname LIKE 'Text%' : Text"));
-      TestFilter(_T("fieldname"),OP_LikeMiddle,valText,_T("fieldname LIKE '%Text%' : Text"));
+      TestFilter(_T("fieldname"),OP_LikeBegin, valText,_T("fieldname LIKE ? : Text"));
+      TestFilter(_T("fieldname"),OP_LikeMiddle,valText,_T("fieldname LIKE ? : Text"));
 
       TestBetween(_T("fieldname"),OP_Between,valText,  valTextExtra, _T("fieldname BETWEEN ? AND ?  : Text : ZZZ"));
       TestBetween(_T("fieldname"),OP_Between,valNumber,valNumberHigh,_T("fieldname BETWEEN ? AND ?  : 123 : 999"));
@@ -92,8 +92,8 @@ namespace OperatorUnitTest
       TestNegate(_T("fieldname"),OP_SmallerEqual,valNumber,_T("NOT fieldname <= ? : 123"));
 
       TestNegate(_T("fieldname"),OP_IsNULL,    valText,_T("NOT fieldname IS NULL : Text"));
-      TestNegate(_T("fieldname"),OP_LikeBegin, valText,_T("NOT fieldname LIKE 'Text%' : Text"));
-      TestNegate(_T("fieldname"),OP_LikeMiddle,valText,_T("NOT fieldname LIKE '%Text%' : Text"));
+      TestNegate(_T("fieldname"),OP_LikeBegin, valText,_T("NOT fieldname LIKE ? : Text"));
+      TestNegate(_T("fieldname"),OP_LikeMiddle,valText,_T("NOT fieldname LIKE ? : Text"));
     }
 
     void TestFilter(XString p_field,SQLOperator p_oper,SQLVariant& p_variant,XString p_expect)
