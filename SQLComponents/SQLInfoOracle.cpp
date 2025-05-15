@@ -483,7 +483,7 @@ SQLInfoOracle::GetSQLStartSubTransaction(XString p_savepointName) const
 }
 
 XString
-SQLInfoOracle::GetSQLCommitSubTransaction(XString p_savepointName) const
+SQLInfoOracle::GetSQLCommitSubTransaction(XString /*p_savepointName*/) const
 {
   // There is no savepoint commit in Oracle!!
   return _T("");
@@ -1208,7 +1208,7 @@ SQLInfoOracle::GetCATALOGColumnDrop(XString p_schema,XString p_tablename,XString
 
 // All index functions
 XString
-SQLInfoOracle::GetCATALOGIndexExists(XString p_schema,XString p_tablename,XString p_indexname) const
+SQLInfoOracle::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_indexname*/) const
 {
   return _T("");
 }
@@ -1923,7 +1923,7 @@ SQLInfoOracle::GetCATALOGTriggerCreate(MetaTrigger& p_trigger) const
 }
 
 XString
-SQLInfoOracle::GetCATALOGTriggerDrop(XString p_schema, XString p_tablename, XString p_triggername) const
+SQLInfoOracle::GetCATALOGTriggerDrop(XString /*p_schema*/, XString /*p_tablename*/, XString /*p_triggername*/) const
 {
   return _T("");
 }
@@ -2126,7 +2126,7 @@ SQLInfoOracle::GetCATALOGViewCreate(XString p_schema,XString p_viewname,XString 
 }
 
 XString 
-SQLInfoOracle::GetCATALOGViewRename(XString p_schema,XString p_viewname,XString p_newname)    const
+SQLInfoOracle::GetCATALOGViewRename(XString /*p_schema*/,XString /*p_viewname*/,XString /*p_newname*/) const
 {
   return _T("");
 }
@@ -2464,7 +2464,7 @@ SQLInfoOracle::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
 }
 
 XString
-SQLInfoOracle::GetPSMProcedureDrop(XString p_schema, XString p_procedure,bool /*p_function /*=false*/) const
+SQLInfoOracle::GetPSMProcedureDrop(XString /*p_schema*/, XString /*p_procedure*/,bool /*p_function /*=false*/) const
 {
   return _T("");
 }
