@@ -208,8 +208,8 @@ SQLFilter::Reset()
   m_field2.Empty();
   m_expression.Empty();
   m_negate            = false;
-  m_openParenthesis   = false;
-  m_closeParenthesis  = false;
+  m_openParenthesis   = 0;
+  m_closeParenthesis  = 0;
   m_extract.m_extract = TS_EXT_NONE;
   m_operator          = OP_NOP;
   m_function          = FN_NOP;
@@ -239,9 +239,9 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
   XString sql;
 
   // Add an extra parenthesis level
-  if(m_openParenthesis)
+  for(int ind = 0;ind < m_openParenthesis;++ind)
   {
-    sql = _T("(");
+    sql += _T("(");
   }
 
   // See if our own home-brewn expression on a filter without operators
@@ -336,7 +336,7 @@ SQLFilter::GetSQLFilter(SQLQuery& p_query)
   }
 
   // End an extra parenthesis level
-  if(m_closeParenthesis)
+  for(int ind = 0;ind < m_closeParenthesis;++ind)
   {
     sql += _T(")");
   }
