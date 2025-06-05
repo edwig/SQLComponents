@@ -653,7 +653,8 @@ SQLInterval::AsXMLDuration() const
         {
           duration.AppendFormat(_T("%dM"),m_interval.intval.day_second.minute);
         }
-        if(m_interval.intval.day_second.second)
+        if(m_interval.intval.day_second.second ||
+           m_interval.intval.day_second.fraction)
         {
           duration.AppendFormat(_T("%d"),m_interval.intval.day_second.second);
 
