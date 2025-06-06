@@ -29,12 +29,14 @@
 #include <GetExePath.h>
 #include <SQLTimestamp.h>
 #include <SQLInterval.h>
+#include <ConvertWideString.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-using namespace std;
+// Needed for va_start on compound objects (XString)
+#pragma warning(disable: 4840)
 
 // The one and only global parameters object
 Parameters params;
@@ -50,22 +52,20 @@ errormap all_errors;
 
 // print string to terminal and logfile
 void
-xputs(const TCHAR* p_string)
+xputs(const XString p_string)
 {
-  size_t len = _tcslen(p_string);
-
-  if(params.m_logfile)
+  if(params.m_logfile.GetIsOpen())
   {
-    fwrite(p_string,1,len,params.m_logfile);
-    fflush(params.m_logfile);
+    params.m_logfile.Write(p_string);
   }
-  fwrite(p_string,1,len,stdout);
+  AutoCSTR string(p_string);
+  fwrite(string.cstr(),1,string.size(),stdout);
   fflush(stdout);
 }
 
 // Formatted print to terminal and logfile
 void
-xprint(bool p_sql,const TCHAR* p_string)
+xprint(bool p_sql,const XString p_string)
 {
   if(params.m_listOnly && !p_sql)
   {
@@ -76,7 +76,7 @@ xprint(bool p_sql,const TCHAR* p_string)
 
 // Formatted print to terminal and logfile
 void
-xprintf(bool p_sql,const TCHAR* p_format,...)
+xprintf(bool p_sql,const XString p_format,...)
 {
   XString buffer;
 
@@ -94,7 +94,7 @@ xprintf(bool p_sql,const TCHAR* p_format,...)
 
 // Print error to terminal and logfile
 void
-xerror(const TCHAR* p_format,...)
+xerror(const XString p_format,...)
 {
   XString buffer;
 
@@ -149,6 +149,7 @@ print_all_errors()
     {
       XString text;
       text.Format(_T("%s: Total errors: %d\n"),err.first.GetString(),err.second);
+      xprint(false,text);
     }
   }
 }

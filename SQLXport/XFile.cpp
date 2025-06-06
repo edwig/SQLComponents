@@ -184,10 +184,11 @@ XFile::NextType()
 void
 XFile::WriteHeader(XString p_type)
 {
-  xfwrite(_T("SQLXport "),  9,m_file);
-  xfwrite(XPORT_VERSION,3,m_file);
-  xfputc(SEPARATOR_STRING,m_file);
-  WriteString(_T('Z'),p_type);
+  xfwrite(_T("SQLXport "),9,m_file);
+  xfwrite(XPORT_VERSION,3,  m_file);
+  xfputc(SEPARATOR_STRING,  m_file);
+  xfputc(sizeof(TCHAR),     m_file);
+  WriteString(_T('Z'),      p_type);
 }
 
 bool
@@ -206,10 +207,21 @@ XFile::ReadHeader(XString& p_type)
   {
     if((TCHAR)xfgetc(m_file) != (TCHAR)SEPARATOR_STRING)
     {
-      xerror(_T("File was created with different separator string. Cannot process."));
+      xerror(_T("File was created with different separator string. Cannot process.\n"));
       return false;
     }
     // Version and separator_string exactly OK!
+
+    // Now check the ANSI/UNICODE marker
+    if((TCHAR)xfgetc(m_file) != sizeof(TCHAR))
+    {
+      xerror(_T("File was created in different ANSI/UNICODE mode. Cannot process.\n"));
+      xerror(_T("This program is in [%s] mode, the file is in [%s] mode!\n")
+            ,sizeof(TCHAR) == 1 ? _T("ANSI") : _T("UNICODE")
+            ,sizeof(TCHAR) == 1 ? _T("UNICODE") : _T("ANSI"));
+      return false;
+    }
+
     TCHAR ch = 0;
     XString type;
     ReadString(ch,type);
@@ -221,21 +233,20 @@ XFile::ReadHeader(XString& p_type)
     p_type = type;
     return true;
   }
+
+  // Print the errors
+  XString errors(_T("This version of the program cannot process the export file!\n"));
   if(_tcscmp(buffer,needed_version) < 0)
   {
-    _ftprintf(stderr,_T("WARNING:\n"));
-    _ftprintf(stderr,_T("Version of export file is smaller than current version!\n")
-                     _T("Current version of program is: %s\n")
-                     _T("Version of the export file is: %s")
-                    ,needed_version
-                    ,buffer);
+    errors += _T("Version of export file is smaller than current version!\n");
   }
   else
   {
-    xerror(_T("This version of the program cannot process the export file!\n")
-           _T("Current version of program is : %s\n")
-           _T("Version of the export file is : %s"),needed_version,buffer);
+    errors += _T("Version of export file is larger than current version!\n");
   }
+  errors.AppendFormat(_T("Current version of program is : %s\n")
+                      _T("Version of the export file is : %s"),needed_version,buffer);
+  xerror(errors);
   return false;
 }
 
@@ -421,7 +432,7 @@ XFile::WriteConstraint(int p_num,XString p_table,XString p_constraint)
 XString
 XFile::ReadConstraint()
 {
-  TCHAR    type;
+  TCHAR   type;
   XString name;
   ReadString(type,name);
   if(type != 'C')
@@ -487,7 +498,7 @@ XFile::WriteProcedure(XString p_procedure)
 XString
 XFile::ReadProcedure()
 {
-  TCHAR    type;
+  TCHAR   type;
   XString name;
   ReadString(type,name);
   if(type != 'F')
@@ -795,7 +806,7 @@ XFile::WriteString(TCHAR p_type,XString& p_string)
 
   xfputc(p_type,m_file);
   xfwrite(&length,sizeof(int),m_file);
-  xfwrite(p_string.GetString(),length,m_file);
+  xfwrite(p_string.GetString(),length * sizeof(TCHAR),m_file);
   xfputc(SEPARATOR_STRING,m_file);
 }
 
@@ -813,6 +824,10 @@ XFile::ReadString(TCHAR& p_type,XString& p_string)
     for(int ind = 0; ind < length; ++ind)
     {
       int character = xfgetc(m_file);
+#ifdef _UNICODE
+      unsigned extra = xfgetc(m_file);
+      character += (extra << 8);
+#endif
       p_string += (TCHAR)character;
     }
 
@@ -967,7 +982,7 @@ XFile::StripDiacritics(_TUCHAR* p_buffer)
 
         case 0xE7: *pnt = _T('c'); break; // ç c-cedilla
         case 0xF1: *pnt = _T('n'); break; // ñ n-tilde 
-        default:               break; // DO NOTHING!!
+        default:                   break; // DO NOTHING!!
       }
     }
   }

@@ -27,13 +27,13 @@
 
 using namespace SQLComponents;
 
-#define XPORT_VERSION "1.0"          // **MUST** be in format x.y (3 chars, 2 digits)
-#define XPORT_DATE    "02-01-2024"
-#define XPORT_YEAR    "2024"
+#define XPORT_VERSION "2.0"          // **MUST** be in format x.y (3 chars, 2 digits)
+#define XPORT_DATE    "06-06-2025"
+#define XPORT_YEAR    "2025"
 
-void xputs (const TCHAR* p_string);
-void xerror(const TCHAR* p_format,...);
+void xputs (const XString p_string);
+void xerror(const XString p_format,...);
 void xerror(int p_rownum,XString p_string);
-void xprint (bool p_sql,const TCHAR* p_string);
-void xprintf(bool p_sql,const TCHAR* p_format,...);
+void xprint (bool p_sql,const XString p_string);
+void xprintf(bool p_sql,const XString p_format,...);
 void print_all_errors();

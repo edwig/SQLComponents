@@ -86,9 +86,11 @@ public:
   // Locking of tables
   bool    m_consistent { false };
   int     m_waitTime   { 999999999 };
+  // Lock reading the parameter file
+  bool    m_readParams { false };
   // Error counting and logfile
   int     m_errors     { 0 };
-  FILE*   m_logfile    { nullptr };
+  WinFile m_logfile;
   // Sometimes left hanging in virus scanner at the end
   bool    m_noHang     { false   };
 

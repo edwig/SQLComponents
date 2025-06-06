@@ -27,6 +27,7 @@
 #include "parameters.h"
 #include "SQLXport.h"
 #include <GetExePath.h>
+#include <WinFile.h>
 
 Parameters::Parameters()
 {
@@ -231,27 +232,28 @@ Parameters::Usage()
 void
 Parameters::ReadParameterFile(XString p_filename)
 {
-  FILE* file = nullptr;
-  errno_t error = _tfopen_s(&file, p_filename, _T("r"));
-  if(error == 0)
+  WinFile file(p_filename);
+  m_readParams = true;
+
+  if(file.Open(winfile_read | open_trans_text))
   {
-    TCHAR buffer[MAX_PATH];
-    while(_fgetts(buffer,MAX_PATH,file))
+    XString line;
+    while(file.Read(line))
     {
-      XString line(buffer);
-      line.Trim(_T("\r\n"));
+      line.Trim(_T("\n"));
       if(line.GetAt(0) != '#')
       {
         ProcessOneParameter(line);
       }
     }
-    fclose(file);
+    file.Close();
   }
   else
   {
-    xprintf(false,_T("ERROR: [%d] Cannot open parameter file: %s\n"),(int)error,p_filename.GetString());
+    xprintf(false,_T("ERROR: [%d] Cannot open parameter file: %s\n"),(int)file.GetLastError(),p_filename.GetString());
     TerminateWithoutCleanup(3);
   }
+  m_readParams = false;
 }
 
 // Processing the options on the command line
@@ -300,26 +302,24 @@ Parameters::MakeLogfile()
   filename += _T(".txt");
 
   // Open in write mode
-  _tfopen_s(&m_logfile,filename,_T("w"));
-  if(m_logfile == NULL)
+  m_logfile.SetFilename(filename);
+  if(m_logfile.Open(winfile_write | open_trans_text | open_shared_read
+                   ,FAttributes::attrib_none,Encoding::UTF8) == false)
   {
     _tprintf(_T("WARNING: Could not open logfile: %s\n"),(LPCTSTR) filename);
   }
 }
 
-
-
 // Close the logfile
 void 
 Parameters::CloseLogfile()
 {
-  if(m_logfile)
+  if(m_logfile.GetIsOpen())
   {
-    if(fclose(m_logfile))
+    if(m_logfile.Close(true) == false)
     {
       _tprintf(_T("WARNING: Logfile not correctly flushed to disk.\n"));
     }
-    m_logfile = nullptr;
   }
 }
 
@@ -375,8 +375,11 @@ Parameters::ProcessOneParameter(XString p_parameter)
   else if(p_parameter.Left(9) .CompareNoCase(_T("stripdiac"))     == 0) m_stripDiacs   = true;
   else if(p_parameter.Left(6) .CompareNoCase(_T("params"))        == 0)
   {
-    XString filename = p_parameter.Mid(7);
-    ReadParameterFile(filename);
+    if(!m_readParams)
+    {
+      XString filename = p_parameter.Mid(7);
+      ReadParameterFile(filename);
+    }
   }
   else
   {
