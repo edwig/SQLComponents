@@ -597,12 +597,15 @@ SQLDataSet::ParseFilters(SQLQuery& p_query,XString p_sql)
   query.Replace(_T("\t"),_T(" "));
   bool whereFound = m_query.Find(_T("WHERE ")) > 0;
 
-  // Offset in the WHERE clause
-  query += whereFound ? _T("\n   AND ") : _T("\n WHERE ");
+  XString condition = m_filters->ParseFiltersToCondition(p_query);
 
   // Add all filters
-  query += m_filters->ParseFiltersToCondition(p_query);
-
+  if(!condition.IsEmpty())
+  {
+    // Offset in the WHERE clause
+    query += whereFound ? _T("\n   AND ") : _T("\n WHERE ");
+    query += condition;
+  }
   return query;
 }
 
