@@ -55,7 +55,7 @@ ExecuteShell(XString  p_command
   {
     if(p_error)
     {
-      CString reason;
+      XString reason;
       switch(res)
       {
         case ERROR_FILE_NOT_FOUND:     reason = _T("File not found");                   break;

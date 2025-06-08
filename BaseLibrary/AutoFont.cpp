@@ -405,7 +405,7 @@ XString AutoFont::ContractFont()
             m_lf.lfPitchAndFamily,
             m_lf.lfFaceName);
   color.Format(_T("%ul"),m_fontColor);
-  str += ",";
+  str += _T(",");
   str += color;
 
 	return str;

@@ -356,7 +356,7 @@ SOAPSecurity::DigestPassword()
   GenerateNonce(nonce);
 
   // According to the standard. This is how we scramble the password
-  XString encrypted = nonce + m_timestamp.AsString() + _T("Z") + m_password;
+  XString encrypted = nonce + m_timestamp.AsString() + XString(_T("Z")) + m_password;
 
   Crypto crypt;
 #ifdef _UNICODE

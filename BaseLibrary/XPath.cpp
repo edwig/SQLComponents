@@ -314,7 +314,7 @@ XPath::GetNumber(XString& p_parsing,XString& p_token)
   ch = p_parsing.GetAt(0);
   while(isdigit(ch) || ch == '.')
   {
-    p_token  += p_parsing.GetAt(0);
+    p_token  += (TCHAR) p_parsing.GetAt(0);
     p_parsing = p_parsing.Mid(1);
     ch = p_parsing.GetAt(0);
   }
@@ -322,19 +322,19 @@ XPath::GetNumber(XString& p_parsing,XString& p_token)
   if(toupper(p_parsing.GetAt(0)) == 'E')
   {
     // Getting the exponent
-    p_token  += p_parsing.GetAt(0);
+    p_token  += (TCHAR) p_parsing.GetAt(0);
     p_parsing = p_parsing.Mid(1);
     // Exponent sign (optional)
     ch = p_parsing.GetAt(0);
     if(ch == '-' || ch == '+')
     {
-      p_token  += p_parsing.GetAt(0);
+      p_token  += (TCHAR) p_parsing.GetAt(0);
       p_parsing = p_parsing.Mid(1);
     }
     // Exponent
     while(isdigit(p_parsing.GetAt(0)))
     {
-      p_token  += p_parsing.GetAt(0);
+      p_token  += (TCHAR) p_parsing.GetAt(0);
       p_parsing = p_parsing.Mid(1);
     }
   }
@@ -400,7 +400,7 @@ XPath::ParseLevel(XString& p_parsing)
   if(!token.IsEmpty())
   {
     // See if we must continue with a 'free' search
-    if(token == "/")
+    if(token == _T("/"))
     {
       recursive = true;
       token = GetToken(p_parsing);
@@ -587,9 +587,9 @@ bool
 XPath::IsOperator(XString p_token)
 {
   return 
-  p_token == "=" || 
-  p_token == "<" || 
-  p_token == ">" ;
+  p_token == _T("=") || 
+  p_token == _T("<") || 
+  p_token == _T(">") ;
 }
 
 bool 

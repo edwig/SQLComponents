@@ -409,7 +409,7 @@ QueryReWriter::ParseStatement(bool p_closingEscape /*= false*/)
     {
       if(p_closingEscape)
       {
-        m_output += "}";
+        m_output += _T("}");
       }
       break;
     }
@@ -434,7 +434,7 @@ QueryReWriter::PrintToken()
                               m_output += m_tokenString;
                               m_output += '\"';
                               break;
-    case Token::TK_COMM_SQL:  m_output += "--";
+    case Token::TK_COMM_SQL:  m_output += _T("--");
                               m_output += m_tokenString;
                               m_output += '\n';
                               break;

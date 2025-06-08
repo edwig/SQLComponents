@@ -179,7 +179,8 @@ LogAnalysis::Reset()
   }
 
   // Reset loglevel
-  m_logLevel = HLL_NOLOG;
+  m_useWriter   = false;
+  m_logLevel    = HLL_NOLOG;
   m_initialised = false;
 }
 
@@ -731,7 +732,7 @@ LogAnalysis::ReadConfig()
       if(line.GetLength() > 0)
       {
         // Look for a comment
-        TCHAR ch = line.GetAt(0);
+        TCHAR ch = (TCHAR) line.GetAt(0);
         if(ch == ';' || ch == '#')
         {
           continue;

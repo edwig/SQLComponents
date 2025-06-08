@@ -298,7 +298,7 @@ protected:
   // The one and only rootnode
   XMLElement*     m_root            { nullptr };              // All elements, from the root up
   Encoding        m_encoding        { Encoding::UTF8 };       // Encoding scheme
-  XString         m_version         { "1.0" };                // XML Version, most likely 1.0
+  XString         m_version         { _T("1.0") };            // XML Version, most likely 1.0
   XString         m_standalone;                               // Stand alone from DTD or XSD's
   bool            m_condensed       { false };                // Condensed output format (no spaces/newlines)
   bool            m_whitespace      { false };                // Collapse whitespace

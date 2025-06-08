@@ -72,7 +72,7 @@ int ConfigureApplicationAlerts(XString p_path)
   AutoCritSec lock(&g_alertCritical);
 
   // Check that the path always ends in a backslash
-  if(p_path.Right(1) != "\\")
+  if(p_path.Right(1) != _T("\\"))
   {
     p_path += '\\';
   }

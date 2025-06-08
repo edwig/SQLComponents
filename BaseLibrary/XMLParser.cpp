@@ -109,7 +109,7 @@ XMLParser::PrintJsonString(const XString& p_string)
 
   for(int ind = 0; ind < p_string.GetLength(); ++ind)
   {
-    TCHAR ch = p_string.GetAt(ind);
+    TCHAR ch = (TCHAR) p_string.GetAt(ind);
     switch(ch)
     {
       case '\"':  *pointer++ = '\\';

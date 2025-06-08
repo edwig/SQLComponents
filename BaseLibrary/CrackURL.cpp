@@ -110,6 +110,7 @@ CrackedURL::Reset()
   m_foundHost       = false;
   m_foundPort       = false;
   m_foundPath       = false;
+  m_foundExtension  = false;
   m_foundParameters = false;
   m_foundAnchor     = false;
 }
@@ -281,12 +282,21 @@ CrackedURL::CrackURL(XString p_url)
     {
       m_extension.Empty();
     }
+    else
+    {
+      m_foundExtension = true;
+    }
   }
-
   // Now a valid URL
   return (m_valid = true);
 }
 
+// Allow a '+' in an URL (webservers should be configured!)
+void
+CrackedURL::SetAllowPlusSign(bool p_allow)
+{
+  m_allowPlus = p_allow;
+}
 
 void
 CrackedURL::SetPath(XString p_path)
@@ -331,6 +341,10 @@ CrackedURL::EncodeURLChars(XString p_text,bool p_queryValue /*=false*/)
 
   // Re-encode the string: Now in buffer/length
   // Watch out: strange code ahead!
+  uchar last = 0;
+  int singlequote = 0;
+  int doublequote = 0;
+
   for(int ind = 0;ind < length; ++ind)
   {
     uchar ch = buffer[ind];
@@ -338,11 +352,23 @@ CrackedURL::EncodeURLChars(XString p_text,bool p_queryValue /*=false*/)
     {
       p_queryValue = true;
     }
-    if(ch == ' ' && p_queryValue)
+    else if(ch == '\'') ++singlequote;
+    else if(ch == '\"') ++doublequote;
+    else if(ch == '0x09' || ch == '0x0D' || ch == '0x20')
     {
-      encoded += '+';
+      // Collapse all red/white space chars to space
+      ch = ' ';
     }
-    else if(_tcschr(m_unsafeString,ch) ||                      // " \"<>#{}|\\^~[]`"     -> All strings
+    if(last == ' ' && ch == ' ')
+    {
+      // Collapse whitespace to one single space
+      if((singlequote % 2 == 0) &&
+         (doublequote % 2 == 0) )
+      {
+        continue;
+      }
+    }
+    else if(_tcschr(m_unsafeString,ch) ||                      // " \"<>#{}|\\^~[]`"    -> All strings
            (p_queryValue && _tcsrchr(m_reservedString,ch)) ||  // "$&+,./:;=?@-!*()'"   -> In query parameter value strings
            (ch < 0x20) ||                                      // 7BITS ASCII Control characters
            (ch > 0x7F) )                                       // Converted UTF-8 characters
@@ -353,6 +379,7 @@ CrackedURL::EncodeURLChars(XString p_text,bool p_queryValue /*=false*/)
     {
       encoded += (_TUCHAR) ch;
     }
+    last = ch;
   }
   delete[] buffer;
   return encoded;
@@ -360,7 +387,7 @@ CrackedURL::EncodeURLChars(XString p_text,bool p_queryValue /*=false*/)
 
 // Decode URL strings, including UTF-8 encoding
 XString
-CrackedURL::DecodeURLChars(XString p_text,bool p_queryValue /*=false*/)
+CrackedURL::DecodeURLChars(XString p_text,bool p_queryValue /*=false*/,bool p_allowPlus /*=true*/)
 {
   XString encoded;
   XString decoded;
@@ -370,7 +397,7 @@ CrackedURL::DecodeURLChars(XString p_text,bool p_queryValue /*=false*/)
   // Whole string decoded for %XX strings
   for(int ind = 0;ind < p_text.GetLength(); ++ind)
   {
-    uchar ch = GetHexcodedChar(p_text,ind,percent,p_queryValue);
+    uchar ch = GetHexcodedChar(p_text,ind,percent,p_queryValue,p_allowPlus);
     decoded += ch;
     if(ch > 0x7F && percent)
     {
@@ -425,7 +452,8 @@ uchar
 CrackedURL::GetHexcodedChar(XString& p_text
                            ,int&     p_index
                            ,bool&    p_percent
-                           ,bool&    p_queryValue)
+                           ,bool&    p_queryValue
+                           ,bool     p_allowPlus /* = true */)
 {
   uchar ch = (uchar) p_text.GetAt(p_index);
 
@@ -449,7 +477,7 @@ CrackedURL::GetHexcodedChar(XString& p_text
   else if(ch == '+' && p_queryValue)
   {
     // See RFC 1630: Google Chrome still does this!
-    ch = ' ';
+    ch = p_allowPlus ? '+' : ' ';
   }
   return ch;
 }
@@ -629,13 +657,14 @@ CrackedURL*
 CrackedURL::operator=(CrackedURL* p_orig)
 {
   // Copy the info
-  m_valid    = p_orig->m_valid;
-  m_scheme   = p_orig->m_scheme;
-  m_secure   = p_orig->m_secure;
-  m_host     = p_orig->m_host;
-  m_port     = p_orig->m_port;
-  m_path     = p_orig->m_path;
-  m_anchor   = p_orig->m_anchor;
+  m_valid     = p_orig->m_valid;
+  m_scheme    = p_orig->m_scheme;
+  m_secure    = p_orig->m_secure;
+  m_host      = p_orig->m_host;
+  m_port      = p_orig->m_port;
+  m_path      = p_orig->m_path;
+  m_extension = p_orig->m_extension;
+  m_anchor    = p_orig->m_anchor;
 
   // Copy status info
   m_foundScheme     = p_orig->m_foundScheme;

@@ -378,7 +378,7 @@ XMLMessage::Print()
 
   if(m_condensed)
   {
-    message += "\n";
+    message += _T("\n");
   }
   return message;
 }

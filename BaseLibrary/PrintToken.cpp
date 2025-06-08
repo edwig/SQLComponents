@@ -388,7 +388,7 @@ BOOL DumpToken(XString& p_list,HANDLE p_token)
     if (explicitEntry->grfInheritance & SUB_CONTAINERS_AND_OBJECTS_INHERIT) p_list += _T("[containers and objects] ");
     if (explicitEntry->grfInheritance & SUB_CONTAINERS_ONLY_INHERIT)        p_list += _T("[sub-containers] ");
     if (explicitEntry->grfInheritance & SUB_OBJECTS_ONLY_INHERIT)           p_list += _T("[sub-objects] ");
-    p_list += "\n";
+    p_list += _T("\n");
     
     text.Format(_T("  Access permission mask = 0x%08lx\n"), explicitEntry->grfAccessPermissions);
     p_list += text;

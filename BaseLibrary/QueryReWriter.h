@@ -128,7 +128,7 @@ public:
   // Getters
   int     GetReplaced() { return m_replaced; }
   int     GetOptions()  { return m_options;  }
-  CString GetSchema()   { return m_schema;   }
+  XString GetSchema()   { return m_schema;   }
 private:
   void    Reset();
   void    Initialization();

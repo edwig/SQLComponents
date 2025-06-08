@@ -962,7 +962,7 @@ JSONParserSOAP::Trim(XString& p_value)
   while(p_value.GetLength())
   {
     int index = p_value.GetLength() - 1;
-    TCHAR ch  = p_value.GetAt(index);
+    TCHAR ch  = (TCHAR) p_value.GetAt(index);
     if(_tcschr(WHITESPACE,ch))
     {
       p_value = p_value.Left(index);
@@ -975,7 +975,7 @@ JSONParserSOAP::Trim(XString& p_value)
 
   while(p_value.GetLength())
   {
-    if(_tcschr(WHITESPACE,p_value.GetAt(0)))
+    if(_tcschr(WHITESPACE,(TCHAR)p_value.GetAt(0)))
     {
       p_value = p_value.Mid(1);
     }
