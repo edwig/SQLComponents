@@ -548,15 +548,20 @@ XPath::ParseLevelFindNodes(XString p_token,bool p_recurse)
 bool
 XPath::ParseLevelNameReduce(XString p_token, bool p_recurse)
 {
+  XmlElementMap found;
   XmlElementMap::iterator it = m_results.begin();
   while(it != m_results.end())
   {
-    if(m_message->FindElement(*it,p_token,p_recurse) == nullptr)
+    XMLElement* child = m_message->FindElement(*it,p_token,p_recurse);
+    if(child)
     {
-      it = m_results.erase(it);
-      continue;
+      found.push_back(child);
     }
-    ++it;
+    it = m_results.erase(it);
+  }
+  if(!found.empty())
+  {
+    m_results.insert(m_results.begin(),found.begin(),found.end());
   }
   return !m_results.empty();
 }
