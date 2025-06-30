@@ -224,6 +224,33 @@ SQLInfoSQLServer::GetRDBMSMaxVarchar() const
   return (DBMAXCHAR - 1);
 }
 
+// Identifier rules differ per RDBMS
+bool
+SQLInfoSQLServer::IsIdentifier(XString p_identifier) const
+{
+  // Cannot be empty and cannot exceed this amount of characters
+  if(p_identifier.GetLength() == 0 ||
+     p_identifier.GetLength() > (int)GetMaxIdentifierNameLength())
+  {
+    return false;
+  }
+  // Must start with one alpha char OR AN UNDERSCORE (EXTENSION)
+  if(!_istalpha(p_identifier.GetAt(0)) && p_identifier.GetAt(0) != '_')
+  {
+    return false;
+  }
+  for(int index = 0;index < p_identifier.GetLength();++index)
+  {
+    // Can be upper/lower alpha or a number OR an underscore
+    TCHAR ch = p_identifier.GetAt(index);
+    if(!_istalnum(ch) && ch != '_')
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 // KEYWORDS
 
 // Keyword for the current date and time
@@ -829,7 +856,7 @@ SQLInfoSQLServer::GetCATALOGDefaultCollation() const
 
 // Get SQL to check if a table already exists in the database
 XString
-SQLInfoSQLServer::GetCATALOGTableExists(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGTableExists(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   XString orgtable(p_tablename);
   XString catalog = GetCatalogAndSchema(p_schema,p_tablename);
@@ -854,13 +881,13 @@ SQLInfoSQLServer::GetCATALOGTableExists(XString& p_schema,XString& p_tablename) 
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTablesList(XString& p_schema,XString& p_pattern) const
+SQLInfoSQLServer::GetCATALOGTablesList(XString& p_schema,XString& p_pattern,bool /*p_quoted = false*/) const
 {
   return GetCATALOGTableAttributes(p_schema,p_pattern);
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   XString query =
     _T("SELECT db_name() AS table_catalog\n")
@@ -930,7 +957,7 @@ SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablena
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTableSynonyms(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGTableSynonyms(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   XString query =
     _T("SELECT db_name() AS table_catalog\n")
@@ -965,7 +992,7 @@ SQLInfoSQLServer::GetCATALOGTableSynonyms(XString& p_schema,XString& p_tablename
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -1096,7 +1123,7 @@ SQLInfoSQLServer::GetCATALOGTemptableDrop(XString p_schema,XString p_tablename) 
 // ALL COLUMN FUNCTIONS
 
 XString 
-SQLInfoSQLServer::GetCATALOGColumnExists(XString p_schema,XString p_tablename,XString p_columnname) const
+SQLInfoSQLServer::GetCATALOGColumnExists(XString p_schema,XString p_tablename,XString p_columnname,bool /*p_quoted /*= false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -1114,14 +1141,14 @@ SQLInfoSQLServer::GetCATALOGColumnExists(XString p_schema,XString p_tablename,XS
 }
 
 XString 
-SQLInfoSQLServer::GetCATALOGColumnList(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGColumnList(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
   XString columns;
-  return GetCATALOGColumnAttributes(p_schema,p_tablename,columns);
+  return GetCATALOGColumnAttributes(p_schema,p_tablename,columns,p_quoted);
 }
 
 XString 
-SQLInfoSQLServer::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablename,XString& p_columnname) const
+SQLInfoSQLServer::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablename,XString& p_columnname,bool /*p_quoted /*= false*/) const
 {
   // In case of a NON-TEMPORARY table, the standard ODBC driver is better
   if(p_tablename.Left(1).Compare(_T("#")))
@@ -1330,13 +1357,13 @@ SQLInfoSQLServer::GetCATALOGColumnDrop(XString p_schema,XString p_tablename,XStr
 
 // All index functions
 XString
-SQLInfoSQLServer::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_indexname*/) const
+SQLInfoSQLServer::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_indexname*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGIndexList(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGIndexList(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   p_schema.Empty(); // Do not use
   p_tablename.MakeLower();
@@ -1364,7 +1391,7 @@ SQLInfoSQLServer::GetCATALOGIndexList(XString& p_schema,XString& p_tablename) co
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablename,XString& p_indexname) const
+SQLInfoSQLServer::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablename,XString& p_indexname,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -1540,7 +1567,7 @@ SQLInfoSQLServer::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 // ALL PRIMARY KEY FUNCTIONS
 
 XString
-SQLInfoSQLServer::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename) const
+SQLInfoSQLServer::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -1559,7 +1586,7 @@ SQLInfoSQLServer::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename) 
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   // In case of a NON-TEMPORARY table, the standard ODBC driver is better
   if(p_tablename.Left(1).Compare(_T("#")))
@@ -1656,7 +1683,7 @@ SQLInfoSQLServer::GetCATALOGPrimaryDrop(XString p_schema,XString p_tablename,XSt
 // ALL FOREIGN KEY FUNCTIONS
 
 XString
-SQLInfoSQLServer::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XString p_constraintname) const
+SQLInfoSQLServer::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XString p_constraintname,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -1680,10 +1707,10 @@ SQLInfoSQLServer::GetCATALOGForeignExists(XString p_schema,XString p_tablename,X
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGForeignList(XString& p_schema,XString& p_tablename,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoSQLServer::GetCATALOGForeignList(XString& p_schema,XString& p_tablename,int p_maxColumns /*=SQLINFO_MAX_COLUMNS*/,bool p_quoted /*= false*/) const
 {
   XString constraint;
-  return GetCATALOGForeignAttributes(p_schema,p_tablename,constraint,p_maxColumns);
+  return GetCATALOGForeignAttributes(p_schema,p_tablename,constraint,p_maxColumns,p_quoted);
 }
 
 XString
@@ -1691,7 +1718,8 @@ SQLInfoSQLServer::GetCATALOGForeignAttributes(XString& p_schema
                                              ,XString& p_tablename
                                              ,XString& p_constraint
                                              ,bool     p_referenced /*=false*/
-                                             ,int    /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+                                             ,int    /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/
+                                             ,bool   /*p_quoted         = false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -2066,7 +2094,7 @@ SQLInfoSQLServer::GetCATALOGCheckDrop(XString p_schema,XString p_tablename,XStri
 // ALL TRIGGER FUNCTIONS
 
 XString
-SQLInfoSQLServer::GetCATALOGTriggerExists(XString p_schema, XString p_tablename, XString p_triggername) const
+SQLInfoSQLServer::GetCATALOGTriggerExists(XString p_schema, XString p_tablename, XString p_triggername,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -2089,14 +2117,14 @@ SQLInfoSQLServer::GetCATALOGTriggerExists(XString p_schema, XString p_tablename,
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTriggerList(XString& p_schema,XString& p_tablename) const
+SQLInfoSQLServer::GetCATALOGTriggerList(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
   XString triggername;
-  return GetCATALOGTriggerAttributes(p_schema,p_tablename,triggername);
+  return GetCATALOGTriggerAttributes(p_schema,p_tablename,triggername,p_quoted);
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablename,XString& p_triggername) const
+SQLInfoSQLServer::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablename,XString& p_triggername,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_tablename.MakeLower();
@@ -2179,7 +2207,7 @@ SQLInfoSQLServer::GetCATALOGTriggerDrop(XString p_schema, XString /*p_tablename*
 // ALL SEQUENCE FUNCTIONS
 
 XString
-SQLInfoSQLServer::GetCATALOGSequenceExists(XString p_schema, XString p_sequence) const
+SQLInfoSQLServer::GetCATALOGSequenceExists(XString p_schema, XString p_sequence,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_sequence.MakeLower();
@@ -2193,7 +2221,7 @@ SQLInfoSQLServer::GetCATALOGSequenceExists(XString p_schema, XString p_sequence)
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern) const
+SQLInfoSQLServer::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_pattern.MakeLower();
@@ -2226,7 +2254,7 @@ SQLInfoSQLServer::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern) c
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGSequenceAttributes(XString& p_schema,XString& p_sequence) const
+SQLInfoSQLServer::GetCATALOGSequenceAttributes(XString& p_schema,XString& p_sequence,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_sequence.MakeLower();
@@ -2299,19 +2327,19 @@ SQLInfoSQLServer::GetCATALOGSequenceDrop(XString p_schema, XString p_sequence) c
 // ALL VIEW FUNCTIONS
 
 XString 
-SQLInfoSQLServer::GetCATALOGViewExists(XString& /*p_schema*/,XString& /*p_viewname*/) const
+SQLInfoSQLServer::GetCATALOGViewExists(XString& /*p_schema*/,XString& /*p_viewname*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString 
-SQLInfoSQLServer::GetCATALOGViewList(XString& p_schema,XString& p_pattern) const
+SQLInfoSQLServer::GetCATALOGViewList(XString& p_schema,XString& p_pattern,bool /*p_quoted = false*/) const
 {
   return GetCATALOGViewAttributes(p_schema, p_pattern);
 }
 
 XString 
-SQLInfoSQLServer::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname) const
+SQLInfoSQLServer::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_viewname.MakeLower();
@@ -2343,7 +2371,7 @@ SQLInfoSQLServer::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGViewText(XString& p_schema,XString& p_viewname) const
+SQLInfoSQLServer::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool /*p_quoted = false*/) const
 {
   p_schema.MakeLower();
   p_viewname.MakeLower();
@@ -2617,7 +2645,7 @@ SQLInfoSQLServer::GetCATALOGSynonymDrop(XString& p_schema,XString& p_synonym,boo
 //////////////////////////////////////////////////////////////////////////
 
 XString
-SQLInfoSQLServer::GetPSMProcedureExists(XString p_schema, XString p_procedure) const
+SQLInfoSQLServer::GetPSMProcedureExists(XString p_schema, XString p_procedure,bool /*p_quoted = false*/) const
 {
   XString query =
 
@@ -2657,7 +2685,7 @@ SQLInfoSQLServer::GetPSMProcedureList(XString& p_schema) const
 }
 
 XString
-SQLInfoSQLServer::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure) const
+SQLInfoSQLServer::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure,bool /*p_quoted = false*/) const
 {
   XString sql =
     _T("SELECT db_name() as catalog_name\n")
@@ -2702,7 +2730,7 @@ SQLInfoSQLServer::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedu
 }
 
 XString
-SQLInfoSQLServer::GetPSMProcedureSourcecode(XString p_schema, XString p_procedure) const
+SQLInfoSQLServer::GetPSMProcedureSourcecode(XString p_schema, XString p_procedure,bool /*p_quoted = false*/) const
 {
   XString query =
     _T("SELECT s.name as source_schema\n")
@@ -2737,14 +2765,14 @@ SQLInfoSQLServer::GetPSMProcedureDrop(XString p_schema,XString p_procedure,bool 
 }
 
 XString
-SQLInfoSQLServer::GetPSMProcedureErrors(XString /*p_schema*/,XString /*p_procedure*/) const
+SQLInfoSQLServer::GetPSMProcedureErrors(XString /*p_schema*/,XString /*p_procedure*/,bool /*p_quoted = false*/) const
 {
   // SQL-Server does not support procedure errors
   return _T("");
 }
 
 XString
-SQLInfoSQLServer::GetPSMProcedurePrivilege(XString& p_schema,XString& p_procedure) const
+SQLInfoSQLServer::GetPSMProcedurePrivilege(XString& p_schema,XString& p_procedure,bool /*p_quoted = false*/) const
 {
   CString sql = _T("SELECT db_name() AS table_catalog\n")
                 _T("      ,s.name    AS table_schema\n")
@@ -2778,7 +2806,7 @@ SQLInfoSQLServer::GetPSMProcedurePrivilege(XString& p_schema,XString& p_procedur
 
 // And it's parameters
 XString
-SQLInfoSQLServer::GetPSMProcedureParameters(XString& p_schema,XString& p_procedure) const
+SQLInfoSQLServer::GetPSMProcedureParameters(XString& p_schema,XString& p_procedure,bool /*p_quoted = false*/) const
 {
   XString query = 
     _T("SELECT specific_catalog AS procedure_cat\n")

@@ -197,6 +197,34 @@ SQLInfoMySQL::GetRDBMSMaxVarchar() const
   return 65535;
 }
 
+// Identifier rules differ per RDBMS
+bool
+SQLInfoMySQL::IsIdentifier(XString p_identifier) const
+{
+  // Cannot be empty and cannot exceed this amount of characters
+  if(p_identifier.GetLength() == 0 ||
+     p_identifier.GetLength() > (int)GetMaxIdentifierNameLength())
+  {
+    return false;
+  }
+  // Must start with one alpha char
+  if(!_istalpha(p_identifier.GetAt(0)))
+  {
+    return false;
+  }
+  for(int index = 0;index < p_identifier.GetLength();++index)
+  {
+    // Can be upper/lower alpha or a number
+    // MySQL does NOT allow an underscore!
+    TCHAR ch = p_identifier.GetAt(index);
+    if(!_istalnum(ch))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 // KEYWORDS
 
 // Keyword for the current date and time
@@ -588,20 +616,20 @@ SQLInfoMySQL::GetCATALOGDefaultCollation() const
 
 // Get SQL to check if a table already exists in the database
 XString
-SQLInfoMySQL::GetCATALOGTableExists(XString& /*p_schema*/,XString& /*p_tablename*/) const
+SQLInfoMySQL::GetCATALOGTableExists(XString& /*p_schema*/,XString& /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   // Still to do in MySQL
   return _T("");
 }
 
 XString
-SQLInfoMySQL::GetCATALOGTablesList(XString& p_schema,XString& p_pattern) const
+SQLInfoMySQL::GetCATALOGTablesList(XString& p_schema,XString& p_pattern,bool /*p_quoted = false*/) const
 {
   return GetCATALOGTableAttributes(p_schema,p_pattern);
 }
 
 XString
-SQLInfoMySQL::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename) const
+SQLInfoMySQL::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   XString sql;
   sql = _T("SELECT table_catalog\n")
@@ -633,14 +661,14 @@ SQLInfoMySQL::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename) 
 }
 
 XString
-SQLInfoMySQL::GetCATALOGTableSynonyms(XString& /*p_schema*/,XString& /*p_tablename*/) const
+SQLInfoMySQL::GetCATALOGTableSynonyms(XString& /*p_schema*/,XString& /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   // MS-Access cannot do this
   return XString();
 }
 
 XString
-SQLInfoMySQL::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename) const
+SQLInfoMySQL::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
 {
   p_schema.Empty(); // do not bind as a parameter
 
@@ -736,20 +764,20 @@ SQLInfoMySQL::GetCATALOGTemptableDrop(XString /*p_schema*/,XString p_tablename) 
 // ALL COLUMN FUNCTIONS
 
 XString 
-SQLInfoMySQL::GetCATALOGColumnExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_columnname*/) const
+SQLInfoMySQL::GetCATALOGColumnExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_columnname*/,bool /*p_quoted /*= false*/) const
 {
   return _T("");
 }
 
 XString 
-SQLInfoMySQL::GetCATALOGColumnList(XString& /*p_schema*/,XString& /*p_tablename*/) const
+SQLInfoMySQL::GetCATALOGColumnList(XString& /*p_schema*/,XString& /*p_tablename*/,bool /*p_quoted /*= false*/) const
 {
   // Standard ODBC driver suffices
   return _T("");
 }
 
 XString 
-SQLInfoMySQL::GetCATALOGColumnAttributes(XString& /*p_schema*/,XString& /*p_tablename*/,XString& /*p_columnname*/) const
+SQLInfoMySQL::GetCATALOGColumnAttributes(XString& /*p_schema*/,XString& /*p_tablename*/,XString& /*p_columnname*/,bool /*p_quoted /*= false*/) const
 {
   // Standard ODBC driver suffices
   return _T("");
@@ -805,7 +833,7 @@ SQLInfoMySQL::GetCATALOGColumnDrop(XString /*p_schema*/,XString p_tablename,XStr
 
 // All index functions
 XString
-SQLInfoMySQL::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_indexname*/) const
+SQLInfoMySQL::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_indexname*/,bool /*p_quoted = false*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -813,7 +841,7 @@ SQLInfoMySQL::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/
 }
 
 XString
-SQLInfoMySQL::GetCATALOGIndexList(XString& /*p_schema*/,XString& /*p_tablename*/) const
+SQLInfoMySQL::GetCATALOGIndexList(XString& /*p_schema*/,XString& /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -821,7 +849,7 @@ SQLInfoMySQL::GetCATALOGIndexList(XString& /*p_schema*/,XString& /*p_tablename*/
 }
 
 XString
-SQLInfoMySQL::GetCATALOGIndexAttributes(XString& /*p_schema*/,XString& /*p_tablename*/,XString& /*p_indexname*/) const
+SQLInfoMySQL::GetCATALOGIndexAttributes(XString& /*p_schema*/,XString& /*p_tablename*/,XString& /*p_indexname*/,bool /*p_quoted = false*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLStatistics instead (see SQLInfo class)
@@ -886,14 +914,14 @@ SQLInfoMySQL::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 // ALL PRIMARY KEY FUNCTIONS
 
 XString
-SQLInfoMySQL::GetCATALOGPrimaryExists(XString /*p_schema*/,XString /*p_tablename*/) const
+SQLInfoMySQL::GetCATALOGPrimaryExists(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   // To be implemented
   return _T("");
 }
 
 XString
-SQLInfoMySQL::GetCATALOGPrimaryAttributes(XString& /*p_schema*/,XString& /*p_tablename*/) const
+SQLInfoMySQL::GetCATALOGPrimaryAttributes(XString& /*p_schema*/,XString& /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   // To be implemented
   return _T("");
@@ -935,7 +963,7 @@ SQLInfoMySQL::GetCATALOGPrimaryDrop(XString /*p_schema*/,XString p_tablename,XSt
 // ALL FOREIGN KEY FUNCTIONS
 
 XString
-SQLInfoMySQL::GetCATALOGForeignExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraintname*/) const
+SQLInfoMySQL::GetCATALOGForeignExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraintname*/,bool /*p_quoted = false*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -943,7 +971,7 @@ SQLInfoMySQL::GetCATALOGForeignExists(XString /*p_schema*/,XString /*p_tablename
 }
 
 XString
-SQLInfoMySQL::GetCATALOGForeignList(XString& /*p_schema*/,XString& /*p_tablename*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoMySQL::GetCATALOGForeignList(XString& /*p_schema*/,XString& /*p_tablename*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/,bool /*p_quoted = false*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -951,7 +979,7 @@ SQLInfoMySQL::GetCATALOGForeignList(XString& /*p_schema*/,XString& /*p_tablename
 }
 
 XString
-SQLInfoMySQL::GetCATALOGForeignAttributes(XString& /*p_schema*/,XString& /*p_tablename*/,XString& /*p_constraintname*/,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/) const
+SQLInfoMySQL::GetCATALOGForeignAttributes(XString& /*p_schema*/,XString& /*p_tablename*/,XString& /*p_constraintname*/,bool /*p_referenced = false*/,int /*p_maxColumns*/ /*=SQLINFO_MAX_COLUMNS*/,bool /*p_quoted = false*/) const
 {
   // Cannot be implemented for generic ODBC
   // Use SQLForeignKeys instead (see SQLInfo class)
@@ -1170,20 +1198,20 @@ SQLInfoMySQL::GetCATALOGCheckDrop(XString  /*p_schema*/,XString  /*p_tablename*/
 // ALL TRIGGER FUNCTIONS
 
 XString
-SQLInfoMySQL::GetCATALOGTriggerExists(XString /*p_schema*/, XString /*p_tablename*/, XString /*p_triggername*/) const
+SQLInfoMySQL::GetCATALOGTriggerExists(XString /*p_schema*/, XString /*p_tablename*/, XString /*p_triggername*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoMySQL::GetCATALOGTriggerList(XString& p_schema,XString& p_tablename) const
+SQLInfoMySQL::GetCATALOGTriggerList(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
   XString triggername;
-  return GetCATALOGTriggerAttributes(p_schema,p_tablename,triggername);
+  return GetCATALOGTriggerAttributes(p_schema,p_tablename,triggername,p_quoted);
 }
 
 XString
-SQLInfoMySQL::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablename,XString& p_triggername) const
+SQLInfoMySQL::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablename,XString& p_triggername,bool /*p_quoted = false*/) const
 {
   XString sql;
   sql = _T("SELECT event_object_catalog\n")
@@ -1246,19 +1274,19 @@ SQLInfoMySQL::GetCATALOGTriggerDrop(XString /*p_schema*/, XString /*p_tablename*
 // ALL SEQUENCE FUNCTIONS
 
 XString
-SQLInfoMySQL::GetCATALOGSequenceExists(XString /*p_schema*/, XString /*p_sequence*/) const
+SQLInfoMySQL::GetCATALOGSequenceExists(XString /*p_schema*/, XString /*p_sequence*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoMySQL::GetCATALOGSequenceList(XString& /*p_schema*/,XString& /*p_pattern*/) const
+SQLInfoMySQL::GetCATALOGSequenceList(XString& /*p_schema*/,XString& /*p_pattern*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoMySQL::GetCATALOGSequenceAttributes(XString& /*p_schema*/,XString& /*p_sequence*/) const
+SQLInfoMySQL::GetCATALOGSequenceAttributes(XString& /*p_schema*/,XString& /*p_sequence*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
@@ -1279,19 +1307,19 @@ SQLInfoMySQL::GetCATALOGSequenceDrop(XString /*p_schema*/, XString /*p_sequence*
 // ALL VIEW FUNCTIONS
 
 XString 
-SQLInfoMySQL::GetCATALOGViewExists(XString& /*p_schema*/,XString& /*p_viewname*/) const
+SQLInfoMySQL::GetCATALOGViewExists(XString& /*p_schema*/,XString& /*p_viewname*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString 
-SQLInfoMySQL::GetCATALOGViewList(XString& p_schema,XString& p_pattern) const
+SQLInfoMySQL::GetCATALOGViewList(XString& p_schema,XString& p_pattern,bool /*p_quoted = false*/) const
 {
   return GetCATALOGViewAttributes(p_schema,p_pattern);
 }
 
 XString 
-SQLInfoMySQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname) const
+SQLInfoMySQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname,bool /*p_quoted = false*/) const
 {
   XString sql;
   sql = _T("SELECT table_catalog\n")
@@ -1320,7 +1348,7 @@ SQLInfoMySQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname) co
 }
 
 XString
-SQLInfoMySQL::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewname*/) const
+SQLInfoMySQL::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewname*/,bool /*p_quoted = false*/) const
 {
   // Cannot query this, Use ODBC functions
   return _T("");
@@ -1455,7 +1483,7 @@ SQLInfoMySQL::GetCATALOGSynonymDrop(XString& /*p_schema*/,XString& /*p_synonym*/
 //////////////////////////////////////////////////////////////////////////
 
 XString
-SQLInfoMySQL::GetPSMProcedureExists(XString p_schema, XString p_procedure) const
+SQLInfoMySQL::GetPSMProcedureExists(XString p_schema, XString p_procedure,bool /*p_quoted = false*/) const
 {
   XString sql;
   sql = _T("SELECT SELECT COUNT(*)\n")
@@ -1494,7 +1522,7 @@ SQLInfoMySQL::GetPSMProcedureList(XString& p_schema) const
 }
 
 XString
-SQLInfoMySQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure) const
+SQLInfoMySQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure,bool /*p_quoted = false*/) const
 {
   XString sql;
   sql = _T("SELECT routine_catalog\n")
@@ -1542,7 +1570,7 @@ SQLInfoMySQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure) 
 }
 
 XString
-SQLInfoMySQL::GetPSMProcedureSourcecode(XString /*p_schema*/, XString /*p_procedure*/) const
+SQLInfoMySQL::GetPSMProcedureSourcecode(XString /*p_schema*/, XString /*p_procedure*/,bool /*p_quoted = false*/) const
 {
   // Source-code already gotten with attributes
   return _T("");
@@ -1561,20 +1589,20 @@ SQLInfoMySQL::GetPSMProcedureDrop(XString /*p_schema*/, XString /*p_procedure*/,
 }
 
 XString
-SQLInfoMySQL::GetPSMProcedureErrors(XString /*p_schema*/,XString /*p_procedure*/) const
+SQLInfoMySQL::GetPSMProcedureErrors(XString /*p_schema*/,XString /*p_procedure*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoMySQL::GetPSMProcedurePrivilege(XString& /*p_schema*/,XString& /*p_procedure*/) const
+SQLInfoMySQL::GetPSMProcedurePrivilege(XString& /*p_schema*/,XString& /*p_procedure*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 // And it's parameters
 XString
-SQLInfoMySQL::GetPSMProcedureParameters(XString& p_schema,XString& p_procedure) const
+SQLInfoMySQL::GetPSMProcedureParameters(XString& p_schema,XString& p_procedure,bool /*p_quoted = false*/) const
 {
   XString sql;
 
