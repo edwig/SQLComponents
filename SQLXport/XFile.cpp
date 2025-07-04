@@ -506,7 +506,7 @@ XFile::ReadProcedure()
     xerror(_T("Internal error reading source. Not a function/trigger/procedure name\n"));
     return _T("");
   }
-  xprintf(false,_T("Importing source %s\n"),name.GetString());
+  xprintf(false,_T("Importing source for: %s\n"),name.GetString());
   return name;
 }
 
@@ -517,14 +517,16 @@ XFile::WriteRows(XPort& p_xport,XString& p_table,bool p_export)
   long    rows    = 0;
   bool    result  = true;
   XString name    = _T("SELECT_for_") + p_table;
-  XString select  = p_xport.GetDefineRowSelect  (p_table);
-  XString count   = p_xport.GetDefineCountSelect(p_table);
   
   if(p_export)
   {
     try
     {
       SQLQuery qry(p_xport.GetDatabase());
+
+      // Query text
+      XString select  = p_xport.GetDefineRowSelect  (p_table,p_xport.GetDatabase()->GetSQLInfoDB());
+      XString count   = p_xport.GetDefineCountSelect(p_table,p_xport.GetDatabase()->GetSQLInfoDB());
 
       // Count our records first
       qry.DoSQLStatement(count);
@@ -598,7 +600,6 @@ XFile::ReadRows(XPort& p_xport,XString& p_table,bool p_object,bool p_list)
   int     errors  = 0;
   int     todo    = 0;
   XString name    = _T("INSERT_for_") + p_table;
-  XString insert  = p_xport.GetDefineRowInsert(p_table);
   OList*  columns = p_xport.GetColumns();
   int     cols    = (int) columns->size();
 
@@ -607,6 +608,7 @@ XFile::ReadRows(XPort& p_xport,XString& p_table,bool p_object,bool p_list)
     // Start transaction
     SQLTransaction trans(p_xport.GetDatabase(),name);
     SQLQuery query(p_xport.GetDatabase());
+    XString insert = p_xport.GetDefineRowInsert(p_table,p_xport.GetDatabase()->GetSQLInfoDB());
 
     // Prepare our query for execution
     if(!p_list)

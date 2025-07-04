@@ -100,6 +100,7 @@ XPort::Export()
   if(m_parameters.m_source)
   {
     ExportProcedures();
+    ExportTriggers();
   }
 
   // STEP 13: for all views
@@ -191,6 +192,9 @@ XPort::Connect()
     m_database.AddMacro(_T("$SCHEMA$"),schema);
     xprintf(false,_T("Default schema for import set to [%s]\n"),schema.GetString());
   }
+  // Use our SQL if possible and present
+  m_database.GetSQLInfoDB()->GetInfo();
+  m_database.GetSQLInfoDB()->SetPreferODBC(false);
   return true;
 }
 
@@ -238,149 +242,181 @@ XPort::CloseDumpFile()
 void    
 XPort::DropSchema()
 {
-  XString drop;
-  XString name(_T("DroppingSchema"));
-  int count  = 0;
-  int errors = 0;
   OList statements;
-  SQLInfoDB* info = m_database.GetSQLInfoDB();
 
+  GatherDropSchema (statements);
+  ExecuteDropSchema(statements);
+}
+
+void
+XPort::GatherDropSchema(OList& p_statements)
+{ 
+  SQLInfoDB* info = m_database.GetSQLInfoDB();
+  XString schema(m_schema);
   XString all;
 
-  XString allsynonyms    = info->GetCATALOGTableSynonyms(m_schema,all);
-  XString allsequences   = info->GetCATALOGSequenceList (m_schema,all);
-  XString allprocedures  = info->GetPSMProcedureList    (m_schema);
-  XString allviews       = info->GetCATALOGViewList     (m_schema,all);
-  XString allconstraints = info->GetCATALOGForeignList  (m_schema,all);
-  XString alltables      = info->GetCATALOGTablesList   (m_schema,all);
-
+  XString allsynonyms    = info->GetCATALOGTableSynonyms(schema,all);
+  XString allsequences   = info->GetCATALOGSequenceList (schema,all);
+  XString allprocedures  = info->GetPSMProcedureList    (schema,all);
+  XString alltriggers    = info->GetCATALOGTriggerList  (schema,all);
+  XString allviews       = info->GetCATALOGViewList     (schema,all);
+  XString allconstraints = info->GetCATALOGForeignList  (schema,all);
+  XString alltables      = info->GetCATALOGTablesList   (schema,all);
+  
   xprintf(false,_T("Gathering contents of schema: %s\n"),m_schema.GetString());
   try
   {
     SQLQuery query(&m_database);
 
     // SYNONYMS
-    query.DoSQLStatement(allsynonyms,m_schema);
+    query.DoSQLStatement(allsynonyms,schema);
     while(query.GetRecord())
     {
-      ++count;
-      XString dropline = _T("DROP SYNONYM ") + m_schema + _T(".") + (XString)query[3];
-      statements.push_back(dropline);
+      XString synonym  = query[3];
+      XString dropline = info->GetCATALOGSynonymDrop(schema,synonym);
+      p_statements.push_back(dropline);
     }
     // SEQUENCES
-    query.DoSQLStatement(allsequences,m_schema);
+    query.DoSQLStatement(allsequences,schema);
     while(query.GetRecord())
     {
-      ++count;
-      XString dropline = info->GetCATALOGSequenceDrop(m_schema,query[3]);
-      statements.push_back(dropline);
+      XString dropline = info->GetCATALOGSequenceDrop(schema,query[3]);
+      p_statements.push_back(dropline);
     }
     // PROCEDURES
-    query.DoSQLStatement(allprocedures,m_schema);
+    query.DoSQLStatement(allprocedures,schema);
     while(query.GetRecord())
     {
-      ++count;
       XString procedure = query[3];
       int     typeproc  = query[4];
-      XString dropline = info->GetPSMProcedureDrop(m_schema,procedure,typeproc == 2);
-      statements.push_back(dropline);
+      XString dropline = info->GetPSMProcedureDrop(schema,procedure,typeproc == 2);
+      p_statements.push_back(dropline);
     }
-    // VIEWS
-    query.DoSQLStatement(allviews,m_schema);
+    // TRIGGERS
+    query.DoSQLStatement(alltriggers,schema);
     while(query.GetRecord())
     {
-      ++count;
+      XString tablename = query[3];
+      XString trigger   = query[4];
+      XString dropline = info->GetCATALOGTriggerDrop(schema,tablename,trigger);
+      p_statements.push_back(dropline);
+    }
+    // VIEWS
+    query.DoSQLStatement(allviews,schema);
+    while(query.GetRecord())
+    {
       XString precursor;
-      XString dropline = info->GetCATALOGViewDrop(m_schema,query[3],precursor);
+      XString dropline = info->GetCATALOGViewDrop(schema,query[3],precursor);
       if(!precursor.IsEmpty())
       {
-        ++count;
-        statements.push_back(precursor);
+        p_statements.push_back(precursor);
       }
-      statements.push_back(dropline);
+      p_statements.push_back(dropline);
     }
     // CONSTRAINTS
-    query.DoSQLStatement(allconstraints,m_schema);
+    query.DoSQLStatement(allconstraints,schema);
     while(query.GetRecord())
     {
       if(query[9].GetAsSLong() == 1)
       {
-        ++count;
-        XString dropline = info->GetCATALOGForeignDrop(m_schema,query[6],query[8]);
-        statements.push_back(dropline);
+        XString dropline = info->GetCATALOGForeignDrop(schema,query[6],query[8]);
+        p_statements.push_back(dropline);
       }
     }
     // TABLES
-    query.DoSQLStatement(alltables,m_schema);
+    query.DoSQLStatement(alltables,schema);
     while(query.GetRecord())
     {
-      ++count;
-      XString dropline = info->GetCATALOGTableDrop(m_schema,query[3]);
-      statements.push_back(dropline);
+      XString dropline = info->GetCATALOGTableDrop(schema,query[3]);
+      p_statements.push_back(dropline);
     }
   }
   catch(StdException& ex)
   {
-  	xerror(_T("Cannot drop schema:%s\nSQL: %s\nError: %s\n"),m_schema.GetString(),drop.GetString(),ex.GetErrorMessage().GetString());
+  	xerror(_T("Cannot gather information for schema:%s Error: %s\n"),m_schema.GetString(),ex.GetErrorMessage().GetString());
     return;
   }
+}
 
+void
+XPort::ExecuteDropSchema(OList& p_statements)
+{
   XString transname(_T("DropSchema"));
   SQLTransaction trans(GetDatabase(),transname);
+  int count  = (int)p_statements.size();
+  int errors = 0;
+  XString drop;
+
   xprintf(false, _T("Dropping the contents of schema: %s\n"), m_schema.GetString());
-  for(auto& statement : statements)
+
+  try
   {
-    if(ImportSQL(statement) != 0)
+    for(auto& statement : p_statements)
     {
-      ++errors;
+      drop = statement;
+      if(ImportSQL(drop) != 0)
+      {
+        ++errors;
+      }
     }
-    if((count % COMMIT_SIZE) == 0)
+    trans.Commit();
+    // Tell what we've done
+    xprintf(false,_T("Schema dropped: %d SQL statements done"),count);
+    if(errors)
     {
-      trans.Commit();
-      _tprintf(_T("DDL DROP statements done: %d/%d\r"),count,(int)statements.size());
-      trans.Start(transname);
+      xprintf(false,_T(". Errors: %d"),errors);
     }
+    xprintf(false,_T("\n"));
   }
-  trans.Commit();
-  if(count >= COMMIT_SIZE)
+  catch(StdException& ex)
   {
-    _tprintf(_T("\n"));
+    xerror(_T("Cannot drop schema:%s\nSQL: %s\nError: %s\n"),m_schema.GetString(),drop.GetString(),ex.GetErrorMessage().GetString());
+    return;
   }
-  // Tell what we've done
-  xprintf(false,_T("Schema dropped: %d SQL statements done"),count);
-  if(errors)
-  {
-    xprintf(false,_T(". Errors: %d"),errors);
-  }
-  xprintf(false,_T("\n"));
 }
 
 int  
 XPort::GetAllTables()
 {
   int count = 0;
+  XString sql = m_database.GetSQLInfoDB()->GetCATALOGTablesList(m_schema,m_object,true);
+
   try
   {
-    XString sql = m_database.GetSQLInfoDB()->GetCATALOGTablesList(m_schema,m_object);
-    SQLQuery qry(&m_database);
+    for(int ind = 0;ind < 2;++ind)
+    {
+      SQLQuery qry(&m_database);
 
-    qry.SetParameter(1,m_schema);
-    if(!m_object.IsEmpty())
-    {
-      qry.SetParameter(2,m_object);
-    }
-    qry.DoSQLStatement(sql);
-    while(qry.GetRecord())
-    {
-      ++count;
-      XString table = qry[3];
-      XString type  = qry[4];
-      // Skip local and global temporary tables
-      // Skip system tables and views
-      if(type.Compare(_T("TABLE")) == 0)
+      int param = 1;
+      if(!m_schema.IsEmpty())
       {
-        m_tables.push_back(table);
+        qry.SetParameter(param++,m_schema);
       }
+      if(!m_object.IsEmpty())
+      {
+        qry.SetParameter(param++,m_object);
+      }
+      qry.DoSQLStatement(sql);
+      while(qry.GetRecord())
+      {
+        ++count;
+        XString table = qry[3];
+        XString type  = qry[4];
+        table = table.Trim();
+        type  = type.Trim();
+        // Skip local and global temporary tables
+        // Skip system tables and views
+        if(type.Compare(_T("TABLE")) == 0)
+        {
+          m_tables.push_back(table);
+        }
+      }
+      if(!m_tables.empty())
+      {
+        return count;
+      }
+      // Standard unquoted names
+      sql = m_database.GetSQLInfoDB()->GetCATALOGTablesList(m_schema,m_object);
     }
   }
   catch(StdException& ex)
@@ -401,10 +437,15 @@ XPort::GetAllCheckConstraints()
   try
   {
     SQLQuery qry(&m_database);
-    qry.SetParameter(1,m_schema);
+
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      qry.SetParameter(param++,m_schema);
+    }
     if(!m_object.IsEmpty())
     {
-      qry.SetParameter(2,m_object);
+      qry.SetParameter(param++,m_object);
     }
     qry.DoSQLStatement(sql);
     while(qry.GetRecord())
@@ -426,22 +467,37 @@ int
 XPort::GetAllViews()
 {
   int count = 0;
-  XString sql = m_database.GetSQLInfoDB()->GetCATALOGViewList(m_schema,m_object);
+  // try quoted identifiers first
+  XString sql = m_database.GetSQLInfoDB()->GetCATALOGViewList(m_schema,m_object,true);
 
   try
   {
-    SQLQuery qry(&m_database);
-    qry.SetParameter(1,m_schema);
-    if(!m_object.IsEmpty())
+    for(int ind = 0;ind < 2;++ind)
     {
-      qry.SetParameter(2,m_object);
-    }
-    qry.DoSQLStatement(sql);
-    while(qry.GetRecord())
-    {
-      ++count;
-      XString viewName = qry[3];
-      m_views.push_back(viewName);
+      SQLQuery qry(&m_database);
+
+      int param = 1;
+      if(!m_schema.IsEmpty())
+      {
+        qry.SetParameter(param++,m_schema);
+      }
+      if(!m_object.IsEmpty())
+      {
+        qry.SetParameter(param++,m_object);
+      }
+      qry.DoSQLStatement(sql);
+      while(qry.GetRecord())
+      {
+        ++count;
+        XString viewName = qry[3];
+        m_views.push_back(viewName);
+      }
+      if(count)
+      {
+        return count;
+      }
+      // Standard identifiers
+      sql = m_database.GetSQLInfoDB()->GetCATALOGViewList(m_schema,m_object);
     }
   }
   catch(StdException& ex)
@@ -458,22 +514,34 @@ XPort::GetAllSequences()
 {
   int count = 0;
   XString object(m_object);
-  XString sql = m_database.GetSQLInfoDB()->GetCATALOGSequenceList(m_schema,object);
+  XString sql = m_database.GetSQLInfoDB()->GetCATALOGSequenceList(m_schema,object,true);
 
   try
   {
-    SQLQuery qry(&m_database);
-    qry.SetParameter(1,m_schema);
-    if(!object.IsEmpty())
+    for(int ind = 0;ind < 2;++ind)
     {
-      qry.SetParameter(2,object);
-    }
-    qry.DoSQLStatement(sql);
-    while(qry.GetRecord())
-    {
-      ++count;
-      XString seqName = qry[3];
-      m_sequences.push_back(seqName);
+      SQLQuery qry(&m_database);
+      int param = 1;
+      if(!m_schema.IsEmpty())
+      {
+        qry.SetParameter(param++,m_schema);
+       }
+      if(!object.IsEmpty())
+      {
+        qry.SetParameter(param++,object);
+      }
+      qry.DoSQLStatement(sql);
+      while(qry.GetRecord())
+      {
+        ++count;
+        XString seqName = qry[3];
+        m_sequences.push_back(seqName);
+      }
+      if(count)
+      {
+        return count;
+      }
+      sql = m_database.GetSQLInfoDB()->GetCATALOGSequenceList(m_schema,object);
     }
   }
   catch(StdException& ex)
@@ -494,30 +562,91 @@ XPort::GetAllProcedures()
   {
     object = _T("%") + object + _T("%");
   }
-  XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,object);
+  XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,object,true);
 
   try
   {
-    SQLQuery qry(&m_database);
-    qry.SetParameter(1,m_schema);
-    if(!m_object.IsEmpty())
+    for(int ind = 0;ind < 2;++ind)
     {
-      qry.SetParameter(2,object);
-    }
-    qry.DoSQLStatement(sql);
-    while(qry.GetRecord())
-    {
-      ++count;
-      XString procType = qry[8].GetAsSLong() == 1 ? _T("procedure") : _T("function");
-      XString procName = qry[3];
-      XString procedure = procType + _T(":") + procName;
-      m_procedures.push_back(procedure);
+      SQLQuery qry(&m_database);
+      int param =1;
+      if(!m_schema.IsEmpty())
+      {
+        qry.SetParameter(param++,m_schema);
+      }
+      if(!m_object.IsEmpty())
+      {
+        qry.SetParameter(param++,object);
+      }
+      qry.DoSQLStatement(sql);
+      while(qry.GetRecord())
+      {
+        ++count;
+        XString procType = qry[8].GetAsSLong() == 1 ? _T("procedure") : _T("function");
+        XString procName = qry[3];
+        XString procedure = procType + _T(":") + procName;
+        m_procedures.push_back(procedure);
+      }
+      if(count)
+      {
+        return count;
+      }
+      sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,object);
     }
   }
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
     xerror(_T("Internal error reading count of procedures.\n"));
+    return 0;
+  }
+  return count;
+}
+
+int
+XPort::GetAllTriggers()
+{
+  int count = 0;
+  XString object(m_object);
+  if(!object.IsEmpty() && (object.Find('%') < 0))
+  {
+    object = _T("%") + object + _T("%");
+  }
+  XString sql = m_database.GetSQLInfoDB()->GetCATALOGTriggerList(m_schema,object,true);
+
+  try
+  {
+    for(int ind = 0;ind < 2;++ind)
+    {
+      SQLQuery qry(&m_database);
+      int param = 1;
+      if(!m_schema.IsEmpty())
+      {
+        qry.SetParameter(param++,m_schema);
+      }
+      if(!m_object.IsEmpty())
+      {
+        qry.SetParameter(param++,object);
+      }
+      qry.DoSQLStatement(sql);
+      while(qry.GetRecord())
+      {
+        ++count;
+        XString trigName = qry[4];
+        XString trigger = _T("trigger:") + trigName;
+        m_triggers.push_back(trigger);
+      }
+      if(count)
+      {
+        return count;
+      }
+      sql = m_database.GetSQLInfoDB()->GetCATALOGTriggerList(m_schema,object);
+    }
+  }
+  catch(StdException& ex)
+  {
+    xerror(ex.GetErrorMessage());
+    xerror(_T("Internal error reading count of triggers.\n"));
     return 0;
   }
   return count;
@@ -539,10 +668,14 @@ XPort::GetAllSynonyms()
   try
   {
     SQLQuery qry(&m_database);
-    qry.SetParameter(1,m_schema);
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      qry.SetParameter(param++,m_schema);
+    }
     if(!object.IsEmpty())
     {
-      qry.SetParameter(2,object);
+      qry.SetParameter(param++,object);
     }
     qry.DoSQLStatement(sql);
     while(qry.GetRecord())
@@ -589,13 +722,14 @@ bool
 XPort::ConsistentTables(XString p_schema)
 {
   XString lock;
+  SQLInfoDB* info = m_database.GetSQLInfoDB();
 
   for(unsigned ind = 0;ind < m_tables.size(); ++ind)
   {
-    XString table = m_tables[ind];
+    XString table = info->QueryIdentifierQuotation(m_tables[ind]);
     xprintf(false,_T("Lock table [%s.%-32s] for export [%u/%u]\n"),p_schema.GetString(),table.GetString(),ind + 1,m_tables.size());
 
-    lock = m_database.GetSQLInfoDB()->GetSQLLockTable(p_schema,table,false,0); // gWaitTime);
+    lock = info->GetSQLLockTable(p_schema,table,false,0); // gWaitTime);
     if(DoSQLStatement(lock,false))
     {
       xprintf(false,_T("Cannot lock table [%s.%s] for export\n"),p_schema.GetString(),table.GetString());
@@ -611,12 +745,14 @@ XPort::PerformStatistics()
 {
   XString calc;
   int ind = 1;
+  SQLInfoDB* info = m_database.GetSQLInfoDB();
+  XString schema = info->QueryIdentifierQuotation(m_schema);
 
   for(auto& table : m_tables)
   {
     xprintf(false,_T("Gather statistics for table: %s.%s [%u/%u]\n"),m_schema.GetString(),table.GetString(),ind++,m_tables.size());
-
-    calc = m_database.GetSQLInfoDB()->GetSQLOptimizeTable(m_schema,table);
+    table = info->QueryIdentifierQuotation(table);
+    calc  = info->GetSQLOptimizeTable(schema,table);
     DoSQLStatement(calc);
   }
   xprintf(false,_T("\n"));
@@ -720,7 +856,12 @@ XPort::GetDefineSQLTable(XString p_table)
   try
   {
     // Getting columns and options for the first statement
-    XString table = m_schema + _T(".") + p_table;
+    XString table;
+    if(!m_schema.IsEmpty())
+    {
+      table = m_schema + _T(".");
+    }
+    table += p_table;
     DDLS statements = create.GetTableStatements(table,true,true,false,false,false,false,false,false);
     if(statements.size() == 1)
     {
@@ -776,7 +917,7 @@ XPort::GetDefineSQLPrimary(XString p_table)
     DDLS statements = create.GetTableStatements(p_table,true,true,true,true,false,false,false,false);
     if(statements.size() >= 1)
     {
-      RecordAllPrimaries(create,statements);
+      RecordAllPrimaries(create,statements,p_table);
       return statements;
     }
   }
@@ -796,7 +937,7 @@ XPort::GetDefineSQLForeigns(XString p_table)
 
   try
   {
-    // Getting columns and foreign keys
+    // Getting columns and foreign keys and possibly overlapping indices
     DDLS statements = create.GetTableStatements(p_table,true,false,false,false,true,false,false,false);
     RecordAllForeigns(create);
     return statements;
@@ -847,9 +988,17 @@ XPort::RecordAllIndices(DDLCreateTable& p_create,DDLS& p_ddls)
 }
 
 void
-XPort::RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls)
+XPort::RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls,CString p_table)
 {
   m_constraints.clear();
+
+  // In case the primary key is also a foreign key
+  if(p_create.m_indices.empty())
+  {
+    m_constraints.push_back(XString(_T("PK_")) + p_table);
+    return;
+  }
+
   DDLS::iterator it = p_ddls.begin() + 1;
   for(auto& index : p_create.m_indices)
   {
@@ -886,18 +1035,21 @@ XString
 XPort::GetDefineSQLView(XString p_view)
 {
   SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetCATALOGViewText(m_schema,p_view);
+  XString sql = info->GetCATALOGViewText(m_schema,p_view,true);
   XString create;
 
   try
   {
-    SQLQuery qry(&m_database);
-    qry.SetParameter(1,m_schema);
-    qry.SetParameter(2,p_view);
-    qry.DoSQLStatement(sql);
-    if(qry.GetRecord())
+    for(int ind = 0;ind < 2;++ind)
     {
-      qry[1].GetAsString(create);
+      SQLQuery qry(&m_database);
+      qry.DoSQLStatement(sql);
+      if(qry.GetRecord())
+      {
+        qry[1].GetAsString(create);
+        break;
+      }
+      sql = info->GetCATALOGViewText(m_schema,p_view);
     }
   }
   catch(StdException& ex)
@@ -913,28 +1065,37 @@ XString
 XPort::GetDefineSQLSequence(XString p_sequence)
 {
   SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetCATALOGSequenceAttributes(m_schema,p_sequence);
+  XString sql = info->GetCATALOGSequenceAttributes(m_schema,p_sequence,true);
   XString define;
 
   try
   {
-    SQLQuery query(m_database);
-    query.SetParameter(1,m_schema);
-    query.SetParameter(2,p_sequence);
-    query.DoSQLStatement(sql);
-    if(query.GetRecord())
+    for(int ind = 0;ind < 2;++ind)
     {
-      MetaSequence seq;
-      seq.m_schemaName   = m_schema;
-      seq.m_sequenceName = p_sequence;
-      seq.m_currentValue = query[4];
-      seq.m_minimalValue = query[5];
-      seq.m_increment    = query[6];
-      seq.m_cache        = query[7];
-      seq.m_cycle        = query[8];
-      seq.m_order        = query[9];
+      SQLQuery query(m_database);
+      int param = 1;
+      if(!m_schema.IsEmpty()) 
+      {
+        query.SetParameter(param++,m_schema);
+      }
+      query.SetParameter(param++,p_sequence);
+      query.DoSQLStatement(sql);
+      if(query.GetRecord())
+      {
+        MetaSequence seq;
+        seq.m_schemaName   = m_schema;
+        seq.m_sequenceName = p_sequence;
+        seq.m_currentValue = query[4];
+        seq.m_minimalValue = query[5];
+        seq.m_increment    = query[6];
+        seq.m_cache        = query[7];
+        seq.m_cycle        = query[8];
+        seq.m_order        = query[9];
 
-      define = info->GetCATALOGSequenceCreate(seq);
+        define = info->GetCATALOGSequenceCreate(seq);
+        break;
+      }
+      sql = info->GetCATALOGSequenceAttributes(m_schema,p_sequence);
     }
   }
   catch (StdException& ex)
@@ -955,7 +1116,7 @@ XPort::GetDefineSQLProcedure(XString p_procedure)
   {
     procedure = p_procedure.Mid(pos + 1);
   }
-  XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureSourcecode(m_schema,procedure);
+  XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureSourcecode(m_schema,procedure,true);
 
   try
   {
@@ -975,6 +1136,44 @@ XPort::GetDefineSQLProcedure(XString p_procedure)
   return create;
 }
 
+XString
+XPort::GetDefineSQLTrigger(XString p_trigger)
+{
+  XString create;
+  XString trigger(p_trigger);
+  int pos = p_trigger.Find(':');
+  if(pos > 0)
+  {
+    trigger = p_trigger.Mid(pos + 1);
+  }
+  XString object;
+  XString sql = m_database.GetSQLInfoDB()->GetCATALOGTriggerAttributes(m_schema,object,trigger,true);
+
+  try
+  {
+    SQLQuery query(&m_database);
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      query.SetParameter(param++,m_schema);
+    }
+    query.SetParameter(param++,trigger);
+    query.DoSQLStatement(sql);
+    while(query.GetRecord())
+    {
+      // PSM source is the 17th field MetaTrigger !!
+      create += query.GetColumn(17)->GetAsString();
+    }
+  }
+  catch(StdException& ex)
+  {
+    xerror(ex.GetErrorMessage());
+    xerror(_T("Internal error reading PSM source of %s.%s\n"),m_schema.GetString(),p_trigger.GetString());
+  }
+  create = create.TrimLeft(_T("\r\n"));
+  return create;
+}
+
 XString 
 XPort::GetDefineSQLSynonym(XString p_synonym)
 {
@@ -984,10 +1183,14 @@ XPort::GetDefineSQLSynonym(XString p_synonym)
   try
   {
     SQLQuery query(&m_database);
-    query.SetParameter(1,m_schema);
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      query.SetParameter(param++,m_schema);
+    }
     if(!p_synonym.IsEmpty())
     {
-      query.SetParameter(2,p_synonym);
+      query.SetParameter(param++,p_synonym);
     }
     query.DoSQLStatement(sql);
     if(query.GetRecord())
@@ -1007,39 +1210,57 @@ XPort::GetDefineSQLSynonym(XString p_synonym)
 // Getters
 
 XString
-XPort::GetDefineRowSelect(XString p_table)
+XPort::GetDefineRowSelect(XString p_table,SQLInfoDB* p_info)
 {
   XString select(_T("SELECT "));
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
   {
     if(ind > 0) select += _T("      ,");
-    select += m_columns[ind];
+    select += p_info->QueryIdentifierQuotation(m_columns[ind]);
     select += _T("\n");
   }
   select += _T(" FROM ");
-  select += m_schema;
-  select += _T(".");
-  select += p_table;
+  if(!m_schema.IsEmpty())
+  {
+    select += p_info->QueryIdentifierQuotation(m_schema);
+    select += _T(".");
+  }
+  select += p_info->QueryIdentifierQuotation(p_table);
 
   if(!m_parameters.m_filter.IsEmpty())
   {
     select += _T("\n WHERE ");
     select += m_parameters.m_filter;
   }
-  if(m_parameters.m_filter.Find(_T("OID")) >= 0)
+
+  // Getting columns and primary key 
+  DDLCreateTable create(p_info);
+  create.GetTableStatements(p_table,true,false,false,true,false,false,false,false);
+
+  if(!create.m_primaries.empty())
   {
-    select += _T("\n ORDER BY OID");
+    int colno = 0;
+    select += _T("\n ORDER BY ");
+    for(auto& primary : create.m_primaries)
+    {
+      if(colno) select += _T(",");
+      select += p_info->QueryIdentifierQuotation(primary.m_columnName);
+      ++colno;
+    }
   }
   return select;
 }
 
 XString
-XPort::GetDefineCountSelect(XString p_table)
+XPort::GetDefineCountSelect(XString p_table,SQLInfoDB* p_info)
 {
   XString select(_T("SELECT COUNT(*) FROM "));
-  select += m_schema;
-  select += _T(".");
-  select += p_table;
+  if(!m_schema.IsEmpty())
+  {
+    select += p_info->QueryIdentifierQuotation(m_schema);
+    select += _T(".");
+  }
+  select += p_info->QueryIdentifierQuotation(p_table);
   if(!m_parameters.m_filter.IsEmpty())
   {
     select += _T("\n WHERE ");
@@ -1049,22 +1270,22 @@ XPort::GetDefineCountSelect(XString p_table)
 }
 
 XString
-XPort::GetDefineRowInsert(XString p_table)
+XPort::GetDefineRowInsert(XString p_table,SQLInfoDB* p_info)
 {
   XString insert(_T("INSERT INTO "));
 
-  if(!m_schema.IsEmpty())
+  if(!m_schema.IsEmpty() && (p_info->GetSchemaNameUsage() & SQL_SU_DML_STATEMENTS))
   {
-    insert += m_schema;
+    insert += p_info->QueryIdentifierQuotation(m_schema);
     insert += _T(".");
   }
-  insert += p_table;
+  insert += p_info->QueryIdentifierQuotation(p_table);
   insert += _T("\n(");
 
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
   {
     insert += (ind > 0) ? _T(" ,") : _T(" ");
-    insert += m_columns[ind];
+    insert += p_info->QueryIdentifierQuotation(m_columns[ind]);
     insert += _T("\n");
   }
   insert += _T(")\nVALUES(");
@@ -1125,10 +1346,14 @@ XPort::WriteColumnAccessRights(XString p_object,int& p_count)
   try
   {
     SQLQuery query(m_database);
-    query.SetParameter(1,m_schema);
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      query.SetParameter(param++,m_schema);
+    }
     if(!p_object.IsEmpty())
     {
-      query.SetParameter(2,p_object);
+      query.SetParameter(param++,p_object);
     }
     query.DoSQLStatement(sql);
     while(query.GetRecord())
@@ -1207,10 +1432,14 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
   try
   {
     SQLQuery query(m_database);
-    query.SetParameter(1,m_schema);
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      query.SetParameter(param++,m_schema);
+    }
     if(!p_sequence.IsEmpty())
     {
-      query.SetParameter(2,p_sequence);
+      query.SetParameter(param++,p_sequence);
     }
     query.DoSQLStatement(sql);
     while(query.GetRecord())
@@ -1349,8 +1578,12 @@ XPort::ExportDefaultConstraints()
     }
 
     SQLQuery query(m_database);
-    query.SetParameter(1,m_schema);
-    query.SetParameter(2,table);
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      query.SetParameter(param++,m_schema);
+    }
+    query.SetParameter(param++,table);
     query.DoSQLStatement(sql);
     while(query.GetRecord())
     {
@@ -1389,8 +1622,12 @@ XPort::ExportCheckConstraints()
     }
 
     SQLQuery query(m_database);
-    query.SetParameter(1,m_schema);
-    query.SetParameter(2,table);
+    int param = 1;
+    if(!m_schema.IsEmpty())
+    {
+      query.SetParameter(param++,m_schema);
+    }
+    query.SetParameter(param++,table);
     query.DoSQLStatement(sql);
     while(query.GetRecord())
     {
@@ -1448,6 +1685,22 @@ XPort::ExportProcedures()
   {
     m_xfile.WriteProcedure(procedure);
     XString sql = GetDefineSQLProcedure(procedure);
+    m_xfile.WriteSQL(sql);
+  }
+  m_xfile.WriteSectionEnd();
+  m_xfile.Flush();
+}
+
+void
+XPort::ExportTriggers()
+{
+  // On import it does the same as procedures/functions
+  m_xfile.WriteSection(_T("PROCEDURES"));
+  GetAllTriggers();
+  for(auto& trigger : m_triggers)
+  {
+    m_xfile.WriteProcedure(trigger);
+    XString sql = GetDefineSQLTrigger(trigger);
     m_xfile.WriteSQL(sql);
   }
   m_xfile.WriteSectionEnd();

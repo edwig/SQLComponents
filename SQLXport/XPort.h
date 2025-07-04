@@ -67,6 +67,7 @@ public:
   int     GetAllViews();
   int     GetAllSequences();
   int     GetAllProcedures();
+  int     GetAllTriggers();
   int     GetAllSynonyms();
   int     DoSQLStatement(XString& p_sql,bool p_can_retry = false);
   void    DropSchema();
@@ -85,6 +86,7 @@ public:
   void    ExportViews();
   void    ExportSequences();
   void    ExportProcedures();
+  void    ExportTriggers();
   void    ExportSynonyms();
   void    ExportRights();
 
@@ -100,17 +102,19 @@ public:
   XString GetDefineSQLView     (XString p_view);
   XString GetDefineSQLSequence (XString p_sequence);
   XString GetDefineSQLProcedure(XString p_procedure);
+  XString GetDefineSQLTrigger  (XString p_trigger);
   XString GetDefineSQLSynonym  (XString p_synonym);
   // Data SQL
-  XString GetDefineCountSelect(XString p_table);
-  XString GetDefineRowSelect  (XString p_table);
-  XString GetDefineRowInsert  (XString p_table);
+  XString GetDefineCountSelect(XString p_table,SQLInfoDB* p_info);
+  XString GetDefineRowSelect  (XString p_table,SQLInfoDB* p_info);
+  XString GetDefineRowInsert  (XString p_table,SQLInfoDB* p_info);
 
   // Getters
   OList*        GetColumns();
   SQLDatabase*  GetDatabase();
 
 private:
+  // Exporting
   void          WriteTableAccessRights (XString p_object,int& p_count);
   void          WriteColumnAccessRights(XString p_object,int& p_count);
   void          WriteProcedureAccessRights(XString p_object,int& p_count);
@@ -120,9 +124,12 @@ private:
   int           ImportSQL(XString& p_sql,bool p_retries = false,XString p_delim = _T(";"));
   void          RecordAllColumns  (DDLCreateTable& p_create);
   void          RecordAllIndices  (DDLCreateTable& p_create,DDLS& p_ddls);
-  void          RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls);
+  void          RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls,CString p_table);
   void          RecordAllForeigns (DDLCreateTable& p_create);
-
+  // Drop old contents
+  void          GatherDropSchema (OList& p_statements);
+  void          ExecuteDropSchema(OList& p_statements);
+  // Importing
   void          ImportTables(bool p_listOnly,TCHAR& p_type);
   void          ImportIndices(TCHAR& p_type);
   void          ImportPrimaryKeys(TCHAR& p_type);
@@ -152,6 +159,7 @@ private:
   OList       m_views;
   OList       m_sequences;
   OList       m_procedures;
+  OList       m_triggers;
   OList       m_synonyms;
   // Retry queue for views
   OList       m_retries;

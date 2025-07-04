@@ -795,7 +795,7 @@ namespace DatabaseUnitTest
       number_of_tests += 5;
       // PERSISTENT STORED MODULES
       ReportSQL    (_T("PSM PROCEDURE exists               :"),p_info->GetPSMProcedureExists    (schema,procedurename));
-      ReportSQL    (_T("PSM PROCEDURE list                 :"),p_info->GetPSMProcedureList      (schema));
+      ReportSQL    (_T("PSM PROCEDURE list                 :"),p_info->GetPSMProcedureList      (schema,procedurename));
       ReportSQL    (_T("PSM PROCEDURE attributes           :"),p_info->GetPSMProcedureAttributes(schema,procedurename));
       ReportSQL    (_T("PSM PROCEDURE sourcecode           :"),p_info->GetPSMProcedureSourcecode(schema,procedurename));
       ReportSQL    (_T("PSM PROCEDURE create               :"),p_info->GetPSMProcedureCreate    (metaproc));
