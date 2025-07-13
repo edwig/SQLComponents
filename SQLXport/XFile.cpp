@@ -332,10 +332,10 @@ XFile::ReadTable(bool p_doNewline)
 }
 
 void
-XFile::WriteIndex(XString p_index)
+XFile::WriteIndex(XString p_table,XString p_index)
 {
   WriteString(_T('I'),p_index);
-  xprintf(false,_T("Exporting index: %s\n"),p_index.GetString());
+  xprintf(false,_T("Exporting index: %s.%s\n"),p_table.GetString(),p_index.GetString());
 }
 
 XString

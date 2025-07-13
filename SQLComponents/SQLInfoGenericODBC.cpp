@@ -1117,19 +1117,19 @@ SQLInfoGenericODBC::GetCATALOGDefaultDrop(XString /*p_schema*/,XString /*p_table
 // All check constraints
 
 XString
-SQLInfoGenericODBC::GetCATALOGCheckExists(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoGenericODBC::GetCATALOGCheckExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return XString();
 }
 
 XString
-SQLInfoGenericODBC::GetCATALOGCheckList(XString  /*p_schema*/,XString  /*p_tablename*/) const
+SQLInfoGenericODBC::GetCATALOGCheckList(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   return XString();
 }
 
 XString
-SQLInfoGenericODBC::GetCATALOGCheckAttributes(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoGenericODBC::GetCATALOGCheckAttributes(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return XString();
 }

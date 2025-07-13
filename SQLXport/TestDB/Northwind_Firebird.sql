@@ -46,7 +46,7 @@ COMMIT WORK;
 
 RECREATE TABLE "Categories" 
 (
-    "CategoryID"    INTEGER NOT NULL,
+    "CategoryID"    INTEGER     NOT NULL,
     "CategoryName"  VARCHAR(15) NOT NULL,
     "Description"   BLOB SUB_TYPE 1 SEGMENT SIZE 80,
     "Picture"       BLOB SUB_TYPE 0 SEGMENT SIZE 80
@@ -55,7 +55,7 @@ RECREATE TABLE "Categories"
 
 RECREATE TABLE "CustomerCustomerDemo" 
 (
-    "CustomerID"      CHAR(5) NOT NULL,
+    "CustomerID"      CHAR(5)  NOT NULL,
     "CustomerTypeID"  CHAR(10) NOT NULL
 );
 
@@ -69,7 +69,7 @@ RECREATE TABLE "CustomerDemographics"
 
 RECREATE TABLE "Customers" 
 (
-    "CustomerID"    CHAR(5) NOT NULL,
+    "CustomerID"    CHAR(5)     NOT NULL,
     "CompanyName"   VARCHAR(40) NOT NULL,
     "ContactName"   VARCHAR(30),
     "ContactTitle"  VARCHAR(30),
@@ -85,7 +85,7 @@ RECREATE TABLE "Customers"
 
 RECREATE TABLE "Employees" 
 (
-    "EmployeeID"       INTEGER NOT NULL,
+    "EmployeeID"       INTEGER     NOT NULL,
     "LastName"         VARCHAR(20) NOT NULL,
     "FirstName"        VARCHAR(10) NOT NULL,
     "Title"            VARCHAR(30),
@@ -108,17 +108,17 @@ RECREATE TABLE "Employees"
 
 RECREATE TABLE "EmployeeTerritories" 
 (
-    "EmployeeID"   INTEGER NOT NULL,
+    "EmployeeID"   INTEGER     NOT NULL,
     "TerritoryID"  VARCHAR(20) NOT NULL
 );
 
 
 RECREATE TABLE "Order Details" 
 (
-    "OrderID"    INTEGER NOT NULL,
-    "ProductID"  INTEGER NOT NULL,
+    "OrderID"    INTEGER       NOT NULL,
+    "ProductID"  INTEGER       NOT NULL,
     "UnitPrice"  DECIMAL(18,4) DEFAULT 0,
-    "Quantity"   SMALLINT DEFAULT 1,
+    "Quantity"   SMALLINT      DEFAULT 1,
     "Discount"   DOUBLE PRECISION DEFAULT 0
 );
 
@@ -144,7 +144,7 @@ RECREATE TABLE "Orders"
 
 RECREATE TABLE "Products" 
 (
-    "ProductID"        INTEGER NOT NULL,
+    "ProductID"        INTEGER     NOT NULL,
     "ProductName"      VARCHAR(40) NOT NULL,
     "SupplierID"       INTEGER,
     "CategoryID"       INTEGER,
@@ -153,20 +153,20 @@ RECREATE TABLE "Products"
     "UnitsInStock"     SMALLINT DEFAULT 0,
     "UnitsOnOrder"     SMALLINT DEFAULT 0,
     "ReorderLevel"     SMALLINT DEFAULT 0,
-    "Discontinued"     BOOLEAN DEFAULT False
+    "Discontinued"     BOOLEAN  DEFAULT False
 );
 
 
 RECREATE TABLE "Region" 
 (
-    "RegionID"           INTEGER NOT NULL,
+    "RegionID"           INTEGER  NOT NULL,
     "RegionDescription"  CHAR(50) NOT NULL
 );
 
 
 RECREATE TABLE "Shippers" 
 (
-    "ShipperID"    INTEGER NOT NULL,
+    "ShipperID"    INTEGER     NOT NULL,
     "CompanyName"  VARCHAR(40) NOT NULL,
     "Phone"        VARCHAR(24)
 );
@@ -174,7 +174,7 @@ RECREATE TABLE "Shippers"
 
 RECREATE TABLE "Suppliers" 
 (
-    "SupplierID"    INTEGER NOT NULL,
+    "SupplierID"    INTEGER     NOT NULL,
     "CompanyName"   VARCHAR(40) NOT NULL,
     "ContactName"   VARCHAR(30),
     "ContactTitle"  VARCHAR(30),
@@ -192,8 +192,8 @@ RECREATE TABLE "Suppliers"
 RECREATE TABLE "Territories" 
 (
     "TerritoryID"           VARCHAR(20) NOT NULL,
-    "TerritoryDescription"  CHAR(50) NOT NULL,
-    "RegionID"              INTEGER NOT NULL
+    "TerritoryDescription"  CHAR(50)    NOT NULL,
+    "RegionID"              INTEGER     NOT NULL
 );
 
 CREATE TABLE "US_States" 
@@ -4034,14 +4034,14 @@ COMMIT WORK;
 --/******************************************************************************/
 
 
-ALTER TABLE "Products" ADD CONSTRAINT "CK_Products_UnitPrice" CHECK ("UnitPrice" >= 0);
-ALTER TABLE "Products" ADD CONSTRAINT "CK_ReorderLevel" CHECK ("ReorderLevel" >= 0);
-ALTER TABLE "Products" ADD CONSTRAINT "CK_UnitsInStock" CHECK ("UnitsInStock" >= 0);
-ALTER TABLE "Products" ADD CONSTRAINT "CK_UnitsOnOrder" CHECK ("UnitsOnOrder" >= 0);
+ALTER TABLE "Products"      ADD CONSTRAINT "CK_Products_UnitPrice" CHECK ("UnitPrice" >= 0);
+ALTER TABLE "Products"      ADD CONSTRAINT "CK_ReorderLevel" CHECK ("ReorderLevel" >= 0);
+ALTER TABLE "Products"      ADD CONSTRAINT "CK_UnitsInStock" CHECK ("UnitsInStock" >= 0);
+ALTER TABLE "Products"      ADD CONSTRAINT "CK_UnitsOnOrder" CHECK ("UnitsOnOrder" >= 0);
 ALTER TABLE "Order Details" ADD CONSTRAINT "CK_Discount" CHECK ("Discount" >= 0 and "Discount" <= 1);
 ALTER TABLE "Order Details" ADD CONSTRAINT "CK_Quantity" CHECK ("Quantity" > 0);
 ALTER TABLE "Order Details" ADD CONSTRAINT "CK_UnitPrice" CHECK ("UnitPrice" >= 0);
-ALTER TABLE "Employees" ADD CONSTRAINT "CK_Birthdate" CHECK ("BirthDate" < CURRENT_TIMESTAMP);
+ALTER TABLE "Employees"     ADD CONSTRAINT "CK_Birthdate" CHECK ("BirthDate" < CURRENT_TIMESTAMP);
 
 
 --/******************************************************************************/
@@ -4049,73 +4049,69 @@ ALTER TABLE "Employees" ADD CONSTRAINT "CK_Birthdate" CHECK ("BirthDate" < CURRE
 --/******************************************************************************/
 
 
-ALTER TABLE "Categories" ADD CONSTRAINT "PK_Categories" PRIMARY KEY ("CategoryID");
+ALTER TABLE "Categories"           ADD CONSTRAINT "PK_Categories"           PRIMARY KEY ("CategoryID");
 ALTER TABLE "CustomerCustomerDemo" ADD CONSTRAINT "PK_CustomerCustomerDemo" PRIMARY KEY ("CustomerID", "CustomerTypeID");
 ALTER TABLE "CustomerDemographics" ADD CONSTRAINT "PK_CustomerDemographics" PRIMARY KEY ("CustomerTypeID");
-ALTER TABLE "Customers" ADD CONSTRAINT "PK_Customers" PRIMARY KEY ("CustomerID");
-ALTER TABLE "EmployeeTerritories" ADD CONSTRAINT "PK_EmployeeTerritories" PRIMARY KEY ("EmployeeID", "TerritoryID");
-ALTER TABLE "Employees" ADD CONSTRAINT "PK_Employees" PRIMARY KEY ("EmployeeID");
-ALTER TABLE "Order Details" ADD CONSTRAINT "PK_Order Details" PRIMARY KEY ("OrderID", "ProductID");
-ALTER TABLE "Orders" ADD CONSTRAINT "PK_Orders" PRIMARY KEY ("OrderID");
-ALTER TABLE "Products" ADD CONSTRAINT "PK_Products" PRIMARY KEY ("ProductID");
-ALTER TABLE "Region" ADD CONSTRAINT "PK_Region" PRIMARY KEY ("RegionID");
-ALTER TABLE "Shippers" ADD CONSTRAINT "PK_Shippers" PRIMARY KEY ("ShipperID");
-ALTER TABLE "Suppliers" ADD CONSTRAINT "PK_Suppliers" PRIMARY KEY ("SupplierID");
-ALTER TABLE "Territories" ADD CONSTRAINT "PK_Territories" PRIMARY KEY ("TerritoryID");
+ALTER TABLE "Customers"            ADD CONSTRAINT "PK_Customers"            PRIMARY KEY ("CustomerID");
+ALTER TABLE "EmployeeTerritories"  ADD CONSTRAINT "PK_EmployeeTerritories"  PRIMARY KEY ("EmployeeID", "TerritoryID");
+ALTER TABLE "Employees"            ADD CONSTRAINT "PK_Employees"            PRIMARY KEY ("EmployeeID");
+ALTER TABLE "Order Details"        ADD CONSTRAINT "PK_Order Details"        PRIMARY KEY ("OrderID", "ProductID");
+ALTER TABLE "Orders"               ADD CONSTRAINT "PK_Orders"               PRIMARY KEY ("OrderID");
+ALTER TABLE "Products"             ADD CONSTRAINT "PK_Products"             PRIMARY KEY ("ProductID");
+ALTER TABLE "Region"               ADD CONSTRAINT "PK_Region"               PRIMARY KEY ("RegionID");
+ALTER TABLE "Shippers"             ADD CONSTRAINT "PK_Shippers"             PRIMARY KEY ("ShipperID");
+ALTER TABLE "Suppliers"            ADD CONSTRAINT "PK_Suppliers"            PRIMARY KEY ("SupplierID");
+ALTER TABLE "Territories"          ADD CONSTRAINT "PK_Territories"          PRIMARY KEY ("TerritoryID");
 
 
 --/******************************************************************************/
 --/***                              Foreign keys                              ***/
 --/******************************************************************************/
 
-
-ALTER TABLE "CustomerCustomerDemo" ADD CONSTRAINT "FK_CustomerCustomerDemo" FOREIGN KEY ("CustomerTypeID") REFERENCES "CustomerDemographics" ("CustomerTypeID");
-ALTER TABLE "CustomerCustomerDemo" ADD CONSTRAINT "FK_CustomerCustomerDemo_Customers" FOREIGN KEY ("CustomerID") REFERENCES "Customers" ("CustomerID");
-ALTER TABLE "EmployeeTerritories" ADD CONSTRAINT "FK_EmployeeTerritories_Employees" FOREIGN KEY ("EmployeeID") REFERENCES "Employees" ("EmployeeID");
-ALTER TABLE "EmployeeTerritories" ADD CONSTRAINT "FK_EmployeeTerritories_Territories" FOREIGN KEY ("TerritoryID") REFERENCES "Territories" ("TerritoryID");
-ALTER TABLE "Employees" ADD CONSTRAINT "FK_Employees_Employees" FOREIGN KEY ("ReportsTo") REFERENCES "Employees" ("EmployeeID");
-ALTER TABLE "Order Details" ADD CONSTRAINT "FK_Order_Details_Orders" FOREIGN KEY ("OrderID") REFERENCES "Orders" ("OrderID");
-ALTER TABLE "Order Details" ADD CONSTRAINT "FK_Order_Details_Products" FOREIGN KEY ("ProductID") REFERENCES "Products" ("ProductID");
-ALTER TABLE "Orders" ADD CONSTRAINT "FK_Orders_Customers" FOREIGN KEY ("CustomerID") REFERENCES "Customers" ("CustomerID");
-ALTER TABLE "Orders" ADD CONSTRAINT "FK_Orders_Employees" FOREIGN KEY ("EmployeeID") REFERENCES "Employees" ("EmployeeID");
-ALTER TABLE "Orders" ADD CONSTRAINT "FK_Orders_Shippers" FOREIGN KEY ("ShipVia") REFERENCES "Shippers" ("ShipperID");
-ALTER TABLE "Products" ADD CONSTRAINT "FK_Products_Categories" FOREIGN KEY ("CategoryID") REFERENCES "Categories" ("CategoryID");
-ALTER TABLE "Products" ADD CONSTRAINT "FK_Products_Suppliers" FOREIGN KEY ("SupplierID") REFERENCES "Suppliers" ("SupplierID");
-ALTER TABLE "Territories" ADD CONSTRAINT "FK_Territories_Region" FOREIGN KEY ("RegionID") REFERENCES "Region" ("RegionID");
-
+ALTER TABLE "CustomerCustomerDemo" ADD CONSTRAINT "FK_CustomerCustomerDemo"            FOREIGN KEY ("CustomerTypeID") REFERENCES "CustomerDemographics" ("CustomerTypeID");
+ALTER TABLE "CustomerCustomerDemo" ADD CONSTRAINT "FK_CustomerCustomerDemo_Customers"  FOREIGN KEY ("CustomerID")     REFERENCES "Customers" ("CustomerID");
+ALTER TABLE "EmployeeTerritories"  ADD CONSTRAINT "FK_EmployeeTerritories_Employees"   FOREIGN KEY ("EmployeeID")     REFERENCES "Employees" ("EmployeeID");
+ALTER TABLE "EmployeeTerritories"  ADD CONSTRAINT "FK_EmployeeTerritories_Territories" FOREIGN KEY ("TerritoryID")    REFERENCES "Territories" ("TerritoryID");
+ALTER TABLE "Employees"            ADD CONSTRAINT "FK_Employees_Employees"             FOREIGN KEY ("ReportsTo")      REFERENCES "Employees" ("EmployeeID");
+ALTER TABLE "Order Details"        ADD CONSTRAINT "FK_Order_Details_Orders"            FOREIGN KEY ("OrderID")        REFERENCES "Orders" ("OrderID");
+ALTER TABLE "Order Details"        ADD CONSTRAINT "FK_Order_Details_Products"          FOREIGN KEY ("ProductID")      REFERENCES "Products" ("ProductID");
+ALTER TABLE "Orders"               ADD CONSTRAINT "FK_Orders_Customers"                FOREIGN KEY ("CustomerID")     REFERENCES "Customers" ("CustomerID");
+ALTER TABLE "Orders"               ADD CONSTRAINT "FK_Orders_Employees"                FOREIGN KEY ("EmployeeID")     REFERENCES "Employees" ("EmployeeID");
+ALTER TABLE "Orders"               ADD CONSTRAINT "FK_Orders_Shippers"                 FOREIGN KEY ("ShipVia")        REFERENCES "Shippers" ("ShipperID");
+ALTER TABLE "Products"             ADD CONSTRAINT "FK_Products_Categories"             FOREIGN KEY ("CategoryID")     REFERENCES "Categories" ("CategoryID");
+ALTER TABLE "Products"             ADD CONSTRAINT "FK_Products_Suppliers"              FOREIGN KEY ("SupplierID")     REFERENCES "Suppliers" ("SupplierID");
+ALTER TABLE "Territories"          ADD CONSTRAINT "FK_Territories_Region"              FOREIGN KEY ("RegionID")       REFERENCES "Region" ("RegionID");
 
 --/******************************************************************************/
 --/***                                Indices                                 ***/
 --/******************************************************************************/
 
-
-CREATE INDEX "CategoryName" ON "Categories" ("CategoryName");
-CREATE INDEX "City" ON "Customers" ("City");
-CREATE INDEX "CompanyNameCustomers" ON "Customers" ("CompanyName");
-CREATE INDEX "PostalCodeCustomers" ON "Customers" ("PostalCode");
-CREATE INDEX "Region" ON "Customers" ("Region");
-CREATE INDEX "LastName" ON "Employees" ("LastName");
-CREATE INDEX "PostalCodeEmployees" ON "Employees" ("PostalCode");
-CREATE INDEX "OrderID" ON "Order Details" ("OrderID");
-CREATE INDEX "OrdersOrder_Details" ON "Order Details" ("OrderID");
-CREATE INDEX "ProductID" ON "Order Details" ("ProductID");
+CREATE INDEX "CategoryName"          ON "Categories" ("CategoryName");
+CREATE INDEX "City"                  ON "Customers" ("City");
+CREATE INDEX "CompanyNameCustomers"  ON "Customers" ("CompanyName");
+CREATE INDEX "PostalCodeCustomers"   ON "Customers" ("PostalCode");
+CREATE INDEX "Region"                ON "Customers" ("Region");
+CREATE INDEX "LastName"              ON "Employees" ("LastName");
+CREATE INDEX "PostalCodeEmployees"   ON "Employees" ("PostalCode");
+CREATE INDEX "OrderID"               ON "Order Details" ("OrderID");
+CREATE INDEX "OrdersOrder_Details"   ON "Order Details" ("OrderID");
+CREATE INDEX "ProductID"             ON "Order Details" ("ProductID");
 CREATE INDEX "ProductsOrder_Details" ON "Order Details" ("ProductID");
-CREATE INDEX "CustomerID" ON "Orders" ("CustomerID");
-CREATE INDEX "CustomerOrders" ON "Orders" ("CustomerID");
-CREATE INDEX "EmployeeID" ON "Orders" ("EmployeeID");
-CREATE INDEX "EmployeesOrders" ON "Orders" ("EmployeeID");
-CREATE INDEX "OrderDate" ON "Orders" ("OrderDate");
-CREATE INDEX "ShipPostalCode" ON "Orders" ("ShipPostalCode");
-CREATE INDEX "ShippedDate" ON "Orders" ("ShippedDate");
-CREATE INDEX "ShippersOrders" ON "Orders" ("ShipVia");
-CREATE INDEX "CategoriesProducts" ON "Products" ("CategoryID");
-CREATE INDEX "CategoryID" ON "Products" ("CategoryID");
-CREATE INDEX "ProductName" ON "Products" ("ProductName");
-CREATE INDEX "SupplierID" ON "Products" ("SupplierID");
-CREATE INDEX "SuppliersProducts" ON "Products" ("SupplierID");
-CREATE INDEX "CompanyNameSuppliers" ON "Suppliers" ("CompanyName");
-CREATE INDEX "PostalCodeSuppliers" ON "Suppliers" ("PostalCode");
-
+CREATE INDEX "CustomerID"            ON "Orders" ("CustomerID");
+CREATE INDEX "CustomerOrders"        ON "Orders" ("CustomerID");
+CREATE INDEX "EmployeeID"            ON "Orders" ("EmployeeID");
+CREATE INDEX "EmployeesOrders"       ON "Orders" ("EmployeeID");
+CREATE INDEX "OrderDate"             ON "Orders" ("OrderDate");
+CREATE INDEX "ShipPostalCode"        ON "Orders" ("ShipPostalCode");
+CREATE INDEX "ShippedDate"           ON "Orders" ("ShippedDate");
+CREATE INDEX "ShippersOrders"        ON "Orders" ("ShipVia");
+CREATE INDEX "CategoriesProducts"    ON "Products" ("CategoryID");
+CREATE INDEX "CategoryID"            ON "Products" ("CategoryID");
+CREATE INDEX "ProductName"           ON "Products" ("ProductName");
+CREATE INDEX "SupplierID"            ON "Products" ("SupplierID");
+CREATE INDEX "SuppliersProducts"     ON "Products" ("SupplierID");
+CREATE INDEX "CompanyNameSuppliers"  ON "Suppliers" ("CompanyName");
+CREATE INDEX "PostalCodeSuppliers"   ON "Suppliers" ("PostalCode");
 
 COMMIT WORK;
 
@@ -4124,7 +4120,6 @@ COMMIT WORK;
 --/******************************************************************************/
 
 SET TERM ^ ;
-
 
 /* Trigger: "Categories_BI" */
 CREATE OR ALTER TRIGGER "Categories_BI" FOR "Categories"
@@ -4136,7 +4131,6 @@ begin
 end
 ^
 
-
 /* Trigger: "Employees_BI" */
 CREATE OR ALTER TRIGGER "Employees_BI" FOR "Employees"
 ACTIVE BEFORE INSERT POSITION 0
@@ -4146,7 +4140,6 @@ begin
     new."EmployeeID" = gen_id("GEN_Employees_ID",1);
 end
 ^
-
 
 /* Trigger: "Orders_BI" */
 CREATE OR ALTER TRIGGER "Orders_BI" FOR "Orders"
@@ -4158,7 +4151,6 @@ begin
 end
 ^
 
-
 /* Trigger: "Products_BI" */
 CREATE OR ALTER TRIGGER "Products_BI" FOR "Products"
 ACTIVE BEFORE INSERT POSITION 0
@@ -4169,7 +4161,6 @@ begin
 end
 ^
 
-
 /* Trigger: "Shippers_BI" */
 CREATE OR ALTER TRIGGER "Shippers_BI" FOR "Shippers"
 ACTIVE BEFORE INSERT POSITION 0
@@ -4179,7 +4170,6 @@ begin
     new."ShipperID" = gen_id("GEN_Shippers_ID",1);
 end
 ^
-
 
 /* Trigger: "Suppliers_BI" */
 CREATE OR ALTER TRIGGER "Suppliers_BI" FOR "Suppliers"
@@ -4193,14 +4183,11 @@ end
 
 SET TERM ; ^
 
-
 COMMIT WORK;
-
 
 --/******************************************************************************/
 --/***                           Stored procedures                            ***/
 --/******************************************************************************/
-
 
 SET TERM ^ ;
 

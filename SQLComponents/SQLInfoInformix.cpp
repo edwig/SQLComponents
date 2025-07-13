@@ -1315,19 +1315,19 @@ SQLInfoInformix::GetCATALOGDefaultDrop(XString /*p_schema*/,XString /*p_tablenam
 // All check constraints
 
 XString
-SQLInfoInformix::GetCATALOGCheckExists(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoInformix::GetCATALOGCheckExists(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoInformix::GetCATALOGCheckList(XString  /*p_schema*/,XString  /*p_tablename*/) const
+SQLInfoInformix::GetCATALOGCheckList(XString  /*p_schema*/,XString  /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoInformix::GetCATALOGCheckAttributes(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoInformix::GetCATALOGCheckAttributes(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }

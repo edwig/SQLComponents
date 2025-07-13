@@ -1034,25 +1034,25 @@ SQLInfoAccess::GetCATALOGDefaultDrop(XString /*p_schema*/,XString /*p_tablename*
 // All check constraints
 
 XString
-SQLInfoAccess::GetCATALOGCheckExists(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoAccess::GetCATALOGCheckExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return XString();
 }
 
 XString 
-SQLInfoAccess::GetCATALOGCheckList(XString  /*p_schema*/,XString  /*p_tablename*/) const
+SQLInfoAccess::GetCATALOGCheckList(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   return XString();
 }
 
 XString 
-SQLInfoAccess::GetCATALOGCheckAttributes(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoAccess::GetCATALOGCheckAttributes(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return XString();
 }
 
 XString
-SQLInfoAccess::GetCATALOGCheckCreate(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/,XString /*p_condition*/) const
+SQLInfoAccess::GetCATALOGCheckCreate(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraint*/,XString /*p_condition*/) const
 {
   return XString();
 }

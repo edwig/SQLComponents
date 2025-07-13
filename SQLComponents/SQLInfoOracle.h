@@ -311,9 +311,9 @@ public:
   XString GetCATALOGDefaultCreate    (XString  p_schema,XString  p_tablename,XString  p_constraint,XString p_column,XString p_code) const override;
   XString GetCATALOGDefaultDrop      (XString  p_schema,XString  p_tablename,XString  p_constraint) const override;
   // All check constraints
-  XString GetCATALOGCheckExists      (XString  p_schema,XString  p_tablename,XString  p_constraint) const override;
-  XString GetCATALOGCheckList        (XString  p_schema,XString  p_tablename) const override;
-  XString GetCATALOGCheckAttributes  (XString  p_schema,XString  p_tablename,XString  p_constraint) const override;
+  XString GetCATALOGCheckExists      (XString  p_schema,XString  p_tablename,XString  p_constraint,bool p_quoted = false) const override;
+  XString GetCATALOGCheckList        (XString  p_schema,XString  p_tablename                      ,bool p_quoted = false) const override;
+  XString GetCATALOGCheckAttributes  (XString  p_schema,XString  p_tablename,XString  p_constraint,bool p_quoted = false) const override;
   XString GetCATALOGCheckCreate      (XString  p_schema,XString  p_tablename,XString  p_constraint,XString p_condition) const override;
   XString GetCATALOGCheckDrop        (XString  p_schema,XString  p_tablename,XString  p_constraint) const override;
   // All trigger functions

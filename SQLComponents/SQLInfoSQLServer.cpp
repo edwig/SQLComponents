@@ -2002,12 +2002,14 @@ SQLInfoSQLServer::GetCATALOGDefaultDrop(XString p_schema,XString p_tablename,XSt
 // All check constraints
 
 XString
-SQLInfoSQLServer::GetCATALOGCheckExists(XString p_schema,XString p_tablename,XString p_constraint) const
+SQLInfoSQLServer::GetCATALOGCheckExists(XString p_schema,XString p_tablename,XString p_constraint,bool p_quoted /*= false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_constraint.MakeLower();
-
+  if(!p_quoted)
+  {
+    p_schema.MakeLower();
+    p_tablename.MakeLower();
+    p_constraint.MakeLower();
+  }
   XString sql = _T("SELECT 1\n")
                 _T("  FROM sys.check_constraints c\n")
                 _T("       inner join sys.objects o ON o.object_id = c.parent_object_id\n")
@@ -2019,19 +2021,21 @@ SQLInfoSQLServer::GetCATALOGCheckExists(XString p_schema,XString p_tablename,XSt
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGCheckList(XString p_schema,XString  p_tablename) const
+SQLInfoSQLServer::GetCATALOGCheckList(XString p_schema,XString  p_tablename,bool p_quoted /*= false*/) const
 {
   XString constraint;
-  return GetCATALOGCheckAttributes(p_schema,p_tablename,constraint);
+  return GetCATALOGCheckAttributes(p_schema,p_tablename,constraint,p_quoted);
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGCheckAttributes(XString  p_schema,XString  p_tablename,XString  p_constraint) const
+SQLInfoSQLServer::GetCATALOGCheckAttributes(XString p_schema,XString p_tablename,XString p_constraint,bool p_quoted /*= false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_constraint.MakeLower();
-
+  if(!p_quoted)
+  {
+    p_schema.MakeLower();
+    p_tablename.MakeLower();
+    p_constraint.MakeLower();
+  }
   XString sql = _T("SELECT db_name() AS catalog\n")
                 _T("      ,s.name    AS constraint_schema\n")
                 _T("      ,o.name    AS constraint_table\n")
@@ -2060,10 +2064,6 @@ SQLInfoSQLServer::GetCATALOGCheckAttributes(XString  p_schema,XString  p_tablena
 XString
 SQLInfoSQLServer::GetCATALOGCheckCreate(XString p_schema,XString p_tablename,XString p_constraint,XString p_condition) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_constraint.MakeLower();
-
   if((p_condition.Left(1) != _T("(")) || (p_condition.Right(1) != _T(")")))
   {
     p_condition = _T("(") + p_condition + _T(")");
@@ -2072,10 +2072,10 @@ SQLInfoSQLServer::GetCATALOGCheckCreate(XString p_schema,XString p_tablename,XSt
   XString sql = _T("ALTER TABLE ");
   if(!p_schema.IsEmpty())
   {
-    sql += p_schema + _T(".");
+    sql += QIQ(p_schema) + _T(".");
   }
-  sql += p_tablename + _T("\n");
-  sql += _T("  ADD CONSTRAINT ") + p_constraint + _T("\n");
+  sql += QIQ(p_tablename) + _T("\n");
+  sql += _T("  ADD CONSTRAINT ") + QIQ(p_constraint) + _T("\n");
   sql += _T("      CHECK ") + p_condition;
   return sql;
 }
@@ -2090,10 +2090,10 @@ SQLInfoSQLServer::GetCATALOGCheckDrop(XString p_schema,XString p_tablename,XStri
   XString sql = _T("ALTER TABLE ");
   if(!p_schema.IsEmpty())
   {
-    sql += p_schema + _T(".");
+    sql += QIQ(p_schema) + _T(".");
   }
   sql += p_tablename + _T("\n");
-  sql += _T("  DROP CONSTRAINT ") + p_constraint;
+  sql += _T("  DROP CONSTRAINT ") + QIQ(p_constraint);
 
   return sql;
 }

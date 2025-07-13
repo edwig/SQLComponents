@@ -360,9 +360,9 @@ DDLCreateTable::GetColumnInfo()
                                     ,column.m_decimalDigits);
     }
     // optional default value
-    if(!column.m_default.IsEmpty() && 
-        column.m_default.CompareNoCase(_T("null")) &&
-        column.m_default.Compare(_T("''")) &&
+    if(!column.m_default.IsEmpty()                      && 
+        column.m_default.CompareNoCase(_T("TRUNCATED")) &&
+        column.m_default.Compare(_T("''"))              &&
         column.m_default.Compare(_T("0")))
     {
       line += _T(" DEFAULT ");

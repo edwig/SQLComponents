@@ -1540,19 +1540,19 @@ SQLInfoPostgreSQL::GetCATALOGDefaultDrop(XString /*p_schema*/,XString /*p_tablen
 // All check constraints
 
 XString
-SQLInfoPostgreSQL::GetCATALOGCheckExists(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoPostgreSQL::GetCATALOGCheckExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoPostgreSQL::GetCATALOGCheckList(XString  /*p_schema*/,XString  /*p_tablename*/) const
+SQLInfoPostgreSQL::GetCATALOGCheckList(XString  /*p_schema*/,XString  /*p_tablename*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }
 
 XString
-SQLInfoPostgreSQL::GetCATALOGCheckAttributes(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoPostgreSQL::GetCATALOGCheckAttributes(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/,bool /*p_quoted = false*/) const
 {
   return _T("");
 }

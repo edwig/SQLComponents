@@ -314,27 +314,29 @@ public:
   //   - Index
   //   - PrimaryKey
   //   - ForeignKey
+  //   - Defaults constraints
+  //   - Check constraints
   //   - Trigger
   //   - Sequence
-  //   - TemporaryTable 
   //   - View
   //   - Privileges
-  //  Functions per object type
-  //   - Exists
-  //   - List
-  //   - Attributes
-  //   - Create
-  //   - Alter  (where possible)
-  //   - Rename (where possible)
-  //   - Drop
+  //   - Synonyms
+  //  Methods per object type
+  //   - Exists                     -> parameter binding
+  //   - List                       -> Parameter binding
+  //   - Attributes                 -> Parameter binding
+  //   - Create                     -> DDL
+  //   - Alter  (where possible)k   -> DDL
+  //   - Rename (where possible)    -> DDL
+  //   - Drop                       -> DDL
   //
   //////////////////////////////////////////////////////////////////////////
 
   // Meta info about meta types
   virtual XString GetCATALOGMetaTypes(int p_type) const = 0;
-  virtual XString GetCATALOGDefaultCharset() const = 0;
+  virtual XString GetCATALOGDefaultCharset()    const = 0;
   virtual XString GetCATALOGDefaultCharsetNCV() const = 0;
-  virtual XString GetCATALOGDefaultCollation() const = 0;
+  virtual XString GetCATALOGDefaultCollation()  const = 0;
   // All table functions
   virtual XString GetCATALOGTableExists       (XString& p_schema,XString& p_tablename,bool p_quoted = false) const = 0;
   virtual XString GetCATALOGTablesList        (XString& p_schema,XString& p_pattern,  bool p_quoted = false) const = 0;
@@ -383,9 +385,9 @@ public:
   virtual XString GetCATALOGDefaultCreate     (XString  p_schema,XString  p_tablename,XString  p_constraint,XString p_column,XString p_code) const = 0;
   virtual XString GetCATALOGDefaultDrop       (XString  p_schema,XString  p_tablename,XString  p_constraint) const = 0;
   // All check constraints
-  virtual XString GetCATALOGCheckExists       (XString  p_schema,XString  p_tablename,XString  p_constraint) const = 0;
-  virtual XString GetCATALOGCheckList         (XString  p_schema,XString  p_tablename) const = 0;
-  virtual XString GetCATALOGCheckAttributes   (XString  p_schema,XString  p_tablename,XString  p_constraint) const = 0;
+  virtual XString GetCATALOGCheckExists       (XString  p_schema,XString  p_tablename,XString  p_constraint,bool p_quoted = false) const = 0;
+  virtual XString GetCATALOGCheckList         (XString  p_schema,XString  p_tablename                      ,bool p_quoted = false) const = 0;
+  virtual XString GetCATALOGCheckAttributes   (XString  p_schema,XString  p_tablename,XString  p_constraint,bool p_quoted = false) const = 0;
   virtual XString GetCATALOGCheckCreate       (XString  p_schema,XString  p_tablename,XString  p_constraint,XString p_condition) const = 0;
   virtual XString GetCATALOGCheckDrop         (XString  p_schema,XString  p_tablename,XString  p_constraint) const = 0;
   // All trigger functions
@@ -426,8 +428,8 @@ public:
   //
   // o GetPSM<Object[s]><Function>
   //   -Procedures / Functions
-  //   - Exists					GetPSMProcedureExists
-  //   - List					  GetPSMProcedureList
+  //   - Exists      GetPSMProcedureExists
+  //   - List        GetPSMProcedureList
   //   - Attributes
   //   - Create
   //   - Drop

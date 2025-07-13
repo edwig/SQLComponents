@@ -223,13 +223,21 @@ XPort::OpenDumpFileWrite()
     xprintf(false,_T("Cannot open the export file [%s]\n"),m_parameters.m_file.GetString());
     return false;
   }
+  xprintf(false,_T("Opened the export dump file for writing [%s]\n"),m_parameters.m_file.GetString());
   return true;
 }
 
 bool
 XPort::OpenDumpFileRead()
 {
-  return m_xfile.OpenRead(m_parameters.m_file,m_database.GetDatabaseTypeName(),m_parameters.m_listOnly);
+  bool result = m_xfile.OpenRead(m_parameters.m_file,m_database.GetDatabaseTypeName(),m_parameters.m_listOnly);
+  if(!result)
+  {
+    xprintf(false,_T("Cannot open the export file [%s]\n"),m_parameters.m_file.GetString());
+    return false;
+  }
+  xprintf(false,_T("Opened the export dump file for reading [%s]\n"),m_parameters.m_file.GetString());
+  return true;
 }
 
 bool
@@ -260,7 +268,7 @@ XPort::GatherDropSchema(OList& p_statements)
   XString allprocedures  = info->GetPSMProcedureList    (schema,all);
   XString alltriggers    = info->GetCATALOGTriggerList  (schema,all);
   XString allviews       = info->GetCATALOGViewList     (schema,all);
-  XString allconstraints = info->GetCATALOGForeignList  (schema,all);
+  XString allforeigns    = info->GetCATALOGForeignList  (schema,all);
   XString alltables      = info->GetCATALOGTablesList   (schema,all);
   
   xprintf(false,_T("Gathering contents of schema: %s\n"),m_schema.GetString());
@@ -272,7 +280,7 @@ XPort::GatherDropSchema(OList& p_statements)
     query.DoSQLStatement(allsynonyms,schema);
     while(query.GetRecord())
     {
-      XString synonym  = query[3];
+      XString synonym  = query[MetaSynonym_synonymname];
       XString dropline = info->GetCATALOGSynonymDrop(schema,synonym);
       p_statements.push_back(dropline);
     }
@@ -280,14 +288,14 @@ XPort::GatherDropSchema(OList& p_statements)
     query.DoSQLStatement(allsequences,schema);
     while(query.GetRecord())
     {
-      XString dropline = info->GetCATALOGSequenceDrop(schema,query[3]);
+      XString dropline = info->GetCATALOGSequenceDrop(schema,query[MetaSequence_sequencename]);
       p_statements.push_back(dropline);
     }
     // PROCEDURES
     query.DoSQLStatement(allprocedures,schema);
     while(query.GetRecord())
     {
-      XString procedure = query[3];
+      XString procedure = query[MetaProcedure_procedurename];
       int     typeproc  = query[4];
       XString dropline = info->GetPSMProcedureDrop(schema,procedure,typeproc == 2);
       p_statements.push_back(dropline);
@@ -296,8 +304,8 @@ XPort::GatherDropSchema(OList& p_statements)
     query.DoSQLStatement(alltriggers,schema);
     while(query.GetRecord())
     {
-      XString tablename = query[3];
-      XString trigger   = query[4];
+      XString tablename = query[MetaTrigger_tablename];
+      XString trigger   = query[MetaTrigger_triggername];
       XString dropline = info->GetCATALOGTriggerDrop(schema,tablename,trigger);
       p_statements.push_back(dropline);
     }
@@ -306,20 +314,20 @@ XPort::GatherDropSchema(OList& p_statements)
     while(query.GetRecord())
     {
       XString precursor;
-      XString dropline = info->GetCATALOGViewDrop(schema,query[3],precursor);
+      XString dropline = info->GetCATALOGViewDrop(schema,query[MetaTable_tablename],precursor);
       if(!precursor.IsEmpty())
       {
         p_statements.push_back(precursor);
       }
       p_statements.push_back(dropline);
     }
-    // CONSTRAINTS
-    query.DoSQLStatement(allconstraints,schema);
+    // FOREIGN KEY CONSTRAINTS
+    query.DoSQLStatement(allforeigns,schema);
     while(query.GetRecord())
     {
-      if(query[9].GetAsSLong() == 1)
+      if(query[MetaForeign_keysequence].GetAsSLong() == 1)
       {
-        XString dropline = info->GetCATALOGForeignDrop(schema,query[6],query[8]);
+        XString dropline = info->GetCATALOGForeignDrop(schema,query[MetaForeign_fk_tablename],query[MetaForeign_fk_constraint]);
         p_statements.push_back(dropline);
       }
     }
@@ -413,7 +421,7 @@ XPort::GetAllTables()
       }
       if(!m_tables.empty())
       {
-        return count;
+        break;
       }
       // Standard unquoted names
       sql = m_database.GetSQLInfoDB()->GetCATALOGTablesList(m_schema,m_object);
@@ -425,6 +433,7 @@ XPort::GetAllTables()
     m_tables.clear();
     count = 0;
   }
+  xprintf(false,_T("Exporting a total of [%d] tables\n"),count);
   return count;
 }
 
@@ -890,12 +899,13 @@ XPort::GetDefineSQLIndex(XString p_table)
   try
   {
     // Getting columns, indices, and primary key (Possibly overlapping indices)
-    DDLS statements = create.GetTableStatements(p_table,true,true,true,true,false,false,false,false);
+    DDLS statements = create.GetTableStatements(p_table,false,false,true,false,false,false,false,false);
     if(statements.size() >= 1)
     {
       RecordAllIndices(create,statements);
       return statements;
     }
+    return statements;
   }
   catch(StdException& ex)
   {
@@ -914,12 +924,12 @@ XPort::GetDefineSQLPrimary(XString p_table)
   try
   {
     // Getting columns, indices, and primary key (Possibly overlapping indices)
-    DDLS statements = create.GetTableStatements(p_table,true,true,true,true,false,false,false,false);
+    DDLS statements = create.GetTableStatements(p_table,false,false,false,true,false,false,false,false);
     if(statements.size() >= 1)
     {
-      RecordAllPrimaries(create,statements,p_table);
-      return statements;
+      RecordAllPrimaries(create,p_table);
     }
+    return statements;
   }
   catch(StdException& ex)
   {
@@ -965,7 +975,7 @@ void
 XPort::RecordAllIndices(DDLCreateTable& p_create,DDLS& p_ddls)
 {
   m_indices.clear();
-  DDLS::iterator it = p_ddls.begin() + 1;
+  DDLS::iterator it = p_ddls.begin();
   for(auto& index : p_create.m_indices)
   {
     XString name = index.m_indexName;
@@ -988,37 +998,23 @@ XPort::RecordAllIndices(DDLCreateTable& p_create,DDLS& p_ddls)
 }
 
 void
-XPort::RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls,CString p_table)
+XPort::RecordAllPrimaries(DDLCreateTable& p_create,CString p_table)
 {
   m_constraints.clear();
 
-  // In case the primary key is also a foreign key
-  if(p_create.m_indices.empty())
+  // Check that we have a primary key
+  if(p_create.m_primaries.empty())
+  {
+    return;
+  }
+  // Check that it has a name
+  if(p_create.m_primaries[0].m_constraintName.IsEmpty())
   {
     m_constraints.push_back(XString(_T("PK_")) + p_table);
     return;
   }
-
-  DDLS::iterator it = p_ddls.begin() + 1;
-  for(auto& index : p_create.m_indices)
-  {
-    XString name = index.m_indexName;
-    if(name.IsEmpty() || index.m_position > 1)
-    {
-      continue;
-    }
-    XString sql = *it;
-    sql.MakeLower();
-    if(sql.Find(_T("primary key")) >= 0)
-    {
-      m_constraints.push_back(name);
-      ++it;
-    }
-    else
-    {
-      it = p_ddls.erase(it);
-    }
-  }
+  // Use the primary key constraint name
+  m_constraints.push_back(p_create.m_primaries[0].m_constraintName);
 }
 
 void
@@ -1220,7 +1216,7 @@ XPort::GetDefineRowSelect(XString p_table,SQLInfoDB* p_info)
     select += _T("\n");
   }
   select += _T(" FROM ");
-  if(!m_schema.IsEmpty())
+  if(!m_schema.IsEmpty() && p_info->GetRDBMSUnderstandsSchemas())
   {
     select += p_info->QueryIdentifierQuotation(m_schema);
     select += _T(".");
@@ -1255,7 +1251,7 @@ XString
 XPort::GetDefineCountSelect(XString p_table,SQLInfoDB* p_info)
 {
   XString select(_T("SELECT COUNT(*) FROM "));
-  if(!m_schema.IsEmpty())
+  if(!m_schema.IsEmpty() && p_info->GetRDBMSUnderstandsSchemas())
   {
     select += p_info->QueryIdentifierQuotation(m_schema);
     select += _T(".");
@@ -1274,7 +1270,7 @@ XPort::GetDefineRowInsert(XString p_table,SQLInfoDB* p_info)
 {
   XString insert(_T("INSERT INTO "));
 
-  if(!m_schema.IsEmpty() && (p_info->GetSchemaNameUsage() & SQL_SU_DML_STATEMENTS))
+  if(!m_schema.IsEmpty() && (p_info->GetRDBMSUnderstandsSchemas()))
   {
     insert += p_info->QueryIdentifierQuotation(m_schema);
     insert += _T(".");
@@ -1504,14 +1500,14 @@ XPort::ExportIndices()
 
   for(auto& table : m_tables)
   {
+    m_indices.clear();
     DDLS statements = GetDefineSQLIndex(table);
-    statements.pop_front();
 
     for(auto& index : m_indices)
     {
       XString sql = statements.front();
       statements.pop_front();
-      m_xfile.WriteIndex(index);
+      m_xfile.WriteIndex(table,index);
       m_xfile.WriteSQL(sql);
     }
   }
@@ -1528,9 +1524,8 @@ XPort::ExportPrimaryKeys()
   for(auto& table : m_tables)
   {
     DDLS statements = GetDefineSQLPrimary(table);
-    if(statements.size() > 1)
+    if(statements.size() >= 1)
     {
-      statements.pop_front();
       m_xfile.WriteConstraint(ind++,table,m_constraints.front());
       m_xfile.WriteSQL(statements.front());
     }
@@ -1606,14 +1601,14 @@ XPort::ExportDefaultConstraints()
 void
 XPort::ExportCheckConstraints()
 {
-  int ind = 0;
+  int cons = 0;
   m_xfile.WriteSection(_T("CHECKS"));
   SQLInfoDB* info = m_database.GetSQLInfoDB();
 
   for(auto& table : m_tables)
   {
     XString all;
-    XString sql = info->GetCATALOGCheckAttributes(m_schema,table,all);
+    XString sql = info->GetCATALOGCheckAttributes(m_schema,table,all,true);
 
     // No constraints to be found on this database
     if(sql.IsEmpty())
@@ -1621,29 +1616,39 @@ XPort::ExportCheckConstraints()
       continue;
     }
 
-    SQLQuery query(m_database);
-    int param = 1;
-    if(!m_schema.IsEmpty())
+    for(int ind = 0;ind < 2;++ind)
     {
-      query.SetParameter(param++,m_schema);
-    }
-    query.SetParameter(param++,table);
-    query.DoSQLStatement(sql);
-    while(query.GetRecord())
-    {
-      XString constraint = query[4];
-      XString definition = query[5];
+      SQLQuery query(m_database);
+      int param = 1;
+      int rows  = 0;
+      if(!m_schema.IsEmpty())
+      {
+        query.SetParameter(param++,m_schema);
+      }
+      query.SetParameter(param++,table);
+      query.DoSQLStatement(sql);
+      while(query.GetRecord())
+      {
+        XString constraint = query[MetaCheck_constraintname];
+        XString definition = query[MetaCheck_condition];
 
-      m_xfile.WriteConstraint(ind++,table,constraint);
-      XString def = info->GetCATALOGCheckCreate(m_schema,table,constraint,definition);
-      m_xfile.WriteSQL(def);
+        m_xfile.WriteConstraint(cons++,table,constraint);
+        XString def = info->GetCATALOGCheckCreate(m_schema,table,constraint,definition);
+        m_xfile.WriteSQL(def);
+        ++rows;
+      }
+      if(rows)
+      {
+        break;
+      }
+      sql = info->GetCATALOGCheckAttributes(m_schema,table,all);
     }
   }
   m_xfile.WriteSectionEnd();
   m_xfile.Flush();
 
   // All check constraints
-  xprintf(false,_T("Total check constraints: %d\n"),ind);
+  xprintf(false,_T("Total check constraints: %d\n"),cons);
 }
 
 void

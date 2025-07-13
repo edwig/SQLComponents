@@ -53,7 +53,7 @@ public:
   void    WriteSection(XString p_name);
   void    WriteTable(XString p_table);
   void    WriteColumns(OList* p_columns);
-  void    WriteIndex(XString p_index);
+  void    WriteIndex(XString p_table,XString p_index);
   void    WriteConstraint(int p_num,XString p_table,XString p_constraint);
   void    WriteView(XString p_view);
   void    WriteSequence(XString p_sequence);

@@ -124,7 +124,7 @@ private:
   int           ImportSQL(XString& p_sql,bool p_retries = false,XString p_delim = _T(";"));
   void          RecordAllColumns  (DDLCreateTable& p_create);
   void          RecordAllIndices  (DDLCreateTable& p_create,DDLS& p_ddls);
-  void          RecordAllPrimaries(DDLCreateTable& p_create,DDLS& p_ddls,CString p_table);
+  void          RecordAllPrimaries(DDLCreateTable& p_create,CString p_table);
   void          RecordAllForeigns (DDLCreateTable& p_create);
   // Drop old contents
   void          GatherDropSchema (OList& p_statements);
