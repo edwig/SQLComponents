@@ -36,7 +36,11 @@ static char THIS_FILE[] = __FILE__;
 
 namespace SQLComponents
 {
-  
+
+// For Firebird the identifiers are transformed to UPPER case
+// as the system catalog is stored in this case setting.
+#define IdentifierCorrect(ident)   if(!p_quoted || !IsIdentifierMixedCase(ident)) ident.MakeUpper()
+
 // Constructor.
 SQLInfoFirebird::SQLInfoFirebird(SQLDatabase* p_database)
                 :SQLInfoDB(p_database)
@@ -773,11 +777,8 @@ SQLInfoFirebird::GetCATALOGDefaultCollation() const
 XString
 SQLInfoFirebird::GetCATALOGTableExists(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_tablename.MakeUpper();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
   XString query = _T("SELECT COUNT(*)\n"
                      "  FROM rdb$relations rel\n");
   if(!p_schema.IsEmpty())
@@ -824,18 +825,12 @@ SQLInfoFirebird::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablenam
                    "   AND rel.rdb$relation_type IN (0,2,4,5)\n");
   if(!p_schema.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_schema.MakeUpper();
-    }
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rel.rdb$owner_name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_tablename.MakeUpper();
-    }
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND rel.rdb$relation_name ");
     sql += (p_tablename.Find(_T("%")) >= 0) ? _T("LIKE") : _T("=");
     sql += " ?";
@@ -855,11 +850,6 @@ SQLInfoFirebird::GetCATALOGTableSynonyms(XString& /*p_schema*/,XString& /*p_tabl
 XString
 SQLInfoFirebird::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_tablename.MakeUpper();
-  }
   XString sql = _T("SELECT TRIM(dbs.mon$database_name)         AS table_catalog\n"
                    "      ,TRIM(rel.rdb$owner_name)            AS table_schema\n"
                    "      ,TRIM(rel.rdb$relation_name)         AS table_name\n"
@@ -873,10 +863,12 @@ SQLInfoFirebird::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,b
                    "   AND rel.rdb$system_flag = 1\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rel.rdb$owner_name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND rel.rdb$relation_name ");
     sql += (p_tablename.Find(_T("%")) >= 0) ? _T("LIKE") : _T("=");
     sql += _T(" ?");
@@ -948,11 +940,8 @@ SQLInfoFirebird::GetCATALOGTemptableDrop(XString /*p_schema*/,XString p_tablenam
 XString 
 SQLInfoFirebird::GetCATALOGColumnExists(XString /*p_schema*/,XString p_tablename,XString p_columnname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_tablename.MakeUpper();
-    p_columnname.MakeUpper();
-  }
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_columnname);
   XString query = _T("SELECT COUNT(*)\n")
                   _T("  FROM rdb$relation_fields\n")
                   _T(" WHERE rdb$relation_name = '") + p_tablename  + _T("'\n")
@@ -1120,28 +1109,19 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablena
   // Schema name
   if(!p_schema.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_schema.MakeUpper();
-    }
+    IdentifierCorrect(p_schema);
     sql += _T("   AND tbl.rdb$owner_name = ?\n");
   }
   // Table name
   if(!p_tablename.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_tablename.MakeUpper();
-    }
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND tbl.rdb$relation_name = ?\n");
   }
   // Optionally add the column name
   if(!p_columnname.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_columnname.MakeUpper();
-    }
+    IdentifierCorrect(p_columnname);
     sql += _T("   AND col.rdb$field_name = ?\n");
   }
   sql += _T(" ORDER BY col.rdb$field_position");
@@ -1199,10 +1179,7 @@ SQLInfoFirebird::GetCATALOGColumnDrop(XString /*p_schema*/,XString p_tablename,X
 XString
 SQLInfoFirebird::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/,XString p_indexname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_indexname.MakeUpper();
-  }
+  IdentifierCorrect(p_indexname);
   XString sql = _T("SELECT COUNT(*)\n")
                 _T("  FROM rdb$indices\n")
                 _T(" WHERE rdb$index_name = '") + p_indexname + _T("'");
@@ -1258,26 +1235,17 @@ SQLInfoFirebird::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablenam
                      "          AND rdb$constraint_type IN ('PRIMARY KEY','FOREIGN KEY'))\n");
   if(!p_schema.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_schema.MakeUpper();
-    }
+    IdentifierCorrect(p_schema);
     query += _T("   AND tab.rdb$owner_name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_tablename.MakeUpper();
-    }
+    IdentifierCorrect(p_tablename);
     query += _T("   AND tab.rdb$relation_name = ?\n");
   }
   if(!p_indexname.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_indexname.MakeUpper();
-    }
+    IdentifierCorrect(p_indexname);
     query += _T("   AND idx.rdb$index_name = ?\n");
   }
   query += _T(" ORDER BY 6"); // Index name
@@ -1352,17 +1320,14 @@ SQLInfoFirebird::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 XString
 SQLInfoFirebird::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_tablename.MakeUpper();
-  }
+  IdentifierCorrect(p_tablename);
   XString query = _T("SELECT COUNT(*)\n"
                      "  FROM rdb$relation_constraints\n"
                      " WHERE rdb$relation_name   = '") + p_tablename + _T("'\n")
                   _T("   AND rdb$constraint_type = 'PRIMARY KEY'");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("   AND rdb$owner_name = '") + p_schema + _T("'");
   }
   return query;
@@ -1371,11 +1336,7 @@ SQLInfoFirebird::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,bo
 XString
 SQLInfoFirebird::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_tablename.MakeUpper();
-  }
+  IdentifierCorrect(p_tablename);
   XString sql = _T("SELECT TRIM(dbs.mon$database_name)   as catalog_name\n"
                    "      ,TRIM(rel.rdb$owner_name)      as schema_name\n"
                    "      ,trim(con.rdb$relation_name)   as table_name\n"
@@ -1394,6 +1355,7 @@ SQLInfoFirebird::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tablen
                    "   AND con.rdb$constraint_type = 'PRIMARY KEY'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rel.rdb$owner_name      = ?");
   }
   sql += _T("   AND rel.rdb$relation_name   = ?");
@@ -1437,18 +1399,16 @@ SQLInfoFirebird::GetCATALOGPrimaryDrop(XString /*p_schema*/,XString p_tablename,
 XString
 SQLInfoFirebird::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XString p_constraintname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_tablename.MakeUpper();
-    p_constraintname.MakeUpper();
-  }
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_constraintname);
+
   XString sql(_T("SELECT COUNT(*)\n"
                  "  FROM rdb$relations rel\n"
                  "   AND rdb$relation_constraints con\n"
                  " WHERE con.rdb$constraint_type = 'FOREIGN KEY'"));
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rel.owner_name          = '") + p_schema + _T("'\n");
   }
   sql += _T("   AND con.rdb$relation_name   = '") + p_tablename + _T("'\n");
@@ -1512,10 +1472,7 @@ SQLInfoFirebird::GetCATALOGForeignAttributes(XString& p_schema
   
   if(!p_schema.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_schema.MakeUpper();
-    }
+    IdentifierCorrect(p_schema);
     if(p_referenced)
     {
       query += _T("   AND pkrel.rdb$owner_name = ?\n");
@@ -1527,10 +1484,7 @@ SQLInfoFirebird::GetCATALOGForeignAttributes(XString& p_schema
   }
   if(!p_tablename.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_tablename.MakeUpper();
-    }
+    IdentifierCorrect(p_tablename);
     if(p_referenced)
     {
       query += _T("   AND pkrel.rdb$relation_name = ?\n");
@@ -1542,10 +1496,7 @@ SQLInfoFirebird::GetCATALOGForeignAttributes(XString& p_schema
   }
   if(!p_constraint.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_constraint.MakeUpper();
-    }
+    IdentifierCorrect(p_constraint);
     if(p_referenced)
     {
       query += _T("   AND fkref.rdb$const_name_uq = ?\n");
@@ -1677,12 +1628,9 @@ SQLInfoFirebird::GetCATALOGDefaultDrop(XString /*p_schema*/,XString /*p_tablenam
 XString
 SQLInfoFirebird::GetCATALOGCheckExists(XString  p_schema,XString p_tablename,XString p_constraint,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_constraint.MakeLower();
-  }
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_constraint);
+
   XString sql = _T("SELECT COUNT(DISTINCT\n")
                 _T("       trim(rc.rdb$constraint_name)) as number\n")
                 _T("  FROM rdb$relations rl\n")
@@ -1692,6 +1640,7 @@ SQLInfoFirebird::GetCATALOGCheckExists(XString  p_schema,XString p_tablename,XSt
                 _T(" WHERE rc.rdb$constraint_type = 'CHECK'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rl.rdb$owner_name      = ?\n");
   }
   sql += _T("   AND rl.rdb$relation_name   = ?")
@@ -1710,12 +1659,6 @@ SQLInfoFirebird::GetCATALOGCheckList(XString  p_schema,XString p_tablename,bool 
 XString
 SQLInfoFirebird::GetCATALOGCheckAttributes(XString  p_schema,XString p_tablename,XString p_constraint,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_constraint.MakeLower();
-  }
   XString sql = _T("SELECT DISTINCT\n")
                 _T("       (SELECT trim(mon$database_name) from mon$database) as catalog_name\n")
                 _T("      ,trim(rl.rdb$owner_name)      as schema_name\n")
@@ -1729,14 +1672,17 @@ SQLInfoFirebird::GetCATALOGCheckAttributes(XString  p_schema,XString p_tablename
                 _T(" WHERE rc.rdb$constraint_type = 'CHECK'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rl.rdb$owner_name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND rl.rdb$relation_name = ?");
   }
   if(!p_constraint.IsEmpty())
   {
+    IdentifierCorrect(p_constraint);
     sql += _T("   AND rc.rdb$constraint_name = ?");
   }
   sql += _T(" GROUP BY 1,2,3,4,5");
@@ -1767,18 +1713,16 @@ SQLInfoFirebird::GetCATALOGCheckDrop(XString /*p_schema*/,XString p_tablename,XS
 XString
 SQLInfoFirebird::GetCATALOGTriggerExists(XString p_schema,XString p_tablename,XString p_triggername,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_tablename.MakeUpper();
-    p_triggername.MakeUpper();
-  }
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_triggername);
+
   XString sql(_T("SELECT COUNT(*)\n"
                  "  FROM rdb$relations     rel\n"
                  "       JOIN rdb$triggers trg ON rel.rdb$relation_name = trg.rdb$relation_name\n"
                  " WHERE trg.rdb$system_flag  = 0\n"));
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql.AppendFormat(_T("   AND rel.rdb$owner_name = '%s'\n"),p_schema.GetString());
   }
   sql.AppendFormat(_T("   AND rdb$relation_name = '%s'\n"),p_tablename.GetString());
@@ -1970,19 +1914,13 @@ SQLInfoFirebird::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablen
                  "        trg.rdb$system_flag IS NULL)\n"));
   if(!p_schema.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_schema.MakeUpper();
-    }
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rel.rdb$owner_name = ?\n");
   }
   // Add tablename filter
   if(!p_tablename.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_tablename.MakeUpper();
-    }
+    IdentifierCorrect(p_tablename);
     if(p_tablename.Find('%') >= 0)
     {
       sql += _T("   AND rel.rdb$relation_name LIKE ?\n");
@@ -1996,10 +1934,7 @@ SQLInfoFirebird::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablen
   // Add trigger name filter
   if(!p_triggername.IsEmpty())
   {
-    if(!p_quoted)
-    {
-      p_triggername.MakeUpper();
-    }
+    IdentifierCorrect(p_triggername);
     if(p_triggername.Find('%') >= 0)
     {
       sql += _T("   AND trg.rdb$trigger_name LIKE ?\n");
@@ -2033,17 +1968,15 @@ SQLInfoFirebird::GetCATALOGTriggerDrop(XString /*p_schema*/, XString /*p_tablena
 XString
 SQLInfoFirebird::GetCATALOGSequenceExists(XString p_schema, XString p_sequence,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_sequence.MakeUpper();
-  }
+  IdentifierCorrect(p_sequence);
+
   XString sql = _T("SELECT COUNT(*)\n"
                    "  FROM rdb$generators\n"
                    " WHERE rdb$system_flag    = 0\n"
                    "   AND rdb$generator_name = '") + p_sequence + _T("'");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("\n   AND rdb$owner_name = '") + p_schema + _T("'");
   }
   return sql;
@@ -2052,11 +1985,6 @@ SQLInfoFirebird::GetCATALOGSequenceExists(XString p_schema, XString p_sequence,b
 XString
 SQLInfoFirebird::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_pattern.MakeUpper();
-  }
   XString sql = _T("SELECT cast('' as varchar(31))  as catalog_name\n"
                    "      ,trim(rdb$owner_name)     as schema_name\n"
                    "      ,trim(rdb$generator_name) as sequence_name\n" 
@@ -2070,10 +1998,12 @@ SQLInfoFirebird::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,boo
                    " WHERE rdb$system_flag    = 0\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rdb$owner_name = ?\n");
   }
   if(!p_pattern.IsEmpty())
   {
+    IdentifierCorrect(p_pattern);
     p_pattern = _T("%") + p_pattern + _T("%");
     sql += _T("   AND rdb$generator_name LIKE ?");
   }
@@ -2083,11 +2013,8 @@ SQLInfoFirebird::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,boo
 XString
 SQLInfoFirebird::GetCATALOGSequenceAttributes(XString& p_schema,XString& p_sequence,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_sequence.MakeUpper();
-  }
+  IdentifierCorrect(p_sequence);
+
   XString sql = _T("SELECT trim(dbs.mon$database_name)  as catalog_name\n"
                    "      ,trim(gen.rdb$owner_name)     as schema_name\n"
                    "      ,trim(gen.rdb$generator_name) as sequence_name\n" 
@@ -2102,6 +2029,7 @@ SQLInfoFirebird::GetCATALOGSequenceAttributes(XString& p_schema,XString& p_seque
                    " WHERE gen.rdb$system_flag = 0\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND gen.rdb$owner_name = ?\n");
   }
   sql += _T("   AND gen.rdb$generator_name = ?");
@@ -2131,16 +2059,14 @@ SQLInfoFirebird::GetCATALOGSequenceDrop(XString /*p_schema*/, XString p_sequence
 XString 
 SQLInfoFirebird::GetCATALOGViewExists(XString& p_schema,XString& p_viewname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_viewname.MakeUpper();
-  }
+  IdentifierCorrect(p_viewname);
+
   XString sql = _T("SELECT count(*)\n"
                    "  FROM rdb$relations\n"
                    " WHERE rdb$relation_type = 1\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rdb$owner_name = ?\n");
   }
   sql += _T("   AND rdb$relation_name = ?");
@@ -2163,8 +2089,7 @@ SQLInfoFirebird::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool p
   }
   else
   {
-    p_schema.MakeUpper();
-    p_viewname.MakeUpper();
+    IdentifierCorrect(p_viewname);
   }
   XString sql = _T("SELECT 'CREATE VIEW ") + viewname + _T(" AS\n' ||")
                 _T("       rdb$view_source\n")
@@ -2172,6 +2097,7 @@ SQLInfoFirebird::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool p
                 _T(" WHERE rdb$relation_name = '") + p_viewname + _T("'");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("\n   AND rdb$owner_name = '") + p_schema + _T("'");
   }
   return sql;
@@ -2180,11 +2106,6 @@ SQLInfoFirebird::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool p
 XString
 SQLInfoFirebird::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_viewname.MakeUpper();
-  }
   XString sql = _T("SELECT trim(dbs.mon$database_name)  AS table_catalog\n"
                    "      ,trim(rel.rdb$owner_name)     AS table_schema\n"
                    "      ,trim(rel.rdb$relation_name)  AS table_name\n"
@@ -2198,10 +2119,12 @@ SQLInfoFirebird::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname,
                    "   AND rel.rdb$system_flag   = 0\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND rel.rdb$owner_name = ?\n");
   }
   if(!p_viewname.IsEmpty())
   {
+    IdentifierCorrect(p_viewname);
     sql += _T("\n AND rel.rdb$relation_name ");
     sql += (p_viewname.Find(_T("%")) >= 0) ? _T("LIKE") : _T("=");
     sql += " ?";
@@ -2225,7 +2148,8 @@ XString
 SQLInfoFirebird::GetCATALOGViewDrop(XString /*p_schema*/,XString p_viewname,XString& p_precursor) const
 {
   XString viewname = QIQ(p_viewname);
-  if(viewname.GetLength() > 0 && isalpha(viewname[0]))
+
+  if(!IsIdentifierMixedCase(p_viewname))
   {
     p_viewname.MakeUpper();
   }
@@ -2243,6 +2167,14 @@ SQLInfoFirebird::GetCATALOGViewDrop(XString /*p_schema*/,XString p_viewname,XStr
 XString
 SQLInfoFirebird::GetCATALOGTablePrivileges(XString& p_schema,XString& p_tablename) const
 {
+  if(!IsIdentifierMixedCase(p_schema))
+  {
+    p_schema.MakeUpper();
+  }
+  if(!IsIdentifierMixedCase(p_tablename))
+  {
+    p_tablename.MakeUpper();
+  }
   XString sql = _T("SELECT (SELECT trim(mon$database_name) from mon$database) as catalog_name\n")
                 _T("      ,trim(rel.rdb$owner_name)     as table_schema\n")
                 _T("      ,trim(priv.rdb$relation_name) as table_name\n")
@@ -2337,16 +2269,19 @@ SQLInfoFirebird::GetCATALOGColumnPrivileges(XString& p_schema,XString& p_tablena
   // Add the filters
   if(!p_schema.IsEmpty())
   {
+    if(!IsIdentifierMixedCase(p_schema)) p_schema.MakeUpper();
     col += _T("   AND rel.rdb$owner_name = '") + p_schema + _T("'\n");
     tab += _T("   AND rel.rdb$owner_name = '") + p_schema + _T("'\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    if(!IsIdentifierMixedCase(p_tablename)) p_tablename.MakeUpper();
     col += _T("   AND priv.rdb$relation_name = '") + p_tablename + _T("'\n");
     tab += _T("   AND priv.rdb$relation_name = '") + p_tablename + _T("'\n");
   }
   if(!p_columnname.IsEmpty())
   {
+    if(!IsIdentifierMixedCase(p_columnname)) p_columnname.MakeUpper();
     col += _T("   AND priv.rdb$field_name = ") + p_columnname + _T("'\n");
   }
   // Add together and order the results
@@ -2462,15 +2397,12 @@ SQLInfoFirebird::GetCATALOGSynonymDrop(XString& /*p_schema*/,XString& /*p_synony
 XString
 SQLInfoFirebird::GetPSMProcedureExists(XString p_schema, XString p_procedure,bool p_quoted /*= false*/) const
 {
-  // Do not use the schema parameter
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_procedure.MakeUpper();
-  }
+  IdentifierCorrect(p_procedure);
+
   XString extra;
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     extra = _T("   AND rdb$owner_name = '") + p_schema + _T("'\n");
   }
   XString query = (_T("SELECT (SELECT COUNT(*)\n")
@@ -2490,12 +2422,10 @@ SQLInfoFirebird::GetPSMProcedureExists(XString p_schema, XString p_procedure,boo
 XString
 SQLInfoFirebird::GetPSMProcedureList(XString& p_schema,XString p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_procedure.MakeUpper();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_procedure);
   XString extra;
+
   if(!p_schema.IsEmpty())
   {
     extra = _T("   AND rdb$owner_name = '") + p_schema + _T("'\n");
@@ -2532,11 +2462,6 @@ SQLInfoFirebird::GetPSMProcedureList(XString& p_schema,XString p_procedure,bool 
 XString
 SQLInfoFirebird::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure,bool p_quoted /*= false*/) const
 {
-  if(p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_procedure.MakeUpper();
-  }
   XString sql1(_T("SELECT trim(dbs.mon$database_name) as catalog_name\n")
                _T("      ,trim(pro.rdb$owner_name) as schema_name\n")
                _T("      ,trim(pro.rdb$procedure_name)\n")
@@ -2582,11 +2507,13 @@ SQLInfoFirebird::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedur
                 _T(" WHERE rdb$function_type IS NOT NULL\n"));
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql1 += _T("   AND pro.rdb$owner_name = '") + p_schema + _T("'\n");
     sql2 += _T("   AND fun.rdb$owner_name = ?\n");
   }
   if(!p_procedure.IsEmpty())
   {
+    IdentifierCorrect(p_procedure);
     sql1 += _T("   AND pro.rdb$procedure_name = '") + p_procedure + _T("'\n");
     sql2 += _T("   AND fun.rdb$function_name  = ?\n");
   }
@@ -2597,11 +2524,9 @@ SQLInfoFirebird::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedur
 XString
 SQLInfoFirebird::GetPSMProcedureSourcecode(XString p_schema,XString p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_procedure.MakeUpper();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_procedure);
+
   // PROCEDURE en FUNCTION queries
   XString sql = _T("SELECT -1 as pos1\n")
                 _T("      ,-1 AS pos2\n")
@@ -2803,11 +2728,6 @@ SQLInfoFirebird::GetPSMProcedurePrivilege(XString& /*p_schema*/,XString& /*p_pro
 XString
 SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_procedure.MakeUpper();
-  }
   XString sql1 = _T("SELECT TRIM(dbs.mon$database_name)  as catalog_name\n"
                     "      ,TRIM(pro.rdb$owner_name)     as schema_name\n"
                     "      ,TRIM(pro.rdb$procedure_name) as procedure_name\n"
@@ -3107,11 +3027,13 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
 
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql1 += _T("   AND pro.rdb$owner_name = '") + p_schema + _T("'\n");
     sql2 += _T("   AND fun.rdb$owner_name = ?\n");
   }
   if(!p_procedure.IsEmpty())
   {
+    IdentifierCorrect(p_procedure);
     sql1 += _T("   AND pro.rdb$procedure_name = '") + p_procedure + _T("'\n");
     sql2 += _T("   AND fun.rdb$function_name = ?\n");
   }

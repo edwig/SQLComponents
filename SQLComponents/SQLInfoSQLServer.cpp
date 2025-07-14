@@ -38,6 +38,10 @@ static char THIS_FILE[] = __FILE__;
 namespace SQLComponents
 {
 
+// For SQLServer the identifiers are transformed to LOWER case
+// as the system catalog is stored in this case setting.
+#define IdentifierCorrect(ident)   if(!p_quoted || !IsIdentifierMixedCase(ident)) ident.MakeLower()
+
 // Constructor.
 SQLInfoSQLServer::SQLInfoSQLServer(SQLDatabase* p_database)
                  :SQLInfoDB(p_database)
@@ -864,14 +868,15 @@ SQLInfoSQLServer::GetCATALOGDefaultCollation() const
 
 // Get SQL to check if a table already exists in the database
 XString
-SQLInfoSQLServer::GetCATALOGTableExists(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGTableExists(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
   XString orgtable(p_tablename);
   XString catalog = GetCatalogAndSchema(p_schema,p_tablename);
   bool istemp = p_tablename.GetAt(0) == '#';
 
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+
   XString query = _T("SELECT COUNT(*)\n")
                   _T("  FROM " + catalog + ".tables  tab\n")
                   _T("      ," + catalog + ".schemas sch\n")
@@ -889,43 +894,44 @@ SQLInfoSQLServer::GetCATALOGTableExists(XString& p_schema,XString& p_tablename,b
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTablesList(XString& p_schema,XString& p_pattern,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGTablesList(XString& p_schema,XString& p_pattern,bool p_quoted /*= false*/) const
 {
-  return GetCATALOGTableAttributes(p_schema,p_pattern);
+  return GetCATALOGTableAttributes(p_schema,p_pattern,p_quoted);
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  XString query =
-    _T("SELECT db_name() AS table_catalog\n")
-    _T("      ,s.name    AS table_schema\n")
-    _T("      ,o.name    AS table_name\n")
-    _T("      ,CASE o.type\n")
-    _T("            WHEN 'U'  THEN 'TABLE'\n")
-    _T("            WHEN 'TT' THEN 'TABLE'\n")
-    _T("            WHEN 'S'  THEN 'SYSTEM TABLE'\n")
-    _T("                      ELSE 'UNKNOWN'\n")
-    _T("       END AS table_type\n")
-    _T("      ,CASE e.name\n")
-    _T("            WHEN N'MS_Description' THEN CAST (e.value AS VARCHAR(4000))\n")
-    _T("            ELSE ''\n")
-    _T("       END  AS remarks\n")
-    _T("      ,null AS tablespace\n")
-    _T("      ,0    AS temporary\n")
-    _T("  FROM sys.objects o\n")
-    _T("            INNER JOIN sys.schemas s  ON o.schema_id = s.schema_id\n")
-    _T("       LEFT OUTER JOIN sys.extended_properties e ON\n")
-    _T("                     ((e.major_id  = o.object_id OR e.major_id IS null)\n")
-    _T("                   AND e.minor_id  = 0\n")
-    _T("                   AND e.class     = 1)\n")
-    _T(" WHERE o.type IN ('U','TT','S')\n");
+  XString query = _T("SELECT db_name() AS table_catalog\n")
+                  _T("      ,s.name    AS table_schema\n")
+                  _T("      ,o.name    AS table_name\n")
+                  _T("      ,CASE o.type\n")
+                  _T("            WHEN 'U'  THEN 'TABLE'\n")
+                  _T("            WHEN 'TT' THEN 'TABLE'\n")
+                  _T("            WHEN 'S'  THEN 'SYSTEM TABLE'\n")
+                  _T("                      ELSE 'UNKNOWN'\n")
+                  _T("       END AS table_type\n")
+                  _T("      ,CASE e.name\n")
+                  _T("            WHEN N'MS_Description' THEN CAST (e.value AS VARCHAR(4000))\n")
+                  _T("            ELSE ''\n")
+                  _T("       END  AS remarks\n")
+                  _T("      ,null AS tablespace\n")
+                  _T("      ,0    AS temporary\n")
+                  _T("  FROM sys.objects o\n")
+                  _T("            INNER JOIN sys.schemas s  ON o.schema_id = s.schema_id\n")
+                  _T("       LEFT OUTER JOIN sys.extended_properties e ON\n")
+                  _T("                     ((e.major_id  = o.object_id OR e.major_id IS null)\n")
+                  _T("                   AND e.minor_id  = 0\n")
+                  _T("                   AND e.class     = 1)\n")
+                  _T(" WHERE o.type IN ('U','TT','S')\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("   AND s.name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     query += _T("   AND o.name ");
     query += p_tablename.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -935,7 +941,6 @@ SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablena
   {
     p_tablename = _T("%");
   }
-
   query += _T("UNION ALL\n")
            _T("SELECT db_name()\n")             // AS table_catalog
            _T("      ,'dbo'\n")                 // AS table_schema
@@ -965,32 +970,33 @@ SQLInfoSQLServer::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablena
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTableSynonyms(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGTableSynonyms(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  XString query =
-    _T("SELECT db_name() AS table_catalog\n")
-    _T("      ,s.name    AS table_schema\n")
-    _T("      ,o.name    AS table_name\n")
-    _T("      ,'SYNONYM' AS table_type\n")
-    _T("      ,CASE e.name\n")
-    _T("            WHEN N'MS_Description' THEN CAST (e.value AS VARCHAR(Max))\n")
-    _T("            ELSE ''\n")
-    _T("       END  AS remarks\n")
-    _T("      ,null AS tablespace\n")
-    _T("      ,0    AS temporary\n")
-    _T("  FROM sys.objects o\n")
-    _T("            INNER JOIN sys.schemas s ON o.schema_id = s.schema_id\n")
-    _T("       LEFT OUTER JOIN sys.extended_properties e ON\n")
-    _T("                     ((e.major_id  = o.object_id OR e.major_id IS null)\n")
-    _T("                   AND e.minor_id  = 0\n")
-    _T("                   AND e.class     = 1)\n")
-    _T(" WHERE o.type = 'SN'\n");
+  XString query = _T("SELECT db_name() AS table_catalog\n")
+                  _T("      ,s.name    AS table_schema\n")
+                  _T("      ,o.name    AS table_name\n")
+                  _T("      ,'SYNONYM' AS table_type\n")
+                  _T("      ,CASE e.name\n")
+                  _T("            WHEN N'MS_Description' THEN CAST (e.value AS VARCHAR(Max))\n")
+                  _T("            ELSE ''\n")
+                  _T("       END  AS remarks\n")
+                  _T("      ,null AS tablespace\n")
+                  _T("      ,0    AS temporary\n")
+                  _T("  FROM sys.objects o\n")
+                  _T("            INNER JOIN sys.schemas s ON o.schema_id = s.schema_id\n")
+                  _T("       LEFT OUTER JOIN sys.extended_properties e ON\n")
+                  _T("                     ((e.major_id  = o.object_id OR e.major_id IS null)\n")
+                  _T("                   AND e.minor_id  = 0\n")
+                  _T("                   AND e.class     = 1)\n")
+                  _T(" WHERE o.type = 'SN'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("   AND s.name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     query += _T("   AND o.name ");
     query += p_tablename.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -1000,11 +1006,8 @@ SQLInfoSQLServer::GetCATALOGTableSynonyms(XString& p_schema,XString& p_tablename
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-
   XString query = _T("SELECT db_name()      AS table_catalog\n")
                   _T("      ,usr.name       AS schema_name\n")
                   _T("      ,obj.name       AS table_name\n")
@@ -1019,10 +1022,12 @@ SQLInfoSQLServer::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,
                   _T("   AND obj.uid = usr.uid\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("   AND usr.name      = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     query += _T("   AND obj.name ");
     query += p_tablename.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -1131,11 +1136,12 @@ SQLInfoSQLServer::GetCATALOGTemptableDrop(XString p_schema,XString p_tablename) 
 // ALL COLUMN FUNCTIONS
 
 XString 
-SQLInfoSQLServer::GetCATALOGColumnExists(XString p_schema,XString p_tablename,XString p_columnname,bool /*p_quoted /*= false*/) const
+SQLInfoSQLServer::GetCATALOGColumnExists(XString p_schema,XString p_tablename,XString p_columnname,bool p_quoted /*= false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_columnname.MakeLower();
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_columnname);
+
   XString query = _T("SELECT count(*)\n")
                   _T("  FROM sys.sysobjects tab\n")
                   _T("      ,sys.schemas    sch\n")
@@ -1156,7 +1162,7 @@ SQLInfoSQLServer::GetCATALOGColumnList(XString& p_schema,XString& p_tablename,bo
 }
 
 XString 
-SQLInfoSQLServer::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablename,XString& p_columnname,bool /*p_quoted /*= false*/) const
+SQLInfoSQLServer::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablename,XString& p_columnname,bool p_quoted /*= false*/) const
 {
   // In case of a NON-TEMPORARY table, the standard ODBC driver is better
   if(p_tablename.Left(1).Compare(_T("#")))
@@ -1299,12 +1305,14 @@ SQLInfoSQLServer::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablen
                   _T(" WHERE table_schema = ?\n");
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     query += _T("   AND table_name ");
     query += p_tablename.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
   }
   if(!p_columnname.IsEmpty())
   {
+    IdentifierCorrect(p_columnname);
     query += _T("   AND column_name ");
     query += p_columnname.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -1371,10 +1379,11 @@ SQLInfoSQLServer::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablena
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGIndexList(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGIndexList(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
   p_schema.Empty(); // Do not use
-  p_tablename.MakeLower();
+  IdentifierCorrect(p_tablename);
+
   XString query = _T("SELECT idx.name\n")
                   _T("      ,col.name\n")
                   _T("      ,ixk.keyno\n")
@@ -1399,10 +1408,10 @@ SQLInfoSQLServer::GetCATALOGIndexList(XString& p_schema,XString& p_tablename,boo
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablename,XString& p_indexname,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablename,XString& p_indexname,bool p_quoted /*= false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
 
   // In case of a NON-TEMPORARY table, the standard ODBC driver is better
   if(p_tablename.Left(1).Compare(_T("#")))
@@ -1576,10 +1585,10 @@ SQLInfoSQLServer::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 // ALL PRIMARY KEY FUNCTIONS
 
 XString
-SQLInfoSQLServer::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,bool p_quoted /*= false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
 
   XString query = _T("SELECT COUNT(*)\n")
                   _T("  FROM dbo.sysobjects tab\n")
@@ -1595,7 +1604,7 @@ SQLInfoSQLServer::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,b
 }
 
 XString
-SQLInfoSQLServer::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tablename,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
   // In case of a NON-TEMPORARY table, the standard ODBC driver is better
   if(p_tablename.Left(1).Compare(_T("#")))
@@ -1631,6 +1640,7 @@ SQLInfoSQLServer::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_table
 
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     query += _T("   AND o.name ");
     query += p_tablename.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -1692,11 +1702,11 @@ SQLInfoSQLServer::GetCATALOGPrimaryDrop(XString p_schema,XString p_tablename,XSt
 // ALL FOREIGN KEY FUNCTIONS
 
 XString
-SQLInfoSQLServer::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XString p_constraintname,bool /*p_quoted = false*/) const
+SQLInfoSQLServer::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XString p_constraintname,bool p_quoted /*= false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_constraintname.MakeLower();
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_constraintname);
 
   XString sql;
   sql.Format(_T("SELECT COUNT(*)\n")
@@ -1727,11 +1737,8 @@ SQLInfoSQLServer::GetCATALOGForeignAttributes(XString& p_schema
                                              ,XString& p_tablename
                                              ,XString& p_constraint
                                              ,bool     p_referenced /*=false*/
-                                             ,bool   /*p_quoted         = false*/) const
+                                             ,bool     p_quoted     /*=false*/) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_constraint.MakeLower();
   XString query = _T("SELECT db_name()         as primary_catalog_name\n")
                   _T("      ,sch.name          as primary_schema_name\n")
                   _T("      ,pri.name          as primary_table_name\n")
@@ -1771,10 +1778,12 @@ SQLInfoSQLServer::GetCATALOGForeignAttributes(XString& p_schema
                   _T("   AND prk.type                 = 'K '\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("   AND sch.name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     if(p_referenced)
     {
       query += _T("   AND pri.name = ?\n");
@@ -1786,6 +1795,7 @@ SQLInfoSQLServer::GetCATALOGForeignAttributes(XString& p_schema
   }
   if(!p_constraint.IsEmpty())
   {
+    IdentifierCorrect(p_constraint);
     if(p_referenced)
     {
       query += _T("   AND prk.name = ?\n");
@@ -1914,20 +1924,19 @@ SQLInfoSQLServer::GetCATALOGForeignDrop(XString p_schema,XString p_tablename,XSt
 XString
 SQLInfoSQLServer::GetCATALOGDefaultExists(XString& p_schema,XString& p_tablename,XString& p_column) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_column.MakeLower();
+  bool p_quoted(true);
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_column);
 
-  XString sql =
-    _T("SELECT 1\n")
-    _T("  FROM sys.default_constraints d\n")
-    _T("       inner join sys.objects o ON o.object_id = d.parent_object_id\n")
-    _T("       inner join sys.schemas s ON s.schema_id = o.schema_id\n")
-    _T("       inner join sys.columns c ON o.object_id = c.object_id AND c.column_id = d.parent_column_id\n")
-    _T(" WHERE s.name = '") + p_schema    + _T("'\n")
-    _T("   AND o.name = '") + p_tablename + _T("'\n")
-    _T("   AND c.name = '") + p_column    + _T("'\n");
-
+  XString sql = _T("SELECT 1\n")
+                _T("  FROM sys.default_constraints d\n")
+                _T("       inner join sys.objects o ON o.object_id = d.parent_object_id\n")
+                _T("       inner join sys.schemas s ON s.schema_id = o.schema_id\n")
+                _T("       inner join sys.columns c ON o.object_id = c.object_id AND c.column_id = d.parent_column_id\n")
+                _T(" WHERE s.name = '") + p_schema    + _T("'\n")
+                _T("   AND o.name = '") + p_tablename + _T("'\n")
+                _T("   AND c.name = '") + p_column    + _T("'\n");
   return sql;
 }
 
@@ -1941,22 +1950,22 @@ SQLInfoSQLServer::GetCATALOGDefaultList(XString& p_schema,XString& p_tablename) 
 XString
 SQLInfoSQLServer::GetCATALOGDefaultAttributes(XString& p_schema,XString& p_tablename,XString& p_column) const
 {
-  p_schema.MakeLower();
-  p_tablename.MakeLower();
-  p_column.MakeLower();
+  bool p_quoted(true);
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_column);
 
-  XString sql =
-    _T("SELECT db_name() AS constraint_catalog\n")
-    _T("      ,s.name    AS constraint_schema\n")
-    _T("      ,o.name    AS constraint_table\n")
-    _T("      ,d.name    AS constraint_name\n")
-    _T("      ,c.name    AS constraint_column\n")
-    _T("      ,CAST(definition AS VARCHAR(Max)) AS constraint_code\n")
-    _T("  FROM sys.default_constraints d\n")
-    _T("       inner join sys.objects o ON o.object_id = d.parent_object_id\n")
-    _T("       inner join sys.schemas s ON s.schema_id = o.schema_id\n")
-    _T("       inner join sys.columns c ON o.object_id = c.object_id AND c.column_id = d.parent_column_id\n")
-    _T(" WHERE s.name = ?\n");
+  XString sql = _T("SELECT db_name() AS constraint_catalog\n")
+                _T("      ,s.name    AS constraint_schema\n")
+                _T("      ,o.name    AS constraint_table\n")
+                _T("      ,d.name    AS constraint_name\n")
+                _T("      ,c.name    AS constraint_column\n")
+                _T("      ,CAST(definition AS VARCHAR(Max)) AS constraint_code\n")
+                _T("  FROM sys.default_constraints d\n")
+                _T("       inner join sys.objects o ON o.object_id = d.parent_object_id\n")
+                _T("       inner join sys.schemas s ON s.schema_id = o.schema_id\n")
+                _T("       inner join sys.columns c ON o.object_id = c.object_id AND c.column_id = d.parent_column_id\n")
+                _T(" WHERE s.name = ?\n");
   if(!p_tablename.IsEmpty())
   {
     sql += _T("   AND o.name ");

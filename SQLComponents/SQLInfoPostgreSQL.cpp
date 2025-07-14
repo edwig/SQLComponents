@@ -37,6 +37,10 @@ static char THIS_FILE[] = __FILE__;
 namespace SQLComponents
 {
 
+// For PostgreSQL the identifiers are transformed to LOWER case
+// as the system catalog is stored in this case setting.
+#define IdentifierCorrect(ident)   if(!p_quoted || !IsIdentifierMixedCase(ident)) ident.MakeLower()
+
 // Constructor. 
 SQLInfoPostgreSQL::SQLInfoPostgreSQL(SQLDatabase* p_database)
                   :SQLInfoDB(p_database)
@@ -626,11 +630,9 @@ SQLInfoPostgreSQL::GetCATALOGDefaultCollation() const
 XString
 SQLInfoPostgreSQL::GetCATALOGTableExists(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+
   XString query = _T("SELECT count(*)\n")
                   _T("  FROM pg_class cl\n")
                   _T("      ,pg_namespace ns\n")
@@ -649,11 +651,6 @@ SQLInfoPostgreSQL::GetCATALOGTablesList(XString& p_schema,XString& p_pattern,boo
 XString
 SQLInfoPostgreSQL::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-  }
   XString query = _T("SELECT current_catalog as table_catalog\n")
                   _T("      ,sch.nspname     as table_schema\n")
                   _T("      ,tab.relname     as table_name\n")
@@ -673,10 +670,12 @@ SQLInfoPostgreSQL::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablen
                   _T("   AND sch.nspname <> 'information_schema'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("    AND sch.nspname = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     query += _T("   AND tab.relname ");
     query += p_tablename.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -697,11 +696,6 @@ SQLInfoPostgreSQL::GetCATALOGTableSynonyms(XString& /*p_schema*/,XString& /*p_ta
 XString
 SQLInfoPostgreSQL::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-  }
   XString query = _T("SELECT current_catalog as table_catalog\n")
                   _T("      ,sch.nspname     as table_schema\n")
                   _T("      ,tab.relname     as table_name\n")
@@ -722,10 +716,12 @@ SQLInfoPostgreSQL::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename
                   _T("   AND sch.nspname <> 'pg_toast'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("    AND sch.name = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     query += _T("   AND tab.relname ");
     query += p_tablename.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -823,12 +819,10 @@ SQLInfoPostgreSQL::GetCATALOGTemptableDrop(XString p_schema,XString p_tablename)
 XString 
 SQLInfoPostgreSQL::GetCATALOGColumnExists(XString p_schema,XString p_tablename,XString p_columnname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_columnname.MakeLower();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_columnname);
+
   XString query = _T("SELECT count(*)\n")
                  _T("  FROM pg_class      tab\n")
                  _T("      ,pg_namespaces sch\n")
@@ -941,12 +935,6 @@ SQLInfoPostgreSQL::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablen
     // Cannot get table statistics
     return XString();
   }
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_indexname.MakeLower();
-  }
   XString sql = _T("SELECT current_database() AS catalog_name\n"
                    "      ,n.nspname          AS schema_name\n"
                    "      ,t.relname          AS table_name\n"
@@ -978,14 +966,17 @@ SQLInfoPostgreSQL::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablen
                    "            WHERE c.conindid = i.indexrelid AND c.contype = 'f' )");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND n.nspname = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND t.relname = ?\n");
   }
   if(!p_indexname.IsEmpty())
   {
+    IdentifierCorrect(p_indexname);
     sql += _T("   AND ci.relname = ?\n");
   }
   sql += _T(" ORDER BY 1,2,3,6,8");
@@ -1052,11 +1043,9 @@ SQLInfoPostgreSQL::GetCATALOGIndexFilter(MetaIndex& /*p_index*/) const
 XString
 SQLInfoPostgreSQL::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+
   XString query = _T("SELECT COUNT(*)\n")
                   _T("  FROM pg_class      tab\n")
                   _T("      ,pg_constraint con\n")
@@ -1072,11 +1061,6 @@ SQLInfoPostgreSQL::GetCATALOGPrimaryExists(XString p_schema,XString p_tablename,
 XString
 SQLInfoPostgreSQL::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-  }
   XString sql = _T("SELECT current_database() AS catalog_name\n"
                    "      ,n.nspname          AS table_schema\n"
                    "      ,c.relname          AS table_name\n"
@@ -1091,11 +1075,12 @@ SQLInfoPostgreSQL::GetCATALOGPrimaryAttributes(XString& p_schema,XString& p_tabl
                    " WHERE con.contype = 'p'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND n.nspname   = ?\n");
-
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND c.relname   = ?\n");
   }
   sql += _T(" ORDER BY 1,2,3,5\n");
@@ -1145,12 +1130,10 @@ SQLInfoPostgreSQL::GetCATALOGPrimaryDrop(XString p_schema,XString p_tablename,XS
 XString
 SQLInfoPostgreSQL::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XString p_constraintname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_constraintname.MakeLower();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_constraintname);
+
   XString sql;
   sql.Format(_T("SELECT COUNT(*)\n")
              _T("  FROM pg_constraint con\n")
@@ -1182,12 +1165,6 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(XString& p_schema
                                               ,bool     p_referenced /*=false*/
                                               ,bool     p_quoted     /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_constraint.MakeLower();
-  }
   XString query = _T("SELECT current_database() AS pktable_catalog\n")
                   _T("      ,pk_ns.nspname      AS pktable_schema\n")
                   _T("      ,pk_tbl.relname     AS pktable_name\n")
@@ -1239,6 +1216,7 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(XString& p_schema
                   _T(" WHERE conf.contype = 'f'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     if(p_referenced)
     {
       query += _T("   AND pk_ns.nspname = ?\n");
@@ -1250,6 +1228,7 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(XString& p_schema
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     if(p_referenced)
     {
       query += _T("   AND pk_tbl.relname = ?\n");
@@ -1261,6 +1240,7 @@ SQLInfoPostgreSQL::GetCATALOGForeignAttributes(XString& p_schema
   }
   if(!p_constraint.IsEmpty())
   {
+    IdentifierCorrect(p_constraint);
     if(p_referenced)
     {
       query += _T("   AND pk_col.attname = ?");
@@ -1446,12 +1426,6 @@ SQLInfoPostgreSQL::GetCATALOGDefaultDrop(XString /*p_schema*/,XString /*p_tablen
 XString
 SQLInfoPostgreSQL::GetCATALOGCheckExists(XString p_schema,XString p_tablename,XString p_constraint,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_constraint.MakeLower();
-  }
   XString sql = _T("SELECT COUNT(*)\n"
                    "  FROM pg_constraint con\n"
                    "       JOIN pg_class     rel ON rel.oid = con.conrelid\n"
@@ -1459,14 +1433,17 @@ SQLInfoPostgreSQL::GetCATALOGCheckExists(XString p_schema,XString p_tablename,XS
                    " WHERE con.contype = 'c'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND nsp.nspname = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND rel.relname = ?\n");
   }
   if(!p_constraint.IsEmpty())
   {
+    IdentifierCorrect(p_constraint);
     sql += _T("   AND con.conname = ?");
   }
   return sql;
@@ -1482,12 +1459,6 @@ SQLInfoPostgreSQL::GetCATALOGCheckList(XString p_schema,XString p_tablename,bool
 XString
 SQLInfoPostgreSQL::GetCATALOGCheckAttributes(XString  p_schema,XString p_tablename,XString p_constraint,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_constraint.MakeLower();
-  }
   XString sql = _T("SELECT current_database() AS catalog_name\n"
                    "      ,nsp.nspname        AS schema_name\n"
                    "      ,rel.relname        AS table_name\n"
@@ -1499,14 +1470,17 @@ SQLInfoPostgreSQL::GetCATALOGCheckAttributes(XString  p_schema,XString p_tablena
                    " WHERE con.contype = 'c'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND nsp.nspname = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND rel.relname = ?\n");
   }
   if(!p_constraint.IsEmpty())
   {
+    IdentifierCorrect(p_constraint);
     sql += _T("   AND con.conname = ?\n");
   }
   sql += _T(" ORDER BY 1,2,3,4");
@@ -1536,12 +1510,10 @@ SQLInfoPostgreSQL::GetCATALOGCheckDrop(XString p_schema,XString p_tablename,XStr
 XString
 SQLInfoPostgreSQL::GetCATALOGTriggerExists(XString p_schema, XString p_tablename, XString p_triggername,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_triggername.MakeLower();
-  }
+  IdentifierCorrect(p_schema);
+  IdentifierCorrect(p_tablename);
+  IdentifierCorrect(p_triggername);
+
   XString sql = _T("SELECT COUNT(*)\n")
                 _T("  FROM information_schema.triggers\n")
                 _T(" WHERE event_object_schema = '") + p_schema      + _T("'\n")
@@ -1560,12 +1532,6 @@ SQLInfoPostgreSQL::GetCATALOGTriggerList(XString& p_schema,XString& p_tablename,
 XString
 SQLInfoPostgreSQL::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablename,XString& p_triggername,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_tablename.MakeLower();
-    p_triggername.MakeLower();
-  }
   XString sql = _T("SELECT current_database()   as trigger_catalog\n")
                 _T("      ,ns.nspname           as trigger_schema\n")
                 _T("      ,cl.relname           as trigger_table\n")
@@ -1594,14 +1560,17 @@ SQLInfoPostgreSQL::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tabl
                 _T(" WHERE NOT tr.tgisinternal\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND ns.nspname = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
+    IdentifierCorrect(p_tablename);
     sql += _T("   AND cl.relname = ?\n");
   }
   if(!p_triggername.IsEmpty())
   {
+    IdentifierCorrect(p_triggername);
     sql += _T("   AND tr.tgname = ?\n");
   }
   // Alphabetically ordered by triggername fills row_number() with the positioning!
@@ -1650,11 +1619,6 @@ SQLInfoPostgreSQL::GetCATALOGSequenceExists(XString p_schema, XString p_sequence
 XString
 SQLInfoPostgreSQL::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_pattern.MakeLower();
-  }
   if(!p_pattern.IsEmpty() && p_pattern.Compare(_T("%")))
   {
     p_pattern = _T("%") + p_pattern + _T("%");
@@ -1675,10 +1639,12 @@ SQLInfoPostgreSQL::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,b
                 _T("  FROM information_schema.sequences\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T(" WHERE sequence_schema  = ?\n");
   }
   if(!p_pattern.IsEmpty())
   {
+    IdentifierCorrect(p_pattern);
     sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
     sql += _T("sequence_name LIKE ?");
   }
@@ -1688,11 +1654,6 @@ SQLInfoPostgreSQL::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,b
 XString
 SQLInfoPostgreSQL::GetCATALOGSequenceAttributes(XString& p_schema,XString& p_sequence,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_sequence.MakeLower();
-  }
   XString sql = _T("SELECT current_database() AS catalog_name\n")
                 _T("      ,sequence_schema    AS schema_name\n")
                 _T("      ,sequence_name\n")
@@ -1708,10 +1669,12 @@ SQLInfoPostgreSQL::GetCATALOGSequenceAttributes(XString& p_schema,XString& p_seq
                 _T("  FROM information_schema.sequences\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T(" WHERE sequence_schema = ?\n");
   }
   if(!p_sequence.IsEmpty())
   {
+    IdentifierCorrect(p_sequence);
     sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
     sql += _T("sequence_name   = ?");
   }
@@ -1750,21 +1713,18 @@ SQLInfoPostgreSQL::GetCATALOGSequenceDrop(XString p_schema, XString p_sequence) 
 XString 
 SQLInfoPostgreSQL::GetCATALOGViewExists(XString& p_schema,XString& p_viewname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeUpper();
-    p_viewname.MakeLower();
-  }
   XString sql(_T("SELECT COUNT(*)\n")
               _T("  FROM pg_catalog.pg_class cl\n") 
               _T("       JOIN pg_catalog.pg_namespace ns ON ns.oid = cl.relnamespace\n")
               _T(" WHERE cl.relkind = 'v'\n"));
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("    AND ns.nspname = ?\n");
   }
   if(!p_viewname.IsEmpty())
   {
+    IdentifierCorrect(p_viewname);
     sql += _T("   AND cl.relname = ?");
   }
   return sql;
@@ -1779,11 +1739,6 @@ SQLInfoPostgreSQL::GetCATALOGViewList(XString& p_schema,XString& p_pattern,bool 
 XString 
 SQLInfoPostgreSQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_viewname.MakeLower();
-  }
   XString query = _T("SELECT current_catalog as table_catalog\n")
                   _T("      ,sch.nspname     as table_schema\n")
                   _T("      ,tab.relname     as table_name\n")
@@ -1802,10 +1757,12 @@ SQLInfoPostgreSQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewnam
                   _T("   AND sch.nspname <> 'information_schema'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("    AND sch.nspname = ?\n");
   }
   if(!p_viewname.IsEmpty())
   {
+    IdentifierCorrect(p_viewname);
     query += _T("   AND tab.relname ");
     query += p_viewname.Find('%') >= 0 ? _T("LIKE") : _T("=");
     query += _T(" ?\n");
@@ -1818,11 +1775,6 @@ SQLInfoPostgreSQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewnam
 XString
 SQLInfoPostgreSQL::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_viewname.MakeLower();
-  }
   XString query = _T("SELECT 'CREATE OR REPLACE VIEW \"' || sch.nspname || '\".\"' || tab.relname || '\" AS ' ||\n")
                   _T("       pg_get_viewdef(tab.oid) as viewtext\n")
                   _T("  FROM pg_catalog.pg_class tab\n")
@@ -1832,10 +1784,12 @@ SQLInfoPostgreSQL::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool
                   _T("   AND sch.nspname <> 'information_schema'\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     query += _T("    AND sch.nspname = '") + p_schema + _T("'\n");
   }
   if(!p_viewname.IsEmpty())
   {
+    IdentifierCorrect(p_viewname);
     query += _T("   AND tab.relname = '") + p_viewname + _T("'");
   }
   return query;
@@ -1980,16 +1934,14 @@ SQLInfoPostgreSQL::GetCATALOGSynonymDrop(XString& /*p_schema*/,XString& /*p_syno
 XString
 SQLInfoPostgreSQL::GetPSMProcedureExists(XString p_schema, XString p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_procedure.MakeLower();
-  }
+  IdentifierCorrect(p_procedure);
+
   XString sql = _T("SELECT count(*)\n")
                 _T("  FROM information_schema.routines\n")
                 _T(" WHERE routine_name = '") + p_procedure + _T("'");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("\n   AND specific_schema = '") + p_schema + _T("'");
   }
   return sql;
@@ -1998,11 +1950,6 @@ SQLInfoPostgreSQL::GetPSMProcedureExists(XString p_schema, XString p_procedure,b
 XString
 SQLInfoPostgreSQL::GetPSMProcedureList(XString& p_schema,XString p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_procedure.MakeLower();
-  }
   XString sql = _T("SELECT current_database() as procedure_catalog\n")
                 _T("      ,ns.nspname         as procedure_schema\n")
                 _T("      ,pr.proname         as procedure_name\n")
@@ -2017,11 +1964,13 @@ SQLInfoPostgreSQL::GetPSMProcedureList(XString& p_schema,XString p_procedure,boo
   // schema name
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND ns.nspname = ?\n");
   }
   // routine name
   if(!p_procedure.IsEmpty())
   {
+    IdentifierCorrect(p_procedure);
     if(p_procedure.Find('%') >= 0)
     {
       sql += _T("   AND pr.proname LIKE ?\n");
@@ -2040,11 +1989,6 @@ SQLInfoPostgreSQL::GetPSMProcedureList(XString& p_schema,XString p_procedure,boo
 XString
 SQLInfoPostgreSQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_procedure.MakeLower();
-  }
   XString sql = _T("SELECT current_database() as procedure_catalog\n")
                 _T("      ,ns.nspname         as procedure_schema\n")
                 _T("      ,pr.proname         as procedure_name\n")
@@ -2066,11 +2010,13 @@ SQLInfoPostgreSQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_proced
                 _T("       LEFT OUTER JOIN pg_catalog.pg_description co ON pr.oid = co.objoid\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("            INNER JOIN pg_catalog.pg_namespace   ns ON ns.oid = pr.pronamespace\n");
     sql += _T(" WHERE ns.nspname = ?\n");
   }
   if(!p_procedure.IsEmpty())
   {
+    IdentifierCorrect(p_procedure);
     sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
     sql += _T("pr.proname ");
     // routine name
@@ -2085,22 +2031,19 @@ SQLInfoPostgreSQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_proced
 XString
 SQLInfoPostgreSQL::GetPSMProcedureSourcecode(XString p_schema,XString p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_procedure.MakeLower();
-  }
   XString sql = _T("SELECT 1 as type\n")
                 _T("      ,1 as line\n")
                 _T("      ,pg_get_functiondef(pr.oid) as source\n")
                 _T("  FROM pg_catalog.pg_proc pr\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("            INNER JOIN pg_catalog.pg_namespace ns ON ns.oid = pr.pronamespace\n");
     sql += _T(" WHERE ns.nspname = '") + p_schema + _T("'\n");
   }
   if(!p_procedure.IsEmpty())
   {
+    IdentifierCorrect(p_procedure);
     sql += _T("   AND pr.proname = '") + p_procedure + _T("'");
   }
   return sql;
@@ -2142,13 +2085,7 @@ SQLInfoPostgreSQL::GetPSMProcedurePrivilege(XString& /*p_schema*/,XString& /*p_p
 XString
 SQLInfoPostgreSQL::GetPSMProcedureParameters(XString& p_schema,XString& p_procedure,bool p_quoted /*= false*/) const
 {
-  if(!p_quoted)
-  {
-    p_schema.MakeLower();
-    p_procedure.MakeLower();
-  }
   XString sql;
-
   sql = _T("SELECT par.specific_catalog\n")
         _T("      ,par.specific_schema\n")
         _T("      ,fun.routine_name\n")
@@ -2179,10 +2116,12 @@ SQLInfoPostgreSQL::GetPSMProcedureParameters(XString& p_schema,XString& p_proced
         _T("   AND par.specific_name    = fun.specific_name\n");
   if(!p_schema.IsEmpty())
   {
+    IdentifierCorrect(p_schema);
     sql += _T("   AND fun.specific_schema = ?\n");
   }
   if(!p_procedure.IsEmpty())
   {
+    IdentifierCorrect(p_procedure);
     sql += _T("   AND fun.routine_name    = ?\n");
   }
   sql += _T(" ORDER BY 1,2,3,18");
