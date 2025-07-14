@@ -682,6 +682,7 @@ DDLCreateTable::GetAccessInfo(bool p_strict /*=false*/)
     m_didPrivileges = !m_access.empty();
   }
 
+  XString subObject;
   bool strict = p_strict || m_info->GetPreferODBC();
 
   // Print all privileges
@@ -689,8 +690,8 @@ DDLCreateTable::GetAccessInfo(bool p_strict /*=false*/)
   {
     if(!strict || IsStrictODBCPrivilege(priv.m_privilege))
     {
-      line = m_target ? m_target->GetCATALOGGrantPrivilege(priv.m_schemaName,priv.m_tableName,priv.m_privilege,priv.m_grantee,priv.m_grantable)
-                      :   m_info->GetCATALOGGrantPrivilege(priv.m_schemaName,priv.m_tableName,priv.m_privilege,priv.m_grantee,priv.m_grantable);
+      line = m_target ? m_target->GetCATALOGGrantPrivilege(priv.m_schemaName,priv.m_tableName,subObject,priv.m_privilege,priv.m_grantee,priv.m_grantable)
+                      :   m_info->GetCATALOGGrantPrivilege(priv.m_schemaName,priv.m_tableName,subObject,priv.m_privilege,priv.m_grantee,priv.m_grantable);
       if(!line.IsEmpty())
       {
         StashTheLine(line);

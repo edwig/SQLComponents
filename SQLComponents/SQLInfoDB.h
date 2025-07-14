@@ -414,8 +414,8 @@ public:
   virtual XString GetCATALOGTablePrivileges   (XString& p_schema,XString& p_tablename) const = 0;
   virtual XString GetCATALOGColumnPrivileges  (XString& p_schema,XString& p_tablename,XString& p_columnname) const = 0;
   virtual XString GetCATALOGSequencePrivilege (XString& p_schema,XString& p_sequence) const = 0;
-  virtual XString GetCATALOGGrantPrivilege    (XString  p_schema,XString  p_objectname,XString p_privilege,XString p_grantee,bool p_grantable) = 0;
-  virtual XString GetCATALOGRevokePrivilege   (XString  p_schema,XString  p_objectname,XString p_privilege,XString p_grantee) = 0;
+  virtual XString GetCATALOGGrantPrivilege    (XString  p_schema,XString  p_objectname,XString p_subObject,XString p_privilege,XString p_grantee,bool p_grantable) = 0;
+  virtual XString GetCATALOGRevokePrivilege   (XString  p_schema,XString  p_objectname,XString p_subObject,XString p_privilege,XString p_grantee) = 0;
   // All Synonym functions
   virtual XString GetCATALOGSynonymList       (XString& p_schema,XString& p_pattern) const = 0;
   virtual XString GetCATALOGSynonymAttributes (XString& p_schema,XString& p_synonym) const = 0;

@@ -1401,15 +1401,19 @@ SQLInfoMySQL::GetCATALOGSequencePrivilege(XString& /*p_schema*/,XString& /*p_seq
 }
 
 XString 
-SQLInfoMySQL::GetCATALOGGrantPrivilege(XString /*p_schema*/,XString p_objectname,XString p_privilege,XString p_grantee,bool p_grantable)
+SQLInfoMySQL::GetCATALOGGrantPrivilege(XString /*p_schema*/,XString p_objectname,XString p_subObject,XString p_privilege,XString p_grantee,bool p_grantable)
 {
   XString sql;
-  p_grantee.MakeLower();
 
   // MySQL does not know the concept of "PUBLIC"
   if(p_grantee.Compare(_T("public")))
   {
-    sql.Format(_T("GRANT %s ON %s TO %s"),p_privilege.GetString(),p_objectname.GetString(),p_grantee.GetString());
+    sql.Format(_T("GRANT %s"),p_privilege.GetString());
+    if(!p_subObject.IsEmpty())
+    {
+      sql.AppendFormat(_T("(%s)"),QIQ(p_subObject).GetString());
+    }
+    sql.AppendFormat(_T(" ON %s TO %s"),QIQ(p_objectname).GetString(),QIQ(p_grantee).GetString());
     if(p_grantable)
     {
       sql += _T(" WITH GRANT OPTION");
@@ -1419,7 +1423,7 @@ SQLInfoMySQL::GetCATALOGGrantPrivilege(XString /*p_schema*/,XString p_objectname
 }
 
 XString 
-SQLInfoMySQL::GetCATALOGRevokePrivilege(XString /*p_schema*/,XString p_objectname,XString p_privilege,XString p_grantee)
+SQLInfoMySQL::GetCATALOGRevokePrivilege(XString /*p_schema*/,XString p_objectname,XString p_subObject,XString p_privilege,XString p_grantee)
 {
   XString sql;
   p_grantee.MakeLower();
@@ -1427,7 +1431,13 @@ SQLInfoMySQL::GetCATALOGRevokePrivilege(XString /*p_schema*/,XString p_objectnam
   // MySQL does not know the concept of "PUBLIC"
   if(p_grantee.Compare(_T("public")))
   {
-    sql.Format(_T("REVOKE %s ON %s FROM %s"), p_privilege.GetString(), p_objectname.GetString(), p_grantee.GetString());
+    sql.Format(_T("REVOKE %s"),p_privilege.GetString());
+    if(!p_subObject.IsEmpty())
+    {
+      sql.AppendFormat(_T("(%s)"),QIQ(p_subObject).GetString());
+    }
+    sql += _T(" ON ");
+    sql.AppendFormat(_T(" ON %s FROM %s"),QIQ(p_objectname).GetString(),QIQ(p_grantee).GetString());
   }
   return sql;
 }

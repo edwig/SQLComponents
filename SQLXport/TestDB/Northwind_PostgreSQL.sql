@@ -8,9 +8,7 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
-
 SET default_tablespace = '';
-
 SET default_with_oids = false;
 
 -- CREATE SCHEMA IF NOT EXISTS northwind
@@ -26,22 +24,22 @@ SET default_with_oids = false;
 
 -- Drop Views
 --
-DROP VIEW IF EXISTS "Alphabetical list of products";
-DROP VIEW IF EXISTS "Product Sales for 1997";
-DROP VIEW IF EXISTS "Category Sales for 1997";
-DROP VIEW IF EXISTS "Current Product List";
-DROP VIEW IF EXISTS "Customer and Suppliers by City";
-DROP VIEW IF EXISTS "Invoices";
-DROP VIEW IF EXISTS "Order Details Extended";
-DROP VIEW IF EXISTS "Order Subtotals";
-DROP VIEW IF EXISTS "Orders Qry";
-DROP VIEW IF EXISTS "Products Above Average Price";
-DROP VIEW IF EXISTS "Products by Category";
-DROP VIEW IF EXISTS "Quarterly Orders";
-DROP VIEW IF EXISTS "Sales by Category";
-DROP VIEW IF EXISTS "Sales Totals by Amount";
-DROP VIEW IF EXISTS "Summary of Sales by Quarter";
-DROP VIEW IF EXISTS "Summary of Sales by Year";
+DROP VIEW IF EXISTS northwind."Alphabetical list of products";
+DROP VIEW IF EXISTS northwind."Product Sales for 1997";
+DROP VIEW IF EXISTS northwind."Category Sales for 1997";
+DROP VIEW IF EXISTS northwind."Current Product List";
+DROP VIEW IF EXISTS northwind."Customer and Suppliers by City";
+DROP VIEW IF EXISTS northwind."Invoices";
+DROP VIEW IF EXISTS northwind."Order Details Extended";
+DROP VIEW IF EXISTS northwind."Order Subtotals";
+DROP VIEW IF EXISTS northwind."Orders Qry";
+DROP VIEW IF EXISTS northwind."Products Above Average Price";
+DROP VIEW IF EXISTS northwind."Products by Category";
+DROP VIEW IF EXISTS northwind."Quarterly Orders";
+DROP VIEW IF EXISTS northwind."Sales by Category";
+DROP VIEW IF EXISTS northwind."Sales Totals by Amount";
+DROP VIEW IF EXISTS northwind."Summary of Sales by Quarter";
+DROP VIEW IF EXISTS northwind."Summary of Sales by Year";
 
 
 ALTER TABLE ONLY northwind."Orders"                 drop CONSTRAINT "FK_Orders_Customers"; 
@@ -76,12 +74,12 @@ DROP TABLE IF EXISTS northwind."Categories";
 DROP TABLE IF EXISTS northwind."Region";
 DROP TABLE IF EXISTS northwind."Employees";
 
-DROP SEQUENCE IF EXISTS "GEN_Categories_ID";
-DROP SEQUENCE IF EXISTS "GEN_Employees_ID";
-DROP SEQUENCE IF EXISTS "GEN_Orders_ID";
-DROP SEQUENCE IF EXISTS "GEN_Products_ID";
-DROP SEQUENCE IF EXISTS "GEN_Shippers_ID";
-DROP SEQUENCE IF EXISTS "GEN_Suppliers_ID";
+DROP SEQUENCE IF EXISTS northwind."GEN_Categories_ID";
+DROP SEQUENCE IF EXISTS northwind."GEN_Employees_ID";
+DROP SEQUENCE IF EXISTS northwind."GEN_Orders_ID";
+DROP SEQUENCE IF EXISTS northwind."GEN_Products_ID";
+DROP SEQUENCE IF EXISTS northwind."GEN_Shippers_ID";
+DROP SEQUENCE IF EXISTS northwind."GEN_Suppliers_ID";
 
 
 ------------------------------------------------------------------------------------
@@ -95,23 +93,23 @@ DROP SEQUENCE IF EXISTS "GEN_Suppliers_ID";
 --/***    SEQUENCES
 --/******************************************************************************/
 
-CREATE SEQUENCE "GEN_Categories_ID" START WITH 1 INCREMENT BY 1;
-ALTER SEQUENCE  "GEN_Categories_ID" RESTART WITH 9;
+CREATE SEQUENCE northwind."GEN_Categories_ID" START WITH 1 INCREMENT BY 1;
+ALTER SEQUENCE  northwind."GEN_Categories_ID" RESTART WITH 9;
 
-CREATE SEQUENCE "GEN_Employees_ID" START WITH 1 INCREMENT BY 1;
-ALTER SEQUENCE  "GEN_Employees_ID" RESTART WITH 10;
+CREATE SEQUENCE northwind."GEN_Employees_ID" START WITH 1 INCREMENT BY 1;
+ALTER SEQUENCE  northwind."GEN_Employees_ID" RESTART WITH 10;
 
-CREATE SEQUENCE "GEN_Orders_ID" START WITH 1 INCREMENT BY 1;
-ALTER SEQUENCE  "GEN_Orders_ID" RESTART WITH 11078;
+CREATE SEQUENCE northwind."GEN_Orders_ID" START WITH 1 INCREMENT BY 1;
+ALTER SEQUENCE  northwind."GEN_Orders_ID" RESTART WITH 11078;
 
-CREATE SEQUENCE "GEN_Products_ID" START WITH 1 INCREMENT BY 1;
-ALTER SEQUENCE  "GEN_Products_ID" RESTART WITH 78;
+CREATE SEQUENCE northwind."GEN_Products_ID" START WITH 1 INCREMENT BY 1;
+ALTER SEQUENCE  northwind."GEN_Products_ID" RESTART WITH 78;
 
-CREATE SEQUENCE "GEN_Shippers_ID" START WITH 1 INCREMENT BY 1;
-ALTER SEQUENCE  "GEN_Shippers_ID" RESTART WITH 4;
+CREATE SEQUENCE northwind."GEN_Shippers_ID" START WITH 1 INCREMENT BY 1;
+ALTER SEQUENCE  northwind."GEN_Shippers_ID" RESTART WITH 4;
 
-CREATE SEQUENCE "GEN_Suppliers_ID" START WITH 1 INCREMENT BY 1;
-ALTER SEQUENCE  "GEN_Suppliers_ID" RESTART WITH 30;
+CREATE SEQUENCE northwind."GEN_Suppliers_ID" START WITH 1 INCREMENT BY 1;
+ALTER SEQUENCE  northwind."GEN_Suppliers_ID" RESTART WITH 30;
 
 --/******************************************************************************/
 --/***    TABLES
@@ -364,7 +362,7 @@ SELECT "Categories"."CategoryName"
   FROM ("Categories" INNER JOIN "Products" ON "Categories"."CategoryID" = "Products"."CategoryID")
        INNER JOIN ("Orders" INNER JOIN "Order Details" ON "Orders"."OrderID" = "Order Details"."OrderID")
                ON "Products"."ProductID" = "Order Details"."ProductID"
- WHERE ((("Orders"."ShippedDate") Between '01.01.1997 00:00:00.0000' And '31.12.1997 23:59:59.9999'))
+ WHERE ((("Orders"."ShippedDate") Between '1997-01-01 00:00:00.0000' And '1997-12-31 23:59:59.9999'))
  GROUP BY "Categories"."CategoryName"
          ,"Products"."ProductName"
 ;
@@ -600,7 +598,7 @@ SELECT DISTINCT "Customers"."CustomerID"
 	  ,"Customers"."City"
 	  ,"Customers"."Country"
   FROM "Customers" RIGHT JOIN "Orders" ON "Customers"."CustomerID" = "Orders"."CustomerID"
- WHERE "Orders"."OrderDate" BETWEEN '01.01.1997 00:00:00.0000' And '31.12.1997 23:59:59.9999'
+ WHERE "Orders"."OrderDate" BETWEEN '1997-01-01 00:00:00.0000' And '1997-12-31 23:59:59.9999'
 ;
 
 CREATE OR REPLACE VIEW "Sales by Category"
@@ -620,7 +618,7 @@ SELECT "Categories"."CategoryID"
             ("Orders" INNER JOIN "Order Details Extended" ON "Orders"."OrderID" = "Order Details Extended"."OrderID")
         ON "Products"."ProductID" = "Order Details Extended"."ProductID")
     ON "Categories"."CategoryID" = "Products"."CategoryID"
- WHERE "Orders"."OrderDate" BETWEEN '01.01.1997 00:00:00.0000' And '31.12.1997 23:59:59.9999'
+ WHERE "Orders"."OrderDate" BETWEEN '1997-01-01 00:00:00.0000' And '1997-12-31 23:59:59.9999'
  GROUP BY "Categories"."CategoryID", "Categories"."CategoryName", "Products"."ProductName"
 --ORDER BY Products.ProductName
 ;
@@ -641,7 +639,7 @@ SELECT "Order Subtotals"."Subtotal" AS "SaleAmount"
         ("Orders" INNER JOIN "Order Subtotals" ON "Orders"."OrderID" = "Order Subtotals"."OrderID")
        ON "Customers"."CustomerID" = "Orders"."CustomerID"
  WHERE ("Order Subtotals"."Subtotal" >2500) 
-   AND ("Orders"."ShippedDate" BETWEEN '01.01.1997 00:00:00.0000' And '31.12.1997 23:59:59.9999')
+   AND ("Orders"."ShippedDate" BETWEEN '1997-01-01 00:00:00.0000' And '1997-12-31 23:59:59.9999')
 ;
 
 CREATE VIEW "Summary of Sales by Quarter"
@@ -4185,7 +4183,7 @@ CREATE INDEX "CategoryName"          ON "Categories" ("CategoryName");
 CREATE INDEX "City"                  ON "Customers" ("City");
 CREATE INDEX "CompanyNameCustomers"  ON "Customers" ("CompanyName");
 CREATE INDEX "PostalCodeCustomers"   ON "Customers" ("PostalCode");
-CREATE INDEX "Region"                ON "Customers" ("Region");
+CREATE INDEX "CustomerRegion"        ON "Customers" ("Region");
 CREATE INDEX "LastName"              ON "Employees" ("LastName");
 CREATE INDEX "PostalCodeEmployees"   ON "Employees" ("PostalCode");
 CREATE INDEX "OrderID"               ON "Order Details" ("OrderID");
@@ -4341,7 +4339,7 @@ BEGIN
   SELECT "ProductName"
         ,SUM("Quantity") AS "Total"
     FROM "Products" P, "Order Details" OD, "Orders" O, "Customers" C
-   WHERE C."CustomerID" = :"CustomerID"
+   WHERE C."CustomerID" = "CustomerID"
      AND C."CustomerID" = O."CustomerID" AND O."OrderID" = OD."OrderID" AND OD."ProductID" = P."ProductID"
    GROUP BY "ProductName";
 END
@@ -4389,7 +4387,7 @@ LANGUAGE plpgsql
 AS
 $$
 BEGIN
-  RETURNS QUERY
+  RETURN QUERY
    SELECT "OrderID"
          ,"OrderDate"
 		 ,"RequiredDate"
@@ -4445,13 +4443,13 @@ LANGUAGE plpgsql
 AS
 $$
 BEGIN
-  RETURNS QUERY
-   SELECT "Orders"."ShippedDate"
-         ,"Orders"."OrderID"
-		 ,"Order Subtotals"."Subtotal"
-		 ,CAST( EXTRACT(year from "ShippedDate") AS VARCHAR(4) ) AS "Year"
-    FROM "Orders" INNER JOIN "Order Subtotals" ON "Orders"."OrderID" = "Order Subtotals"."OrderID"
-    WHERE "Orders"."ShippedDate" Between "Beginning_Date" And "Ending_Date";
+  RETURN QUERY
+  SELECT "Orders"."ShippedDate"
+        ,"Orders"."OrderID"
+        ,"Order Subtotals"."Subtotal"
+	    ,CAST( EXTRACT(year from "ShippedDate") AS VARCHAR(4) ) AS "Year"
+   FROM "Orders" INNER JOIN "Order Subtotals" ON "Orders"."OrderID" = "Order Subtotals"."OrderID"
+  WHERE "Orders"."ShippedDate" Between "Beginning_Date" And "Ending_Date";
 END
 $$;
 
@@ -4471,22 +4469,22 @@ BEGIN
   if("OrdYear" != '1996' AND "OrdYear" != '1997' AND "OrdYear" != '1998' ) 
   then
     "OrdYear" = '1998';
-  END
+  END IF;
   
-  RETURNS QUERY
-   SELECT "ProductName"
-         ,ROUND(SUM(CAST(OD."Quantity" * (1-OD."Discount") * OD."UnitPrice" AS decimal(14,2))), 0) as "TotalPurchase"
-    FROM "Order Details" OD
-	    ,"Orders" O
-		,"Products" P
-		,"Categories" C
-   WHERE OD."OrderID" = O."OrderID"
-     AND OD."ProductID" = P."ProductID"
-     AND P."CategoryID" = C."CategoryID"
-     AND C."CategoryName" = "CategoryName"
-      AND CAST(EXTRACT(year from O."OrderDate") as varchar(4)) = "OrdYear"
-    GROUP BY "ProductName"
-    ORDER BY "ProductName";
+  RETURN QUERY
+  SELECT "ProductName"
+        ,ROUND(SUM(CAST(OD."Quantity" * (1-OD."Discount") * OD."UnitPrice" AS decimal(14,2))), 0) as "TotalPurchase"
+   FROM "Order Details" OD
+       ,"Orders" O
+	   ,"Products" P
+	   ,"Categories" C
+  WHERE OD."OrderID" = O."OrderID"
+    AND OD."ProductID" = P."ProductID"
+    AND P."CategoryID" = C."CategoryID"
+    AND C."CategoryName" = "CategoryName"
+    AND CAST(EXTRACT(year from O."OrderDate") as varchar(4)) = "OrdYear"
+  GROUP BY "ProductName"
+  ORDER BY "ProductName";
 END
 $$;
 
@@ -4496,17 +4494,17 @@ CREATE TYPE "ProductPrice" AS
    ,"UnitPrice" DECIMAL(18,4)
 );
 
-CREATE OR REPLACE FUNCTION "Ten Most Expensive Products"
+CREATE OR REPLACE FUNCTION "Ten Most Expensive Products"()
 RETURNS SETOF "ProductPrice"
 LANGUAGE plpgsql
 AS
 $$
 BEGIN
   RETURN QUERY
-  SELECT FIRST 10
-         "Products"."ProductName" AS "TenMostExpensiveProducts"
+  SELECT "Products"."ProductName" AS "TenMostExpensiveProducts"
 		,"Products"."UnitPrice"
     FROM "Products"
-   ORDER BY "Products"."UnitPrice" DESC;
+   ORDER BY "Products"."UnitPrice" DESC
+   LIMIT 10;
 END
 $$;

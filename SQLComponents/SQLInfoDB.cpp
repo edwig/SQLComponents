@@ -261,7 +261,7 @@ SQLInfoDB::MakeInfoTableTable(MTableMap& p_tables
     {
       SQLQuery qry(m_database);
 
-      if(!p_schema.IsEmpty()) qry.SetParameter(p_schema);
+      if(!p_schema.IsEmpty())    qry.SetParameter(p_schema);
       if(!p_tablename.IsEmpty()) qry.SetParameter(p_tablename);
 
       qry.DoSQLStatement(sql);
@@ -1185,21 +1185,23 @@ SQLInfoDB::ReadTablesFromQuery(SQLQuery& p_query,MTableMap& p_tables)
   {
     MetaTable table;
 
-    table.m_catalog    = (XString) p_query[1];
-    table.m_schema     = (XString) p_query[2];
-    table.m_table      = (XString) p_query[3];
-    table.m_objectType = (XString) p_query[4];
-    table.m_remarks    = (XString) p_query[5];
-    table.m_tablespace = (XString) p_query[6];
-    table.m_temporary  = (bool)    p_query[7];
+    table.m_catalog    = (XString) p_query[MetaTable_catalogname];
+    table.m_schema     = (XString) p_query[MetaTable_schemaname];
+    table.m_table      = (XString) p_query[MetaTable_tablename];
+    table.m_objectType = (XString) p_query[MetaTable_objecttype];
+    table.m_remarks    = (XString) p_query[MetaTable_remarks];
+    table.m_fullName   = (XString) p_query[MetaTable_fullname];
+    table.m_tablespace = (XString) p_query[MetaTable_tablespace];
+    table.m_temporary  = (bool)    p_query[MetaTable_temporary];
 
     // Some RDBMS's still have CHAR catalog fields, padded with spaces
-    table.m_catalog.Trim();
-    table.m_schema.Trim();
-    table.m_table.Trim();
-    table.m_objectType.Trim();
-    table.m_remarks.Trim();
-    table.m_tablespace.Trim();
+    table.m_catalog    = table.m_catalog.Trim();
+    table.m_schema     = table.m_schema.Trim();
+    table.m_table      = table.m_table.Trim();
+    table.m_objectType = table.m_objectType.Trim();
+    table.m_remarks    = table.m_remarks.Trim();
+    table.m_fullName   = table.m_fullName.Trim();
+    table.m_tablespace = table.m_tablespace.Trim();
 
     p_tables.push_back(table);
   }

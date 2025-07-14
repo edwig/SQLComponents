@@ -1696,7 +1696,7 @@ SQLInfoFirebird::GetCATALOGCheckExists(XString  p_schema,XString p_tablename,XSt
   }
   sql += _T("   AND rl.rdb$relation_name   = ?")
          _T("   AND rc.rdb$constraint_name = ?")
-         _T(" GROUP BY1,2,3,4,5");
+         _T(" GROUP BY 1,2,3,4,5");
   return sql;
 }
 
@@ -2365,13 +2365,19 @@ SQLInfoFirebird::GetCATALOGSequencePrivilege(XString& /*p_schema*/,XString& /*p_
 XString
 SQLInfoFirebird::GetCATALOGGrantPrivilege(XString /*p_schema*/
                                          ,XString p_objectname
+                                         ,XString p_subObject
                                          ,XString p_privilege
                                          ,XString p_grantee
                                          ,bool    p_grantable)
 {
   XString sql;
-  sql.Format(_T("GRANT %s ON %s TO %s"),p_privilege.GetString(),QIQ(p_objectname).GetString(),p_grantee.GetString());
-  if (p_grantable)
+  sql.Format(_T("GRANT %s"),p_privilege.GetString());
+  if(!p_subObject.IsEmpty())
+  {
+    sql.AppendFormat(_T("(%s)"),QIQ(p_subObject).GetString());
+  }
+  sql.AppendFormat(_T(" ON %s TO %s"),QIQ(p_objectname).GetString(),QIQ(p_grantee).GetString());
+  if(p_grantable)
   {
     sql += _T(" WITH GRANT OPTION");
   }
@@ -2381,11 +2387,17 @@ SQLInfoFirebird::GetCATALOGGrantPrivilege(XString /*p_schema*/
 XString 
 SQLInfoFirebird::GetCATALOGRevokePrivilege(XString /*p_schema*/
                                           ,XString p_objectname
+                                          ,XString p_subObject
                                           ,XString p_privilege
                                           ,XString p_grantee)
 {
   XString sql;
-  sql.Format(_T("REVOKE %s ON %s FROM %s"),p_privilege.GetString(),QIQ(p_objectname).GetString(),p_grantee.GetString());
+  sql.Format(_T("REVOKE %s"),p_privilege.GetString());
+  if(!p_subObject.IsEmpty())
+  {
+    sql.AppendFormat(_T("(%s)"),QIQ(p_subObject).GetString());
+  }
+  sql.AppendFormat(_T(" ON %s FROM %s"),QIQ(p_objectname).GetString(),QIQ(p_grantee).GetString());
   return sql;
 }
 

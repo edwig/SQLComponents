@@ -112,7 +112,7 @@ XPort::Export()
   // STEP 15: All object rights
   if(m_parameters.m_grants)
   {
-    ExportRights();
+    ExportPrivileges();
   }
 
   // STEP 16: End-of file marker
@@ -1309,9 +1309,10 @@ XPort::WriteTableAccessRights(XString p_object,int& p_count)
     SQLInfoDB* info = m_database.GetSQLInfoDB();
     if(info->MakeInfoTablePrivileges(privileges,errors,m_schema,p_object))
     {
+      XString column;
       for(auto& priv : privileges)
       {
-        XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,priv.m_privilege,priv.m_grantee,priv.m_grantable);
+        XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,column,priv.m_privilege,priv.m_grantee,priv.m_grantable);
         m_xfile.WriteSQL(grant);
 
         if((++p_count % COMMIT_SIZE) == 0)
@@ -1341,7 +1342,7 @@ XPort::WriteColumnAccessRights(XString p_object,int& p_count)
     {
       for(auto& priv : privileges)
       {
-        XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,priv.m_privilege,priv.m_grantee,priv.m_grantable);
+        XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,priv.m_columnName,priv.m_privilege,priv.m_grantee,priv.m_grantable);
         m_xfile.WriteSQL(grant);
 
         if((++p_count % COMMIT_SIZE) == 0)
@@ -1376,11 +1377,12 @@ XPort::WriteProcedureAccessRights(XString p_object,int& p_count)
     query.DoSQLStatement(sql);
     while(query.GetRecord())
     {
+      XString empty;
       XString grantee   = query[5];
       XString privilege = query[6];
       bool    grantable = _tcsicmp(query[7].GetAsString(),_T("YES")) == 0;
 
-      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
+      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,empty,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
@@ -1424,11 +1426,12 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
     query.DoSQLStatement(sql);
     while(query.GetRecord())
     {
+      XString empty;
       XString privilege = query[4];
       XString grantee   = query[5];
       bool    grantable = _tcsicmp(query[6].GetAsString(),_T("YES")) == 0;
 
-      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_sequence,privilege,grantee,grantable);
+      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_sequence,empty,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
@@ -1714,7 +1717,7 @@ XPort::ExportSynonyms()
 }
 
 void
-XPort::ExportRights()
+XPort::ExportPrivileges()
 {
   m_xfile.WriteSection(_T("ACCESS RIGHTS"));
 

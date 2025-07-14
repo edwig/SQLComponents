@@ -88,7 +88,7 @@ public:
   void    ExportProcedures();
   void    ExportTriggers();
   void    ExportSynonyms();
-  void    ExportRights();
+  void    ExportPrivileges();
 
   // IMPORT
   void    ImportDump();

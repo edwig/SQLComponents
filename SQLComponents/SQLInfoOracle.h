@@ -340,8 +340,8 @@ public:
   XString GetCATALOGTablePrivileges  (XString& p_schema,XString& p_tablename) const override;
   XString GetCATALOGColumnPrivileges (XString& p_schema,XString& p_tablename,XString& p_columnname) const override;
   XString GetCATALOGSequencePrivilege(XString& p_schema,XString& p_sequence) const override;
-  XString GetCATALOGGrantPrivilege   (XString  p_schema,XString  p_objectname,XString p_privilege,XString p_grantee,bool p_grantable) override;
-  XString GetCATALOGRevokePrivilege  (XString  p_schema,XString  p_objectname,XString p_privilege,XString p_grantee) override;
+  XString GetCATALOGGrantPrivilege   (XString  p_schema,XString  p_objectname,XString p_subObject,XString p_privilege,XString p_grantee,bool p_grantable) override;
+  XString GetCATALOGRevokePrivilege  (XString  p_schema,XString  p_objectname,XString p_subObject,XString p_privilege,XString p_grantee) override;
   // All Synonym functions
   XString GetCATALOGSynonymList      (XString& p_schema,XString& p_pattern) const override;
   XString GetCATALOGSynonymAttributes(XString& p_schema,XString& p_synonym) const override;

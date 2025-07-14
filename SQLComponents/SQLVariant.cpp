@@ -24,7 +24,6 @@
 // Version number: See SQLComponents.h
 //
 #include "StdAfx.h"
-#include "SQLComponents.h"
 #include "SQLVariant.h"
 #include "SQLDataType.h"
 #include "SQLVariantTrim.h"
@@ -32,19 +31,13 @@
 #include "SQLTime.h"
 #include "SQLTimestamp.h"
 #include "SQLGuid.h"
-#include "bcd.h"
-#include <math.h>
-#include <float.h>
-#include <limits.h>
-#include <string>
+#include <bcd.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
-
-using std::string;
 
 namespace SQLComponents
 {

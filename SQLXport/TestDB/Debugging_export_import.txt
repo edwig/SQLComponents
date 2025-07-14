@@ -8,5 +8,5 @@ PostgreSQL testing:
 
 Firebird testing:
 -----------------
-/dir:export /dbase:fb_northwind /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump
-/dir:import /dbase:bu_northwind /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump /drop
+/dir:export /dbase:fb_northwind    /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump
+/dir:import /dbase:bu_fb_northwind /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump /drop
