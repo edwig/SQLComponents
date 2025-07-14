@@ -1158,7 +1158,7 @@ XPort::GetDefineSQLTrigger(XString p_trigger)
     while(query.GetRecord())
     {
       // PSM source is the 17th field MetaTrigger !!
-      create += query.GetColumn(17)->GetAsString();
+      create += query.GetColumn(MetaTrigger_source)->GetAsString();
     }
   }
   catch(StdException& ex)
@@ -1302,26 +1302,23 @@ XPort::GetDefineRowInsert(XString p_table,SQLInfoDB* p_info)
 void
 XPort::WriteTableAccessRights(XString p_object,int& p_count)
 {
-  SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetCATALOGTablePrivileges(m_schema,p_object);
-
   try
   {
-    SQLQuery query(m_database);
-    query.DoSQLStatement(sql);
-    while(query.GetRecord())
+    XString errors;
+    MPrivilegeMap privileges;
+    SQLInfoDB* info = m_database.GetSQLInfoDB();
+    if(info->MakeInfoTablePrivileges(privileges,errors,m_schema,p_object))
     {
-      XString grantee   = query[5];
-      XString privilege = query[6];
-      bool    grantable = _tcsicmp(query[7].GetAsString(),_T("YES")) == 0;
-
-      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
-      m_xfile.WriteSQL(grant);
-
-      if((++p_count % COMMIT_SIZE) == 0)
+      for(auto& priv : privileges)
       {
-        _tprintf(_T("%d records processed\r"),p_count);
-        _tprintf(_T("Exporting access rights: "));
+        XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,priv.m_privilege,priv.m_grantee,priv.m_grantable);
+        m_xfile.WriteSQL(grant);
+
+        if((++p_count % COMMIT_SIZE) == 0)
+        {
+          _tprintf(_T("%d records processed\r"),p_count);
+          _tprintf(_T("Exporting access rights: "));
+        }
       }
     }
   }
@@ -1335,36 +1332,23 @@ XPort::WriteTableAccessRights(XString p_object,int& p_count)
 void
 XPort::WriteColumnAccessRights(XString p_object,int& p_count)
 {
-  SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString all;
-  XString sql = info->GetCATALOGColumnPrivileges(m_schema,p_object,all);
-
   try
   {
-    SQLQuery query(m_database);
-    int param = 1;
-    if(!m_schema.IsEmpty())
+    XString errors;
+    MPrivilegeMap privileges;
+    SQLInfoDB* info = m_database.GetSQLInfoDB();
+    if(info->MakeInfoColumnPrivileges(privileges,errors,m_schema,p_object))
     {
-      query.SetParameter(param++,m_schema);
-    }
-    if(!p_object.IsEmpty())
-    {
-      query.SetParameter(param++,p_object);
-    }
-    query.DoSQLStatement(sql);
-    while(query.GetRecord())
-    {
-      XString grantee   = query[6];
-      XString privilege = query[7];
-      bool    grantable = _tcsicmp(query[8].GetAsString(),_T("YES")) == 0;
-
-      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,privilege,grantee,grantable);
-      m_xfile.WriteSQL(grant);
-
-      if((++p_count % COMMIT_SIZE) == 0)
+      for(auto& priv : privileges)
       {
-        _tprintf(_T("%d records processed\r"),p_count);
-        _tprintf(_T("Exporting access rights: "));
+        XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,priv.m_privilege,priv.m_grantee,priv.m_grantable);
+        m_xfile.WriteSQL(grant);
+
+        if((++p_count % COMMIT_SIZE) == 0)
+        {
+          _tprintf(_T("%d records processed\r"),p_count);
+          _tprintf(_T("Exporting access rights: "));
+        }
       }
     }
   }

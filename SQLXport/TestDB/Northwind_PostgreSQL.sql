@@ -43,6 +43,22 @@ DROP VIEW IF EXISTS "Sales Totals by Amount";
 DROP VIEW IF EXISTS "Summary of Sales by Quarter";
 DROP VIEW IF EXISTS "Summary of Sales by Year";
 
+
+ALTER TABLE ONLY northwind."Orders"                 drop CONSTRAINT "FK_Orders_Customers"; 
+ALTER TABLE ONLY northwind."Orders"                 drop CONSTRAINT "FK_Orders_Employees"; 
+ALTER TABLE ONLY northwind."Orders"                 drop CONSTRAINT "FK_Orders_Shippers"; 
+ALTER TABLE ONLY northwind."Order Details"          drop CONSTRAINT "FK_Order_Details_products";
+ALTER TABLE ONLY northwind."Order Details"          drop CONSTRAINT "FK_Order_Details_orders"; 
+ALTER TABLE ONLY northwind."Products"               drop CONSTRAINT "FK_Products_Categories"; 
+ALTER TABLE ONLY northwind."Products"               drop CONSTRAINT "FK_Products_Suppliers"; 
+ALTER TABLE ONLY northwind."Territories"            drop CONSTRAINT "FK_Territories_Region"; 
+ALTER TABLE ONLY northwind."EmployeeTerritories"    drop CONSTRAINT "FK_Employee_Territories_territories";
+ALTER TABLE ONLY northwind."EmployeeTerritories"    drop CONSTRAINT "FK_Employee_Territories_employees";
+ALTER TABLE ONLY northwind."CustomerCustomerDemo"   drop CONSTRAINT "FK_Customer_Customer_Demo_Customer_Demographics";
+ALTER TABLE ONLY northwind."CustomerCustomerDemo"   drop CONSTRAINT "FK_Customer_Customer_Demo_customers";
+ALTER TABLE ONLY northwind."Employees"              drop CONSTRAINT "FK_Employees_Employees";
+
+
 --- drop tables
 ---
 DROP TABLE IF EXISTS northwind."Customer_Customer_Demo";
@@ -4115,7 +4131,6 @@ INSERT INTO northwind."US_States" VALUES (51, 'Wyoming', 'WY', 'west');
 --/***                           Check constraints                            ***/
 --/******************************************************************************/
 
-
 ALTER TABLE "Products"      ADD CONSTRAINT "CK_Products_UnitPrice" CHECK ("UnitPrice" >= 0);
 ALTER TABLE "Products"      ADD CONSTRAINT "CK_ReorderLevel"       CHECK ("ReorderLevel" >= 0);
 ALTER TABLE "Products"      ADD CONSTRAINT "CK_UnitsInStock"       CHECK ("UnitsInStock" >= 0);
@@ -4128,40 +4143,37 @@ ALTER TABLE "Employees"     ADD CONSTRAINT "CK_Birthdate"          CHECK ("Birth
 --
 -- PRIMARY KEYS
 --
-
-ALTER TABLE ONLY northwind."Categories"             ADD CONSTRAINT "PK_Categories" PRIMARY KEY ("CategoryID");
+ALTER TABLE ONLY northwind."Categories"             ADD CONSTRAINT "PK_Categories"             PRIMARY KEY ("CategoryID");
 ALTER TABLE ONLY northwind."CustomerCustomerDemo"   ADD CONSTRAINT "PK_Customer_Customer_Demo" PRIMARY KEY ("CustomerID", "CustomerTypeID");
-ALTER TABLE ONLY northwind."CustomerDemographics"   ADD CONSTRAINT "PK_Customer_Demographics" PRIMARY KEY ("CustomerTypeID");
-ALTER TABLE ONLY northwind."Customers"              ADD CONSTRAINT "PK_Customers" PRIMARY KEY ("CustomerID");
-ALTER TABLE ONLY northwind."Employees"              ADD CONSTRAINT "PK_Employees" PRIMARY KEY ("EmployeeID");
-ALTER TABLE ONLY northwind."EmployeeTerritories"    ADD CONSTRAINT "PK_Employee_Territories" PRIMARY KEY ("EmployeeID", "TerritoryID");
-ALTER TABLE ONLY northwind."Order Details"          ADD CONSTRAINT "PK_Order_Details" PRIMARY KEY ("OrderID", "ProductID");
-ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "PK_Orders" PRIMARY KEY ("OrderID");
-ALTER TABLE ONLY northwind."Products"               ADD CONSTRAINT "PK_Products" PRIMARY KEY ("ProductID");
-ALTER TABLE ONLY northwind."Region"                 ADD CONSTRAINT "PK_Region" PRIMARY KEY ("RegionID");
-ALTER TABLE ONLY northwind."Shippers"               ADD CONSTRAINT "PK_Shippers" PRIMARY KEY ("ShipperID");
-ALTER TABLE ONLY northwind."Suppliers"              ADD CONSTRAINT "PK_Suppliers" PRIMARY KEY ("SupplierID");
-ALTER TABLE ONLY northwind."Territories"            ADD CONSTRAINT "PK_Territories" PRIMARY KEY ("TerritoryID");
-ALTER TABLE ONLY northwind."US_States"              ADD CONSTRAINT "PK_Usstates" PRIMARY KEY ("StateID");
-
+ALTER TABLE ONLY northwind."CustomerDemographics"   ADD CONSTRAINT "PK_Customer_Demographics"  PRIMARY KEY ("CustomerTypeID");
+ALTER TABLE ONLY northwind."Customers"              ADD CONSTRAINT "PK_Customers"              PRIMARY KEY ("CustomerID");
+ALTER TABLE ONLY northwind."Employees"              ADD CONSTRAINT "PK_Employees"              PRIMARY KEY ("EmployeeID");
+ALTER TABLE ONLY northwind."EmployeeTerritories"    ADD CONSTRAINT "PK_Employee_Territories"   PRIMARY KEY ("EmployeeID", "TerritoryID");
+ALTER TABLE ONLY northwind."Order Details"          ADD CONSTRAINT "PK_Order_Details"          PRIMARY KEY ("OrderID", "ProductID");
+ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "PK_Orders"                 PRIMARY KEY ("OrderID");
+ALTER TABLE ONLY northwind."Products"               ADD CONSTRAINT "PK_Products"               PRIMARY KEY ("ProductID");
+ALTER TABLE ONLY northwind."Region"                 ADD CONSTRAINT "PK_Region"                 PRIMARY KEY ("RegionID");
+ALTER TABLE ONLY northwind."Shippers"               ADD CONSTRAINT "PK_Shippers"               PRIMARY KEY ("ShipperID");
+ALTER TABLE ONLY northwind."Suppliers"              ADD CONSTRAINT "PK_Suppliers"              PRIMARY KEY ("SupplierID");
+ALTER TABLE ONLY northwind."Territories"            ADD CONSTRAINT "PK_Territories"            PRIMARY KEY ("TerritoryID");
+ALTER TABLE ONLY northwind."US_States"              ADD CONSTRAINT "PK_Usstates"               PRIMARY KEY ("StateID");
 
 --
 -- FOREIGN KEYS
 --
-
-ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "FK_Orders_Customers" FOREIGN KEY ("CustomerID") REFERENCES northwind."Customers";
-ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "FK_Orders_Employees" FOREIGN KEY ("EmployeeID") REFERENCES northwind."Employees";
-ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "FK_Orders_Shippers" FOREIGN KEY ("ShipVia") REFERENCES northwind."Shippers";
-ALTER TABLE ONLY northwind."Order Details"          ADD CONSTRAINT "FK_Order_Details_products" FOREIGN KEY ("ProductID") REFERENCES northwind."Products";
-ALTER TABLE ONLY northwind."Order Details"          ADD CONSTRAINT "FK_Order_Details_orders" FOREIGN KEY ("OrderID") REFERENCES northwind."Orders";
-ALTER TABLE ONLY northwind."Products"               ADD CONSTRAINT "FK_Products_Categories" FOREIGN KEY ("CategoryID") REFERENCES northwind."Categories";
-ALTER TABLE ONLY northwind."Products"               ADD CONSTRAINT "FK_Products_Suppliers" FOREIGN KEY ("SupplierID") REFERENCES northwind."Suppliers";
-ALTER TABLE ONLY northwind."Territories"            ADD CONSTRAINT "FK_Territories_Region" FOREIGN KEY ("RegionID") REFERENCES northwind."Region";
+ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "FK_Orders_Customers"                 FOREIGN KEY ("CustomerID")  REFERENCES northwind."Customers";
+ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "FK_Orders_Employees"                 FOREIGN KEY ("EmployeeID")  REFERENCES northwind."Employees";
+ALTER TABLE ONLY northwind."Orders"                 ADD CONSTRAINT "FK_Orders_Shippers"                  FOREIGN KEY ("ShipVia")     REFERENCES northwind."Shippers";
+ALTER TABLE ONLY northwind."Order Details"          ADD CONSTRAINT "FK_Order_Details_products"           FOREIGN KEY ("ProductID")   REFERENCES northwind."Products";
+ALTER TABLE ONLY northwind."Order Details"          ADD CONSTRAINT "FK_Order_Details_orders"             FOREIGN KEY ("OrderID")     REFERENCES northwind."Orders";
+ALTER TABLE ONLY northwind."Products"               ADD CONSTRAINT "FK_Products_Categories"              FOREIGN KEY ("CategoryID")  REFERENCES northwind."Categories";
+ALTER TABLE ONLY northwind."Products"               ADD CONSTRAINT "FK_Products_Suppliers"               FOREIGN KEY ("SupplierID")  REFERENCES northwind."Suppliers";
+ALTER TABLE ONLY northwind."Territories"            ADD CONSTRAINT "FK_Territories_Region"               FOREIGN KEY ("RegionID")    REFERENCES northwind."Region";
 ALTER TABLE ONLY northwind."EmployeeTerritories"    ADD CONSTRAINT "FK_Employee_Territories_territories" FOREIGN KEY ("TerritoryID") REFERENCES northwind."Territories";
-ALTER TABLE ONLY northwind."EmployeeTerritories"    ADD CONSTRAINT "FK_Employee_Territories_employees" FOREIGN KEY ("EmployeeID") REFERENCES northwind."Employees";
+ALTER TABLE ONLY northwind."EmployeeTerritories"    ADD CONSTRAINT "FK_Employee_Territories_employees"   FOREIGN KEY ("EmployeeID")  REFERENCES northwind."Employees";
 ALTER TABLE ONLY northwind."CustomerCustomerDemo"   ADD CONSTRAINT "FK_Customer_Customer_Demo_Customer_Demographics" FOREIGN KEY ("CustomerTypeID") REFERENCES northwind."CustomerDemographics";
-ALTER TABLE ONLY northwind."CustomerCustomerDemo"   ADD CONSTRAINT "FK_Customer_Customer_Demo_customers" FOREIGN KEY ("CustomerID") REFERENCES northwind."Customers";
-ALTER TABLE ONLY northwind."Employees"              ADD CONSTRAINT "FK_Employees_Employees" FOREIGN KEY ("ReportsTo") REFERENCES northwind."Employees";
+ALTER TABLE ONLY northwind."CustomerCustomerDemo"   ADD CONSTRAINT "FK_Customer_Customer_Demo_customers" FOREIGN KEY ("CustomerID")  REFERENCES northwind."Customers";
+ALTER TABLE ONLY northwind."Employees"              ADD CONSTRAINT "FK_Employees_Employees"              FOREIGN KEY ("ReportsTo")   REFERENCES northwind."Employees";
 
     
 --/******************************************************************************/

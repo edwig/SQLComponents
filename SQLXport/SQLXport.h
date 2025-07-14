@@ -28,7 +28,7 @@
 using namespace SQLComponents;
 
 #define XPORT_VERSION "2.0"          // **MUST** be in format x.y (3 chars, 2 digits)
-#define XPORT_DATE    "06-06-2025"
+#define XPORT_DATE    "03-07-2025"
 #define XPORT_YEAR    "2025"
 
 void xputs (const XString p_string);

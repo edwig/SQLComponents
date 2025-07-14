@@ -765,8 +765,11 @@ DDLCreateTable::ReplaceLengthPrecScale(TypeInfo*  p_type
   // Replace as strings
   if(p_length > 0)
   {
-    params.Replace(_T("max length"),length);    // ORACLE DOES THIS!!
-    params.Replace(_T("length"),    length);
+    // ODBC's create_params should report "length" for single length datatypes
+    // But the various RDBMS drivers have variations on this
+    params.Replace(_T("max. length"),length);    // PostgreSQL DOES THIS!!
+    params.Replace(_T("max length"), length);    // Oracle     DOES THIS!!
+    params.Replace(_T("length"),     length);    // SQLServer  DOES THIS!!
   }
   else if(p_type->m_type_name.CompareNoCase(_T("varchar")) == 0)
   {

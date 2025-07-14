@@ -1057,13 +1057,13 @@ SQLInfoDB::MakeInfoTablePrivileges(MPrivilegeMap& p_privileges,XString& p_errors
     {
       MetaPrivilege priv;
 
-      priv.m_catalogName = (XString) query[1];
-      priv.m_schemaName  = (XString) query[2];
-      priv.m_tableName   = (XString) query[3];
-      priv.m_grantor     = (XString) query[4];
-      priv.m_grantee     = (XString) query[5];
-      priv.m_privilege   = (XString) query[6];
-      priv.m_grantable   = ((XString)query[7]).Compare(_T("YES")) == 0;
+      priv.m_catalogName = (XString) query[MetaPrivilege_catalogname];
+      priv.m_schemaName  = (XString) query[MetaPrivilege_schemaname];
+      priv.m_tableName   = (XString) query[MetaPrivilege_tablename];
+      priv.m_grantor     = (XString) query[MetaPrivilege_grantor];
+      priv.m_grantee     = (XString) query[MetaPrivilege_grantee];
+      priv.m_privilege   = (XString) query[MetaPrivilege_privilege];
+      priv.m_grantable   = ((XString)query[MetaPrivilege_grantable]).Compare(_T("YES")) == 0;
 
       p_privileges.push_back(priv);
     }

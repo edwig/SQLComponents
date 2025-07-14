@@ -1096,10 +1096,6 @@ SQLInfoPostgreSQL::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplica
         query += _T("UNIQUE ");
       }
       query += _T("INDEX ");
-      if(!index.m_schemaName.IsEmpty())
-      {
-        query += QIQ(index.m_schemaName) + _T(".");
-      }
       query += QIQ(index.m_indexName);
       query += _T(" ON ");
       if(!index.m_schemaName.IsEmpty())
@@ -1633,17 +1629,15 @@ SQLInfoPostgreSQL::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tabl
                 _T(" WHERE NOT tr.tgisinternal\n");
   if(!p_schema.IsEmpty())
   {
-    sql += _T(" WHERE ns.nspname = ?\n");
+    sql += _T("   AND ns.nspname = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
-    sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
-    sql += _T("cl.relname = ?\n");
+    sql += _T("   AND cl.relname = ?\n");
   }
   if(!p_triggername.IsEmpty())
   {
-    sql += p_schema.IsEmpty() && p_tablename.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
-    sql += _T("tr.tgname = ?\n");
+    sql += _T("   AND tr.tgname = ?\n");
   }
   // Alphabetically ordered by triggername fills row_number() with the positioning!
   sql += _T(" ORDER BY 1,2,3,4");
@@ -1836,7 +1830,7 @@ SQLInfoPostgreSQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewnam
                   _T("   AND sch.nspname <> 'information_schema'\n");
   if(!p_schema.IsEmpty())
   {
-    query += _T("    AND sch.name = ?\n");
+    query += _T("    AND sch.nspname = ?\n");
   }
   if(!p_viewname.IsEmpty())
   {
@@ -1850,10 +1844,28 @@ SQLInfoPostgreSQL::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewnam
 }
 
 XString
-SQLInfoPostgreSQL::GetCATALOGViewText(XString& /*p_schema*/,XString& /*p_viewname*/,bool /*p_quoted = false*/) const
+SQLInfoPostgreSQL::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool p_quoted /*= false*/) const
 {
-  // Cannot query this, Use ODBC functions
-  return _T("");
+  if(!p_quoted)
+  {
+    p_schema.MakeLower();
+    p_viewname.MakeLower();
+  }
+  XString query = _T("SELECT pg_get_viewdef(tab.oid) as viewtext\n")
+                  _T("  FROM pg_catalog.pg_class tab\n")
+                  _T("       left join pg_catalog.pg_namespace sch on tab.relnamespace = sch.oid\n")
+                  _T(" WHERE tab.relkind = 'v'\n")
+                  _T("   AND substring(sch.nspname,1,3) <> 'pg_'\n")
+                  _T("   AND sch.nspname <> 'information_schema'\n");
+  if(!p_schema.IsEmpty())
+  {
+    query += _T("    AND sch.nspname = '") + p_schema + _T("'\n");
+  }
+  if(!p_viewname.IsEmpty())
+  {
+    query += _T("   AND tab.relname = '") + p_viewname + _T("'");
+  }
+  return query;
 }
 
 XString
@@ -2058,17 +2070,18 @@ SQLInfoPostgreSQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_proced
                 _T("       END as procedure_type\n")
                 _T("      ,pg_get_functiondef(pr.oid) as source\n")
                 _T("  FROM pg_catalog.pg_proc pr\n")
-                _T("            INNER JOIN pg_catalog.pg_namespace   ns ON ns.oid = pr.pronamespace\n")
-                _T("       LEFT OUTER JOIN pg_catalog.pg_description co ON pr.oid = co.objoid\n")
-                _T(" WHERE ns.nspname = ?\n");
-  // routine name
-  if(p_procedure.Find('%') >= 0)
+                _T("       LEFT OUTER JOIN pg_catalog.pg_description co ON pr.oid = co.objoid\n");
+  if(!p_schema.IsEmpty())
   {
-    sql += _T("   AND pr.proname LIKE ?\n");
+    sql += _T("            INNER JOIN pg_catalog.pg_namespace   ns ON ns.oid = pr.pronamespace\n");
+    sql += _T(" WHERE ns.nspname = ?\n");
   }
-  else
+  if(!p_procedure.IsEmpty())
   {
-    sql += _T("   AND pr.proname = ?\n");
+    sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
+    sql += _T("pr.proname ");
+    // routine name
+    sql += (p_procedure.Find('%') >= 0) ? _T("LIKE ?\n") : _T("= ?\n");
   }
   // Sorting
   sql += _T(" ORDER BY 1,2,3");
@@ -2077,16 +2090,33 @@ SQLInfoPostgreSQL::GetPSMProcedureAttributes(XString& p_schema,XString& p_proced
 }
 
 XString
-SQLInfoPostgreSQL::GetPSMProcedureSourcecode(XString /*p_schema*/, XString /*p_procedure*/,bool /*p_quoted /*= false*/) const
+SQLInfoPostgreSQL::GetPSMProcedureSourcecode(XString p_schema,XString p_procedure,bool p_quoted /*= false*/) const
 {
-  // Source code already gotten by ProcedureAttributes!
-  return XString();
+  if(!p_quoted)
+  {
+    p_schema.MakeLower();
+    p_procedure.MakeLower();
+  }
+  XString sql = _T("SELECT 1 as type\n")
+                _T("      ,1 as line\n")
+                _T("      ,pg_get_functiondef(pr.oid) as source\n")
+                _T("  FROM pg_catalog.pg_proc pr\n");
+  if(!p_schema.IsEmpty())
+  {
+    sql += _T("            INNER JOIN pg_catalog.pg_namespace ns ON ns.oid = pr.pronamespace\n");
+    sql += _T(" WHERE ns.nspname = '") + p_schema + _T("'\n");
+  }
+  if(!p_procedure.IsEmpty())
+  {
+    sql += _T("   AND pr.proname = '") + p_procedure + _T("'");
+  }
+  return sql;
 }
 
 XString
-SQLInfoPostgreSQL::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
+SQLInfoPostgreSQL::GetPSMProcedureCreate(MetaProcedure& p_procedure) const
 {
-  return _T("");
+  return p_procedure.m_source;
 }
 
 XString

@@ -1,0 +1,12 @@
+DEBUGGING command lines for export/import with SQLXPort
+=======================================================
+
+PostgreSQL testing:
+-------------------
+/dir:export /dbase:pg_northwind    /user:northwind /passwd:northwind /schema:northwind /file:pg_northwind.dump
+/dir:import /dbase:bu_pg_northwind /user:northwind /passwd:northwind /schema:northwind /file:pg_northwind.dump /drop
+
+Firebird testing:
+-----------------
+/dir:export /dbase:fb_northwind /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump
+/dir:import /dbase:bu_northwind /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump /drop
