@@ -43,6 +43,8 @@ typedef enum _constraints
 }
 ConsType;
 
+typedef std::vector<bool> BoolList;
+
 const int COMMIT_SIZE = 100;
 
 class XPort
@@ -141,6 +143,10 @@ private:
   void          ImportProcedures(TCHAR& p_type);
   void          ImportSynonyms(TCHAR& p_type);
   void          ImportRights(bool p_listOnly,TCHAR& p_type);
+  // Prepare a table for bulk import and complete the bulk import
+  void          FindIdentity(XString p_sql);
+  void          BulkImportPrepare (XString p_table);
+  void          BulkImportComplete(XString p_table);
 
   // All the parameters
   Parameters& m_parameters;
@@ -161,6 +167,8 @@ private:
   OList       m_procedures;
   OList       m_triggers;
   OList       m_synonyms;
+  BoolList    m_trimlist;
+  bool        m_identity;
   // Retry queue for views
   OList       m_retries;
 };

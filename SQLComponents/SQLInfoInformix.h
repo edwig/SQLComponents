@@ -201,6 +201,10 @@ public:
   // Query to perform a keep alive ping
   XString GetPing() const override;
 
+  // Pre- and postfix statements for a bulk import
+  XString GetBulkImportPrefix (XString p_schema,XString p_tablename,bool p_identity = true,bool p_constraints = true) const;
+  XString GetBulkImportPostfix(XString p_schema,XString p_tablename,bool p_identity = true,bool p_constraints = true) const;
+
   //////////////////////////////////////////////////////////////////////////
   // SQL STRINGS
 
@@ -228,8 +232,8 @@ public:
   // Get the name of a temp table (local temporary or global temporary)
   XString GetTempTablename(XString p_schema,XString p_tablename,bool p_local) const override;
 
-  // Changes to parameters before binding to an ODBC HSTMT handle
-  void DoBindParameterFixup(SQLSMALLINT& p_dataType,SQLSMALLINT& p_sqlDatatype,SQLULEN& p_columnSize,SQLSMALLINT& p_scale,SQLLEN& p_bufferSize,SQLLEN* p_indicator) const override;
+  // Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
+  bool DoBindParameterFixup(SQLSMALLINT& p_dataType,SQLSMALLINT& p_sqlDatatype,SQLULEN& p_columnSize,SQLSMALLINT& p_scale,SQLLEN& p_bufferSize,SQLLEN* p_indicator) const override;
 
   //////////////////////////////////////////////////////////////////////////
   //

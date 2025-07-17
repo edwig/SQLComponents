@@ -615,6 +615,19 @@ SQLInfoOracle::GetPing() const
   return _T("SELECT current_timestamp FROM DUAL");
 }
 
+// Pre- and postfix statements for a bulk import
+XString
+SQLInfoOracle::GetBulkImportPrefix(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_identity = true*/,bool /*p_constraints = true*/) const
+{
+  return _T("");
+}
+
+XString
+SQLInfoOracle::GetBulkImportPostfix(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_identity = true*/,bool /*p_constraints = true*/) const
+{
+  return _T("");
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -701,8 +714,8 @@ SQLInfoOracle::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool /*
   return p_tablename;
 }
 
-// Changes to parameters before binding to an ODBC HSTMT handle
-void
+// Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
+bool
 SQLInfoOracle::DoBindParameterFixup(SQLSMALLINT& p_dataType,SQLSMALLINT& p_sqlDatatype,SQLULEN& /*p_columnSize*/,SQLSMALLINT& /*p_scale*/,SQLLEN& /*p_bufferSize*/,SQLLEN* /*p_indicator*/) const
 {
   // Oracle driver can only bind to SQL_DECIMAL
@@ -714,6 +727,7 @@ SQLInfoOracle::DoBindParameterFixup(SQLSMALLINT& p_dataType,SQLSMALLINT& p_sqlDa
   {
     p_sqlDatatype = SQL_NUMERIC;
   }
+  return false;
 }
 
 //////////////////////////////////////////////////////////////////////////

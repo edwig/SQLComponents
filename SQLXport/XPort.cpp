@@ -195,6 +195,9 @@ XPort::Connect()
   // Use our SQL if possible and present
   m_database.GetSQLInfoDB()->GetInfo();
   m_database.GetSQLInfoDB()->SetPreferODBC(false);
+  // Generate not too much indexes for export
+  m_database.GetSQLInfoDB()->SetFilterPKFK(true);
+
   return true;
 }
 
@@ -891,10 +894,10 @@ XPort::GetDefineSQLIndex(XString p_table)
 {
   DDLCreateTable create(m_database.GetSQLInfoDB());
 
-  if(m_database.GetDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
-  {
-    create.SetOptionIndexDuplicateNulls(true);
-  }
+//   if(m_database.GetDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
+//   {
+//     create.SetOptionIndexDuplicateNulls(true);
+//   }
 
   try
   {
@@ -965,9 +968,13 @@ void
 XPort::RecordAllColumns(DDLCreateTable& p_create)
 {
   m_columns.clear();
+  m_trimlist.clear();
+
   for(auto& column : p_create.m_columns)
   {
     m_columns.push_back(column.m_column);
+    bool trim = (column.m_datatype == SQL_CHAR || column.m_datatype == SQL_WCHAR);
+    m_trimlist.push_back(trim);
   }
 }
 
@@ -1212,8 +1219,12 @@ XPort::GetDefineRowSelect(XString p_table,SQLInfoDB* p_info)
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
   {
     if(ind > 0) select += _T("      ,");
+    if(m_trimlist[ind])
+    {
+      select += _T("TRIM(");
+    }
     select += p_info->QueryIdentifierQuotation(m_columns[ind]);
-    select += _T("\n");
+    select += m_trimlist[ind] ? _T(")\n") : _T("\n");
   }
   select += _T(" FROM ");
   if(!m_schema.IsEmpty() && p_info->GetRDBMSUnderstandsSchemas())
@@ -1862,6 +1873,7 @@ XPort::ImportTables(bool p_listOnly,TCHAR& p_type)
         XString table = m_xfile.ReadTable(p_listOnly);
         XString sql = m_xfile.ReadSQL();
         m_xfile.ReadColumns(GetColumns());
+        FindIdentity(sql);
 
         SQLTransaction trans(GetDatabase(),_T("table_") + table);
         if(ImportObject(m_object,table))
@@ -1876,7 +1888,11 @@ XPort::ImportTables(bool p_listOnly,TCHAR& p_type)
         trans.Commit();
 
         // STEP 5b: Import data rows in this table
+
+        BulkImportPrepare(table);
         m_xfile.ReadRows(*this,table,haveTable,p_listOnly);
+        BulkImportComplete(table);
+
         p_type = m_xfile.NextType();
       }
       m_xfile.ReadEnd();
@@ -2161,3 +2177,59 @@ XPort::ImportSQL(XString& p_sql,bool p_retries/*= false*/,XString p_delim /*=";"
     return DoSQLStatement(p_sql,p_retries);
   }
 }
+
+// Find the identity of a column before bulk import
+void
+XPort::FindIdentity(XString p_sql)
+{
+  m_identity = false;
+  if(p_sql.Find(_T("identity")) >= 0)
+  {
+    m_identity = true;
+  }
+}
+
+
+// Prepare a table for bulk import and complete the bulk import
+void
+XPort::BulkImportPrepare(XString p_table)
+{
+  XString batch = m_database.GetSQLInfoDB()->GetBulkImportPrefix(m_schema,p_table,m_identity);
+  if(!batch.IsEmpty())
+  {
+    try
+    {
+       SQLQuery query(&m_database);
+       SQLTransaction trans(&m_database,_T("prepare"));
+
+       query.DoSQLStatementBatch(batch);
+       trans.Commit();
+    }
+    catch(StdException& ex)
+    {
+      xerror(_T("Error while preparing table [%s] for bulk import: %s"),p_table.GetString(),ex.GetErrorMessage().GetString());
+    }
+  }
+}
+
+void
+XPort::BulkImportComplete(XString p_table)
+{
+  XString batch = m_database.GetSQLInfoDB()->GetBulkImportPostfix(m_schema,p_table,m_identity);
+  if(!batch.IsEmpty())
+  {
+    try
+    {
+      SQLQuery query(&m_database);
+      SQLTransaction trans(&m_database,_T("complete"));
+
+      query.DoSQLStatementBatch(batch);
+      trans.Commit();
+    }
+    catch(StdException& ex)
+    {
+      xerror(_T("Error while completing table [%s] bulk import: %s"),p_table.GetString(),ex.GetErrorMessage().GetString());
+    }
+  }
+}
+

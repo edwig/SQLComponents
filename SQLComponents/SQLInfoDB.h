@@ -62,6 +62,10 @@ public:
   // We prefer the strict 'standard' ODBC drivers meta queries
   void    SetPreferODBC(bool p_prefer);
   bool    GetPreferODBC();
+  // Filtering of the primary and/or foreign keys in order to
+  // select the indexes that are NOT automatically created by pk/fk constraints
+  void    SetFilterPKFK(bool p_filter);
+  bool    GetFilterPKFK() const;
 
   // OVERRIDES AND EXTRAS OF THE ODBC MakeInfo<object> functions
 
@@ -262,6 +266,10 @@ public:
   // Query to perform a keep alive ping
   virtual XString GetPing() const = 0;
 
+  // Pre- and postfix statements for a bulk import
+  virtual XString GetBulkImportPrefix (XString p_schema,XString p_tablename,bool p_identity = true,bool p_constraints = true) const = 0;
+  virtual XString GetBulkImportPostfix(XString p_schema,XString p_tablename,bool p_identity = true,bool p_constraints = true) const = 0;
+
   //////////////////////////////////////////////////////////////////////////
   // SQL STRINGS
 
@@ -295,8 +303,8 @@ public:
   // SQLQuery service functions for tinkering with bindings and buffers
   
 
-  // Changes to parameters before binding to an ODBC HSTMT handle
-  virtual void DoBindParameterFixup(SQLSMALLINT& p_dataType
+  // Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
+  virtual bool DoBindParameterFixup(SQLSMALLINT& p_dataType
                                    ,SQLSMALLINT& p_sqlDatatype
                                    ,SQLULEN&     p_columnSize
                                    ,SQLSMALLINT& p_scale
@@ -521,7 +529,7 @@ public:
   // Calling a stored function with named parameters, returning a value
   virtual SQLVariant* DoSQLCallNamedParameters(SQLQuery* p_query,XString& p_schema,XString& p_procedure,bool p_function = true) = 0;
   
-private:
+protected:
   // Read a tables cursor from the database
   bool    ReadMetaTypesFromQuery(SQLQuery& p_query,MMetaMap&  p_objects,int p_type);
   bool    ReadTablesFromQuery   (SQLQuery& p_query,MTableMap& p_tables);
@@ -534,6 +542,8 @@ private:
   XString m_defaultCollation;
   // Prefer ODBC meta-queries above hand crafted ones
   bool    m_preferODBC { true };
+  // Filtering of PK/FK
+  bool    m_filterPKFK { false };
 };
 
 inline void    
@@ -558,6 +568,18 @@ inline bool
 SQLInfoDB::GetPreferODBC()
 {
   return m_preferODBC;
+}
+
+inline void
+SQLInfoDB::SetFilterPKFK(bool p_filter)
+{
+  m_filterPKFK = p_filter;
+}
+
+inline bool
+SQLInfoDB::GetFilterPKFK() const
+{
+  return m_filterPKFK;
 }
 
 // End of namespace

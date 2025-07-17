@@ -595,6 +595,19 @@ SQLInfoFirebird::GetPing() const
   return "SELECT CAST('now' AS timestamp) FROM rdb$database";
 }
 
+// Pre- and postfix statements for a bulk import
+XString
+SQLInfoFirebird::GetBulkImportPrefix(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_identity = true*/,bool /*p_constraints = true*/) const
+{
+  return _T("");
+}
+
+XString
+SQLInfoFirebird::GetBulkImportPostfix(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_identity = true*/,bool /*p_constraints = true*/) const
+{
+  return _T("");
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -668,8 +681,8 @@ SQLInfoFirebird::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool 
   return p_tablename;
 }
 
-// Changes to parameters before binding to an ODBC HSTMT handle
-void
+// Changes to parameters before binding to an ODBC HSTMT handle  (returning the At-Exec status)
+bool
 SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/
                                      ,SQLSMALLINT& /*p_sqlDatatype*/
                                      ,SQLULEN&     /*p_columnSize*/
@@ -677,6 +690,7 @@ SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/
                                      ,SQLLEN&      /*p_bufferSize*/
                                      ,SQLLEN*      /*p_indicator*/) const
 {
+  return false;
 }
 
 //////////////////////////////////////////////////////////////////////////

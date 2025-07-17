@@ -78,13 +78,14 @@ static void xfread(void* p_buffer,size_t p_size,FILE* p_file)
 }
 
 // XFILE BINARY FORMAT
-// 1: HEADER ("SQLXport 1.0")
+// 1: HEADER ("SQLXport 2.0") + '<S>' + ANSI/UNICODE + "Z"
 // 2: String objects: n * object ( 'T'<n>string of length n'\1' )
 // 3: Data   objects: n * object ( 'D'<n><type><N>binary data of length <n>'\2' )
 //
 // Type of objects
 // 'S'  : Section name. To be printed in the logfile
 // 'Q'  : Resulting SQL.Run on import
+// 'A'  : Schema name
 // 'T'  : Table name
 // 'C'  : Column name
 // 'I'  : Index name
@@ -93,13 +94,12 @@ static void xfread(void* p_buffer,size_t p_size,FILE* p_file)
 // 'N'  : Sequence name
 // 'F'  : Function/procedure/type/package/trigger etc
 // 'P'  : Public synonym
+// 'U'  : User object
 // 'K'  : Count of number or records in the table (Optional after 1.5)
 // 'R'  : Row object. string is empty "n" is number of columns
 // 'D'  : Data object. string is binary data
 // 'E'  : End marker for recurring groups. Contains string "END"
 // 'X'  : End-of file marker. Contains the string 'END-EXPORT'
-// 'A'  : Schema name
-// 'U'  : User object
 // 'Z'  : RDBMS type name
 
 XFile::XFile(Parameters& p_parameters)
@@ -656,6 +656,10 @@ XFile::ReadRows(XPort& p_xport,XString& p_table,bool p_object,bool p_list)
       // row count
       ++rows;
 
+      if(m_parameters.m_debug)
+      {
+        xprint(false,_T("\n"));
+      }
       for(int ind = 0;ind < cols; ++ind)
       {
         SQLVariant* var = query.GetParameter(ind+1);
@@ -880,9 +884,17 @@ XFile::WriteData(SQLComponents::SQLVariant* p_var)
   const void* buffer = p_var->GetDataPointer();
 
   // Potentially a shorter string
-  if(type == SQL_C_CHAR)
+  if(type == SQL_CHAR)
   {
-    int altlength = (int) _tcslen((TCHAR*)buffer);
+    int altlength = (int) strlen((char*)buffer);
+    if(altlength < length)
+    {
+      length = altlength;
+    }
+  }
+  if(type == SQL_WCHAR)
+  {
+    int altlength = (int)wcslen((wchar_t*)buffer) * sizeof(wchar_t);
     if(altlength < length)
     {
       length = altlength;
@@ -890,11 +902,11 @@ XFile::WriteData(SQLComponents::SQLVariant* p_var)
   }
 
   // Write to XFILE dump
-  xfputc(_T('D'),m_file);                            // Writing data
+  xfputc(_T('D'),m_file);                        // Writing data
   xfwrite(&length,(size_t)sizeof(int),m_file);   // Binary length of object
   xfwrite(&type,  (size_t)sizeof(int),m_file);   // SQL_C_* datatype
   xfwrite(&sqltyp,(size_t)sizeof(int),m_file);   // SQL_XXX datatype
-  xfputc(isnull ? _T('N') : _T('-'),m_file);             // IS NULL ?
+  xfputc(isnull ? _T('N') : _T('-'),m_file);     // IS NULL ?
   xfwrite(buffer,(size_t)length,m_file);         // Binary data
   xfputc(SEPERATOR_DATA,m_file);                 // End-separator
 }

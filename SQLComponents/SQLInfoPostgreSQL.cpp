@@ -496,6 +496,19 @@ SQLInfoPostgreSQL::GetPing() const
   return _T("SELECT current_timestamp");
 }
 
+// Pre- and postfix statements for a bulk import
+XString
+SQLInfoPostgreSQL::GetBulkImportPrefix(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_identity = true*/,bool /*p_constraints = true*/) const
+{
+  return _T("");
+}
+
+XString
+SQLInfoPostgreSQL::GetBulkImportPostfix(XString /*p_schema*/,XString /*p_tablename*/,bool /*p_identity = true*/,bool /*p_constraints = true*/) const
+{
+  return _T("");
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // SQL STRINGS
@@ -567,10 +580,11 @@ SQLInfoPostgreSQL::GetTempTablename(XString /*p_schema*/,XString p_tablename,boo
   return p_tablename;
 }
 
-// Changes to parameters before binding to an ODBC HSTMT handle
-void
+// Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
+bool
 SQLInfoPostgreSQL::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/,SQLSMALLINT& /*p_sqlDatatype*/,SQLULEN& /*p_columnSize*/,SQLSMALLINT& /*p_scale*/,SQLLEN& /*p_bufferSize*/,SQLLEN* /*p_indicator*/) const
 {
+  return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -944,7 +958,7 @@ SQLInfoPostgreSQL::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablen
                    "       END                AS non_unique\n"
                    "      ,NULL::text         AS index_qualifier\n"  // Use schema name!
                    "      ,ci.relname         AS index_name\n"
-                   "      ,1                  AS type\n"           // tableIndexOther
+                   "      ,1                  AS type\n"              // tableIndexOther
                    "      ,keys.ordinality    AS ordinal_position\n"  // a.attnum
                    "      ,a.attname          AS column_name\n"
                    "      ,CASE i.indoption[a.attnum - 1] & 1\n"
@@ -960,10 +974,15 @@ SQLInfoPostgreSQL::GetCATALOGIndexAttributes(XString& p_schema,XString& p_tablen
                    "       JOIN pg_namespace n ON n.oid  = t.relnamespace\n"
                    "       JOIN unnest(i.indkey) WITH ORDINALITY AS keys(attnum, ordinality) ON true\n"
                    "       JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = keys.attnum\n"
-                   " WHERE NOT i.indisprimary\n"
-                   "   AND NOT EXISTS\n"
-                   "         ( SELECT 1 FROM pg_constraint c\n"
-                   "            WHERE c.conindid = i.indexrelid AND c.contype = 'f' )");
+                   " WHERE 1 = 1\n");
+  if(m_filterPKFK)
+  {
+    // Select the indexes for re-creation of the table
+    sql += _T("   AND NOT i.indisprimary\n"
+              "   AND NOT EXISTS\n"
+              "         ( SELECT 1 FROM pg_constraint c\n"
+              "            WHERE c.conindid = i.indexrelid AND c.contype = 'f' )");
+  }
   if(!p_schema.IsEmpty())
   {
     IdentifierCorrect(p_schema);

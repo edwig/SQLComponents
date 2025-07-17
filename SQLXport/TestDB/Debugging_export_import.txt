@@ -10,3 +10,9 @@ Firebird testing:
 -----------------
 /dir:export /dbase:fb_northwind    /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump
 /dir:import /dbase:bu_fb_northwind /user:sysdba    /passwd:altijd    /schema:sysdba    /file:fb_northwind.dump /drop
+
+MS-SQLServer testing:
+---------------------
+/dir:export /dbase:ms_northwind    /user:northwind /passwd:northwind /schema:northwind /file:ms_northwind.dump
+/dir:import /dbase:bu_ms_northwind /user:northwind /passwd:northwind /schema:northwind /file:ms_northwind.dump /drop
+
