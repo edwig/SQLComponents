@@ -28,6 +28,7 @@
 #include "XPort.h"
 #include "SQLQuery.h"
 #include "SQLTransaction.h"
+#include "SQLTimestamp.h"
 #include "SQLXport.h"
 #include "Parameters.h"
 
@@ -101,6 +102,7 @@ static void xfread(void* p_buffer,size_t p_size,FILE* p_file)
 // 'E'  : End marker for recurring groups. Contains string "END"
 // 'X'  : End-of file marker. Contains the string 'END-EXPORT'
 // 'Z'  : RDBMS type name
+// 'G'  : Generated at timestamp (header only)
 
 XFile::XFile(Parameters& p_parameters)
       :m_parameters(p_parameters)
@@ -189,6 +191,11 @@ XFile::WriteHeader(XString p_type)
   xfputc(SEPARATOR_STRING,  m_file);
   xfputc(sizeof(TCHAR),     m_file);
   WriteString(_T('Z'),      p_type);
+
+  SQLTimestamp stamp = SQLTimestamp::CurrentTimestamp();
+  XString timestamp  = stamp.AsXMLStringTZ(3);
+  WriteString(_T('G'),timestamp);
+  xprintf(false,_T("Export dump was generated on: %s\n"),timestamp.GetString());
 }
 
 bool
@@ -231,6 +238,12 @@ XFile::ReadHeader(XString& p_type)
       return false;
     }
     p_type = type;
+
+    ch = _T('G');
+    XString timestamp;
+    ReadString(ch,timestamp);
+    xprintf(false,_T("Export dump was generated on: %s\n"),timestamp.GetString());
+
     return true;
   }
 

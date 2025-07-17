@@ -168,7 +168,7 @@ private:
   OList       m_triggers;
   OList       m_synonyms;
   BoolList    m_trimlist;
-  bool        m_identity;
+  bool        m_identity { false };
   // Retry queue for views
   OList       m_retries;
 };
