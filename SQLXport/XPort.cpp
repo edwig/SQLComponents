@@ -1150,27 +1150,14 @@ XPort::GetDefineSQLTrigger(XString p_trigger)
     trigger = p_trigger.Mid(pos + 1);
   }
   XString object;
-  XString sql = m_database.GetSQLInfoDB()->GetCATALOGTriggerAttributes(m_schema,object,trigger,true);
-
-  try
+  XString errors;
+  MTriggerMap triggers;
+  if(m_database.GetSQLInfoDB()->MakeInfoTableTriggers(triggers,errors,m_schema,object,trigger))
   {
-    SQLQuery query(&m_database);
-    int param = 1;
-    if(!m_schema.IsEmpty())
-    {
-      query.SetParameter(param++,m_schema);
-    }
-    query.SetParameter(param++,trigger);
-    query.DoSQLStatement(sql);
-    while(query.GetRecord())
-    {
-      // PSM source is the 17th field MetaTrigger !!
-      create += query.GetColumn(MetaTrigger_source)->GetAsString();
-    }
+    create = m_database.GetSQLInfoDB()->GetCATALOGTriggerCreate(triggers[0]);
   }
-  catch(StdException& ex)
+  else
   {
-    xerror(ex.GetErrorMessage());
     xerror(_T("Internal error reading PSM source of %s.%s\n"),m_schema.GetString(),p_trigger.GetString());
   }
   create = create.TrimLeft(_T("\r\n"));

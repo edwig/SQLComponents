@@ -1598,10 +1598,10 @@ SQLInfoPostgreSQL::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tabl
 }
 
 XString
-SQLInfoPostgreSQL::GetCATALOGTriggerCreate(MetaTrigger& /*p_trigger*/) const
+SQLInfoPostgreSQL::GetCATALOGTriggerCreate(MetaTrigger& p_trigger) const
 {
   // Already retrieved by TriggerAttributes!
-  return _T("");
+  return p_trigger.m_source;
 }
 
 XString
