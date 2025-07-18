@@ -122,6 +122,7 @@ XFile::OpenCreate(XString p_filename,XString p_databaseType)
   if(m_file)
   {
     WriteHeader(p_databaseType);
+    xprintf(false,_T("Creating database export for RDBMS vendor type [%s]\n"),p_databaseType.GetString());
   }
   else
   {
@@ -145,7 +146,7 @@ XFile::OpenRead(XString p_filename,XString p_databaseType,bool p_listonly)
             ,p_filename.GetString());
       return false;
     }
-    if(!p_listonly && type != p_databaseType)
+    if(!p_listonly && type.CompareNoCase(p_databaseType))
     {
       xerror(_T("File [%s] is for a different RDBMS database platform!\n")
              _T("The export came from a [%s] database.\n")
@@ -153,6 +154,7 @@ XFile::OpenRead(XString p_filename,XString p_databaseType,bool p_listonly)
             ,type.GetString(),p_databaseType.GetString());
       return false;
     }
+    xprintf(false,_T("Incoming inport for database of RDBMS vendor type [%s]\n"),type.GetString());
   }
   else
   {
