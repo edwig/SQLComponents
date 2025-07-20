@@ -1061,6 +1061,16 @@ XPort::GetDefineSQLView(XString p_view)
     xerror(_T("Internal error: Getting information for view: %s\n"),p_view.GetString());
     return _T("");
   }
+
+  // Some RDBMS only store the creation text partially
+  if(create.Left(6).CompareNoCase(_T("CREATE")))
+  {
+    XString extra = info->GetCATALOGViewCreate(m_schema,p_view,create);
+    if(extra.GetLength() > create.GetLength())
+    {
+      return extra;
+    }
+  }
   return create;
 }
 
