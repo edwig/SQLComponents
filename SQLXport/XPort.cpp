@@ -1123,29 +1123,23 @@ XString
 XPort::GetDefineSQLProcedure(XString p_procedure)
 {
   XString create;
+
+  // Find procedure/function name
   XString procedure(p_procedure);
   int pos = p_procedure.Find(':');
   if(pos > 0)
   {
     procedure = p_procedure.Mid(pos + 1);
   }
-  XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureSourcecode(m_schema,procedure,true);
 
-  try
+  // Find all attributes
+  XString errors;
+  MProcedureMap procedures;
+  if(m_database.GetSQLInfoDB()->MakeInfoPSMProcedures(procedures,errors,m_schema,procedure))
   {
-    SQLQuery query(&m_database);
-    query.DoSQLStatement(sql);
-    while(query.GetRecord())
-    {
-      create += query.GetColumn(3)->GetAsString();
-    }
+    // Find the true definition
+    create = m_database.GetSQLInfoDB()->GetPSMProcedureCreate(procedures[0]);
   }
-  catch(StdException& ex)
-  {
-    xerror(ex.GetErrorMessage());
-    xerror(_T("Internal error reading PSM source of %s.%s\n"),m_schema.GetString(),p_procedure.GetString());
-  }
-  create = create.TrimLeft(_T("\r\n"));
   return create;
 }
 

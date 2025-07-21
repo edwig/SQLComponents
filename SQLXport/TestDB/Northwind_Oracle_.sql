@@ -15467,4 +15467,50 @@ begin
 end;
 /
 
+CREATE OR REPLACE FUNCTION northwind."MostExpensiveProduct"(p_year INTEGER)
+return NUMBER
+AS
+  max_value number(10,2);
+  BEGIN
+    SELECT MAX("UnitPrice")
+	  INTO max_value
+	  FROM "Products";
+    RETURN max_value;
+  END;  
+/
+
+CREATE OR REPLACE FUNCTION northwind."CheapestProduct"(p_year INTEGER)
+return NUMBER
+AS
+  min_value number(10,2);
+  BEGIN
+    SELECT MIN("UnitPrice")
+	  INTO min_value
+	  FROM "Products";
+    RETURN min_value;
+  END;  
+/
+
+CREATE OR REPLACE FUNCTION northwind."ItemsOrderedBetween"(p_start DATE,p_end DATE)
+RETURN NUMBER
+AS
+  total NUMBER(10);
+  BEGIN
+    SELECT Sum(od."Quantity")
+      INTO total
+      FROM "Orders" os INNER JOIN "Order Details" od ON od."OrderID" = os."OrderID"
+     WHERE os."OrderDate" BETWEEN p_start AND p_end;
+     RETURN total;  
+  END;
+/
+
+CREATE OR REPLACE PROCEDURE northwind."CorrectBirthdate"
+AS
+BEGIN
+   UPDATE northwind."Employees"
+      SET "BirthDate" = TO_DATE('01-01-1945','DD-MM-YYYY')
+	WHERE "BirthDate" < TO_DATE('01-01-1945','DD-MM-YYYY');
+END;
+/
+
 COMMIT;

@@ -2571,7 +2571,6 @@ SQLInfoOracle::GetPSMProcedureList(XString& p_schema,XString p_procedure,bool p_
 XString
 SQLInfoOracle::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure,bool p_quoted /*= false*/) const
 {
-  p_procedure.MakeUpper();
   CString package;
 
   int pos = p_procedure.Find('.');
@@ -2642,8 +2641,8 @@ SQLInfoOracle::GetPSMProcedureSourcecode(XString p_schema, XString p_procedure,b
 {
   XString sql;
 
-  sql = _T("SELECT 0 as object_id\n")
-        _T("      ,0 as object_line\n")
+  sql = _T("SELECT 0    as object_id\n")
+        _T("      ,line as object_line\n")
         _T("      ,text\n")
         _T("  FROM all_source\n");
   if(!p_schema.IsEmpty())
@@ -2662,9 +2661,17 @@ SQLInfoOracle::GetPSMProcedureSourcecode(XString p_schema, XString p_procedure,b
 }
 
 XString
-SQLInfoOracle::GetPSMProcedureCreate(MetaProcedure& /*p_procedure*/) const
+SQLInfoOracle::GetPSMProcedureCreate(MetaProcedure& p_procedure) const
 {
-  return _T("");
+  XString sql = _T("CREATE OR REPLACE ");
+  XString source = p_procedure.m_source;
+  int pos = source.Find(_T(' '));
+  if(pos > 0 && pos < 10)
+  {
+    source = source.Left(pos + 1) + QIQ(p_procedure.m_schemaName) + _T(".") + source.Mid(pos+1).TrimLeft();
+  }
+  sql += source;
+  return sql;
 }
 
 XString
