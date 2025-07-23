@@ -1921,9 +1921,17 @@ SQLInfoOracle::GetCATALOGCheckCreate(XString p_schema,XString p_tablename,XStrin
 }
 
 XString
-SQLInfoOracle::GetCATALOGCheckDrop(XString  /*p_schema*/,XString  /*p_tablename*/,XString  /*p_constraint*/) const
+SQLInfoOracle::GetCATALOGCheckDrop(XString p_schema,XString p_tablename,XString p_constraint) const
 {
-  return _T("");
+  XString sql(_T("ALTER TABLE "));
+  if(!p_schema.IsEmpty())
+  {
+    sql += QIQ(p_schema) + _T(".");
+  }
+  sql += QIQ(p_tablename) + _T("\n");
+  sql += _T("  DROP CONSTRAINT ") + QIQ(p_constraint);
+
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -2102,6 +2110,7 @@ SQLInfoOracle::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,bool 
                 _T("      ,cache_size                 AS cache\n")
                 _T("      ,decode(cycle_flag,'N',0,1) AS cycle\n")
                 _T("      ,decode(order_flag,'N',0,1) AS ordering\n")
+                _T("      ,'' AS remarks\n")
                 _T("  FROM all_sequences\n");
   if (!p_schema.IsEmpty())
   {
@@ -2130,6 +2139,7 @@ SQLInfoOracle::GetCATALOGSequenceAttributes(XString& p_schema,XString& p_sequenc
                 _T("      ,cache_size                 AS cache\n")
                 _T("      ,decode(cycle_flag,'N',0,1) AS cycle\n")
                 _T("      ,decode(order_flag,'N',0,1) AS ordering\n")
+                _T("      ,'' AS remarks\n")
                 _T("  FROM all_sequences\n");
   if(!p_schema.IsEmpty())
   {
@@ -2461,6 +2471,35 @@ SQLInfoOracle::GetCATALOGSynonymDrop(XString& /*p_schema*/,XString& /*p_synonym*
 {
   // Not implemented yet
   return _T("");
+}
+
+// For ALL objects
+XString
+SQLInfoOracle::GetCATALOGCommentCreate(XString p_schema,XString p_object,XString p_name,XString p_subObject,XString p_remark) const
+{
+  XString sql;
+  if(!p_object.IsEmpty() && !p_name.IsEmpty() && !p_remark.IsEmpty())
+  {
+    sql.Format(_T("COMMENT ON %s "),p_object.GetString());
+    if(!p_schema.IsEmpty())
+    {
+      sql += QIQ(p_schema) + _T(".");
+    }
+    sql += QIQ(p_name);
+    if(!p_subObject.IsEmpty())
+    {
+      sql += _T(".") + QIQ(p_subObject);
+    }
+    if(p_remark.CompareNoCase(_T("NULL")))
+    {
+      sql.AppendFormat(_T(" IS '%s'"),p_remark.GetString());
+    }
+    else
+    {
+      sql += _T(" IS NULL");
+    }
+  }
+  return sql;
 }
 
 //////////////////////////////////////////////////////////////////////////

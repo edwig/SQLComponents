@@ -114,8 +114,10 @@ XPort::Export()
   {
     ExportPrivileges();
   }
+  // STEP 16: Export all gathered comments
+  ExportComments();
 
-  // STEP 16: End-of file marker
+  // STEP 17: End-of file marker
   CloseDumpFile();
 
   xprintf(false,_T("\n*** Export ready ***\n\n"));
@@ -878,6 +880,7 @@ XPort::GetDefineSQLTable(XString p_table)
     if(statements.size() == 1)
     {
       RecordAllColumns(create);
+      RecordAllComments(create);
       return statements[0];
     }
   }
@@ -1098,14 +1101,20 @@ XPort::GetDefineSQLSequence(XString p_sequence)
         MetaSequence seq;
         seq.m_schemaName   = m_schema;
         seq.m_sequenceName = p_sequence;
-        seq.m_currentValue = query[4];
-        seq.m_minimalValue = query[5];
-        seq.m_increment    = query[6];
-        seq.m_cache        = query[7];
-        seq.m_cycle        = query[8];
-        seq.m_order        = query[9];
+        seq.m_currentValue = query[MetaSequence_currentvalue];
+        seq.m_minimalValue = query[MetaSequence_minimalvalue];
+        seq.m_increment    = query[MetaSequence_increment];
+        seq.m_cache        = query[MetaSequence_cache];
+        seq.m_cycle        = query[MetaSequence_cycle];
+        seq.m_order        = query[MetaSequence_order];
+        seq.m_remarks      = (XString) query[MetaSequence_remarks];
 
         define = info->GetCATALOGSequenceCreate(seq);
+        XString comment = info->GetCATALOGCommentCreate(m_schema,_T("SEQUENCE"),p_sequence,_T(""),seq.m_remarks);
+        if(!comment.IsEmpty())
+        {
+          m_comments.push_back(comment);
+        }
         break;
       }
       sql = info->GetCATALOGSequenceAttributes(m_schema,p_sequence);
@@ -1159,6 +1168,11 @@ XPort::GetDefineSQLTrigger(XString p_trigger)
   if(m_database.GetSQLInfoDB()->MakeInfoTableTriggers(triggers,errors,m_schema,object,trigger))
   {
     create = m_database.GetSQLInfoDB()->GetCATALOGTriggerCreate(triggers[0]);
+    XString comment = m_database.GetSQLInfoDB()->GetCATALOGCommentCreate(m_schema,_T("TRIGGER"),trigger,_T(""),triggers[0].m_remarks);
+    if(!comment.IsEmpty())
+    {
+      m_comments.push_back(comment);
+    }
   }
   else
   {
@@ -1750,6 +1764,32 @@ XPort::ExportPrivileges()
   m_xfile.Flush();
 }
 
+void
+XPort::ExportComments()
+{
+  m_xfile.WriteSection(_T("COMMENTS"));
+
+  xprintf(false,_T("Exporting comments: "));
+  for(auto& comment : m_comments)
+  {
+    m_xfile.WriteSQL(comment);
+  }
+  // End of all synonyms
+  m_xfile.WriteSectionEnd();
+  m_xfile.Flush();
+  xprintf(false,_T("%d records\n"),(int)m_comments.size());
+}
+
+void
+XPort::RecordAllComments(DDLCreateTable& p_create)
+{
+  DDLS comments = p_create.GetCommentStatements();
+  for(auto& comment : comments)
+  {
+    m_comments.push_back(comment);
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // HIGH LEVEL IMPORT
@@ -1827,6 +1867,11 @@ XPort::ImportDump()
     {
       // STEP 15: All rights on all objects (missing column rights)
       ImportRights(m_parameters.m_listOnly,type);
+    }
+    else if(section_name.CompareNoCase(_T("COMMENTS")) == 0)
+    {
+      // STEP 16: Import all comments
+      ImportComments(type);
     }
     else
     {
@@ -2116,6 +2161,40 @@ XPort::ImportRights(bool p_listOnly,TCHAR& p_type)
     {
       _tprintf(_T("%d records processed\r"),count);
       _tprintf(_T("Importing access rights: "));
+    }
+  }
+  trans.Commit();
+
+  xprintf(false,_T("%d records imported."),count);
+  if(errors)
+  {
+    xprintf(false,_T(" %d records failed."),errors);
+  }
+  xprintf(false,_T("\n"));
+  m_xfile.ReadEnd();
+  p_type = m_xfile.NextType();
+}
+
+void
+XPort::ImportComments(TCHAR& p_type)
+{
+  int count = 0;
+  int errors = 0;
+
+  p_type = m_xfile.NextType();
+  xprintf(false,_T("Importing comments: "));
+
+  SQLTransaction trans(GetDatabase(),_T("comments"));
+  while(p_type != 'E')
+  {
+    ++count;
+    XString sql = m_xfile.ReadSQL();
+    ImportSQL(sql,true);
+    p_type = m_xfile.NextType();
+    if((count % COMMIT_SIZE) == 0)
+    {
+      _tprintf(_T("%d records processed\r"),count);
+      _tprintf(_T("Importing comments: "));
     }
   }
   trans.Commit();

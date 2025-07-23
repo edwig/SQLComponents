@@ -91,6 +91,7 @@ public:
   void    ExportTriggers();
   void    ExportSynonyms();
   void    ExportPrivileges();
+  void    ExportComments();
 
   // IMPORT
   void    ImportDump();
@@ -128,6 +129,7 @@ private:
   void          RecordAllIndices  (DDLCreateTable& p_create,DDLS& p_ddls);
   void          RecordAllPrimaries(DDLCreateTable& p_create,CString p_table);
   void          RecordAllForeigns (DDLCreateTable& p_create);
+  void          RecordAllComments (DDLCreateTable& p_create);
   // Drop old contents
   void          GatherDropSchema (OList& p_statements);
   void          ExecuteDropSchema(OList& p_statements);
@@ -143,6 +145,7 @@ private:
   void          ImportProcedures(TCHAR& p_type);
   void          ImportSynonyms(TCHAR& p_type);
   void          ImportRights(bool p_listOnly,TCHAR& p_type);
+  void          ImportComments(TCHAR& p_type);
   // Prepare a table for bulk import and complete the bulk import
   void          FindIdentity(XString p_sql);
   void          BulkImportPrepare (XString p_table);
@@ -168,6 +171,7 @@ private:
   OList       m_triggers;
   OList       m_synonyms;
   BoolList    m_trimlist;
+  OList       m_comments;
   bool        m_identity { false };
   // Retry queue for views
   OList       m_retries;
