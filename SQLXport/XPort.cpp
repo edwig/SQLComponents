@@ -340,7 +340,7 @@ XPort::GatherDropSchema(OList& p_statements)
     query.DoSQLStatement(alltables,schema);
     while(query.GetRecord())
     {
-      XString dropline = info->GetCATALOGTableDrop(schema,query[3]);
+      XString dropline = info->GetCATALOGTableDrop(schema,query[3],false,true);
       p_statements.push_back(dropline);
     }
   }

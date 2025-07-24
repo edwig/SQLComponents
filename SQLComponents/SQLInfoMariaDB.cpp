@@ -778,10 +778,21 @@ SQLInfoMariaDB::GetCATALOGDefaultCollation() const
 
 // Get SQL to check if a table already exists in the database
 XString
-SQLInfoMariaDB::GetCATALOGTableExists(XString& /*p_schema*/,XString& /*p_tablename*/,bool /*p_quoted = false*/) const
+SQLInfoMariaDB::GetCATALOGTableExists(XString& p_schema,XString& p_tablename,bool p_quoted /*= false*/) const
 {
-  // Still to do in MySQL
-  return _T("");
+  XString sql;
+  sql = _T("SELECT COUNT(*)\n")
+        _T("  FROM information_schema.tables\n")  
+        _T(" WHERE table_type = 'BASE TABLE'\n")
+        _T("   AND table_schema NOT IN ('mysql','sys','performance_schema')\n");
+  if(!p_schema.IsEmpty())
+  {
+    IdentifierCorrect(p_schema);
+    sql += _T("   AND table_schema = ?\n");
+  }
+  IdentifierCorrect(p_tablename);
+  sql += _T("   AND table_name = ?");
+  return sql;
 }
 
 XString
@@ -827,8 +838,12 @@ SQLInfoMariaDB::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablename
 XString
 SQLInfoMariaDB::GetCATALOGTableSynonyms(XString& /*p_schema*/,XString& /*p_tablename*/,bool /*p_quoted = false*/) const
 {
-  // MariaDB does not support SYNONYM's
-  return XString();
+  // MariaDB does not support SYNONYMS, but we must return an empty select statement
+  // so that proceses as 'DropSchema' can continue
+  XString sql = _T("SELECT *\n"
+                   "  FROM information_schema.tables\n"
+                   " WHERE 0 = 1");
+  return sql;
 }
 
 XString
@@ -870,7 +885,12 @@ SQLInfoMariaDB::GetCATALOGTableCreate(MetaTable& p_table,MetaColumn& /*p_column*
   {
     sql += _T("TEMPORARY ");
   }
-  sql += _T("TABLE ") + QIQ(p_table.m_table);
+  sql += _T("TABLE ");
+  if(!p_table.m_schema.IsEmpty())
+  {
+    sql += QIQ(p_table.m_schema) + _T(".");
+  }
+  sql += QIQ(p_table.m_table);
   return sql;
 }
 
@@ -893,14 +913,15 @@ SQLInfoMariaDB::GetCATALOGTableRename(XString p_schema,XString p_tablename,XStri
 }
 
 XString
-SQLInfoMariaDB::GetCATALOGTableDrop(XString p_schema,XString p_tablename,bool p_ifExist /*= false*/,bool p_restrict /*= false*/,bool p_cascade /*= false*/) const
+SQLInfoMariaDB::GetCATALOGTableDrop(XString /*p_schema*/,XString p_tablename,bool p_ifExist /*= false*/,bool p_restrict /*= false*/,bool p_cascade /*= false*/) const
 {
   XString sql(_T("DROP TABLE "));
   if (p_ifExist)
   {
     sql += _T("IF EXISTS ");
   }
-  sql += QIQ(p_schema) + _T(".") + QIQ(p_tablename);
+  // BEWARE: drop table cannot use the schema prefix !!
+  sql += QIQ(p_tablename);
   if (p_restrict)
   {
     sql += _T(" RESTRICT");
@@ -923,14 +944,21 @@ SQLInfoMariaDB::GetCATALOGTemptableCreate(XString p_schema,XString p_tablename,X
 }
 
 XString 
-SQLInfoMariaDB::GetCATALOGTemptableIntoTemp(XString /*p_schema*/,XString p_tablename,XString p_select) const
+SQLInfoMariaDB::GetCATALOGTemptableIntoTemp(XString p_schema,XString p_tablename,XString p_select) const
 {
-  return _T("INSERT INTO ") + QIQ(p_tablename) + _T("\n") + p_select;
+  XString sql(_T("INSERT INTO "));
+  if(!p_schema.IsEmpty())
+  {
+    sql += QIQ(p_schema) + _T(".");
+  }
+  sql += QIQ(p_tablename) + _T("\n") + p_select;
+  return sql;
 }
 
 XString 
 SQLInfoMariaDB::GetCATALOGTemptableDrop(XString /*p_schema*/,XString p_tablename) const
 {
+  // DROP table cannot use the schema name
   return _T("DROP TABLE ") + QIQ(p_tablename);
 }
 
@@ -1129,11 +1157,20 @@ SQLInfoMariaDB::GetCATALOGColumnDrop(XString /*p_schema*/,XString p_tablename,XS
 
 // All index functions
 XString
-SQLInfoMariaDB::GetCATALOGIndexExists(XString /*p_schema*/,XString /*p_tablename*/,XString /*p_indexname*/,bool /*p_quoted = false*/) const
+SQLInfoMariaDB::GetCATALOGIndexExists(XString p_schema,XString /*p_tablename*/,XString p_indexname,bool p_quoted /*= false*/) const
 {
-  // Cannot be implemented for generic ODBC
-  // Use SQLStatistics instead (see SQLInfo class)
-  return _T("");
+  XString sql = _T("SELECT COUNT(*)\n"
+                   "  FROM information_schema.statistics\n"
+                   " WHERE 1 = 1\n");
+  if(!p_schema.IsEmpty())
+  {
+    IdentifierCorrect(p_schema);
+    sql += _T("   AND table_schema = ?\n");
+  }
+  IdentifierCorrect(p_indexname);
+  sql += _T("  AND index_name = ?");
+
+  return sql;
 }
 
 XString
@@ -1847,7 +1884,7 @@ SQLInfoMariaDB::GetCATALOGSequenceExists(XString p_schema,XString p_sequence,boo
 XString
 SQLInfoMariaDB::GetCATALOGSequenceList(XString& p_schema,XString& p_pattern,bool p_quoted /*= false*/) const
 {
-  if(p_pattern.Find('%') < 0)
+  if(!p_pattern.IsEmpty() && p_pattern.Find('%') < 0)
   {
     p_pattern = _T("%") + p_pattern + _T("%");
   }
@@ -2010,12 +2047,12 @@ SQLInfoMariaDB::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool p_
   if(!p_schema.IsEmpty())
   {
     IdentifierCorrect(p_schema);
-    sql += _T("   AND table_schema = ?\n");
+    sql += _T("   AND table_schema = '") + p_schema + _T("'\n");
   }
   if(!p_viewname.IsEmpty())
   {
     IdentifierCorrect(p_viewname);
-    sql += _T("   AND table_name   = ?");
+    sql += _T("   AND table_name   = '") + p_viewname +_T("'");
   }
   return sql;
 }

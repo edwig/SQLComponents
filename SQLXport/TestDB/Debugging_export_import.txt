@@ -20,3 +20,8 @@ Oracle testing:
 ---------------
 /dir:export /dbase:ora_northwind    /user:northwind /passwd:northwind /schema:northwind /file:ora_northwind.dump
 /dir:import /dbase:bu_ora_northwind /user:northwind /passwd:northwind /schema:northwind /file:ora_northwind.dump /drop
+
+MariaDB testing:
+----------------
+/dir:export /dbase:mdb_northwind    /user:northwind /passwd:northwind /schema:northwind /file:mdb_northwind.dump
+/dir:import /dbase:bu_mdb_northwind /user:northwind /passwd:northwind /schema:northwind /file:mdb_northwind.dump /drop
