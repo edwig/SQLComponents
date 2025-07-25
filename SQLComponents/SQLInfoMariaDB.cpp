@@ -1798,13 +1798,17 @@ SQLInfoMariaDB::GetCATALOGTriggerAttributes(XString& p_schema,XString& p_tablena
   {
     IdentifierCorrect(p_schema);
     sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
-    sql += _T("event_object_table = ?\n");
+    sql += _T("event_object_table ");
+    sql += p_tablename.Find(_T("%")) >= 0 ? _T("LIKE") : _T("=");
+    sql += _T(" ?\n");
   }
   if(!p_triggername.IsEmpty())
   {
     IdentifierCorrect(p_triggername);
     sql += p_schema.IsEmpty() && p_tablename.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
-    sql += _T("trigger_name = ?\n");
+    sql += _T("trigger_name ");
+    sql += p_triggername.Find(_T("%")) >= 0 ? _T("LIKE") : _T("=");
+    sql += _T(" ?\n");
   }
   sql += _T(" ORDER BY 1,2,3,6");
   return sql;
@@ -2294,7 +2298,7 @@ SQLInfoMariaDB::GetPSMProcedureList(XString& p_schema,XString p_procedure,bool p
     IdentifierCorrect(p_procedure);
     sql += _T("   AND routine_name ");
     sql += (p_procedure.Find(_T("%")) >= 0) ? _T("LIKE") : _T("=");
-    sql += _T("\n");
+    sql += _T(" ?\n");
   }
   sql += _T(" ORDER BY 1,2,3");
 
