@@ -45,7 +45,8 @@ ConsType;
 
 typedef std::vector<bool> BoolList;
 
-const int COMMIT_SIZE = 100;
+const int     COMMIT_SIZE  = 100;
+const LPCTSTR SCHEMA_MACRO = _T("$SCHEMA$");
 
 class XPort
 {
@@ -122,6 +123,7 @@ private:
   void          WriteColumnAccessRights(XString p_object,int& p_count);
   void          WriteProcedureAccessRights(XString p_object,int& p_count);
   void          WriteSequenceAccessRights(XString p_sequence,int& p_count);
+  void          PostProcessSQL(XString& p_sql);
   void          ShowRetryName(XString& p_sql);
   bool          ImportObject(XString& p_object,XString& p_importing);
   int           ImportSQL(XString& p_sql,bool p_retries = false,XString p_delim = _T(";"));

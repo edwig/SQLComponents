@@ -191,7 +191,7 @@ XPort::Connect()
   xprintf(false,_T("Database [%s] opened by user [%s]\n"),database.GetString(),user.GetString());
   if(!schema.IsEmpty())
   {
-    m_database.AddMacro(_T("$SCHEMA$"),schema);
+    m_database.AddMacro(SCHEMA_MACRO,schema);
     xprintf(false,_T("Default schema for import set to [%s]\n"),schema.GetString());
   }
   // Use our SQL if possible and present
@@ -200,7 +200,15 @@ XPort::Connect()
   // Generate not too much indexes for export
   m_database.GetSQLInfoDB()->SetFilterPKFK(true);
 
-  return true;
+  // Explicitly set the default schema, as givven from the parameters
+  // This will set the schema search-path or the default (database+schema)
+  if(m_database.SetDefaultSchema(user,schema))
+  {
+    xprintf(false,_T("Default schema search path set to [%s->%s]\n"),user.GetString(),schema.GetString());
+    return true;
+  }
+  xerror(_T("Cannot determine the schema search path for [%s->%s]\n"),user.GetString(),schema.GetString());
+  return false;
 }
 
 bool
@@ -725,7 +733,7 @@ XPort::DoSQLStatement(XString& p_sql,bool p_can_retry)
       m_retries.push_back(p_sql);
       return 0;
     }
-    p_sql.Replace(_T("$SCHEMA$"),m_parameters.m_schema);
+    p_sql.Replace(SCHEMA_MACRO,m_parameters.m_schema);
     xerror(_T("Error in sql: %s\n%s\n"),ex.GetErrorMessage().GetString(),p_sql.GetString());
     return -1;
   }
@@ -793,7 +801,7 @@ XPort::ShowRetryName(XString& p_sql)
   if(pos > 0)
   {
     name = p_sql.Left(pos);
-    name.Replace(_T("$SCHEMA$"),m_parameters.m_schema);
+    name.Replace(SCHEMA_MACRO,m_parameters.m_schema);
     xprintf(false,_T("Retry: %s\n"),name.GetString());
   }
 }
@@ -1284,20 +1292,22 @@ XPort::GetDefineCountSelect(XString p_table,SQLInfoDB* p_info)
 XString
 XPort::GetDefineRowInsert(XString p_table,SQLInfoDB* p_info)
 {
+  bool inf = (m_parameters.m_listOnly == false);
+
   XString insert(_T("INSERT INTO "));
 
-  if(!m_schema.IsEmpty() && (p_info->GetRDBMSUnderstandsSchemas()))
+  if(!m_schema.IsEmpty() && inf && (p_info->GetRDBMSUnderstandsSchemas()))
   {
     insert += p_info->QueryIdentifierQuotation(m_schema);
     insert += _T(".");
   }
-  insert += p_info->QueryIdentifierQuotation(p_table);
+  insert += inf ? p_info->QueryIdentifierQuotation(p_table) : p_table;
   insert += _T("\n(");
 
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
   {
     insert += (ind > 0) ? _T(" ,") : _T(" ");
-    insert += p_info->QueryIdentifierQuotation(m_columns[ind]);
+    insert += inf ? p_info->QueryIdentifierQuotation(m_columns[ind]) : m_columns[ind];
     insert += _T("\n");
   }
   insert += _T(")\nVALUES(");
@@ -1663,6 +1673,7 @@ XPort::ExportViews()
   {
     m_xfile.WriteView(view);
     XString sql = GetDefineSQLView(view);
+    PostProcessSQL(sql);
     m_xfile.WriteSQL(sql);
   }
   m_xfile.WriteSectionEnd();
@@ -1693,6 +1704,7 @@ XPort::ExportProcedures()
   {
     m_xfile.WriteProcedure(procedure);
     XString sql = GetDefineSQLProcedure(procedure);
+    PostProcessSQL(sql);
     m_xfile.WriteSQL(sql);
   }
   m_xfile.WriteSectionEnd();
@@ -1709,6 +1721,7 @@ XPort::ExportTriggers()
   {
     m_xfile.WriteProcedure(trigger);
     XString sql = GetDefineSQLTrigger(trigger);
+    PostProcessSQL(sql);
     m_xfile.WriteSQL(sql);
   }
   m_xfile.WriteSectionEnd();
@@ -1787,6 +1800,39 @@ XPort::RecordAllComments(DDLCreateTable& p_create)
   for(auto& comment : comments)
   {
     m_comments.push_back(comment);
+  }
+}
+
+void
+XPort::PostProcessSQL(XString& p_sql)
+{
+  if(m_database.GetDatabaseType() == DatabaseType::RDBMS_MARIADB ||
+     m_database.GetDatabaseType() == DatabaseType::RDBMS_MYSQL)
+  {
+    bool quotes = true;
+    XString search(m_schema);
+    XString quote = m_database.GetSQLInfoDB()->GetIdentifierQuoteCharacter();
+    if(quote.GetLength() == 1)
+    {
+      // These quotes: " ' ` 
+      search = quote + search + quote;
+    }
+    else if(quote.GetLength() == 2)
+    {
+      // These quotes: [] or {}
+      search = quote[0] + search + quote[1];
+    }
+    else
+    {
+      // No quotes
+      quotes = false;
+    }
+    // Search for the longest strings first
+    if(quotes)
+    {
+      p_sql.Replace(search,SCHEMA_MACRO);
+    }
+    p_sql.Replace(search,m_schema);
   }
 }
 
@@ -2230,7 +2276,7 @@ XPort::ImportSQL(XString& p_sql,bool p_retries/*= false*/,XString p_delim /*=";"
 {
   if(m_parameters.m_listOnly)
   {
-    p_sql.Replace(_T("$SCHEMA$"),m_parameters.m_schema);
+    p_sql.Replace(SCHEMA_MACRO,m_parameters.m_schema);
     xprint(true,p_sql.GetString());
     if(p_sql.Right(p_delim.GetLength()) != p_delim)
     {
@@ -2264,6 +2310,11 @@ XPort::FindIdentity(XString p_sql)
 void
 XPort::BulkImportPrepare(XString p_table)
 {
+  if(m_parameters.m_listOnly)
+  {
+    return;
+  }
+
   XString batch = m_database.GetSQLInfoDB()->GetBulkImportPrefix(m_schema,p_table,m_identity);
   if(!batch.IsEmpty())
   {
@@ -2285,6 +2336,11 @@ XPort::BulkImportPrepare(XString p_table)
 void
 XPort::BulkImportComplete(XString p_table)
 {
+  if(m_parameters.m_listOnly)
+  {
+    return;
+  }
+
   XString batch = m_database.GetSQLInfoDB()->GetBulkImportPostfix(m_schema,p_table,m_identity);
   if(!batch.IsEmpty())
   {

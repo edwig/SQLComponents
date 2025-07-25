@@ -23,5 +23,7 @@ Oracle testing:
 
 MariaDB testing:
 ----------------
-/dir:export /dbase:mdb_northwind    /user:northwind /passwd:northwind /schema:northwind /file:mdb_northwind.dump
-/dir:import /dbase:bu_mdb_northwind /user:northwind /passwd:northwind /schema:northwind /file:mdb_northwind.dump /drop
+BEWARE: schemaname = databasename
+----------------
+/dir:export /dbase:mdb_northwind    /user:northwind /passwd:northwind /schema:northwind    /file:mdb_northwind.dump
+/dir:import /dbase:bu_mdb_northwind /user:northwind /passwd:northwind /schema:bu_northwind /file:mdb_northwind.dump /drop
