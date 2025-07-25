@@ -3,6 +3,23 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.3
 ===== Released since: 06-09-2023 =====
 ======================================
 
+Version 2.3.3 of 27-07-2025
+---------------------------
+1)  Various fixes for streaming of data with SQLPutData and SQLGetData for (C/B)LOB's
+    and the various LONGxxxxx data types, for SQLServer and Oracle
+2)  Empty interval should yiels a zero duration, instead of an empty string
+3)  SQLXport Unicode fixes
+4)  Full roundtrip export/import with SQLXport program. Tested with the 'Northwind'
+    database for the following RDBMses:
+    -  Firebird
+    -  MariaDB (MySQL)
+    -  PostgreSQL
+    -  Oracle
+    -  SQLServer
+5)  Full support for case-sensitive database objects. Most ODBC drivers only support
+    case-sensitive discovery for SQLTables and SQLColumns. Other discovery functions
+    mostly fail (SQLPrimaryKeys, SQLForeignKes, SQLStatistics, SQLProcedures etc)
+
 Version 2.3.2 of 17-02-2025
 ---------------------------
 1)  SQLVariant::GetAsChar() now no longer returns a XString, but a char*
