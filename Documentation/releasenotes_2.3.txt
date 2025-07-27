@@ -7,6 +7,8 @@ Version 2.3.4 of ..-..-2025
 ---------------------------
 1)  Fixes for MySQL and a Northwind test database for MySQL
 2)  Synchronisation with the latest BaseLibrary and XPath upgrade
+3)  MariaDB is now derived from MySQL as it is 95% identical
+    MySQL does not support SEQUENCES
 
 Version 2.3.3 of 27-07-2025
 ---------------------------
