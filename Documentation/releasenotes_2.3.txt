@@ -3,6 +3,11 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.3
 ===== Released since: 06-09-2023 =====
 ======================================
 
+Version 2.3.4 of ..-..-2025
+---------------------------
+1)  Fixes for MySQL and a Northwind test database for MySQL
+2)  Synchronisation with the latest BaseLibrary and XPath upgrade
+
 Version 2.3.3 of 27-07-2025
 ---------------------------
 1)  Various fixes for streaming of data with SQLPutData and SQLGetData for (C/B)LOB's
