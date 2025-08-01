@@ -51,6 +51,7 @@ public:
 
   // Writing to the export file
   void    WriteSection(XString p_name);
+  void    WriteUserType(XString p_type);
   void    WriteTable(XString p_table);
   void    WriteColumns(OList* p_columns);
   void    WriteIndex(XString p_table,XString p_index);
@@ -68,6 +69,7 @@ public:
   // Reading from the export file
   _TUCHAR NextType();
   XString ReadSection();
+  XString ReadUserType();
   XString ReadTable(bool p_doNewline);
   void    ReadColumns(OList* p_columns);
   XString ReadIndex();

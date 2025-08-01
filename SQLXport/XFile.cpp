@@ -87,6 +87,7 @@ static void xfread(void* p_buffer,size_t p_size,FILE* p_file)
 // 'S'  : Section name. To be printed in the logfile
 // 'Q'  : Resulting SQL.Run on import
 // 'A'  : Schema name
+// 'Y'  : User defined type
 // 'T'  : Table name
 // 'C'  : Column name
 // 'I'  : Index name
@@ -314,6 +315,28 @@ XFile::ReadSection()
   }
   xprintf(false,_T("\n"));
   xprintf(false,_T("Import section: %s\n"),name.GetString());
+  return name;
+}
+
+void
+XFile::WriteUserType(XString p_type)
+{
+  WriteString(_T('Y'),p_type);
+  xprintf(false,_T("Exporting user type: %s\n"),p_type.GetString());
+}
+
+XString
+XFile::ReadUserType()
+{
+  TCHAR   type;
+  XString name;
+  ReadString(type,name);
+  if(type != 'Y')
+  {
+    xerror(_T("Internal error reading source. Not a user type\n"));
+    return _T("");
+  }
+  xprintf(false,_T("Importing user type: %s\n"),name.GetString());
   return name;
 }
 

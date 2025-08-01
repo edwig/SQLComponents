@@ -4322,6 +4322,23 @@ EXECUTE FUNCTION "NewSuppliersID"();
 --
 -------------------------------------------------------------------------------
 
+CREATE TYPE northwind."Province" 
+    AS ENUM ('GRO'
+	        ,'FRL'
+			,'DRE'
+			,'OVR'
+			,'GEL'
+			,'UTR'
+			,'NHL'
+			,'ZHL'
+			,'ZEE'
+			,'BRA'
+			,'FLE'
+			,'LIM');
+
+CREATE DOMAIN northwind."Rabat" 
+    AS DECIMAL(12,4) NOT NULL DEFAULT 0.0 
+	   CHECK(Value = 0 OR (Value >= 0.05 AND Value <= 0.3));
 
 CREATE TYPE "OrderHistory" AS
 (

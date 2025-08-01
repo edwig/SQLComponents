@@ -65,6 +65,7 @@ public:
   bool    CloseDumpFile();
 
   // Commands
+  int     GetAllUserTypes();
   int     GetAllTables();
   int     GetAllCheckConstraints();
   int     GetAllViews();
@@ -80,6 +81,7 @@ public:
   void    PerformRetries();
 
   // EXPORT
+  void    ExportUserTypes();
   void    ExportTables();
   void    ExportIndices();
   void    ExportPrimaryKeys();
@@ -103,6 +105,7 @@ public:
   DDLS    GetDefineSQLPrimary (XString p_table);
   DDLS    GetDefineSQLForeigns(XString p_table);
 
+  XString GetDefineSQLUserType (XString p_type);
   XString GetDefineSQLView     (XString p_view);
   XString GetDefineSQLSequence (XString p_sequence);
   XString GetDefineSQLProcedure(XString p_procedure);
@@ -136,6 +139,7 @@ private:
   void          GatherDropSchema (OList& p_statements);
   void          ExecuteDropSchema(OList& p_statements);
   // Importing
+  void          ImportUserTypes(TCHAR& p_type);
   void          ImportTables(bool p_listOnly,TCHAR& p_type);
   void          ImportIndices(TCHAR& p_type);
   void          ImportPrimaryKeys(TCHAR& p_type);
@@ -145,6 +149,7 @@ private:
   void          ImportViews(TCHAR& p_type);
   void          ImportSequences(TCHAR& p_type);
   void          ImportProcedures(TCHAR& p_type);
+  void          ImportTriggers(TCHAR& p_type);
   void          ImportSynonyms(TCHAR& p_type);
   void          ImportRights(bool p_listOnly,TCHAR& p_type);
   void          ImportComments(TCHAR& p_type);
@@ -163,6 +168,7 @@ private:
   XString     m_schema;
   XString     m_object;
   // Object lists with objects
+  OList       m_usertypes;
   OList       m_tables;
   OList       m_columns;
   OList       m_indices;

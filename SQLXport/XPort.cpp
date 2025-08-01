@@ -73,6 +73,8 @@ XPort::Export()
     }
   }
 
+  ExportUserTypes();
+
   // STEP 5: Export of all tables/columns and data of all tables
   ExportTables();
 
@@ -283,6 +285,7 @@ XPort::GatherDropSchema(OList& p_statements)
   XString allviews       = info->GetCATALOGViewList     (schema,all);
   XString allforeigns    = info->GetCATALOGForeignList  (schema,all);
   XString alltables      = info->GetCATALOGTablesList   (schema,all);
+  XString alltypes       = info->GetCATALOGTypeList     (schema,all);
   
   xprintf(false,_T("Gathering contents of schema: %s\n"),m_schema.GetString());
   try
@@ -351,6 +354,19 @@ XPort::GatherDropSchema(OList& p_statements)
       XString dropline = info->GetCATALOGTableDrop(schema,query[3],false,true);
       p_statements.push_back(dropline);
     }
+    // USER TYPES
+    if(!alltypes.IsEmpty())
+    {
+      query.DoSQLStatement(alltypes,schema);
+      while(query.GetRecord())
+      {
+        if(query.GetColumn(MetaType_ordinal)->GetAsSLong() == 1)
+        {
+          XString dropline = info->GetCATALOGTypeDrop(schema,query[MetaType_typename]);
+          p_statements.push_back(dropline);
+        }
+      }
+    }
   }
   catch(StdException& ex)
   {
@@ -394,6 +410,55 @@ XPort::ExecuteDropSchema(OList& p_statements)
     xerror(_T("Cannot drop schema:%s\nSQL: %s\nError: %s\n"),m_schema.GetString(),drop.GetString(),ex.GetErrorMessage().GetString());
     return;
   }
+}
+
+int
+XPort::GetAllUserTypes()
+{
+  int count = 0;
+  XString sql = m_database.GetSQLInfoDB()->GetCATALOGTypeList(m_schema,m_object,true);
+
+  try
+  {
+    for(int ind = 0;ind < 2;++ind)
+    {
+      SQLQuery qry(&m_database);
+      int param = 1;
+      if(!m_schema.IsEmpty())
+      {
+        qry.SetParameter(param++,m_schema);
+      }
+      if(!m_object.IsEmpty())
+      {
+        qry.SetParameter(param++,m_object);
+      }
+      qry.DoSQLStatement(sql);
+      while(qry.GetRecord())
+      {
+        XString usertype = qry[MetaType_typename];
+        int     ordinal  = qry[MetaType_ordinal];
+        if(ordinal == 1)
+        {
+          ++count;
+          m_usertypes.push_back(usertype);
+        }
+      }
+      if(!m_usertypes.empty())
+      {
+        break;
+      }
+      // Standard naming conventions
+      sql = m_database.GetSQLInfoDB()->GetCATALOGTypeList(m_schema,m_object);
+    }
+  }
+  catch(StdException& ex)
+  {
+    xerror(_T("Error counting user defined types: %s\n"),ex.GetErrorMessage().GetString());
+    m_usertypes.clear();
+    count = 0;
+  }
+  xprintf(false,_T("Exporting a total of [%d] user defined types\n"),count);
+  return count;
 }
 
 int  
@@ -1045,6 +1110,36 @@ XPort::RecordAllForeigns(DDLCreateTable& p_create)
   }
 }
 
+XString 
+XPort::GetDefineSQLUserType(XString p_type)
+{
+  XString create;
+  XString usertype(p_type);
+  int pos = p_type.Find(':');
+  if(pos > 0)
+  {
+    usertype = p_type.Mid(pos + 1);
+  }
+  XString object;
+  XString errors;
+  MUserTypeMap usertypes;
+  if(m_database.GetSQLInfoDB()->MakeInfoUserTypes(usertypes,errors,m_schema,usertype))
+  {
+    create = m_database.GetSQLInfoDB()->GetCATALOGTypeCreate(usertypes);
+    XString comment = m_database.GetSQLInfoDB()->GetCATALOGCommentCreate(m_schema,_T("TYPE"),usertype,_T(""),usertypes[0].m_remarks);
+    if(!comment.IsEmpty())
+    {
+      m_comments.push_back(comment);
+    }
+  }
+  else
+  {
+    xerror(_T("Internal error reading user type %s.%s\n"),m_schema.GetString(),p_type.GetString());
+  }
+  create = create.TrimLeft(_T("\r\n"));
+  return create;
+}
+
 XString
 XPort::GetDefineSQLView(XString p_view)
 {
@@ -1481,6 +1576,22 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
 //////////////////////////////////////////////////////////////////////////
 
 void
+XPort::ExportUserTypes()
+{
+  m_xfile.WriteSection(_T("USERTYPES"));
+  GetAllUserTypes();
+  for(auto& type : m_usertypes)
+  {
+    m_xfile.WriteUserType(type);
+    XString sql = GetDefineSQLUserType(type);
+    PostProcessSQL(sql);
+    m_xfile.WriteSQL(sql);
+  }
+  m_xfile.WriteSectionEnd();
+  m_xfile.Flush();
+}
+
+void
 XPort::ExportTables()
 {
   m_xfile.WriteSection(_T("TABLES"));
@@ -1715,7 +1826,7 @@ void
 XPort::ExportTriggers()
 {
   // On import it does the same as procedures/functions
-  m_xfile.WriteSection(_T("PROCEDURES"));
+  m_xfile.WriteSection(_T("TRIGGERS"));
   GetAllTriggers();
   for(auto& trigger : m_triggers)
   {
@@ -1858,7 +1969,12 @@ XPort::ImportDump()
     // Read and show the section name
     XString section_name = m_xfile.ReadSection();
 
-    if(section_name.CompareNoCase(_T("TABLES")) == 0)
+    if(section_name.CompareNoCase(_T("USERTYPES")) == 0)
+    {
+      // STEP 4: Importing all user defined types
+      ImportUserTypes(type);
+    }
+    else if(section_name.CompareNoCase(_T("TABLES")) == 0)
     {
       // STEP 5: IMporting tables
       ImportTables(m_parameters.m_listOnly,type);
@@ -1904,19 +2020,24 @@ XPort::ImportDump()
       // STEP 13: Importing all PL/SQL source
       ImportProcedures(type);
     }
+    else if(section_name.CompareNoCase(_T("TRIGGERS")) == 0)
+    {
+      // STEP 14: Importing all PL/SQL source
+      ImportTriggers(type);
+    }
     else if(section_name.CompareNoCase(_T("SYNONYMS")) == 0)
     {
-      // STEP 14: Importing synonyms
+      // STEP 15: Importing synonyms
       ImportSynonyms(type);
     }
     else if(section_name.CompareNoCase(_T("ACCESS RIGHTS")) == 0)
     {
-      // STEP 15: All rights on all objects (missing column rights)
+      // STEP 16: All rights on all objects (missing column rights)
       ImportRights(m_parameters.m_listOnly,type);
     }
     else if(section_name.CompareNoCase(_T("COMMENTS")) == 0)
     {
-      // STEP 16: Import all comments
+      // STEP 17: Import all comments
       ImportComments(type);
     }
     else
@@ -1936,6 +2057,27 @@ XPort::ImportDump()
 // DETAILS OF IMPORT
 //
 //////////////////////////////////////////////////////////////////////////
+
+void
+XPort::ImportUserTypes(TCHAR& p_type)
+{
+  xprintf(false,_T("Importing user types\n"));
+  SQLTransaction trans(GetDatabase(),_T("usertypes"));
+  p_type = m_xfile.NextType();
+  while(p_type != 'E')
+  {
+    XString sequence = m_xfile.ReadUserType();
+    XString sql = m_xfile.ReadSQL();
+    if(ImportObject(m_object,sequence))
+    {
+      ImportSQL(sql);
+    }
+    p_type = m_xfile.NextType();
+  }
+  m_xfile.ReadEnd();
+  p_type = m_xfile.NextType();
+  trans.Commit();
+}
 
 void
 XPort::ImportTables(bool p_listOnly,TCHAR& p_type)
@@ -2137,7 +2279,28 @@ XPort::ImportSequences(TCHAR& p_type)
 void
 XPort::ImportProcedures(TCHAR& p_type)
 {
-  xprintf(false,_T("Importing all PSM source procedures/functions/triggers.\n"));
+  xprintf(false,_T("Importing all PSM source for procedures and functions.\n"));
+  p_type = m_xfile.NextType();
+  while(p_type != 'E')
+  {
+    XString procedure = m_xfile.ReadProcedure();
+    XString sql = m_xfile.ReadSQL();
+    if(ImportObject(m_object,procedure))
+    {
+      SQLTransaction trans(GetDatabase(),_T("psm_") + procedure);
+      ImportSQL(sql,true,_T("\n/"));
+      trans.Commit();
+    }
+    p_type = m_xfile.NextType();
+  }
+  m_xfile.ReadEnd();
+  p_type = m_xfile.NextType();
+}
+
+void
+XPort::ImportTriggers(TCHAR& p_type)
+{
+  xprintf(false,_T("Importing all PSM source for triggers.\n"));
   p_type = m_xfile.NextType();
   while(p_type != 'E')
   {
