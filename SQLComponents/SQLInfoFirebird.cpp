@@ -901,7 +901,9 @@ SQLInfoFirebird::GetCATALOGTypeAttributes(XString& p_schema,XString& p_typename,
 XString
 SQLInfoFirebird::GetCATALOGTypeSource(XString& p_schema,XString& p_typename,bool p_quoted /*= false*/) const
 {
-  XString sql(_T("SELECT 'CREATE DOMAIN \"' || Trim(fld.rdb$field_name) || '\" AS ' ||\n"
+  XString sql(_T("SELECT 1 as object\n"
+                 "      ,1 as line\n"
+                 "      ,'CREATE DOMAIN \"' || Trim(fld.rdb$field_name) || '\" AS ' ||\n"
                  "       CASE fld.rdb$field_type\n"
                  "            WHEN 7  THEN 'SMALLINT'\n"
                  "            WHEN 8  THEN 'INTEGER'\n"
@@ -1054,7 +1056,8 @@ SQLInfoFirebird::GetCATALOGTableCatalog(XString& p_schema,XString& p_tablename,b
                    "      ,CAST('SYSTEM TABLE' as varchar(31)) AS table_type\n"
                    "      ,rel.rdb$description                 AS remarks\n"
                    "      ,trim(rel.rdb$owner_name) || '.' || trim(rel.rdb$relation_name) AS full_name\n"
-                   "      ,cast('' as varchar(31)) as storage_space\n"
+                   "      ,cast('' as varchar(31))             as storage_space\n"
+                   "      ,0                                   as temporary"
                    "  FROM rdb$relations rel\n"
                    "      ,mon$database  dbs\n"
                    " WHERE rel.rdb$relation_type IN (0,3)\n"
@@ -1163,16 +1166,8 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablena
            "      ,trim(col.rdb$relation_name) as table_name\n"            // 3  - VARCHAR NOT NULL
            "      ,trim(col.rdb$field_name)    as column_name\n"           // 4  - VARCHAR NOT NULL
            "      ,CASE fld.rdb$field_type\n"
-           "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN 2\n"
-           "                              WHEN 2 THEN 2\n"
-           "                                     ELSE 5\n"
-           "                              END\n"
-           "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN 2\n"
-           "                              WHEN 2 THEN 2\n"
-           "                                     ELSE 4\n"
-           "                              END\n"
+           "            WHEN 7  THEN 5\n"
+           "            WHEN 8  THEN 4\n"
            "            WHEN 10 THEN 7\n"
            "            WHEN 12 THEN 10\n"
            "            WHEN 13 THEN 13\n"
@@ -1194,16 +1189,8 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablena
            "                     ELSE 0\n"
            "       END                           as data_type\n"	          // 5  - SMALLINT NOT NULL
            "      ,CASE fld.rdb$field_type\n"
-           "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN 'NUMERIC'\n"
-           "                              WHEN 2 THEN 'DECIMAL'\n"
-           "                                     ELSE 'SMALLINT'\n"
-           "                              END\n"
-           "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN 'NUMERIC'\n"
-           "                              WHEN 2 THEN 'DECIMAL'\n"
-           "                                     ELSE 'INTEGER'\n"
-           "                              END\n"
+           "            WHEN 7  THEN 'SMALLINT'\n"
+           "            WHEN 8  THEN 'INTEGER'\n"
            "            WHEN 10 THEN 'FLOAT'\n"
            "            WHEN 12 THEN 'DATE'\n"
            "            WHEN 13 THEN 'TIME'\n"
@@ -1225,16 +1212,8 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablena
            "                     ELSE 'UNKNOWN'\n"
            "       END                                        as type_name\n"		// 6  - VARCHAR NOT NULL
            "      ,CASE fld.rdb$field_type\n"
-           "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN fld.rdb$field_precision\n"
-           "                              WHEN 2 THEN fld.rdb$field_precision\n"
-           "                                     ELSE 5\n"
-           "                              END\n"
-           "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN fld.rdb$field_precision\n"
-           "                              WHEN 2 THEN fld.rdb$field_precision\n"
-           "                                     ELSE 11\n"
-           "                              END\n"
+           "            WHEN 7  THEN 5\n"
+           "            WHEN 8  THEN 11\n"
            "            WHEN 10 THEN 12\n"
            "            WHEN 12 THEN 10\n"
            "            WHEN 13 THEN 13\n"
@@ -1260,16 +1239,8 @@ SQLInfoFirebird::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablena
            "      ,trim(col.rdb$description)                  as remarks\n"                  // 12 - VARCHAR
            "      ,trim(col.rdb$default_source)               as column_def\n"               // 13 - VARCHAR
            "      ,CASE fld.rdb$field_type\n"
-           "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN 2\n"
-           "                              WHEN 2 THEN 2\n"
-           "                                     ELSE 5\n"
-           "                              END\n"
-           "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-           "                              WHEN 1 THEN 2\n"
-           "                              WHEN 2 THEN 2\n"
-           "                                     ELSE 4\n"
-           "                              END\n"
+           "            WHEN 7  THEN 5\n"
+           "            WHEN 8  THEN 4\n"
            "            WHEN 10 THEN 7\n"
            "            WHEN 12 THEN 9\n"
            "            WHEN 13 THEN 10\n"
@@ -2515,29 +2486,29 @@ SQLInfoFirebird::GetCATALOGRevokePrivilege(XString /*p_schema*/
 XString
 SQLInfoFirebird::GetCATALOGSynonymList(XString& /*p_schema*/,XString& /*p_pattern*/) const
 {
-  // Not implemented yet
-  return XString();
+  // Firebird does not immplement synonyms
+  return _T("");
 }
 
 XString
 SQLInfoFirebird::GetCATALOGSynonymAttributes(XString& /*p_schema*/,XString& /*p_synonym*/) const
 {
-  // Not implemented yet
-  return XString();
+  // Firebird does not immplement synonyms
+  return _T("");
 }
 
 XString
 SQLInfoFirebird::GetCATALOGSynonymCreate(XString& /*p_schema*/,XString& /*p_synonym*/,XString /*p_forObject*/,bool /*p_private = true*/) const
 {
-  // Not implemented yet
-  return XString();
+  // Firebird does not immplement synonyms
+  return _T("");
 }
 
 XString
 SQLInfoFirebird::GetCATALOGSynonymDrop(XString& /*p_schema*/,XString& /*p_synonym*/,bool /*p_private = true*/) const
 {
-  // Not implemented yet
-  return XString();
+  // Firebird does not immplement synonyms
+  return _T("");
 }
 
 // For ALL objects
@@ -2939,16 +2910,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "      ,TRIM(par.rdb$parameter_name) as column_name\n"
                     "      ,(par.rdb$parameter_type * 3) + 1 as column_type\n"
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 5\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 4\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 5\n"
+                    "            WHEN 8  THEN 4\n"
                     "            WHEN 10 THEN 7\n"
                     "            WHEN 12 THEN 10\n"
                     "            WHEN 13 THEN 13\n"
@@ -2970,16 +2933,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "                     ELSE 0\n"
                     "       END                           as data_type\n"
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 'NUMERIC'\n"
-                    "                              WHEN 2 THEN 'DECIMAL'\n"
-                    "                                     ELSE 'SMALLINT'\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 'NUMERIC'\n"
-                    "                              WHEN 2 THEN 'DECIMAL'\n"
-                    "                                     ELSE 'INTEGER'\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 'SMALLINT'\n"
+                    "            WHEN 8  THEN 'INTEGER'\n"
                     "            WHEN 10 THEN 'FLOAT'\n"
                     "            WHEN 12 THEN 'DATE'\n"
                     "            WHEN 13 THEN 'TIME'\n"
@@ -3001,16 +2956,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "                     ELSE 'UNKNOWN'\n"
                     "       END                                        as type_name\n"		// 6  - VARCHAR NOT NULL
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN fld.rdb$field_precision\n"
-                    "                              WHEN 2 THEN fld.rdb$field_precision\n"
-                    "                                     ELSE 5\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN fld.rdb$field_precision\n"
-                    "                              WHEN 2 THEN fld.rdb$field_precision\n"
-                    "                                     ELSE 11\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 5\n"
+                    "            WHEN 8  THEN 11\n"
                     "            WHEN 10 THEN 12\n"
                     "            WHEN 12 THEN 10\n"
                     "            WHEN 13 THEN 13\n"
@@ -3037,16 +2984,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "      ,par.RDB$DESCRIPTION   as remarks\n"
                     "      ,par.RDB$DEFAULT_source as default_value\n"
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 5\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 4\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 5\n"
+                    "            WHEN 8  THEN 4\n"
                     "            WHEN 10 THEN 7\n"
                     "            WHEN 12 THEN 9\n"
                     "            WHEN 13 THEN 10\n"
@@ -3091,16 +3030,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "                      ELSE 2 \n"
                     "       END as column_type\n"
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 5\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 4\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 5\n"
+                    "            WHEN 8  THEN 4\n"
                     "            WHEN 10 THEN 7\n"
                     "            WHEN 12 THEN 10\n"
                     "            WHEN 13 THEN 13\n"
@@ -3122,16 +3053,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "                     ELSE 0\n"
                     "       END                           as data_type\n"
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 'NUMERIC'\n"
-                    "                              WHEN 2 THEN 'DECIMAL'\n"
-                    "                                     ELSE 'SMALLINT'\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 'NUMERIC'\n"
-                    "                              WHEN 2 THEN 'DECIMAL'\n"
-                    "                                     ELSE 'INTEGER'\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 'SMALLINT'\n"
+                    "            WHEN 8  THEN 'INTEGER'\n"
                     "            WHEN 10 THEN 'FLOAT'\n"
                     "            WHEN 12 THEN 'DATE'\n"
                     "            WHEN 13 THEN 'TIME'\n"
@@ -3153,16 +3076,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "                     ELSE 'UNKNOWN'\n"
                     "       END                                        as type_name\n"		// 6  - VARCHAR NOT NULL
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN fld.rdb$field_precision\n"
-                    "                              WHEN 2 THEN fld.rdb$field_precision\n"
-                    "                                     ELSE 5\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN fld.rdb$field_precision\n"
-                    "                              WHEN 2 THEN fld.rdb$field_precision\n"
-                    "                                     ELSE 11\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 5\n"
+                    "            WHEN 8  THEN 11\n"
                     "            WHEN 10 THEN 12\n"
                     "            WHEN 12 THEN 10\n"
                     "            WHEN 13 THEN 13\n"
@@ -3185,16 +3100,8 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "      ,par.rdb$description   as remarks\n"
                     "      ,par.rdb$default_source as default_value\n"
                     "      ,CASE fld.rdb$field_type\n"
-                    "            WHEN 7  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 5\n"
-                    "                              END\n"
-                    "            WHEN 8  THEN CASE fld.rdb$field_sub_type\n"
-                    "                              WHEN 1 THEN 2\n"
-                    "                              WHEN 2 THEN 2\n"
-                    "                                     ELSE 4\n"
-                    "                              END\n"
+                    "            WHEN 7  THEN 5\n"
+                    "            WHEN 8  THEN 4\n"
                     "            WHEN 10 THEN 7\n"
                     "            WHEN 12 THEN 9\n"
                     "            WHEN 13 THEN 10\n"
