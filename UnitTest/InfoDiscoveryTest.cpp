@@ -105,7 +105,7 @@ namespace DatabaseUnitTest
       MTableMap tables;
       XString   errors;
 
-      if(info->MakeInfoTableTable(tables,errors,_T(""),p_table))
+      if(info->MakeInfoTableTable(tables,errors,_T(""),_T(""),p_table))
       {
         number_of_tests++;
 
@@ -134,10 +134,11 @@ namespace DatabaseUnitTest
 
     void ColumnsDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
+      XString    catalog;
       XString    errors;
       MColumnMap columns;
 
-      if(p_info->MakeInfoTableColumns(columns,errors,p_schema,p_table))
+      if(p_info->MakeInfoTableColumns(columns,errors,catalog,p_schema,p_table))
       {
         number_of_tests++;
 
@@ -158,8 +159,9 @@ namespace DatabaseUnitTest
     {
       MPrimaryMap primaries;
       XString     errors;
+      XString     catalog;
 
-      if(p_info->MakeInfoTablePrimary(primaries,errors,p_schema,p_table))
+      if(p_info->MakeInfoTablePrimary(primaries,errors,catalog,p_schema,p_table))
       {
         number_of_tests++;
 
@@ -186,8 +188,9 @@ namespace DatabaseUnitTest
     {
       MForeignMap references;
       XString     errors;
+      XString     catalog;
 
-      if(p_info->MakeInfoTableForeign(references,errors,p_schema,p_table))
+      if(p_info->MakeInfoTableForeign(references,errors,catalog,p_schema,p_table))
       {
         number_of_tests++;
         for(auto& ref : references)
@@ -205,9 +208,10 @@ namespace DatabaseUnitTest
     void IndicesDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
     {
       MIndicesMap statistics;
-      XString        errors;
+      XString     errors;
+      XString     catalog;
 
-      if(p_info->MakeInfoTableStatistics(statistics,errors,p_schema,p_table,nullptr))
+      if(p_info->MakeInfoTableStatistics(statistics,errors,catalog,p_schema,p_table,nullptr))
       {
         number_of_tests++;
 
@@ -227,7 +231,8 @@ namespace DatabaseUnitTest
     {
       MSpecialsMap specials;
       XString errors;
-      if(p_info->MakeInfoTableSpecials(specials,errors,p_schema,p_table))
+      XString catalog;
+      if(p_info->MakeInfoTableSpecials(specials,errors,catalog,p_schema,p_table))
       {
         number_of_tests++;
 
@@ -247,8 +252,9 @@ namespace DatabaseUnitTest
     {
       MTriggerMap triggers;
       XString errors;
+      XString catalog;
 
-      if(p_info->MakeInfoTableTriggers(triggers,errors,p_schema,p_table))
+      if(p_info->MakeInfoTableTriggers(triggers,errors,catalog,p_schema,p_table))
       {
         XString line;
 
@@ -286,8 +292,9 @@ namespace DatabaseUnitTest
     {
       MPrivilegeMap privileges;
       XString errors;
+      XString catalog;
 
-      if(p_info->MakeInfoTablePrivileges(privileges,errors,p_schema,p_table))
+      if(p_info->MakeInfoTablePrivileges(privileges,errors,catalog,p_schema,p_table))
       {
 
         number_of_tests++;
@@ -316,7 +323,7 @@ namespace DatabaseUnitTest
 
       MProcedureMap procedures;
       XString errors;
-      if(info->MakeInfoPSMProcedures(procedures,errors,_T(""),p_procedure))
+      if(info->MakeInfoPSMProcedures(procedures,errors,_T(""),_T(""),p_procedure))
       {
         number_of_tests++;
         for(auto& proc : procedures)
@@ -336,8 +343,9 @@ namespace DatabaseUnitTest
     {
       MParameterMap params;
       XString errors;
+      XString catalog;
 
-      if(p_info->MakeInfoPSMParameters(params,errors,p_schema,p_procedure))
+      if(p_info->MakeInfoPSMParameters(params,errors,catalog,p_schema,p_procedure))
       {
         number_of_tests++;
         for(auto& parm : params)

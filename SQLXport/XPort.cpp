@@ -970,11 +970,6 @@ XPort::GetDefineSQLIndex(XString p_table)
 {
   DDLCreateTable create(m_database.GetSQLInfoDB());
 
-//   if(m_database.GetDatabaseType() == DatabaseType::RDBMS_SQLSERVER)
-//   {
-//     create.SetOptionIndexDuplicateNulls(true);
-//   }
-
   try
   {
     // Getting columns, indices, and primary key (Possibly overlapping indices)
@@ -1122,8 +1117,9 @@ XPort::GetDefineSQLUserType(XString p_type)
   }
   XString object;
   XString errors;
+  XString catalog;
   MUserTypeMap usertypes;
-  if(m_database.GetSQLInfoDB()->MakeInfoUserTypes(usertypes,errors,m_schema,usertype))
+  if(m_database.GetSQLInfoDB()->MakeInfoUserTypes(usertypes,errors,catalog,m_schema,usertype))
   {
     create = m_database.GetSQLInfoDB()->GetCATALOGTypeCreate(usertypes);
     XString comment = m_database.GetSQLInfoDB()->GetCATALOGCommentCreate(m_schema,_T("TYPE"),usertype,_T(""),usertypes[0].m_remarks);
@@ -1246,8 +1242,9 @@ XPort::GetDefineSQLProcedure(XString p_procedure)
 
   // Find all attributes
   XString errors;
+  XString catalog;
   MProcedureMap procedures;
-  if(m_database.GetSQLInfoDB()->MakeInfoPSMProcedures(procedures,errors,m_schema,procedure))
+  if(m_database.GetSQLInfoDB()->MakeInfoPSMProcedures(procedures,errors,catalog,m_schema,procedure))
   {
     // Find the true definition
     create = m_database.GetSQLInfoDB()->GetPSMProcedureCreate(procedures[0]);
@@ -1426,9 +1423,10 @@ XPort::WriteTableAccessRights(XString p_object,int& p_count)
   try
   {
     XString errors;
+    XString catalog;
     MPrivilegeMap privileges;
     SQLInfoDB* info = m_database.GetSQLInfoDB();
-    if(info->MakeInfoTablePrivileges(privileges,errors,m_schema,p_object))
+    if(info->MakeInfoTablePrivileges(privileges,errors,catalog,m_schema,p_object))
     {
       XString column;
       for(auto& priv : privileges)
@@ -1457,9 +1455,10 @@ XPort::WriteColumnAccessRights(XString p_object,int& p_count)
   try
   {
     XString errors;
+    XString catalog;
     MPrivilegeMap privileges;
     SQLInfoDB* info = m_database.GetSQLInfoDB();
-    if(info->MakeInfoColumnPrivileges(privileges,errors,m_schema,p_object))
+    if(info->MakeInfoColumnPrivileges(privileges,errors,catalog,m_schema,p_object))
     {
       for(auto& priv : privileges)
       {
