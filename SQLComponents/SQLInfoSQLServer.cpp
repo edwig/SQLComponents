@@ -2924,14 +2924,14 @@ SQLInfoSQLServer::GetCATALOGCommentCreate(XString p_schema,XString p_object,XStr
   }
   sql += _T("  @name = N'MS_Description',\n");
   if(!p_remark.IsEmpty())
-  {
+    {
     sql += _T("  @value = N'") + p_remark + _T("',\n");
-  }
+    }
   p_object.MakeUpper();
   sql += _T("  @level0type = N'SCHEMA', @level0name = N'")               + QIQ(p_schema) + _T("',\n");
   sql += _T("  @level1type = N'") + p_object + _T("', @level1name = N'") + QIQ(p_name)   + _T("',\n");
-  if(!p_subObject.IsEmpty())
-  {
+    if(!p_subObject.IsEmpty())
+    {
     sql += _T("  @level2type = N'COLUMN', @level2name = N'") + QIQ(p_subObject) + _T("'");
   }
   return sql;

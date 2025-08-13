@@ -737,8 +737,8 @@ DDLCreateTable::FindSchemaName(XString p_tableName)
     m_tableName = p_tableName;
   }
   // Two part name
-    m_schema    = p_tableName.Left(pos);
-    m_tableName = p_tableName.Mid(pos + 1);
+  m_schema    = p_tableName.Left(pos);
+  m_tableName = p_tableName.Mid(pos + 1);
 
   pos = p_tableName.Find('.');
   if(pos < 0)
