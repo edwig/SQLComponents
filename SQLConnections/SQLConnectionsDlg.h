@@ -70,12 +70,14 @@ protected:
 
   XString   m_connectionName;
   XString   m_datasource;
+  XString   m_targetSchema;
   XString   m_username;
   XString   m_password1;
   XString   m_password2;
   XString   m_options;
 
   CEdit      m_editConnectionName;
+  CEdit      m_editTargetSchema;
   CEdit      m_editUsername;
   CEdit      m_editPassword1;
   CEdit      m_editPassword2;
@@ -99,6 +101,7 @@ public:
   afx_msg void OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult);
   afx_msg void OnEnChangeName();
   afx_msg void OnCbnCloseupDatasource();
+  afx_msg void OnEnChangeTargetSchema();
   afx_msg void OnEnChangeUser();
   afx_msg void OnEnChangePassword1();
   afx_msg void OnEnChangePassword2();
