@@ -605,10 +605,10 @@ SQLDataSet::ParseFilters(SQLQuery& p_query,XString p_sql)
   if(!condition.IsEmpty())
   {
     // Offset in the WHERE clause
-    query += whereFound ? _T("\n   AND ") : _T("\n WHERE ");
-    query += condition;
+    p_sql += whereFound ? _T("\n   AND ") : _T("\n WHERE ");
+    p_sql += condition;
   }
-  return query;
+  return p_sql;
 }
 
 // Construct the selection SQL for opening the dataset
