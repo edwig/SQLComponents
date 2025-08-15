@@ -212,8 +212,9 @@ bool
 SQLInfoFirebird::IsIdentifier(XString p_identifier) const
 {
   if(p_identifier.GetLength() == 0 ||  // Cannot be empty
-     p_identifier.GetLength() >= 64 )  // Cannot exceed 63 chars
+     p_identifier.GetLength() >= 63 )  // Cannot exceed 63 chars (version 4.0)
   {
+    // But beware: version 3.0 has identifiers of 31 characters
     return false;
   }
   // Must start with one alpha char
@@ -223,8 +224,10 @@ SQLInfoFirebird::IsIdentifier(XString p_identifier) const
   }
   for(int index = 0;index < p_identifier.GetLength();++index)
   {
-    // Can be upper/lower alpha or a number
-    if(!_istalnum(p_identifier.GetAt(index)))
+    // Can be upper/lower alpha or a number, an underscore or a dollar sign
+    // because catalog identifiers can contain "rdb$...." names
+    TCHAR ch = p_identifier.GetAt(index);
+    if(!_istalnum(ch) && ch != _T('_') && ch != _T('$'))
     {
       return false;
     }
