@@ -27,6 +27,7 @@
 #include "SQLComponents.h"
 #include "SQLDatabasePool.h"
 #include "SQLDatabase.h"
+#include "SQLInfoDB.h"
 #include <AutoCritical.h>
 #include <ServiceReporting.h>
 
@@ -579,6 +580,11 @@ SQLDatabasePool::OpenDatabase(SQLDatabase* p_dbs,XString& p_connectionName)
     // Tell it what the standard rebind info is (if any)
     // Can only be done after the open (when SQLDatabase has cleared and set it' rebound info)
     AddRebindsToDatabase(p_dbs);
+
+    // Getting the correct settings and do the discovery
+    SQLInfoDB* info = p_dbs->GetSQLInfoDB();
+    info->SetPreferODBC(m_preferODBC);
+    info->GetInfo();
     
     // Tell it the logfile
     XString text;
