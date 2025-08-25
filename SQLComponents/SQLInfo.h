@@ -324,6 +324,10 @@ public:
   // Preparing identifiers for doing a query (quotations)
   XString QueryIdentifierQuotation(XString p_identifier) const;
   
+  // Identifier rules differ per RDBMS
+  virtual bool IsIdentifier         (XString p_identifier) const;
+  virtual bool IsIdentifierMixedCase(XString p_identifier) const;
+
 private:
   // SQLDatabase has access to attribute methods
   friend SQLDatabase;
@@ -356,9 +360,6 @@ protected:
                         ,SQLTCHAR* search_schema
                         ,SQLTCHAR* search_table
                         ,SQLTCHAR* search_type);
-  // Identifier rules differ per RDBMS
-  virtual bool IsIdentifier(XString p_identifier) const;
-  virtual bool IsIdentifierMixedCase(XString p_identifier) const;
   // Create quoted identifier
   XString QuotedIdentifier(XString p_identifier) const;
   // Prepare an identifier for an ODBC discovery function

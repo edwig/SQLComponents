@@ -43,6 +43,12 @@ static char THIS_FILE[] = __FILE__;
 namespace SQLComponents
 {
 
+// Name mapping of code-page names is case insensitive
+bool NoCaseCompare::operator()(const XString& p_left,const XString& p_right) const
+{
+  return (p_left.CompareNoCase(p_right) < 0);
+}
+
 // CTOR: To be later connected to a database
 // by calling Init() seperatly
 SQLQuery::SQLQuery()
@@ -1252,7 +1258,6 @@ SQLQuery::BindColumns()
 
     // Keep the new variable under name and column number
     XString columnName(colName);
-    columnName.MakeLower();
     m_numMap .insert(std::make_pair(icol,var));
     m_nameMap.insert(std::make_pair(columnName,var));
 

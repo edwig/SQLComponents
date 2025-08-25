@@ -48,9 +48,13 @@ namespace SQLComponents
 
 class SQLDate;
 class SQLDatabase;
+struct NoCaseCompare
+{
+  bool operator()(const XString& p_left,const XString& p_right) const;
+};
 
 typedef std::map<int,    SQLVariant*> ColNumMap;
-typedef std::map<XString,SQLVariant*> ColNameMap;
+typedef std::map<XString,SQLVariant*,NoCaseCompare> ColNameMap;
 typedef std::map<int,    SQLVariant*> VarMap;
 typedef std::map<int,    unsigned>    MaxSizeMap;
 
