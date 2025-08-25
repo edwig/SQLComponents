@@ -1174,7 +1174,15 @@ SQLQuery::BindColumns()
   SQLSMALLINT dataType  = 0;
   SQLTCHAR    colName[SQL_MAX_IDENTIFIER + 1];
   unsigned short icol;
+  SQLInfoDB*  info = nullptr;
 
+  // Getting the info
+  if(m_database)
+  {
+    info = m_database->GetSQLInfoDB();
+  }
+
+  // RDBMS defined maximum column length
   GetMaxColumnLength();
 
   // Prepare for at-exec buffering. If not set, use the default of 32K
@@ -1248,9 +1256,9 @@ SQLQuery::BindColumns()
     if(type == SQL_C_NUMERIC)
     {
       SQL_NUMERIC_STRUCT* numeric = const_cast<SQL_NUMERIC_STRUCT*>(var->GetAsNumeric());
-      if (m_database)
+      if(info)
       {
-        m_database->GetSQLInfoDB()->GetRDBMSNumericPrecisionScale(precision,scale);
+        info->GetRDBMSNumericPrecisionScale(precision,scale);
       }
       numeric->precision = (SQLCHAR)  precision;
       numeric->scale     = (SQLSCHAR) scale;
@@ -1258,6 +1266,10 @@ SQLQuery::BindColumns()
 
     // Keep the new variable under name and column number
     XString columnName(colName);
+    if(info && info->IsIdentifierMixedCase(colName) == false)
+    {
+      columnName.MakeLower();
+    }
     m_numMap .insert(std::make_pair(icol,var));
     m_nameMap.insert(std::make_pair(columnName,var));
 
