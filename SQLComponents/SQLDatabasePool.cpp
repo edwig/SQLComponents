@@ -584,6 +584,7 @@ SQLDatabasePool::OpenDatabase(SQLDatabase* p_dbs,XString& p_connectionName)
     // Getting the correct settings and do the discovery
     SQLInfoDB* info = p_dbs->GetSQLInfoDB();
     info->SetPreferODBC(m_preferODBC);
+    info->SetUseIdentifierQuotation(m_useQuotation);
     info->GetInfo();
     
     // Tell it the logfile

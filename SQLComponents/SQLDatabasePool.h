@@ -80,6 +80,8 @@ public:
   void     GetListOfConnections(XString& p_list);
   // Get the current ODBC discovery for new connections
   bool     GetPreferODBCDiscover();
+  // Get the use of identifier quotation
+  bool            GetUseIdentifierQuotation();
 
   // SETTERS
 
@@ -91,6 +93,8 @@ public:
   void     SetMaxDatabases(unsigned p_maximum);
   // Set preference for ODBC discovery of database objects
   void     SetPreferODBCDiscovery(bool p_discover);
+  // Set the use of identifier quotation
+  void     SetUseIdentifierQuotation(bool p_use);
 
   // FUNCTIONS
 
@@ -127,6 +131,7 @@ private:
   unsigned        m_maxDatabases    { MIN_DATABASES };  // Maximum number of concurrently open database
   unsigned        m_openConnections { 0 };              // Currently open connections
   bool            m_preferODBC      { true };           // Prefer standard ODBC discovery functions over SQL
+  bool            m_useQuotation    { true };           // Prefer to use the identifier quotation mechanisms
   SQLConnections  m_connections;                        // Connection names out of "database.xml"
   DbsPool         m_allDatabases;                       // List with lists of all databases
   DbsPool         m_freeDatabases;                      // List with lists of currently unused databases
@@ -169,5 +174,18 @@ SQLDatabasePool::SetPreferODBCDiscovery(bool p_discover)
 {
   m_preferODBC = p_discover;
 }
+
+inline bool
+SQLDatabasePool::GetUseIdentifierQuotation()
+{
+  return m_useQuotation;
+}
+
+inline void
+SQLDatabasePool::SetUseIdentifierQuotation(bool p_use)
+{
+  m_useQuotation = p_use;
+}
+
 
 }
