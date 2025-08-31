@@ -3121,6 +3121,12 @@ SQLInfo::IsIdentifierMixedCase(XString p_identifier) const
 XString
 SQLInfo::QueryIdentifierQuotation(XString p_identifier) const
 {
+  // See if we must do this
+  if(!m_useIdentifierQuotation)
+  {
+    return p_identifier;
+  }
+
   // Empty names are unaltered
   if(p_identifier.IsEmpty())
   {
