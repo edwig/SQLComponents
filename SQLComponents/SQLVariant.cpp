@@ -216,9 +216,10 @@ SQLVariant::SQLVariant(const SQLGUID* p_guid)
 SQLVariant::SQLVariant(const void* p_binary,size_t p_size)
 {
   Init();
-  m_datatype    = SQL_C_BINARY;
-  m_sqlDatatype = SQL_BINARY;
-  m_indicator   = 0;
+  m_datatype     = SQL_C_BINARY;
+  m_sqlDatatype  = SQL_BINARY;
+  m_indicator    = 0;
+  m_binaryLength = (int) p_size;
   m_data.m_dataBINARY = new BYTE[(size_t)p_size + 1];
   memcpy(m_data.m_dataBINARY,p_binary,p_size);
 }
@@ -3190,7 +3191,7 @@ SQLVariant::BinaryToString(unsigned char* buffer,int buflen) const
   }
   BYTE* colPointer = reinterpret_cast<BYTE*>(m_data.m_dataBINARY);
   SQLLEN dataLen = m_binaryLength;
-  if(m_indicator >= 0 && m_indicator < m_binaryLength)
+  if(m_indicator > 0 && m_indicator < m_binaryLength)
   {
     dataLen = m_indicator;
   }
