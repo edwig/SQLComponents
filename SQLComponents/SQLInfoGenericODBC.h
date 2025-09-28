@@ -74,6 +74,9 @@ public:
   // Supports the ODBC call procedure with named parameters
   bool    GetRDBMSSupportsODBCCallNamedParameters() const;
 
+  // Supports the ODBC call procedure with named parameters
+  bool    GetRDBMSSupportsNamedParameters() const;
+
   // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
   bool    GetRDBMSSupportsDatatypeTime() const override;
 
@@ -100,6 +103,9 @@ public:
 
   // Maximum for a VARCHAR to be handled without AT-EXEC data. Assume NVARCHAR is half that size!
   int GetRDBMSMaxVarchar() const override;
+
+  // Return parameters from a PSM procedure module can be a result set (SUSPEND)
+  bool GetRDBMSResultSetFromPSM() const override;
 
   // Identifier rules differ per RDBMS (USES DBInfo::IsIdentifier)
   // bool IsIdentifier(XString p_identifier) const override;

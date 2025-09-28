@@ -139,6 +139,13 @@ SQLInfoFirebird::GetRDBMSSupportsODBCCallNamedParameters() const
   return false;
 }
 
+// Supports the ODBC call procedure with named parameters
+bool
+SQLInfoFirebird::GetRDBMSSupportsNamedParameters() const
+{
+  return false;
+}
+
 // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
 bool
 SQLInfoFirebird::GetRDBMSSupportsDatatypeTime() const
@@ -232,6 +239,13 @@ SQLInfoFirebird::IsIdentifier(XString p_identifier) const
       return false;
     }
   }
+  return true;
+}
+
+// Return parameters from a PSM procedure module can be a result set (SUSPEND)
+bool
+SQLInfoFirebird::GetRDBMSResultSetFromPSM() const
+{
   return true;
 }
 
@@ -687,12 +701,18 @@ SQLInfoFirebird::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool 
 // Changes to parameters before binding to an ODBC HSTMT handle  (returning the At-Exec status)
 bool
 SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/
-                                     ,SQLSMALLINT& /*p_sqlDatatype*/
+                                     ,SQLSMALLINT&   p_sqlDatatype
                                      ,SQLULEN&     /*p_columnSize*/
                                      ,SQLSMALLINT& /*p_scale*/
-                                     ,SQLLEN&      /*p_bufferSize*/
-                                     ,SQLLEN*      /*p_indicator*/) const
+                                     ,SQLLEN&        p_bufferSize
+                                     ,SQLLEN*        p_indicator) const
 {
+  // BLOB SUB_TYPE 0 (RAW DATA) should be mutated as SQL_VARBINARY and with a length indicator
+  if(p_sqlDatatype == SQL_BINARY)
+  {
+    p_sqlDatatype = SQL_VARBINARY;
+    *p_indicator  = p_bufferSize;
+  }
   return false;
 }
 
@@ -3015,7 +3035,7 @@ SQLInfoFirebird::GetPSMProcedureParameters(XString& p_schema,XString& p_procedur
                     "       END                                         as sql_data_type\n"
                     "      ,CAST(0 AS SMALLINT)                         as sql_datetime_sub\n"
                     "      ,fld.rdb$field_length / rdb$character_length as char_octet_length\n"
-                    "      ,par.rdb$parameter_number + par.rdb$parameter_type + 1 as ordinal_position\n"
+                    "      ,par.rdb$parameter_number + 1 as ordinal_position\n"
                     "      ,CASE (coalesce(par.rdb$null_flag,0,0)-1)*-1\n"
                     "            WHEN 0 THEN 'NO'\n"
                     "            WHEN 1 THEN 'YES'\n"
@@ -3536,27 +3556,25 @@ SQLInfoFirebird::DoSQLCallProcedure(SQLQuery* p_query,const XString& p_procedure
   if(query.GetRecord())
   {
     // Processing the result
-    int type     = 0;
-    int setIndex = -1;
+    int setIndex = 0;
     for(int resIndex = 1;resIndex <= query.GetNumberOfColumns();++resIndex)
     {
       // Getting the next result from the result set
       SQLVariant* result = query.GetColumn(resIndex);
 
       // Finding the next OUTPUT parameter in the original query call
-      do
+      SQLParameter* target = p_query->GetOutputParameter(++setIndex);
+      if(target == nullptr)
       {
-        const SQLVariant* target = p_query->GetParameter(++setIndex);
-        if(target == nullptr)
-        {
-          throw StdException(_T("Wrong number of output parameters for procedure call"));
-        }
-        type = target->GetParameterType();
+        throw StdException(_T("Wrong number of output parameters for procedure call"));
       }
-      while(type != SQL_PARAM_OUTPUT && type != SQL_PARAM_INPUT_OUTPUT);
-
       // Storing the result;
-      p_query->SetParameter(setIndex,result);
+      SQLVariant* old = target->m_value;
+      target->m_value = new SQLVariant(result);
+      if(old)
+      {
+        delete old;
+      }
     }
     // Returning the first return column as the result of the procedure
     return true;
@@ -3633,7 +3651,7 @@ SQLInfoFirebird::ConstructSQLForProcedureCall(SQLQuery*      p_query
 {
   // Start with select form
   XString sql = _T("SELECT * FROM ");
-  sql += p_procedure;
+  sql += QIQ(p_procedure);
 
   // Opening parenthesis
   sql += _T("(");
@@ -3641,23 +3659,24 @@ SQLInfoFirebird::ConstructSQLForProcedureCall(SQLQuery*      p_query
   // Build list of markers
   int ind = 1;
   int res = 1;
+  bool delimiter(false);
   while(true)
   {
     // Try get the next parameter
-    var* parameter = p_query->GetParameter(ind);
+    SQLParameter* parameter = p_query->GetInputParameter(ind);
     if(parameter == nullptr) break;
 
-    // Input parameters ONLY!!
-    int type = parameter->GetParameterType();
-    if(type == SQL_PARAM_INPUT)
+    // Add marker
+    if(delimiter)
     {
-      // Add marker
-      if(ind > 1) sql += _T(",");
-      sql += _T("?");
-
-      // Add the parameter with the result counter!
-      p_thecall->SetParameter(res++,parameter);
+      sql += _T(",");
     }
+    sql += _T("?");
+    delimiter = true;
+
+    // Add the parameter with the result counter!
+    p_thecall->SetParameter(res++,parameter->m_value);
+
     // Next parameter
     ++ind;
   }

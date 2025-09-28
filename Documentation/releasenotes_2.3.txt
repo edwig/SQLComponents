@@ -9,6 +9,12 @@ Version 2.3.4 of ..-..-2025
 2)  Synchronisation with the latest BaseLibrary and XPath upgrade
 3)  MariaDB is now derived from MySQL as it is 95% identical
     MySQL does not support SEQUENCES
+4)  Parameters for the SQLQuery now support input/output types. The result is that
+    more database types can be supported for output parameters.
+    Please review the "SetParameter" / "GetParameter" methods for extra optional 
+    parameters.
+    Rewriting your logic especially for "GetParameter" migth be in order.
+    Also see the changes in the Unit testset for this change!!
 
 Version 2.3.3 of 27-07-2025
 ---------------------------

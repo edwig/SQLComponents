@@ -156,6 +156,13 @@ SQLInfoOracle::GetRDBMSSupportsODBCCallNamedParameters() const
   return false;
 }
 
+// Supports the ODBC call procedure with named parameters
+bool
+SQLInfoOracle::GetRDBMSSupportsNamedParameters() const
+{
+  return true;
+}
+
 // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
 bool
 SQLInfoOracle::GetRDBMSSupportsDatatypeTime() const
@@ -284,6 +291,13 @@ SQLInfoOracle::IsIdentifier(XString p_identifier) const
     }
   }
   return true;
+}
+
+// Return parameters from a PSM procedure module can be a result set (SUSPEND)
+bool
+SQLInfoOracle::GetRDBMSResultSetFromPSM() const
+{
+  return false;
 }
 
 // KEYWORDS

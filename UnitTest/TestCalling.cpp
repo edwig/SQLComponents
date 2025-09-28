@@ -156,7 +156,7 @@ namespace DatabaseUnitTest
       // Call with 1 input parameter and a BCD return parameter
       q2.ResetParameters();
       q2.SetParameter(0,bcd(),P_SQL_PARAM_OUTPUT);
-      q2.GetParameter(0)->SetNumericPrecisionScale(18,2);
+      q2.GetParameter(0,P_SQL_PARAM_OUTPUT)->SetNumericPrecisionScale(18,2);
       var* res = q2.DoSQLCall(g_schema,_T("getdecimal"),_T("345.99"));
       text.Format(_T("Result of GETDECIMAL '345.99' = [%s]"),res->GetAsBCD().AsString().GetString());
       Logger::WriteMessage(text);
@@ -166,15 +166,15 @@ namespace DatabaseUnitTest
       // Call with 1 input parameter and return value AND return parameter
       var txt(SQL_C_CHAR,200);
       q2.ResetParameters();
-      q2.SetParameter(0,bcd(),P_SQL_PARAM_OUTPUT);
-      q2.GetParameter(0)->SetNumericPrecisionScale(18,2);
       q2.SetParameter(1,m_duplicate);
+      q2.SetParameter(1,bcd(),P_SQL_PARAM_OUTPUT);
+      q2.GetParameter(1,P_SQL_PARAM_OUTPUT)->SetNumericPrecisionScale(18,2);
       q2.SetParameter(2,&txt,P_SQL_PARAM_OUTPUT);
 
-      res = q2.DoSQLCall(g_schema,_T("multinout"),true);
+      res = q2.DoSQLCall(g_schema,_T("multinout"),false);
 
-      bcd number = res->GetAsBCD();
-      XString restext = q2.GetParameter(2)->GetAsString();
+      bcd     number  = q2.GetOutputParameter(1)->m_value->GetAsBCD();
+      XString restext = q2.GetOutputParameter(2)->m_value->GetAsString();
       text.Format(_T("Result of MULTINOUT: [%s] [%s]\n"),number.AsString().GetString(),(LPCTSTR)restext);
       Logger::WriteMessage(text);
 

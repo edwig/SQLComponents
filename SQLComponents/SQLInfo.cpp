@@ -2825,7 +2825,7 @@ SQLInfo::MakeInfoPSMParameters(MParameterMap& p_parameters
         if(cbDefaultValue  > 0) par.m_default    = szDefaultValue;
         if(cbIsNullable    > 0) par.m_isNullable    = szIsNullable;
         // Numbers
-        par.m_columnType    = cbColumnType    > 0 ? ColumnType    : 0;
+        par.m_columnType    = (SQLParamType)(cbColumnType > 0 ? ColumnType : 0);
         par.m_datatype      = cbDataType      > 0 ? DataType      : 0;
         par.m_columnSize    = cbColumnSize    > 0 ? ColumnSize    : 0;
         par.m_bufferLength  = cbBufferSize    > 0 ? BufferSize    : 0;

@@ -133,6 +133,13 @@ SQLInfoAccess::GetRDBMSSupportsODBCCallNamedParameters() const
   return false;
 }
 
+// Supports the ODBC call procedure with named parameters
+bool
+SQLInfoAccess::GetRDBMSSupportsNamedParameters() const
+{
+  return false;
+}
+
 // If the database does not support the datatype TIME, it can be implemented as a DECIMAL
 bool
 SQLInfoAccess::GetRDBMSSupportsDatatypeTime() const
@@ -225,6 +232,13 @@ SQLInfoAccess::IsIdentifier(XString p_identifier) const
     }
   }
   return true;
+}
+
+// Return parameters from a PSM procedure module can be a result set (SUSPEND)
+bool 
+SQLInfoAccess::GetRDBMSResultSetFromPSM() const
+{
+  return false;
 }
 
 // KEYWORDS

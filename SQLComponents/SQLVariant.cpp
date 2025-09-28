@@ -506,6 +506,17 @@ SQLVariant::IsEmpty() const
 }
 
 bool
+SQLVariant::IsStringType() const
+{
+  switch(m_datatype)
+  {
+    case SQL_C_CHAR:  // Fall through
+    case SQL_C_WCHAR: return true;
+    default:          return false;
+  }
+}
+
+bool
 SQLVariant::IsNumericType() const
 {
   switch(m_datatype)

@@ -184,11 +184,11 @@ SQLDataSet::Close()
   // Forget the data
   Forget(true);
   ResetFilters();
+  ResetParameters();
 
   // Forget all caches
   m_names.clear();
   m_types.clear();
-  m_parameters.clear();
   m_primaryKey.clear();
 
   // Forget the query
@@ -297,15 +297,25 @@ SQLDataSet::SetParameter(const XString& p_name,const SQLVariant& p_value)
     if(m_parameters[ind].m_name == p_name)
     {
       // Found it: set a new value
-      m_parameters[ind].m_value = p_value;
+      m_parameters[ind].m_value = new SQLVariant(p_value);
       return;
     }
   }
   // New parameter
   SQLParameter par;
   par.m_name   = p_name;
-  par.m_value  = p_value;
+  par.m_value  = new SQLVariant(p_value);
   m_parameters.push_back(par);
+}
+
+void
+SQLDataSet::ResetParameters()
+{
+  for(auto& parm : m_parameters)
+  {
+    delete parm.m_value;
+  }
+  m_parameters.clear();
 }
 
 void
@@ -368,7 +378,7 @@ SQLDataSet::GetParameter(const XString& p_name)
   {
     if(m_parameters[ind].m_name == p_name)
     {
-      return &(m_parameters[ind].m_value);
+      return m_parameters[ind].m_value;
     }
   }
   return NULL;
@@ -576,14 +586,14 @@ SQLDataSet::ParseSelection(SQLQuery& p_query)
   {
     sql += (count++ == 0) ? _T("\n WHERE ") : _T("\n   AND ");
     sql += info ? info->QueryIdentifierQuotation(it->m_name) : it->m_name;
-    if(it->m_value.IsNULL())
+    if(it->m_value->IsNULL())
     {
       sql += _T(" IS NULL");
     }
     else
     {
       sql += _T(" = ?");
-      p_query.SetParameter(++number,&(it->m_value));
+      p_query.SetParameter(++number,it->m_value);
     }
   }
 

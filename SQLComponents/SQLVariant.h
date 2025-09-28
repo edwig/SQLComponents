@@ -100,6 +100,7 @@ public:
    // STATUS
    bool    IsNULL() const;
    bool    IsEmpty() const;
+   bool    IsStringType() const;
    bool    IsNumericType() const;
    bool    IsDecimalType() const;
    bool    IsIntervalType() const;

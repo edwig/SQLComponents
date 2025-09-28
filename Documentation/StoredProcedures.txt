@@ -1,0 +1,30 @@
+STORED PROCEDURE       | MS-Access | Informix | Firebird | MariaDB  | PostgreSQL | Oracle   | SQL-Server
+==========================================================================================================
+EXECUTE [PROCEDURE]    |    -      | EXECUTE  | EXECUTE  | CALL     | CALL       | EXEC     | EXECUTE
+                       |           |          |          |          |            |          |
+SELECT * FROM          |    -      |    -     | suspend  |    -     | via type   | via set  | via array
+                       |           |          |          |          |            |          |
+INPUT parameters       |    X      |    X     |    X     |    X     |     X      |    X     |    X
+                       |           |          |          |          |            |          |
+OUTPUT parameters      |    -      |    X     |    X     |    X     |     X      |    X     |    X     
+                       |           |          |          |          |            |          |
+INOUT parameters       |    -      |    X     |    -     |    X     |     X      |    X     |    -
+                       |           |          |          |          |            |          |
+OUTPUT IN CALL         |    -      |    -     |    -     |    -     |     -      |    -     |    X
+                       |           |          |          |          |            |          |
+DEFAULT VALUE          |    -      |    X     |    X     |    -     |     X      | on input |    X
+                       |           |          |          |          |            |          |
+NOT NULL               |    -      |    X     |    X     |    -     |     -      |    -     |    X
+                       |           |          |          |          |            |          |
+FUNCTION CAN MUTATE    |    -      |    X     |    -     |    X     |     X      |    X     |    -
+                       |           |          |          |          |            |          |
+PROCEDURE HAS RETURN   |    -      |    -     |    -     |    -     |     -      |  X (INT) |    -
+                       |           |          |          |          |            |          |
+Separate OUTPUT set    |    X      |    -     |    X     |    -     |     -      |    -     |    -
+                       |           |          |          |          |            |          |
+Autonomous transaction |    -      |    X     |    X     |AriaEngine|  subtrans  |    X     |    - 
+                       |           |          |          |          |            |          |
+Named Parameters       |    -      |    -     |    -     |    -     |     X      |    X     |    X
+                       |           |          |          |          |            |          |
+Named Parameters ODBC  |    -      |    X     |    -     |    -     |     -      |    -     |    X
+                       |           |          |          |          |            |          |
