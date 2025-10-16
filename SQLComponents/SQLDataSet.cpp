@@ -2,8 +2,8 @@
 //
 // File: SQLDataSet.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -30,13 +30,8 @@
 #include "SQLQuery.h"
 #include "SQLVariantFormat.h"
 #include "SQLInfoDB.h"
+#include <time.h>
 #include <algorithm>
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 namespace SQLComponents
 {
@@ -93,7 +88,7 @@ SQLDataSet::SQLDataSet()
 {
 }
 
-SQLDataSet::SQLDataSet(XString p_name,SQLDatabase* p_database /*=NULL*/)
+SQLDataSet::SQLDataSet(const XString& p_name,SQLDatabase* p_database /*=NULL*/)
            :m_name(p_name)
            ,m_database(p_database)
 {
@@ -403,7 +398,7 @@ SQLDataSet::GetSequenceName()
 }
 
 void
-SQLDataSet::SetQuery(XString& p_query)
+SQLDataSet::SetQuery(const XString& p_query)
 {
   // Setting the total query supersedes these
   m_selection.Empty();
@@ -419,56 +414,56 @@ SQLDataSet::SetQuery(XString& p_query)
 }
 
 void
-SQLDataSet::SetSelection(XString p_selection)
+SQLDataSet::SetSelection(const XString& p_selection)
 {
   m_query.Empty();
   m_selection = p_selection;
 }
 
 void
-SQLDataSet::SetFromTables(XString p_from)
+SQLDataSet::SetFromTables(const XString& p_from)
 {
   m_query.Empty();
   m_fromTables = p_from;
 }
 
 void
-SQLDataSet::SetWhereCondition(XString p_condition)
+SQLDataSet::SetWhereCondition(const XString& p_condition)
 {
   m_query.Empty();
   m_whereCondition = p_condition;
 }
 
 void
-SQLDataSet::SetGroupBy(XString p_groupby)
+SQLDataSet::SetGroupBy(const XString& p_groupby)
 {
   m_query.Empty();
   m_groupby = p_groupby;
 }
 
 void
-SQLDataSet::SetOrderBy(XString p_orderby)
+SQLDataSet::SetOrderBy(const XString& p_orderby)
 {
   m_query.Empty();
   m_orderby = p_orderby;
 }
 
 void
-SQLDataSet::AddGroupby(XString p_groupby)
+SQLDataSet::AddGroupby(const XString& p_groupby)
 {
   if(!m_groupby.IsEmpty())
   {
-    m_groupby += ", ";
+    m_groupby += _T(", ");
   }
   m_groupby += p_groupby;
 }
 
 void
-SQLDataSet::AddOrderBy(XString p_orderby)
+SQLDataSet::AddOrderBy(const XString& p_orderby)
 {
   if(!m_orderby.IsEmpty())
   {
-    m_orderby += ", ";
+    m_orderby += _T(", ");
   }
   m_orderby += p_orderby;
 }
@@ -522,14 +517,22 @@ SQLDataSet::ParseQuery()
     }
     if(c == '$' && !inAphos && !inQuote)
     {
+      ++pos;
       XString parNaam;
-      do 
+      while(true)
       {
-        c = m_query.GetAt(++pos);
-        parNaam += (char) c;
-      } 
-      while (isalnum(c) || c == '_');
-      parNaam = parNaam.Left(parNaam.GetLength() - 1);
+        if(pos < m_query.GetLength())
+        {
+          c = m_query.GetAt(pos);
+          if(isalnum(c) || c == _T('_'))
+          {
+            parNaam += (TCHAR)c;
+            ++pos;
+          }
+          else break;
+        }
+        else break;
+      }
       // Found parameter name
       SQLVariant* par = GetParameter(parNaam);
       if(par)
@@ -1336,7 +1339,7 @@ SQLDataSet::GetFieldType(int p_num)
 
 // Get a field number
 int
-SQLDataSet::GetFieldNumber(XString p_name)
+SQLDataSet::GetFieldNumber(const XString& p_name)
 {
   for(unsigned int ind = 0; ind < m_names.size(); ++ind)
   {
@@ -1378,7 +1381,7 @@ SQLDataSet::InsertRecord()
 
 // Insert new field in new record
 int
-SQLDataSet::InsertField(XString p_name,const SQLVariant* p_value)
+SQLDataSet::InsertField(const XString& p_name,const SQLVariant* p_value)
 {
   if(m_current >= 0 && m_current < (int)m_records.size())
   {
@@ -1941,7 +1944,7 @@ SQLDataSet::GetWhereClause(SQLQuery* p_query,const SQLRecord* p_record,int& p_pa
 //////////////////////////////////////////////////////////////////////////
 
 bool
-SQLDataSet::XMLSave(XString p_filename,XString p_name,Encoding p_encoding /*= Encoding::UTF8*/)
+SQLDataSet::XMLSave(const XString& p_filename,const XString& p_name,Encoding p_encoding /*= Encoding::UTF8*/)
 {
   XMLMessage msg;
   msg.SetRootNodeName(p_name);
@@ -1951,7 +1954,7 @@ SQLDataSet::XMLSave(XString p_filename,XString p_name,Encoding p_encoding /*= En
 }
 
 bool
-SQLDataSet::XMLLoad(XString p_filename)
+SQLDataSet::XMLLoad(const XString& p_filename)
 {
   XMLMessage msg;
   if(msg.LoadFile(p_filename))

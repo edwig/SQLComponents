@@ -2,8 +2,8 @@
 //
 // File: SQLInfoSQLServer.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -28,12 +28,6 @@
 #include "SQLInfoSQLServer.h"
 #include "SQLQuery.h"
 #include "sqlncli.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 namespace SQLComponents
 {
@@ -245,7 +239,7 @@ SQLInfoSQLServer::GetRDBMSMaxVarchar() const
 
 // Identifier rules differ per RDBMS
 bool
-SQLInfoSQLServer::IsIdentifier(XString p_identifier) const
+SQLInfoSQLServer::IsIdentifier(const XString& p_identifier) const
 {
   // Cannot be empty and cannot exceed this amount of characters
   if(p_identifier.GetLength() == 0 ||
@@ -254,14 +248,14 @@ SQLInfoSQLServer::IsIdentifier(XString p_identifier) const
     return false;
   }
   // Must start with one alpha char OR AN UNDERSCORE (EXTENSION)
-  if(!_istalpha(p_identifier.GetAt(0)) && p_identifier.GetAt(0) != '_')
+  if(!_istalpha((TCHAR)p_identifier.GetAt(0)) && p_identifier.GetAt(0) != '_')
   {
     return false;
   }
   for(int index = 0;index < p_identifier.GetLength();++index)
   {
     // Can be upper/lower alpha or a number OR an underscore
-    TCHAR ch = p_identifier.GetAt(index);
+    TCHAR ch = (TCHAR) p_identifier.GetAt(index);
     if(!_istalnum(ch) && ch != '_')
     {
       return false;
@@ -359,7 +353,7 @@ SQLInfoSQLServer::GetKEYWORDParameterPrefix() const
 // Get select part to add new record identity to a table
 // Can be special column like 'OID' or a sequence select
 XString
-SQLInfoSQLServer::GetKEYWORDIdentityString(XString& p_tablename,XString p_postfix /*= "_seq"*/) const
+SQLInfoSQLServer::GetKEYWORDIdentityString(const XString& p_tablename,const XString& p_postfix /*= "_seq"*/) const
 {
   if(m_useSequences)
   {
@@ -373,7 +367,7 @@ SQLInfoSQLServer::GetKEYWORDIdentityString(XString& p_tablename,XString p_postfi
 
 // Gets the UPPER function
 XString
-SQLInfoSQLServer::GetKEYWORDUpper(XString& p_expression) const
+SQLInfoSQLServer::GetKEYWORDUpper(const XString& p_expression) const
 {
   return _T("UPPER(") + p_expression + _T(")");
 }
@@ -387,7 +381,7 @@ SQLInfoSQLServer::GetKEYWORDInterval1MinuteAgo() const
 
 // Gets the Not-NULL-Value statement of the database
 XString
-SQLInfoSQLServer::GetKEYWORDStatementNVL(XString& p_test,XString& p_isnull) const
+SQLInfoSQLServer::GetKEYWORDStatementNVL(const XString& p_test,const XString& p_isnull) const
 {
   return XString(_T("NVL(")) + p_test + _T(",") + p_isnull + _T(")");
 }
@@ -657,19 +651,19 @@ SQLInfoSQLServer::GetSQLTopNRows(XString p_sql,int p_top,int p_skip /*= 0*/) con
 XString
 SQLInfoSQLServer::GetSelectForUpdateTableClause(unsigned p_lockWaitTime) const
 {
-  XString clause(" WITH (ROWLOCK,UPDLOCK");
+  XString clause(_T(" WITH (ROWLOCK,UPDLOCK"));
   if(p_lockWaitTime == 0)
   {
-    clause += ",READPAST";
+    clause += _T(",READPAST");
   }
-  clause += ")";
+  clause += _T(")");
   return clause;
 }
 
 XString
 SQLInfoSQLServer::GetSelectForUpdateTrailer(XString p_select,unsigned /*p_lockWaitTime*/) const
 {
-  return p_select + "\nFOR UPDATE";
+  return p_select + _T("\nFOR UPDATE");
 }
 
 // Query to perform a keep alive ping
@@ -1419,7 +1413,7 @@ SQLInfoSQLServer::GetCATALOGTableDrop(XString p_schema,XString p_tablename,bool 
 XString 
 SQLInfoSQLServer::GetCATALOGTemptableCreate(XString /*p_schema*/,XString p_tablename,XString p_select) const
 {
-  CString sel(p_select);
+  XString sel(p_select);
   sel.MakeLower();
   int pos = sel.Find(_T("from "));
 
@@ -2680,7 +2674,7 @@ SQLInfoSQLServer::GetCATALOGViewText(XString& p_schema,XString& p_viewname,bool 
   IdentifierCorrect(p_schema);
   IdentifierCorrect(p_viewname);
 
-  CString sql = _T("SELECT CAST(definition AS varchar(max)) view_text\n")
+  XString sql = _T("SELECT CAST(definition AS varchar(max)) view_text\n")
                 _T("  FROM sys.objects     o\n")
                 _T("       inner join sys.sql_modules m on m.object_id = o.object_id\n")
                 _T("       inner join sys.schemas s     on s.schema_id = o.schema_id\n")
@@ -2723,7 +2717,7 @@ SQLInfoSQLServer::GetCATALOGTablePrivileges(XString& p_schema,XString& p_tablena
   IdentifierCorrect(p_schema);
   IdentifierCorrect(p_tablename);
 
-  CString sql = _T("SELECT db_name() AS table_catalog\n")
+  XString sql = _T("SELECT db_name() AS table_catalog\n")
                 _T("      ,s.name    AS table_schema\n")
                 _T("      ,o.name    AS table_name\n")
                 _T("      ,g.name    AS grantor\n")
@@ -2757,7 +2751,7 @@ XString
 SQLInfoSQLServer::GetCATALOGColumnPrivileges(XString& p_schema,XString& p_tablename,XString& p_columnname) const
 {
   bool p_quoted(true);
-  CString sql = _T("SELECT db_name() AS table_catalog\n")
+  XString sql = _T("SELECT db_name() AS table_catalog\n")
                 _T("      ,s.name    AS table_schema\n")
                 _T("      ,o.name    AS table_name\n")
                 _T("      ,c.name    AS column_name\n")
@@ -3118,7 +3112,7 @@ SQLInfoSQLServer::GetPSMProcedureErrors(XString /*p_schema*/,XString /*p_procedu
 XString
 SQLInfoSQLServer::GetPSMProcedurePrivilege(XString& p_schema,XString& p_procedure,bool p_quoted /*= false*/) const
 {
-  CString sql = _T("SELECT db_name() AS table_catalog\n")
+  XString sql = _T("SELECT db_name() AS table_catalog\n")
                 _T("      ,s.name    AS table_schema\n")
                 _T("      ,o.name    AS table_name\n")
                 _T("      ,g.name    AS grantor\n")
@@ -3500,7 +3494,7 @@ SQLInfoSQLServer::GetSESSIONConstraintsImmediate() const
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant*
-SQLInfoSQLServer::DoSQLCall(SQLQuery* /*p_query*/,XString& /*p_schema*/,XString& /*p_procedure*/)
+SQLInfoSQLServer::DoSQLCall(SQLQuery* /*p_query*/,const XString& /*p_schema*/,const XString& /*p_procedure*/)
 {
   // MS-SQLServer supports standard calls
   return nullptr;
@@ -3508,7 +3502,7 @@ SQLInfoSQLServer::DoSQLCall(SQLQuery* /*p_query*/,XString& /*p_schema*/,XString&
 
 // Calling a stored function with named parameters, returning a value
 SQLVariant*
-SQLInfoSQLServer::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,XString& /*p_schema*/,XString& /*p_procedure*/,bool /*p_function = true*/)
+SQLInfoSQLServer::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,const XString& /*p_schema*/,const XString& /*p_procedure*/,bool /*p_function = true*/)
 {
   // MS-SQLServer supports standard calls with named parameters
   return nullptr;

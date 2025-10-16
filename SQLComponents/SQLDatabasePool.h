@@ -2,8 +2,8 @@
 //
 // File: SQLDatabasePool.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -59,14 +59,18 @@ public:
   // Return a database connection to the pool
   virtual void            GiveUp(SQLDatabase* p_database);
   // Read all database definitions from 'database.xml'
-  virtual bool            ReadConnections(XString p_filename = _T(""),bool p_reset = false);
+  virtual bool            ReadConnections(const XString p_filename = _T(""),bool p_reset = false);
   // Add a column rebind for this database session: No bounds checking!
   virtual void            AddColumnRebind(int p_sqlType,int p_cppType);
   // Add a parameter rebind for this database session: No bounds checking!
   virtual void            AddParameterRebind(int p_sqlType,int p_cppType);
   // Adding / Deleting connections to the connections list
-  virtual bool            AddConnection(XString p_name,XString p_datasource,XString p_username,XString p_password,XString p_options);
-  virtual bool            DelConnection(XString p_name);
+  virtual bool            AddConnection(const XString& p_name
+                                       ,const XString& p_datasource
+                                       ,const XString& p_username
+                                       ,const XString& p_password
+                                       ,const XString& p_options);
+  virtual bool            DelConnection(const XString& p_name);
 
   // GETTERS
 
@@ -88,7 +92,7 @@ public:
   // Standard log level of new database connections
   void     SetLoggingActivation(int p_loglevel);
   // Encryption key of the connections file
-  void     SetEncryptionKey(XString p_key);
+  void     SetEncryptionKey(const XString& p_key);
   // Set current max databases allowed
   void     SetMaxDatabases(unsigned p_maximum);
   // Set preference for ODBC discovery of database objects
@@ -110,13 +114,13 @@ public:
 
 private:
   // Get OR make a logged in database connection
-  SQLDatabase* GetDatabaseInternally(DbsPool& p_pool,XString& p_connectionName);
+  SQLDatabase* GetDatabaseInternally(DbsPool& p_pool,const XString& p_connectionName);
   // Create a new database object
-  SQLDatabase* MakeDatabase(XString p_connectionName);
+  SQLDatabase* MakeDatabase(const XString& p_connectionName);
   // Open the connection to the RDBMS server
-  void         OpenDatabase(SQLDatabase* p_dbs,XString& p_connectionName);
+  void         OpenDatabase(SQLDatabase* p_dbs,const XString& p_connectionName);
   // Return a connection to the pool
-  void         GiveUpInternally(SQLDatabase* p_database, XString& p_connectionName);
+  void         GiveUpInternally(SQLDatabase* p_database,const XString& p_connectionName);
   // Cleanup in a list of databases
   void         CleanupInternally(bool p_aggressive);
   // Close all databases in the list an clean up the list
@@ -158,7 +162,7 @@ SQLDatabasePool::SetLoggingActivation(int p_loglevel)
 }
 
 inline void
-SQLDatabasePool::SetEncryptionKey(XString p_key)
+SQLDatabasePool::SetEncryptionKey(const XString& p_key)
 {
   m_connections.SetEncryptionKey(p_key);
 }

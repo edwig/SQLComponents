@@ -2,8 +2,8 @@
 //
 // File: SQLInfoFirebird.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -27,12 +27,6 @@
 #include "SQLComponents.h"
 #include "SQLInfoFirebird.h"
 #include "SQLQuery.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 namespace SQLComponents
 {
@@ -216,7 +210,7 @@ SQLInfoFirebird::GetRDBMSMaxVarchar() const
 
 // Identifier rules differ per RDBMS
 bool
-SQLInfoFirebird::IsIdentifier(XString p_identifier) const
+SQLInfoFirebird::IsIdentifier(const XString& p_identifier) const
 {
   if(p_identifier.GetLength() == 0 ||  // Cannot be empty
      p_identifier.GetLength() >= 63 )  // Cannot exceed 63 chars (version 4.0)
@@ -225,7 +219,7 @@ SQLInfoFirebird::IsIdentifier(XString p_identifier) const
     return false;
   }
   // Must start with one alpha char
-  if(!_istalpha(p_identifier.GetAt(0)))
+  if(!_istalpha((TCHAR)p_identifier.GetAt(0)))
   {
     return false;
   }
@@ -233,7 +227,7 @@ SQLInfoFirebird::IsIdentifier(XString p_identifier) const
   {
     // Can be upper/lower alpha or a number, an underscore or a dollar sign
     // because catalog identifiers can contain "rdb$...." names
-    TCHAR ch = p_identifier.GetAt(index);
+    TCHAR ch = (TCHAR) p_identifier.GetAt(index);
     if(!_istalnum(ch) && ch != _T('_') && ch != _T('$'))
     {
       return false;
@@ -334,14 +328,14 @@ SQLInfoFirebird::GetKEYWORDParameterPrefix() const
 // Get select part to add new record identity to a table
 // Can be special column like 'OID' or a sequence select
 XString
-SQLInfoFirebird::GetKEYWORDIdentityString(XString& p_tablename,XString p_postfix /*= "_seq"*/) const
+SQLInfoFirebird::GetKEYWORDIdentityString(const XString& p_tablename,const XString& p_postfix /*= "_seq"*/) const
 {
   return _T("GEN_ID(") + p_tablename + p_postfix + _T(",1)");
 }
 
 // Gets the UPPER function
 XString
-SQLInfoFirebird::GetKEYWORDUpper(XString& p_expression) const
+SQLInfoFirebird::GetKEYWORDUpper(const XString& p_expression) const
 {
   return _T("UPPER(") + p_expression + _T(")");
 }
@@ -356,7 +350,7 @@ SQLInfoFirebird::GetKEYWORDInterval1MinuteAgo() const
 
 // Gets the Not-NULL-Value statement of the database
 XString
-SQLInfoFirebird::GetKEYWORDStatementNVL(XString& p_test,XString& p_isnull) const
+SQLInfoFirebird::GetKEYWORDStatementNVL(const XString& p_test,const XString& p_isnull) const
 {
   return _T("COALESCE(") + p_test + _T(",") + p_isnull + _T(")");
 }
@@ -596,10 +590,10 @@ SQLInfoFirebird::GetSelectForUpdateTableClause(unsigned /*p_lockWaitTime*/) cons
 XString
 SQLInfoFirebird::GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const
 {
-  XString sql = p_select + "\nFOR UPDATE";
+  XString sql = p_select + _T("\nFOR UPDATE");
   if(p_lockWaitTime)
   {
-    sql += "\nWITH LOCK";
+    sql += _T("\nWITH LOCK");
   }
   return sql;
 }
@@ -609,7 +603,7 @@ XString
 SQLInfoFirebird::GetPing() const
 {
   // Not implemented yet
-  return "SELECT CAST('now' AS timestamp) FROM rdb$database";
+  return _T("SELECT CAST('now' AS timestamp) FROM rdb$database");
 }
 
 // Pre- and postfix statements for a bulk import
@@ -1056,7 +1050,7 @@ SQLInfoFirebird::GetCATALOGTableAttributes(XString& p_schema,XString& p_tablenam
     IdentifierCorrect(p_tablename);
     sql += _T("   AND rel.rdb$relation_name ");
     sql += (p_tablename.Find(_T("%")) >= 0) ? _T("LIKE") : _T("=");
-    sql += " ?";
+    sql += _T(" ?");
   }
   return sql;
 }
@@ -1492,7 +1486,7 @@ SQLInfoFirebird::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicate
       query += QIQ(index.m_columnName);
     }
   }
-  query += ")";
+  query += _T(")");
   return query;
 }
 
@@ -2326,7 +2320,7 @@ SQLInfoFirebird::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname,
     IdentifierCorrect(p_viewname);
     sql += _T("\n AND rel.rdb$relation_name ");
     sql += (p_viewname.Find(_T("%")) >= 0) ? _T("LIKE") : _T("=");
-    sql += " ?";
+    sql += _T(" ?");
   }
   return sql;
 }
@@ -3227,7 +3221,7 @@ SQLInfoFirebird::GetPSMDeclaration(bool    /*p_first*/
   {
     line += _T(" TYPE OF ") + p_domain;
   }
-  else if(!p_asColumn)
+  else if(!p_asColumn.IsEmpty())
   {
     line += _T(" TYPE OF COLUMN ") + p_asColumn;
   }
@@ -3493,7 +3487,7 @@ SQLInfoFirebird::GetSESSIONConstraintsImmediate() const
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant* 
-SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,XString& /*p_schema*/,XString& p_procedure)
+SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,const XString& /*p_schema*/,const XString& p_procedure)
 {
   bool result = false;
   int returns = GetCountReturnParameters(p_query);
@@ -3513,7 +3507,7 @@ SQLInfoFirebird::DoSQLCall(SQLQuery* p_query,XString& /*p_schema*/,XString& p_pr
 
 // Calling a stored function with named parameters, returning a value
 SQLVariant*
-SQLInfoFirebird::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,XString& /*p_schema*/,XString& /*p_procedure*/,bool /*p_function = true*/)
+SQLInfoFirebird::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,const XString& /*p_schema*/,const XString& /*p_procedure*/,bool /*p_function = true*/)
 {
   return nullptr;
 }

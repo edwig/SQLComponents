@@ -2,8 +2,8 @@
 //
 // File: CalculateTest.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -24,14 +24,10 @@
 // Version number: See SQLComponents.h
 //
 #include "stdafx.h"
-#include "SQLVariant.h"
-#include "SQLVariantOperator.h"
-#include "SQLDate.h"
-#include "SQLTime.h"
-#include "SQLTimestamp.h"
-#include "SQLInterval.h"
-#include "SQLDataType.h"
-#include "bcd.h"
+#include <SQLVariant.h>
+#include <SQLVariantOperator.h>
+#include <SQLDataType.h>
+#include <bcd.h>
 #include "UnitTest.h"
 
 namespace OperatorUnitTest
@@ -112,7 +108,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format(_T("Add test %s + %s"),leftType,rightType);
+          message.Format(_T("Add test %s + %s"),leftType.GetString(),rightType.GetString());
           Logger::WriteMessage(message);
 
           SQLVariant result = *left + *right; // TEST
@@ -157,7 +153,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format(_T("Subtraction test %s - %s"),leftType,rightType);
+          message.Format(_T("Subtraction test %s - %s"),leftType.GetString(),rightType.GetString());
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR)
@@ -207,7 +203,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format(_T("Multiplication test %s * %s"),leftType,rightType);
+          message.Format(_T("Multiplication test %s * %s"),leftType.GetString(),rightType.GetString());
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR ||
@@ -252,7 +248,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format(_T("Division test %s / %s"),leftType,rightType);
+          message.Format(_T("Division test %s / %s"),leftType.GetString(),rightType.GetString());
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR)
@@ -297,7 +293,7 @@ namespace OperatorUnitTest
           XString leftType  = SQLDataType::FindDatatype(left ->GetDataType());
           XString rightType = SQLDataType::FindDatatype(right->GetDataType());
           XString message;
-          message.Format(_T("Modulo test %s %% %s"),leftType,rightType);
+          message.Format(_T("Modulo test %s %% %s"),leftType.GetString(),rightType.GetString());
           Logger::WriteMessage(message);
 
           if(x == CT_CHAR && y == CT_CHAR)

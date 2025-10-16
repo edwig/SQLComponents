@@ -10,12 +10,6 @@
 #include <limits.h> // For max sizes of int, long and int64
 #include "Icd.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 //////////////////////////////////////////////////////////////////////////
 //
 //  ICD CONSTRUCTORS / DESTRUCTORS

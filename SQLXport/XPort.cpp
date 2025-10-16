@@ -2,8 +2,8 @@
 //
 // File: XPort.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -806,7 +806,7 @@ XPort::DoSQLStatement(XString& p_sql,bool p_can_retry)
 }
 
 bool
-XPort::ConsistentTables(XString p_schema)
+XPort::ConsistentTables(const XString& p_schema)
 {
   XString lock;
   SQLInfoDB* info = m_database.GetSQLInfoDB();
@@ -859,7 +859,7 @@ XPort::PerformRecompile()
 
 
 void
-XPort::ShowRetryName(XString& p_sql)
+XPort::ShowRetryName(const XString& p_sql)
 {
   XString name;
   int pos = p_sql.Find(_T("\n"));
@@ -936,7 +936,7 @@ XPort::PerformRetries()
 }
 
 XString 
-XPort::GetDefineSQLTable(XString p_table)
+XPort::GetDefineSQLTable(const XString& p_table)
 {
   DDLCreateTable create(m_database.GetSQLInfoDB());
 
@@ -966,7 +966,7 @@ XPort::GetDefineSQLTable(XString p_table)
 }
 
 DDLS
-XPort::GetDefineSQLIndex(XString p_table)
+XPort::GetDefineSQLIndex(const XString& p_table)
 {
   DDLCreateTable create(m_database.GetSQLInfoDB());
 
@@ -991,7 +991,7 @@ XPort::GetDefineSQLIndex(XString p_table)
 }
 
 DDLS
-XPort::GetDefineSQLPrimary(XString p_table)
+XPort::GetDefineSQLPrimary(const XString& p_table)
 {
   DDLCreateTable create(m_database.GetSQLInfoDB());
 
@@ -1015,7 +1015,7 @@ XPort::GetDefineSQLPrimary(XString p_table)
 }
 
 DDLS
-XPort::GetDefineSQLForeigns(XString p_table)
+XPort::GetDefineSQLForeigns(const XString& p_table)
 {
   DDLCreateTable create(m_database.GetSQLInfoDB());
 
@@ -1076,7 +1076,7 @@ XPort::RecordAllIndices(DDLCreateTable& p_create,DDLS& p_ddls)
 }
 
 void
-XPort::RecordAllPrimaries(DDLCreateTable& p_create,CString p_table)
+XPort::RecordAllPrimaries(DDLCreateTable& p_create,const XString& p_table)
 {
   m_constraints.clear();
 
@@ -1106,7 +1106,7 @@ XPort::RecordAllForeigns(DDLCreateTable& p_create)
 }
 
 XString 
-XPort::GetDefineSQLUserType(XString p_type)
+XPort::GetDefineSQLUserType(const XString& p_type)
 {
   XString create;
   XString usertype(p_type);
@@ -1137,10 +1137,11 @@ XPort::GetDefineSQLUserType(XString p_type)
 }
 
 XString
-XPort::GetDefineSQLView(XString p_view)
+XPort::GetDefineSQLView(const XString& p_view)
 {
+  XString view(p_view);
   SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetCATALOGViewText(m_schema,p_view,true);
+  XString sql = info->GetCATALOGViewText(m_schema,view,true);
   XString create;
 
   try
@@ -1154,20 +1155,20 @@ XPort::GetDefineSQLView(XString p_view)
         qry[1].GetAsString(create);
         break;
       }
-      sql = info->GetCATALOGViewText(m_schema,p_view);
+      sql = info->GetCATALOGViewText(m_schema,view);
     }
   }
   catch(StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror(_T("Internal error: Getting information for view: %s\n"),p_view.GetString());
+    xerror(_T("Internal error: Getting information for view: %s\n"),view.GetString());
     return _T("");
   }
 
   // Some RDBMS only store the creation text partially
   if(create.Left(6).CompareNoCase(_T("CREATE")))
   {
-    XString extra = info->GetCATALOGViewCreate(m_schema,p_view,create);
+    XString extra = info->GetCATALOGViewCreate(m_schema,view,create);
     if(extra.GetLength() > create.GetLength())
     {
       return extra;
@@ -1177,10 +1178,12 @@ XPort::GetDefineSQLView(XString p_view)
 }
 
 XString
-XPort::GetDefineSQLSequence(XString p_sequence)
+XPort::GetDefineSQLSequence(const XString& p_sequence)
 {
+  XString sequence(p_sequence);
+
   SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetCATALOGSequenceAttributes(m_schema,p_sequence,true);
+  XString sql = info->GetCATALOGSequenceAttributes(m_schema,sequence,true);
   XString define;
 
   try
@@ -1193,7 +1196,7 @@ XPort::GetDefineSQLSequence(XString p_sequence)
       {
         query.SetParameter(param++,m_schema);
       }
-      query.SetParameter(param++,p_sequence);
+      query.SetParameter(param++,sequence);
       query.DoSQLStatement(sql);
       if(query.GetRecord())
       {
@@ -1209,14 +1212,14 @@ XPort::GetDefineSQLSequence(XString p_sequence)
         seq.m_remarks      = (XString) query[MetaSequence_remarks];
 
         define = info->GetCATALOGSequenceCreate(seq);
-        XString comment = info->GetCATALOGCommentCreate(m_schema,_T("SEQUENCE"),p_sequence,_T(""),seq.m_remarks);
+        XString comment = info->GetCATALOGCommentCreate(m_schema,_T("SEQUENCE"),sequence,_T(""),seq.m_remarks);
         if(!comment.IsEmpty())
         {
           m_comments.push_back(comment);
         }
         break;
       }
-      sql = info->GetCATALOGSequenceAttributes(m_schema,p_sequence);
+      sql = info->GetCATALOGSequenceAttributes(m_schema,sequence);
     }
   }
   catch (StdException& ex)
@@ -1228,7 +1231,7 @@ XPort::GetDefineSQLSequence(XString p_sequence)
 }
 
 XString
-XPort::GetDefineSQLProcedure(XString p_procedure)
+XPort::GetDefineSQLProcedure(const XString& p_procedure)
 {
   XString create;
 
@@ -1253,7 +1256,7 @@ XPort::GetDefineSQLProcedure(XString p_procedure)
 }
 
 XString
-XPort::GetDefineSQLTrigger(XString p_trigger)
+XPort::GetDefineSQLTrigger(const XString& p_trigger)
 {
   XString create;
   XString trigger(p_trigger);
@@ -1283,10 +1286,12 @@ XPort::GetDefineSQLTrigger(XString p_trigger)
 }
 
 XString 
-XPort::GetDefineSQLSynonym(XString p_synonym)
+XPort::GetDefineSQLSynonym(const XString& p_synonym)
 {
   XString create;
-  XString sql = m_database.GetSQLInfoDB()->GetCATALOGSynonymAttributes(m_schema,p_synonym);
+  XString synonym(p_synonym);
+
+  XString sql = m_database.GetSQLInfoDB()->GetCATALOGSynonymAttributes(m_schema,synonym);
 
   try
   {
@@ -1298,19 +1303,19 @@ XPort::GetDefineSQLSynonym(XString p_synonym)
     }
     if(!p_synonym.IsEmpty())
     {
-      query.SetParameter(param++,p_synonym);
+      query.SetParameter(param++,synonym);
     }
     query.DoSQLStatement(sql);
     if(query.GetRecord())
     {
       XString definition = query.GetColumn(4)->GetAsString();
-      create = m_database.GetSQLInfoDB()->GetCATALOGSynonymCreate(m_schema,p_synonym,definition);
+      create = m_database.GetSQLInfoDB()->GetCATALOGSynonymCreate(m_schema,synonym,definition);
     }
   }
   catch (StdException& ex)
   {
     xerror(ex.GetErrorMessage());
-    xerror(_T("Internal error reading synonym of %s.%s\n"),m_schema.GetString(),p_synonym.GetString());
+    xerror(_T("Internal error reading synonym of %s.%s\n"),m_schema.GetString(),synonym.GetString());
   }
   return create;
 }
@@ -1318,7 +1323,7 @@ XPort::GetDefineSQLSynonym(XString p_synonym)
 // Getters
 
 XString
-XPort::GetDefineRowSelect(XString p_table,SQLInfoDB* p_info)
+XPort::GetDefineRowSelect(const XString& p_table,SQLInfoDB* p_info)
 {
   XString select(_T("SELECT "));
   for(unsigned ind = 0;ind < m_columns.size(); ++ind)
@@ -1364,7 +1369,7 @@ XPort::GetDefineRowSelect(XString p_table,SQLInfoDB* p_info)
 }
 
 XString
-XPort::GetDefineCountSelect(XString p_table,SQLInfoDB* p_info)
+XPort::GetDefineCountSelect(const XString& p_table,SQLInfoDB* p_info)
 {
   XString select(_T("SELECT COUNT(*) FROM "));
   if(!m_schema.IsEmpty() && p_info->GetRDBMSUnderstandsSchemas())
@@ -1382,7 +1387,7 @@ XPort::GetDefineCountSelect(XString p_table,SQLInfoDB* p_info)
 }
 
 XString
-XPort::GetDefineRowInsert(XString p_table,SQLInfoDB* p_info)
+XPort::GetDefineRowInsert(const XString& p_table,SQLInfoDB* p_info)
 {
   bool inf = (m_parameters.m_listOnly == false);
 
@@ -1418,7 +1423,7 @@ XPort::GetDefineRowInsert(XString p_table,SQLInfoDB* p_info)
 }
 
 void
-XPort::WriteTableAccessRights(XString p_object,int& p_count)
+XPort::WriteTableAccessRights(const XString& p_object,int& p_count)
 {
   try
   {
@@ -1450,7 +1455,7 @@ XPort::WriteTableAccessRights(XString p_object,int& p_count)
 }
 
 void
-XPort::WriteColumnAccessRights(XString p_object,int& p_count)
+XPort::WriteColumnAccessRights(const XString& p_object,int& p_count)
 {
   try
   {
@@ -1481,10 +1486,12 @@ XPort::WriteColumnAccessRights(XString p_object,int& p_count)
 }
 
 void
-XPort::WriteProcedureAccessRights(XString p_object,int& p_count)
+XPort::WriteProcedureAccessRights(const XString& p_object,int& p_count)
 {
+  XString object(p_object);
+
   SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetPSMProcedurePrivilege(m_schema,p_object);
+  XString sql = info->GetPSMProcedurePrivilege(m_schema,object);
 
   if(sql.IsEmpty())
   {
@@ -1502,7 +1509,7 @@ XPort::WriteProcedureAccessRights(XString p_object,int& p_count)
       XString privilege = query[6];
       bool    grantable = _tcsicmp(query[7].GetAsString(),_T("YES")) == 0;
 
-      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_object,empty,privilege,grantee,grantable);
+      XString grant = info->GetCATALOGGrantPrivilege(m_schema,object,empty,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
@@ -1520,11 +1527,11 @@ XPort::WriteProcedureAccessRights(XString p_object,int& p_count)
 }
 
 void
-XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
+XPort::WriteSequenceAccessRights(const XString& p_sequence,int& p_count)
 {
-  // To be implemented
+  XString sequence(p_sequence);
   SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetCATALOGSequencePrivilege(m_schema,p_sequence);
+  XString sql = info->GetCATALOGSequencePrivilege(m_schema,sequence);
 
   if(sql.IsEmpty())
   {
@@ -1541,7 +1548,7 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
     }
     if(!p_sequence.IsEmpty())
     {
-      query.SetParameter(param++,p_sequence);
+      query.SetParameter(param++,sequence);
     }
     query.DoSQLStatement(sql);
     while(query.GetRecord())
@@ -1551,7 +1558,7 @@ XPort::WriteSequenceAccessRights(XString p_sequence,int& p_count)
       XString grantee   = query[5];
       bool    grantable = _tcsicmp(query[6].GetAsString(),_T("YES")) == 0;
 
-      XString grant = info->GetCATALOGGrantPrivilege(m_schema,p_sequence,empty,privilege,grantee,grantable);
+      XString grant = info->GetCATALOGGrantPrivilege(m_schema,sequence,empty,privilege,grantee,grantable);
       m_xfile.WriteSQL(grant);
 
       if((++p_count % COMMIT_SIZE) == 0)
@@ -1930,7 +1937,7 @@ XPort::PostProcessSQL(XString& p_sql)
     else if(quote.GetLength() == 2)
     {
       // These quotes: [] or {}
-      search = quote[0] + search + quote[1];
+      search = XString(quote[0]) + search + quote[1];
     }
     else
     {
@@ -2419,7 +2426,7 @@ XPort::ImportComments(TCHAR& p_type)
 
 // Import everything (object = empty) or 1 object only
 bool
-XPort::ImportObject(XString& p_object,XString& p_importing)
+XPort::ImportObject(const XString& p_object,const XString& p_importing)
 {
   if(p_object.IsEmpty())
   {
@@ -2434,7 +2441,7 @@ XPort::ImportObject(XString& p_object,XString& p_importing)
 
 // Service function: List or run SQL
 int
-XPort::ImportSQL(XString& p_sql,bool p_retries/*= false*/,XString p_delim /*=";"*/)
+XPort::ImportSQL(XString& p_sql,bool p_retries/*= false*/,const XString& p_delim /*=";"*/)
 {
   if(m_parameters.m_listOnly)
   {
@@ -2470,7 +2477,7 @@ XPort::FindIdentity(XString p_sql)
 
 // Prepare a table for bulk import and complete the bulk import
 void
-XPort::BulkImportPrepare(XString p_table)
+XPort::BulkImportPrepare(const XString& p_table)
 {
   if(m_parameters.m_listOnly)
   {
@@ -2496,7 +2503,7 @@ XPort::BulkImportPrepare(XString p_table)
 }
 
 void
-XPort::BulkImportComplete(XString p_table)
+XPort::BulkImportComplete(const XString& p_table)
 {
   if(m_parameters.m_listOnly)
   {

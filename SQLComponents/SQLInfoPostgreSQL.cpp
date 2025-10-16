@@ -2,8 +2,8 @@
 //
 // File: SQLInfoPostgreSQL.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -27,12 +27,6 @@
 #include "SQLComponents.h"
 #include "SQLInfoPostgreSQL.h"
 #include "SQLQuery.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 namespace SQLComponents
 {
@@ -224,7 +218,7 @@ SQLInfoPostgreSQL::GetRDBMSMaxVarchar() const
 
 // Identifier rules differ per RDBMS
 bool
-SQLInfoPostgreSQL::IsIdentifier(XString p_identifier) const
+SQLInfoPostgreSQL::IsIdentifier(const XString& p_identifier) const
 {
   // Cannot be empty and cannot exceed this amount of characters
   if(p_identifier.GetLength() == 0 ||
@@ -233,14 +227,14 @@ SQLInfoPostgreSQL::IsIdentifier(XString p_identifier) const
     return false;
   }
   // Must start with one alpha char
-  if(!_istalpha(p_identifier.GetAt(0)))
+  if(!_istalpha((TCHAR)p_identifier.GetAt(0)))
   {
     return false;
   }
   for(int index = 0;index < p_identifier.GetLength();++index)
   {
     // Can be upper/lower alpha or a number OR an underscore
-    TCHAR ch = p_identifier.GetAt(index);
+    TCHAR ch = (TCHAR) p_identifier.GetAt(index);
     if(!_istalnum(ch) && ch != '_')
     {
       return false;
@@ -340,14 +334,14 @@ SQLInfoPostgreSQL::GetKEYWORDParameterPrefix() const
 // Get select part to add new record identity to a table
 // Can be special column like 'OID' or a sequence select
 XString
-SQLInfoPostgreSQL::GetKEYWORDIdentityString(XString& p_tablename,XString p_postfix /*= "_seq"*/) const
+SQLInfoPostgreSQL::GetKEYWORDIdentityString(const XString& p_tablename,const XString& p_postfix /*= "_seq"*/) const
 {
   return _T("nextval('") + p_tablename + p_postfix + _T("')");
 }
 
 // Gets the UPPER function
 XString
-SQLInfoPostgreSQL::GetKEYWORDUpper(XString& p_expression) const
+SQLInfoPostgreSQL::GetKEYWORDUpper(const XString& p_expression) const
 {
   return _T("UPPER(") + p_expression + _T(")");
 }
@@ -362,7 +356,7 @@ SQLInfoPostgreSQL::GetKEYWORDInterval1MinuteAgo() const
 
 // Gets the Not-NULL-Value statement of the database
 XString
-SQLInfoPostgreSQL::GetKEYWORDStatementNVL(XString& p_test,XString& p_isnull) const
+SQLInfoPostgreSQL::GetKEYWORDStatementNVL(const XString& p_test,const XString& p_isnull) const
 {
   return _T("{fn IFNULL(") + p_test + _T(",") + p_isnull + _T(")}");
 }
@@ -494,10 +488,10 @@ SQLInfoPostgreSQL::GetSelectForUpdateTableClause(unsigned /*p_lockWaitTime*/) co
 XString
 SQLInfoPostgreSQL::GetSelectForUpdateTrailer(XString p_select,unsigned p_lockWaitTime) const
 {
-  XString sql = p_select + "\nFOR UPDATE";
+  XString sql = p_select + _T("\nFOR UPDATE");
   if(!p_lockWaitTime)
   {
-    sql += " SKIP LOCKED";
+    sql += _T(" SKIP LOCKED");
   }
   return sql;
 }
@@ -2449,7 +2443,7 @@ SQLInfoPostgreSQL::GetPSMDeclaration(bool    /*p_first*/
       line += _T(" DEFAULT ") + p_default;
     }
   }
-  else if(!p_asColumn)
+  else if(!p_asColumn.IsEmpty())
   {
     line += p_asColumn + _T("%TYPE");
   }
@@ -2684,7 +2678,7 @@ SQLInfoPostgreSQL::GetSESSIONConstraintsImmediate() const
 
 // Calling a stored function or procedure if the RDBMS does not support ODBC call escapes
 SQLVariant*
-SQLInfoPostgreSQL::DoSQLCall(SQLQuery* p_query,XString& p_schema,XString& p_procedure)
+SQLInfoPostgreSQL::DoSQLCall(SQLQuery* p_query,const XString& p_schema,const XString& p_procedure)
 {
   // PostgreSQL does not support the return parameter of the "{[?=]CALL procedure(?,?)}" sequence
   // instead you have to do a "SELECT procedure(?,?)" 
@@ -2751,7 +2745,7 @@ SQLInfoPostgreSQL::DoSQLCall(SQLQuery* p_query,XString& p_schema,XString& p_proc
 
 // Calling a stored function with named parameters, returning a value
 SQLVariant*
-SQLInfoPostgreSQL::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,XString& /*p_schema*/,XString& /*p_procedure*/,bool /*p_function = true*/)
+SQLInfoPostgreSQL::DoSQLCallNamedParameters(SQLQuery* /*p_query*/,const XString& /*p_schema*/,const XString& /*p_procedure*/,bool /*p_function = true*/)
 {
   return nullptr;
 }
@@ -2787,7 +2781,7 @@ SQLInfoPostgreSQL::GetCountReturnParameters(SQLQuery* p_query)
 XString
 SQLInfoPostgreSQL::ConstructSQLForProcedureCall(SQLQuery* p_query
                                                ,SQLQuery* p_thecall
-                                               ,XString&  p_schema
+                                               ,const XString& p_schema
                                                ,const XString& p_procedure)
 {
   // Start with select form

@@ -2,8 +2,8 @@
 //
 // File: Xfile.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -45,23 +45,23 @@ public:
   XFile(Parameters& p_parameters);
  ~XFile();
 
-  bool    OpenCreate(XString p_filename,XString p_databaseType);
-  bool    OpenRead  (XString p_filename,XString p_databaseType,bool p_listonly);
+  bool    OpenCreate(const XString& p_filename,const XString& p_databaseType);
+  bool    OpenRead  (const XString& p_filename,const XString& p_databaseType,bool p_listonly);
   bool    Close();
 
   // Writing to the export file
-  void    WriteSection(XString p_name);
-  void    WriteUserType(XString p_type);
-  void    WriteTable(XString p_table);
+  void    WriteSection(const XString& p_name);
+  void    WriteUserType(const XString& p_type);
+  void    WriteTable(const XString& p_table);
   void    WriteColumns(OList* p_columns);
-  void    WriteIndex(XString p_table,XString p_index);
-  void    WriteConstraint(int p_num,XString p_table,XString p_constraint);
-  void    WriteView(XString p_view);
-  void    WriteSequence(XString p_sequence);
-  void    WriteProcedure(XString p_procedure);
-  void    WriteSQL(XString p_sql);
-  void    WriteSynonym(XString p_type,XString p_name);
-  bool    WriteRows(XPort& p_xport,XString& p_table,bool p_export);
+  void    WriteIndex(const XString& p_table,const XString& p_index);
+  void    WriteConstraint(int p_num,const XString& p_table,const XString& p_constraint);
+  void    WriteView(const XString& p_view);
+  void    WriteSequence(const XString& p_sequence);
+  void    WriteProcedure(const XString& p_procedure);
+  void    WriteSQL(const XString& p_sql);
+  void    WriteSynonym(const XString& p_type,const XString& p_name);
+  bool    WriteRows(XPort& p_xport,const XString& p_table,bool p_export);
   void    WriteSectionEnd();
   void    WriteEndExport();
   void    Flush();
@@ -85,9 +85,9 @@ public:
 
 private:
   // Private objects occurring multiple times
-  void    WriteHeader(XString p_type);
+  void    WriteHeader(const XString& p_type);
   bool    ReadHeader(XString& p_type);
-  void    WriteString(TCHAR p_type,XString& p_string);
+  void    WriteString(TCHAR p_type,const XString& p_string);
   bool    ReadString(TCHAR& p_type,XString& p_string);
   void    WriteObject(TCHAR p_type,int  p_length);
   bool    ReadObject(TCHAR& p_type,int& p_length);

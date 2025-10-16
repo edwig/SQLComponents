@@ -2,8 +2,8 @@
 //
 // File: TestDataSet.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -27,10 +27,6 @@
 #include "TestSQL.h"
 #include "SQLDatabase.h"
 #include "SQLDataSet.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
 
 bcd
 TestAppend(SQLDatabase* p_dbs,int p_master)

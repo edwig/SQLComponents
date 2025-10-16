@@ -2,8 +2,8 @@
 //
 // File: FilterTest.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -24,10 +24,10 @@
 // Version number: See SQLComponents.h
 //
 #include "stdafx.h"
-#include "SQLFilter.h"
-#include "SQLVariant.h"
-#include "SQLDate.h"
-#include "SQLQuery.h"
+#include <SQLFilter.h>
+#include <SQLVariant.h>
+#include <SQLDate.h>
+#include <SQLQuery.h>
 #include "UnitTest.h"
 #include <bcd.h>
 
@@ -165,7 +165,10 @@ namespace OperatorUnitTest
       number_of_tests++;
     }
 
-    void TestExpression(XString p_field,SQLOperator p_oper,XString p_expression,XString p_expect)
+    void TestExpression(const XString& p_field
+                       ,const SQLOperator p_oper
+                       ,const XString& p_expression
+                       ,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -292,7 +295,7 @@ namespace OperatorUnitTest
       TestFunctionString2 (_T("fieldname"),OP_Equal,FN_IFNULL,          _T("other"), _T("other"), _T("{fn IFNULL(fieldname,?)} = ?"));
     }
 
-    void TestFunctionConstant(XString p_field,SQLOperator p_oper,SQLFunction p_function,XString p_expect)
+    void TestFunctionConstant(const XString& p_field,SQLOperator p_oper,SQLFunction p_function,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -304,7 +307,7 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionString1(XString p_field,SQLOperator p_oper,SQLFunction p_function,XString p_value,XString p_expect)
+    void TestFunctionString1(const XString& p_field,SQLOperator p_oper,SQLFunction p_function,const XString& p_value,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -318,7 +321,7 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionString2(XString p_field,SQLOperator p_oper,SQLFunction p_function,XString p_value1,XString p_value2,XString p_expect)
+    void TestFunctionString2(const XString p_field,SQLOperator p_oper,SQLFunction p_function,const XString& p_value1,const XString& p_value2,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -334,9 +337,9 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionString3(XString p_field,SQLOperator p_oper,SQLFunction p_function
-                            ,XString p_value1,XString p_value2,XString p_value3
-                            ,XString p_expect)
+    void TestFunctionString3(const XString& p_field,SQLOperator p_oper,SQLFunction p_function
+                            ,const XString& p_value1,const XString& p_value2,const XString& p_value3
+                            ,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -354,9 +357,9 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionString4(XString p_field,SQLOperator p_oper,SQLFunction p_function
-                            ,XString p_value1,XString p_value2,XString p_value3,XString p_value4
-                            ,XString p_expect)
+    void TestFunctionString4(const XString& p_field,SQLOperator p_oper,SQLFunction p_function
+                            ,const XString& p_value1,const XString& p_value2,const XString& p_value3,const XString& p_value4
+                            ,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -376,7 +379,7 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionNumber1(XString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number,XString p_expect)
+    void TestFunctionNumber1(const XString& p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -390,7 +393,12 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionNumber2(XString p_field,SQLOperator p_oper,SQLFunction p_function,bcd p_number1,bcd p_number2,XString p_expect)
+    void TestFunctionNumber2(const XString& p_field
+                            ,SQLOperator    p_oper
+                            ,SQLFunction    p_function
+                            ,bcd            p_number1
+                            ,bcd            p_number2
+                            ,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -406,7 +414,12 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionExtract(XString p_field,SQLOperator p_oper,SQLFunction p_function,SQLExtractPart p_part,XString p_value,XString p_expect)
+    void TestFunctionExtract(const XString& p_field
+                            ,SQLOperator    p_oper
+                            ,SQLFunction    p_function
+                            ,SQLExtractPart p_part
+                            ,const XString& p_value
+                            ,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field,p_oper);
@@ -421,7 +434,13 @@ namespace OperatorUnitTest
       ++number_of_tests;
     }
 
-    void TestFunctionTSCalc(XString p_field,SQLOperator p_oper,SQLFunction p_function,SQLTimestampCalcPart p_part,int p_add,XString p_value,XString p_expect)
+    void TestFunctionTSCalc(const XString& p_field
+                           ,SQLOperator    p_oper
+                           ,SQLFunction    p_function
+                           ,SQLTimestampCalcPart p_part
+                           ,int            p_add
+                           ,const XString& p_value
+                           ,const XString& p_expect)
     {
       SQLQuery query;
       SQLFilter filter(p_field, p_oper);

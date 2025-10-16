@@ -2,8 +2,8 @@
 //
 // File: VariantFormatting.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -24,10 +24,9 @@
 // Version number: See SQLComponents.h
 //
 #include "stdafx.h"
-#include "SQLVariantFormat.h"
-#include "SQLTimestamp.h"
-#include "SQLTime.h"
-#include "SQLDate.h"
+#include <SQLVariantFormat.h>
+#include <SQLTimestamp.h>
+#include <SQLDate.h>
 #include "UnitTest.h"
 
 namespace DatabaseUnitTest
@@ -203,8 +202,8 @@ namespace DatabaseUnitTest
       SQLVariantFormat fdate(date2);
       // Forcing the string to a timestamp
       fdate.SetFormat(theDate);
-      fdate.FormatDate(_T("dddd dd MMMM jjjj |M:mm:ss"));
-      Assert::AreEqual(_T("donderdag 15 oktober 1959 15:50:20"),fdate.GetFormat());
+      fdate.FormatDate(_T("dddd dd MMMM jjjj |H:mm:ss"));
+      Assert::AreEqual(_T("donderdag 15 oktober 1959 15:50:20"),fdate.GetFormat().GetString());
       number_of_tests++;
 
       // Only for date
@@ -223,7 +222,7 @@ namespace DatabaseUnitTest
       SQLVariantFormat fdate4(date4);
       // Forcing to a time
       fdate.SetFormat(theDate);
-      fdate.FormatDate(_T("|M:mm:ss"));
+      fdate.FormatDate(_T("|H:mm:ss"));
       Assert::AreEqual(_T("15:50:20"),fdate.GetFormat());
       number_of_tests++;
     }

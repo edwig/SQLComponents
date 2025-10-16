@@ -2,8 +2,8 @@
 //
 // File: SQLVariant.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -32,12 +32,6 @@
 #include "SQLTimestamp.h"
 #include "SQLGuid.h"
 #include <bcd.h>
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 namespace SQLComponents
 {
@@ -1134,7 +1128,11 @@ SQLVariant::GetAsBinary() const
     return (void*)m_data.m_dataWCHAR;
   }
   // Use GetDataPointer instead
-  return ThrowErrorDatatype(SQL_C_BINARY);
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_BINARY);
+  }
+  return nullptr;
 }
 
 bool
@@ -1197,7 +1195,10 @@ SQLVariant::GetAsSShort() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_SHORT);
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_SHORT);
+  }
   return 0;
 }
 
@@ -1256,7 +1257,10 @@ SQLVariant::GetAsUShort() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_USHORT);
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_USHORT);
+  }
   return 0;
 }
 
@@ -1314,8 +1318,11 @@ SQLVariant::GetAsSLong() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_SLONG);
-  return 0L;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_SLONG);
+  }
+  return 0;
 }
 
 
@@ -1374,8 +1381,11 @@ SQLVariant::GetAsULong() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_ULONG);
-  return 0UL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_ULONG);
+  }
+  return 0;
 }
 
 float
@@ -1432,7 +1442,10 @@ SQLVariant::GetAsFloat() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_FLOAT);
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_FLOAT);
+  }
   return 0.0;
 }
 
@@ -1490,11 +1503,11 @@ SQLVariant::GetAsDouble() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_DOUBLE);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_DOUBLE);
+  }
+  return 0.0;
 }
 
 char
@@ -1552,11 +1565,11 @@ SQLVariant::GetAsBit() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_BIT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_BIT);
+  }
+  return 0;
 }
 
 char
@@ -1614,11 +1627,11 @@ SQLVariant::GetAsSTinyInt() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_STINYINT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_STINYINT);
+  }
+  return 0;
 }
 
 unsigned char
@@ -1675,11 +1688,11 @@ SQLVariant::GetAsUTinyInt() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_UTINYINT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_UTINYINT);
+  }
+  return 0;
 }
 
 SQLBIGINT
@@ -1736,11 +1749,11 @@ SQLVariant::GetAsSBigInt() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_SBIGINT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_SBIGINT);
+  }
+  return 0L;
 }
 
 SQLUBIGINT
@@ -1797,11 +1810,11 @@ SQLVariant::GetAsUBigInt() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_UBIGINT);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
-  return NULL; 
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_UBIGINT);
+  }
+  return 0;
 }
 
 __declspec(thread) static SQL_NUMERIC_STRUCT g_number;
@@ -1889,8 +1902,12 @@ SQLVariant::GetAsNumeric() const
                           break;
   }
   // Other datatypes cannot convert
-  ThrowErrorDatatype(SQL_C_NUMERIC);
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_NUMERIC);
+  }
+  memset(&g_number,0,sizeof(SQL_NUMERIC_STRUCT));
+  return &g_number;
 }
 
 const SQLGUID*
@@ -1900,8 +1917,11 @@ SQLVariant::GetAsGUID() const
   {
     return &m_data.m_dataGUID;
   }
-  ThrowErrorDatatype(SQL_C_GUID);
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_GUID);
+  }
+  return nullptr;
 }
 
 __declspec(thread) static DATE_STRUCT g_date;
@@ -1933,8 +1953,12 @@ SQLVariant::GetAsDate() const
     }
     return &g_date;
   }
-  ThrowErrorDatatype(SQL_C_DATE);
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_DATE);
+  }
+  memset(&g_date,0,sizeof(SQL_DATE_STRUCT));
+  return &g_date;
 }
 
 __declspec(thread) static TIME_STRUCT g_time;
@@ -1966,8 +1990,12 @@ SQLVariant::GetAsTime() const
     }
     return &g_time;
   }
-  ThrowErrorDatatype(SQL_C_TIME);
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_TIME);
+  }
+  memset(&g_time,0,sizeof(SQL_TIME_STRUCT));
+  return &g_time;
 }
 
 __declspec(thread) static TIMESTAMP_STRUCT g_timestamp;
@@ -1981,10 +2009,10 @@ SQLVariant::GetAsTimestamp() const
   }
   if(m_datatype == SQL_C_DATE || m_datatype == SQL_C_TYPE_DATE)
   {
-    ASSERT(m_data.m_dataTIMESTAMP.hour     == 0);
-    ASSERT(m_data.m_dataTIMESTAMP.minute   == 0);
-    ASSERT(m_data.m_dataTIMESTAMP.second   == 0);
-    ASSERT(m_data.m_dataTIMESTAMP.fraction == 0);
+    ATLASSERT(m_data.m_dataTIMESTAMP.hour     == 0);
+    ATLASSERT(m_data.m_dataTIMESTAMP.minute   == 0);
+    ATLASSERT(m_data.m_dataTIMESTAMP.second   == 0);
+    ATLASSERT(m_data.m_dataTIMESTAMP.fraction == 0);
     return &m_data.m_dataTIMESTAMP;
   }
   if(m_datatype == SQL_C_CHAR ||
@@ -2003,8 +2031,11 @@ SQLVariant::GetAsTimestamp() const
     }
     return &g_timestamp;
   }
-  ThrowErrorDatatype(SQL_C_TIMESTAMP);
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_TIMESTAMP);
+  }
+  return nullptr;
 }
 
 // European timestamp has the day-month-year order
@@ -2058,8 +2089,11 @@ SQLVariant::GetAsInterval() const
   {
     return &m_data.m_dataINTERVAL;
   }
-  ThrowErrorDatatype(SQL_C_INTERVAL_DAY_TO_SECOND);
-  return NULL;
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_INTERVAL_DAY_TO_SECOND);
+  }
+  return nullptr;
 }
 
 SQLDate
@@ -2210,10 +2244,10 @@ SQLVariant::GetAsBCD() const
     case SQL_C_INTERVAL_MINUTE_TO_SECOND: // Fall through
     default:                              break;
   }
-  ThrowErrorDatatype(SQL_C_NUMERIC);
-  // We never come here, but this is to prevent 
-  // Warning C4715 not all control paths return a value
-  // In various versions of the MSC++ compiler
+  if(m_datatype)
+  {
+    ThrowErrorDatatype(SQL_C_NUMERIC);
+  }
   return bcd(); 
 }
 
@@ -2860,7 +2894,7 @@ SQLVariant::Set(LPCTSTR p_string,bool p_wide /*=false*/)
 }
 
 void
-SQLVariant::Set(const XString p_string,bool p_wide /*=false*/)
+SQLVariant::Set(const XString& p_string,bool p_wide /*=false*/)
 {
   if(p_wide)
   {

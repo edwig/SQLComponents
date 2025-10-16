@@ -1,10 +1,6 @@
 Planning of features for SQLComponents library
 ==============================================
 
-1)
-AND STILL MORE UNIT TESTS!
-
-2)
-SQLMigrate has been moved to the Open ODBCQueryTool project!!
-Take a look at this project to see the latest improvements.
-It is no longer maintained here!
+1) AND STILL MORE UNIT TESTS!
+2) Move to XString based in std::string / std::wstring
+   Removing the dependency on the MFC libraries

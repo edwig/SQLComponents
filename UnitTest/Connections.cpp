@@ -2,8 +2,8 @@
 //
 // File: Connections.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -24,9 +24,9 @@
 // Version number: See SQLComponents.h
 //
 #include "stdafx.h"
-#include "SQLDatabasePool.h"
-#include "SQLQuery.h"
-#include "SQLAutoDBS.h"
+#include <SQLDatabasePool.h>
+#include <SQLQuery.h>
+#include <SQLAutoDBS.h>
 #include "UnitTest.h"
 
 namespace ConnectionsUnitTest
@@ -62,7 +62,8 @@ public:
     SQLConnections conn;
     FillConnections(conn);
 
-    bool result = conn.SaveConnectionsFile();
+    XString filename;
+    bool result = conn.SaveConnectionsFile(filename);
     Assert::IsTrue(result);
     ++number_of_tests;
   }
@@ -75,11 +76,13 @@ public:
     SQLConnections conn;
     FillConnections(conn);
 
-    bool result = conn.SaveConnectionsFile();
+    XString filename;
+    bool result = conn.SaveConnectionsFile(filename);
     Assert::IsTrue(result);
 
+    XString otherfile;
     SQLConnections other;
-    result = other.LoadConnectionsFile();
+    result = other.LoadConnectionsFile(otherfile);
     Assert::IsTrue(result);
 
     SQLConnection* theConn = other.GetConnection(_T("Other"));
@@ -100,9 +103,10 @@ public:
 
     SQLComponents::InitSQLComponents(LN_ENGLISH);
 
+    XString filename;
     SQLConnections conn;
     FillConnections(conn);
-    conn.SaveConnectionsFile();
+    conn.SaveConnectionsFile(filename);
 
     m_pool.ReadConnections();
 

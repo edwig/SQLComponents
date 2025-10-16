@@ -2,8 +2,8 @@
 //
 // File: BasicSheet.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -47,7 +47,7 @@ namespace DatabaseUnitTest
       excel.GetSheetNames(sheets);
       for(auto& name : sheets)
       {
-        Logger::WriteMessage("Sheet name: " + name);
+        Logger::WriteMessage(_T("Sheet name: ") + name);
         number_of_tests++;
       }
 
@@ -58,7 +58,7 @@ namespace DatabaseUnitTest
 
     void TestXMLWorksheet(BasicXmlExcel& p_excel,int p_sheet,XString p_name)
     {
-      Logger::WriteMessage("Testing worksheet: " + p_name);
+      Logger::WriteMessage(_T("Testing worksheet: ") + p_name);
 
       // Get worksheet (zero based)
       BasicXmlWorksheet* sheet = p_excel.GetWorksheet(p_sheet - 1);
@@ -90,7 +90,12 @@ namespace DatabaseUnitTest
       InitSQLComponents();
 
       BasicExcel excel(_T("..\\UnitTest\\BasicExcel.xls"));
-      XString error = excel.GetError();
+      XString error;
+      char* er = excel.GetError();
+      if(er)
+      {
+        error = (LPCSTR)er;
+      }
       Assert::IsTrue(error.IsEmpty());
       number_of_tests++;
 
@@ -101,7 +106,7 @@ namespace DatabaseUnitTest
 
     void TestWorksheet(BasicExcel& p_excel,int p_sheet,XString p_name)
     {
-      Logger::WriteMessage("Testing worksheet: " + p_name);
+      Logger::WriteMessage(_T("Testing worksheet: ") + p_name);
 
       // Get worksheet (zero based)
       BasicExcelWorksheet* sheet = p_excel.GetWorksheet(p_sheet - 1);

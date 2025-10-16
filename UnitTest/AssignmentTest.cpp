@@ -2,8 +2,8 @@
 //
 // File: AssignmentTest.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -24,12 +24,12 @@
 // Version number: See SQLComponents.h
 //
 #include "stdafx.h"
-#include "SQLVariant.h"
-#include "SQLDate.h"
-#include "SQLTime.h"
-#include "SQLTimestamp.h"
-#include "SQLInterval.h"
-#include "bcd.h"
+#include <SQLVariant.h>
+#include <SQLDate.h>
+#include <SQLTime.h>
+#include <SQLTimestamp.h>
+#include <SQLInterval.h>
+#include <bcd.h>
 #include "UnitTest.h"
 
 int number_of_tests = 0;
@@ -87,7 +87,7 @@ namespace OperatorUnitTest
       number_of_tests += 4;
     }
 
-    TEST_METHOD(TestAssignCString)
+    TEST_METHOD(TestAssignXString)
     {
       Logger::WriteMessage("SQLVariant = XString");
 
@@ -96,14 +96,14 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual(_T("23"),oneString);
+      Assert::AreEqual(_T("23"),oneString.GetString());
       Assert::AreEqual(SQL_C_CHAR,one.GetDataType());
 
       SQLVariant two = twentythree; // Assignment XString -> to SQLVariant
       XString twoString;
       two.GetAsString(twoString);
 
-      Assert::AreEqual(_T("23"),twoString);
+      Assert::AreEqual(_T("23"),twoString.GetString());
       Assert::AreEqual(SQL_C_CHAR,two.GetDataType());
 
       number_of_tests += 4;
@@ -537,7 +537,7 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual(_T("20578 14:22:8"),oneString);
+      Assert::AreEqual(_T("20578 14:22:8"),oneString.GetString());
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
 
       number_of_tests += 2;
@@ -552,7 +552,7 @@ namespace OperatorUnitTest
       XString oneString;
       one.GetAsString(oneString);
 
-      Assert::AreEqual(_T("20578 14:22:8"),oneString);
+      Assert::AreEqual(_T("20578 14:22:8"),oneString.GetString());
       Assert::AreEqual(SQL_C_INTERVAL_DAY_TO_SECOND,one.GetDataType());
 
       number_of_tests += 2;

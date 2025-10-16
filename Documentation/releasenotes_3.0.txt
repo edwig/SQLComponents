@@ -1,0 +1,13 @@
+RELEASENOTES SQLCOMPONENTS VERSION 3.0
+======================================
+===== Released since: 15-10-2025 =====
+======================================
+
+CAVEAT: Work on the 3.0.0 has begun in the master branch
+        THIS IS BY NOW MEANS A WORKING BRANCH
+        For production code: use the "version2" branche of this library!!!
+
+Version 3.0.0 of xx-xx-2025
+---------------------------
+1)  Now based on version 2.0.0 of the BaseLibrary dropping the dependency on MFC
+    ATL::CString is now fully replaced by std::string and std::wstring

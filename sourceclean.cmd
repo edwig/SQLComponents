@@ -10,7 +10,10 @@ del /q /s /f *.VC.db
 rmdir /q /s .vs
 rmdir /q /s Debug
 rmdir /q /s Release
-rmdir /q /s bin
+rmdir /q /s bin_Debug64
+rmdir /q /s bin_DebugUnicode64
+rmdir /q /s bin_Release64
+rmdir /q /s bin_ReleaseUnicode64
 rmdir /q /s lib
 rmdir /q /s BaseLibrary\x64
 rmdir /q /s BaseLibrary\Debug

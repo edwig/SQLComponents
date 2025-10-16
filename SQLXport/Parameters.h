@@ -2,8 +2,8 @@
 //
 // File: Parameters.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -49,7 +49,7 @@ public:
   // Processing the options on the command line
   void ProcessCommandLine(int argc,TCHAR* argv[]);
   // Process parameters from a parameter file
-  void ReadParameterFile(XString p_filename);
+  void ReadParameterFile(const XString& p_filename);
   // Create the logfile
   void MakeLogfile();
   // Close the logfile

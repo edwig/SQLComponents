@@ -2,8 +2,8 @@
 //
 // File: XPort.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -31,10 +31,6 @@
 #include <SQLInterval.h>
 #include <ConvertWideString.h>
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
 // Needed for va_start on compound objects (XString)
 #pragma warning(disable: 4840)
 
@@ -52,7 +48,7 @@ errormap all_errors;
 
 // print string to terminal and logfile
 void
-xputs(const XString p_string)
+xputs(const XString& p_string)
 {
   if(params.m_logfile.GetIsOpen())
   {
@@ -65,7 +61,7 @@ xputs(const XString p_string)
 
 // Formatted print to terminal and logfile
 void
-xprint(bool p_sql,const XString p_string)
+xprint(bool p_sql,const XString& p_string)
 {
   if(params.m_listOnly && !p_sql)
   {
@@ -76,7 +72,7 @@ xprint(bool p_sql,const XString p_string)
 
 // Formatted print to terminal and logfile
 void
-xprintf(bool p_sql,const XString p_format,...)
+xprintf(bool p_sql,LPCTSTR p_format,...)
 {
   XString buffer;
 
@@ -94,7 +90,7 @@ xprintf(bool p_sql,const XString p_format,...)
 
 // Print error to terminal and logfile
 void
-xerror(const XString p_format,...)
+xerror(LPCTSTR p_format,...)
 {
   XString buffer;
 
@@ -111,7 +107,7 @@ xerror(const XString p_format,...)
 }
 
 void
-xerror(int p_rownum,XString p_string)
+xerror(int p_rownum,const XString& p_string)
 {
   XString text;
   errormap::iterator pos = all_errors.find(p_string);
@@ -255,6 +251,9 @@ ExportImport()
 
 int _tmain(int argc, TCHAR* argv[])
 {
+  // Initialize the base library
+  InitBaseLibrary();
+
   // Initialize the SQL components
   InitSQLComponents(LN_ENGLISH);
 

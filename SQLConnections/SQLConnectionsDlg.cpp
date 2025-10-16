@@ -2,8 +2,8 @@
 //
 // File: SQLConnectionsDlg.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -29,10 +29,6 @@
 #include "SQLConnectionsDlg.h"
 #include <SQLDatabase.h>
 #include "afxdialogex.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
 
 // CAboutDlg dialog used for App About
 
@@ -159,7 +155,7 @@ BOOL SQLConnectionsDlg::OnInitDialog()
   if (pSysMenu != nullptr)
   {
     BOOL bNameValid;
-    XString strAboutMenu;
+    CString strAboutMenu;
     bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
     ASSERT(bNameValid);
     if (!strAboutMenu.IsEmpty())
@@ -256,7 +252,7 @@ SQLConnectionsDlg::FillDatasources(DataSources& sources)
 void
 SQLConnectionsDlg::LoadConnections()
 {
-  m_connections.LoadConnectionsFile();
+  m_connections.LoadConnectionsFile(m_connectionsFile);
   unsigned index = 0;
 
   m_selectUpdate = false;
@@ -324,7 +320,7 @@ SQLConnectionsDlg::SaveConnections()
                                ,conn->m_targetSchema);
   }
   // Save m_connections
-  if(!m_connections.SaveConnectionsFile())
+  if(!m_connections.SaveConnectionsFile(m_connectionsFile))
   {
     ::MessageBox(GetSafeHwnd(),_T("Could **NOT** save the 'database.xml' file"),_T("Error"),MB_OK | MB_ICONERROR);
     return false;
@@ -439,7 +435,7 @@ SQLConnectionsDlg::MakeCurrentConnection()
 bool
 SQLConnectionsDlg::SanityChecks(int p_index)
 {
-  XString errors;
+  CString errors;
 
   for (int i = 0; i < m_list.GetItemCount(); ++i)
   {
@@ -471,24 +467,24 @@ SQLConnectionsDlg::SanityChecks(int p_index)
 void
 SQLConnectionsDlg::TestTheConnection()
 {
-  XString error;
+  CString error;
 
   try
   {
     SQLDatabase database;
-    if(database.Open(m_datasource,m_username,m_password1))
+    if(database.Open(m_datasource.GetString(),m_username.GetString(),m_password1.GetString()))
     {
-      XString message;
+      CString message;
       message.Format(_T("The connection with [%s] as user [%s] has succeeded!\n\n")
                      _T("The 'true' database name is: %s\n")
                      _T("This database is a [%s:%s] database\n")
                      _T("Vendors ODBC driver version is: %s")
                     ,m_datasource
                     ,m_username
-                    ,database.GetDatabaseName()
-                    ,database.GetDBVendorName()
-                    ,database.GetDBVendorVersion()
-                    ,database.GetDBVendorDriverVersion());
+                    ,database.GetDatabaseName().GetString()
+                    ,database.GetDBVendorName().GetString()
+                    ,database.GetDBVendorVersion().GetString()
+                    ,database.GetDBVendorDriverVersion().GetString());
       ::MessageBox(GetSafeHwnd(),message,_T("Melding"),MB_OK);
       database.Close();
     }
@@ -584,7 +580,7 @@ SQLConnectionsDlg::OnLvnItemchangedList(NMHDR* pNMHDR, LRESULT* pResult)
 void 
 SQLConnectionsDlg::OnEnChangeName()
 {
-  XString name = m_connectionName;
+  CString name = m_connectionName;
   UpdateData();
   if(name.Compare(m_connectionName))
   {
@@ -598,7 +594,7 @@ SQLConnectionsDlg::OnCbnCloseupDatasource()
   int ind = m_comboDatasource.GetCurSel();
   if(ind >= 0)
   {
-    XString datasource;
+    CString datasource;
     m_comboDatasource.GetLBText(ind,datasource);
     if(datasource.Compare(m_datasource))
     {
@@ -612,7 +608,7 @@ SQLConnectionsDlg::OnCbnCloseupDatasource()
 void
 SQLConnectionsDlg::OnEnChangeTargetSchema()
 {
-  XString target = m_targetSchema;
+  CString target = m_targetSchema;
   UpdateData();
   if(target.Compare(m_targetSchema))
   {
@@ -623,7 +619,7 @@ SQLConnectionsDlg::OnEnChangeTargetSchema()
 void 
 SQLConnectionsDlg::OnEnChangeUser()
 {
-  XString user = m_username;
+  CString user = m_username;
   UpdateData();
   if(user.Compare(m_username))
   {
@@ -634,7 +630,7 @@ SQLConnectionsDlg::OnEnChangeUser()
 void 
 SQLConnectionsDlg::OnEnChangePassword1()
 {
-  XString password = m_password1;
+  CString password = m_password1;
   UpdateData();
   if (password.Compare(m_password1))
   {
@@ -645,7 +641,7 @@ SQLConnectionsDlg::OnEnChangePassword1()
 void 
 SQLConnectionsDlg::OnEnChangePassword2()
 {
-  XString password = m_password2;
+  CString password = m_password2;
   UpdateData();
   if (password.Compare(m_password2))
   {
@@ -656,7 +652,7 @@ SQLConnectionsDlg::OnEnChangePassword2()
 void 
 SQLConnectionsDlg::OnEnChangeOptions()
 {
-  XString options = m_options;
+  CString options = m_options;
   UpdateData();
   if (options.Compare(m_options))
   {

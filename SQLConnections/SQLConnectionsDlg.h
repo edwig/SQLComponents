@@ -2,8 +2,8 @@
 //
 // File: SQLConnectionsDlg.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -68,13 +68,13 @@ protected:
   CButton    m_buttonOK;
   CButton    m_buttonCancel;
 
-  XString   m_connectionName;
-  XString   m_datasource;
-  XString   m_targetSchema;
-  XString   m_username;
-  XString   m_password1;
-  XString   m_password2;
-  XString   m_options;
+  CString   m_connectionName;
+  CString   m_datasource;
+  CString   m_targetSchema;
+  CString   m_username;
+  CString   m_password1;
+  CString   m_password2;
+  CString   m_options;
 
   CEdit      m_editConnectionName;
   CEdit      m_editTargetSchema;
@@ -84,6 +84,7 @@ protected:
   CEdit      m_editOptions;
 
   SQLConnections m_connections;
+  XString        m_connectionsFile;
   bool           m_changed { false };
   bool           m_selectUpdate  { true };
   int            m_selection { -1 };

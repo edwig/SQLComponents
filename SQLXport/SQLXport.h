@@ -2,8 +2,8 @@
 //
 // File: XPort.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -31,9 +31,9 @@ using namespace SQLComponents;
 #define XPORT_DATE    "30-07-2025"
 #define XPORT_YEAR    "2025"
 
-void xputs (const XString p_string);
-void xerror(const XString p_format,...);
-void xerror(int p_rownum,XString p_string);
-void xprint (bool p_sql,const XString p_string);
-void xprintf(bool p_sql,const XString p_format,...);
+void xputs (const XString& p_string);
+void xerror(LPCTSTR p_format,...);
+void xerror(int p_rownum,const XString& p_string);
+void xprint (bool p_sql,const XString& p_string);
+void xprintf(bool p_sql,LPCTSTR p_format,...);
 void print_all_errors();

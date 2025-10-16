@@ -13,7 +13,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{9496
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		Documentation\DesignRules.txt = Documentation\DesignRules.txt
-		framework.h = framework.h
 		Planning.txt = Planning.txt
 		Readme.md = Readme.md
 		Documentation\releasenotes_1.3.txt = Documentation\releasenotes_1.3.txt
@@ -25,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "General", "General", "{9496
 		Documentation\releasenotes_2.1.txt = Documentation\releasenotes_2.1.txt
 		Documentation\releasenotes_2.2.txt = Documentation\releasenotes_2.2.txt
 		Documentation\releasenotes_2.3.txt = Documentation\releasenotes_2.3.txt
+		Documentation\releasenotes_3.0.txt = Documentation\releasenotes_3.0.txt
 		sourceclean.cmd = sourceclean.cmd
 	EndProjectSection
 EndProject

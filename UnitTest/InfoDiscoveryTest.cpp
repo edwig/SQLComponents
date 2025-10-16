@@ -2,8 +2,8 @@
 //
 // File: InfoDiscoveryTest.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -24,10 +24,9 @@
 // Version number: See SQLComponents.h
 //
 #include "stdafx.h"
-#include "SQLComponents.h"
-#include "SQLDatabase.h"
-#include "SQLQuery.h"
-#include "SQLInfoDB.h"
+#include <SQLComponents.h>
+#include <SQLDatabase.h>
+#include <SQLInfoDB.h>
 #include "UnitTest.h"
 
 namespace DatabaseUnitTest
@@ -73,7 +72,7 @@ namespace DatabaseUnitTest
       MetaType(META_TABLES,  _T("tables"));
     }
 
-    void MetaType(int p_type,XString p_name)
+    void MetaType(int p_type,const XString& p_name)
     {
       SQLInfoDB* info = m_database->GetSQLInfoDB();
       MMetaMap objects;
@@ -97,7 +96,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TableDiscovery(XString p_table)
+    void TableDiscovery(const XString& p_table)
     {
       Logger::WriteMessage(_T("\nDO TABLE DISCOVERY: ") + p_table);
 
@@ -132,7 +131,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ColumnsDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
+    void ColumnsDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_table)
     {
       XString    catalog;
       XString    errors;
@@ -155,7 +154,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void PrimaryDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
+    void PrimaryDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_table)
     {
       MPrimaryMap primaries;
       XString     errors;
@@ -184,7 +183,7 @@ namespace DatabaseUnitTest
       }
     }
     
-    void ForeignDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
+    void ForeignDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_table)
     {
       MForeignMap references;
       XString     errors;
@@ -205,7 +204,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void IndicesDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
+    void IndicesDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_table)
     {
       MIndicesMap statistics;
       XString     errors;
@@ -227,7 +226,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void SpecialDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
+    void SpecialDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_table)
     {
       MSpecialsMap specials;
       XString errors;
@@ -248,7 +247,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TriggerDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
+    void TriggerDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_table)
     {
       MTriggerMap triggers;
       XString errors;
@@ -288,7 +287,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TabPrivDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_table)
+    void TabPrivDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_table)
     {
       MPrivilegeMap privileges;
       XString errors;
@@ -315,7 +314,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ProcedureDiscovery(XString p_procedure)
+    void ProcedureDiscovery(const XString& p_procedure)
     {
       Logger::WriteMessage(_T("\nDO PROCEDURE DISCOVERY: ") + p_procedure);
 
@@ -339,7 +338,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void ParametersDiscovery(SQLInfoDB* p_info,XString p_schema,XString p_procedure)
+    void ParametersDiscovery(SQLInfoDB* p_info,const XString& p_schema,const XString& p_procedure)
     {
       MParameterMap params;
       XString errors;
@@ -360,7 +359,7 @@ namespace DatabaseUnitTest
       }
     }
 
-    void TranslateSQLtoNative(XString p_sql)
+    void TranslateSQLtoNative(const XString& p_sql)
     {
       SQLInfoDB* info = m_database->GetSQLInfoDB();
       XString translated = info->NativeSQL(NULL,p_sql);

@@ -2,8 +2,8 @@
 //
 // File: SQLPrimaryKey.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -28,12 +28,6 @@
 #include "SQLPrimaryKey.h"
 #include "SQLInfoDB.h"
 #include <algorithm>
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
 
 namespace SQLComponents
 {
@@ -139,7 +133,7 @@ SQLPrimaryKey::GetPrimaryValue()
       total += ',';
     }
 
-    CString key;
+    XString key;
     val->GetAsString(key);
     if(val->IsNumericType())
     {
@@ -209,7 +203,7 @@ SQLPrimaryKey::GetCondition(SQLInfoDB* p_info /*=nullptr*/)
 }
 
 void 
-SQLPrimaryKey::AddField(XString p_field,SQLVariant& p_value)
+SQLPrimaryKey::AddField(const XString& p_field,SQLVariant& p_value)
 {
   SQLVariant* value = new SQLVariant(p_value);
 

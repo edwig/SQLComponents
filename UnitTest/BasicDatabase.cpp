@@ -2,8 +2,8 @@
 //
 // File: BasaicDatabase.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -498,7 +498,7 @@ namespace DatabaseUnitTest
         SQLVariant* desc = masterRecord->GetField(_T("description"));
         XString name;
         desc->GetAsString(name);
-        Logger::WriteMessage("Master record: " + name);
+        Logger::WriteMessage(_T("Master record: ") + name);
       }
       else
       {
@@ -512,11 +512,11 @@ namespace DatabaseUnitTest
       for(auto& rec : *recSet)
       {
         bcd num = rec->GetField(_T("amount"))->GetAsBCD();
-        Logger::WriteMessage("Detail record: " + num.AsString());
+        Logger::WriteMessage(_T("Detail record: ") + num.AsString());
         total += num;
         number_of_tests++;
       }
-      Logger::WriteMessage("Total of details: " + total.AsString());
+      Logger::WriteMessage(_T("Total of details: ") + total.AsString());
       number_of_tests++;
 
       // Delete details result set
@@ -733,7 +733,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("TABLE Catalogs                     :"),p_info->GetCATALOGTableCatalog   (schema,table));
       ReportSQL    (_T("TABLE exists                       :"),p_info->GetCATALOGTableExists    (schema,table));
       ReportSQL    (_T("TABLE create                       :"),p_info->GetCATALOGTableCreate    (tables,metacolumns));
-      ReportSQL    (_T("TABLE Rename                       :"),p_info->GetCATALOGTableRename    (schema,table,table + "_ext"));
+      ReportSQL    (_T("TABLE Rename                       :"),p_info->GetCATALOGTableRename    (schema,table,table + _T("_ext")));
       ReportSQL    (_T("TABLE Drop                         :"),p_info->GetCATALOGTableDrop      (schema,table));
       number_of_tests += 9;
       // CATALOG Temp table
@@ -747,7 +747,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("COLUMN all attributes of the column:"),p_info->GetCATALOGColumnAttributes(schema,table,column));
       ReportSQL    (_T("COLUMN Create                      :"),p_info->GetCATALOGColumnCreate    (metacolumns));
       ReportSQL    (_T("COLUMN Alter                       :"),p_info->GetCATALOGColumnAlter     (metacolumns));
-      ReportSQL    (_T("COLUMN Rename                      :"),p_info->GetCATALOGColumnRename    (schema,table,column,column + "_ext",type));
+      ReportSQL    (_T("COLUMN Rename                      :"),p_info->GetCATALOGColumnRename    (schema,table,column,column + _T("_ext"),type));
       ReportSQL    (_T("COLUMN Drop                        :"),p_info->GetCATALOGColumnDrop      (schema,table,column));
       number_of_tests += 7;
       // CATALOG Index
@@ -762,7 +762,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("PRIMARY KEY exists                 :"),p_info->GetCATALOGPrimaryExists    (schema,table));
       ReportSQL    (_T("PRIMARY KEY attributes             :"),p_info->GetCATALOGPrimaryAttributes(schema,table));
       ReportSQL    (_T("PRIMARY KEY create                 :"),p_info->GetCATALOGPrimaryCreate    (primaries));
-      ReportSQL    (_T("PRIMARY KEY drop                   :"),p_info->GetCATALOGPrimaryDrop      (schema,table,"pk_" + table));
+      ReportSQL    (_T("PRIMARY KEY drop                   :"),p_info->GetCATALOGPrimaryDrop      (schema,table,_T("pk_") + table));
       number_of_tests += 4;
       // CATALOG Foreign key
       ReportSQL    (_T("FOREIGN KEY exists                 :"),p_info->GetCATALOGForeignExists    (schema,table,foreign));
@@ -784,7 +784,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("SEQUENCE lists                     :"),p_info->GetCATALOGSequenceList      (schema,table));
       ReportSQL    (_T("SEQUENCE attributes                :"),p_info->GetCATALOGSequenceAttributes(schema,table));
       ReportSQL    (_T("SEQUENCE create                    :"),p_info->GetCATALOGSequenceCreate    (sequence));
-      ReportSQL    (_T("SEQUENCE drop                      :"),p_info->GetCATALOGSequenceDrop      (schema,table + "_seq"));
+      ReportSQL    (_T("SEQUENCE drop                      :"),p_info->GetCATALOGSequenceDrop      (schema,table + _T("_seq")));
       number_of_tests += 5;
       // CATALOG View
       ReportSQL    (_T("VIEW exists                        :"),p_info->GetCATALOGViewExists    (schema,viewname));
@@ -819,14 +819,14 @@ namespace DatabaseUnitTest
       ReportString (_T("PSM CURSOR declaration             :"),p_info->GetPSMCursorDeclaration(destiny,select));
       ReportString (_T("PSM CURSOR Fetch                   :"),p_info->GetPSMCursorFetch(cursorname,cursorcolumns,cursorparameters));
       ReportString (_T("PSM exception catch NODATA         :"),p_info->GetPSMExceptionCatchNoData());
-      ReportString (_T("PSM exception catch SQLSTATE       :"),p_info->GetPSMExceptionCatch("HY001"));
-      ReportString (_T("PSM exception raise                :"),p_info->GetPSMExceptionRaise("NODATA"));
+      ReportString (_T("PSM exception catch SQLSTATE       :"),p_info->GetPSMExceptionCatch(_T("HY001")));
+      ReportString (_T("PSM exception raise                :"),p_info->GetPSMExceptionRaise(_T("NODATA")));
       number_of_tests += 16;
       // SESSION CONTROL
       ReportSQL    (_T("SESSION Getting session/terminal   :"),p_info->GetSESSIONMyself());
-      ReportSQL    (_T("SESSION exists                     :"),p_info->GetSESSIONExists("123"));
+      ReportSQL    (_T("SESSION exists                     :"),p_info->GetSESSIONExists(_T("123")));
       ReportSQL    (_T("SESSION list                       :"),p_info->GetSESSIONList());
-      ReportSQL    (_T("SESSION attributes                 :"),p_info->GetSESSIONExists("123"));
+      ReportSQL    (_T("SESSION attributes                 :"),p_info->GetSESSIONExists(_T("123")));
       ReportSQL    (_T("SET ALL CONSTRAINTS DEFERRED       :"),p_info->GetSESSIONConstraintsDeferred());
       ReportSQL    (_T("SET ALL CONSTRAINTS IMMEDIATE      :"),p_info->GetSESSIONConstraintsImmediate());
       number_of_tests += 6;
@@ -937,17 +937,21 @@ namespace DatabaseUnitTest
       ReportGenericODBC();
     }
 
-    void TestEscapeCodes(SQLDatabase& p_dbs,CString p_test,CString p_sql,CString p_expected,CString p_native)
+    void TestEscapeCodes(SQLDatabase&   p_dbs
+                        ,const XString& p_test
+                        ,const XString& p_sql
+                        ,const XString& p_expected
+                        ,const XString& p_native)
     {
       Logger::WriteMessage(p_test);
       SQLQuery query(p_dbs);
       SQLVariant* var = query.DoSQLStatementScalar(p_sql);
-      CString result;
+      XString result;
       var->GetAsString(result);
       Assert::AreEqual(p_expected.GetString(),result.GetString());
 
       SQLInfoDB* info = p_dbs.GetSQLInfoDB();
-      CString native = info->NativeSQL(NULL,p_sql);
+      XString native = info->NativeSQL(NULL,p_sql);
       Assert::AreEqual(p_native.GetString(),native.GetString());
 
       ++number_of_tests;

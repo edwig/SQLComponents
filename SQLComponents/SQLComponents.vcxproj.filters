@@ -330,9 +330,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Configuration</Filter>
     </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>Configuration</Filter>
-    </ClInclude>
     <ClInclude Include="SQLComponents.h">
       <Filter>Configuration</Filter>
     </ClInclude>

@@ -2,8 +2,8 @@
 //
 // File: Parameters.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -230,7 +230,7 @@ Parameters::Usage()
 
 // Read all parameters from a parameter file
 void
-Parameters::ReadParameterFile(XString p_filename)
+Parameters::ReadParameterFile(const XString& p_filename)
 {
   WinFile file(p_filename);
   m_readParams = true;

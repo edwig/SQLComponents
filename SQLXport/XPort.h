@@ -2,8 +2,8 @@
 //
 // File: XPort.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -75,7 +75,7 @@ public:
   int     GetAllSynonyms();
   int     DoSQLStatement(XString& p_sql,bool p_can_retry = false);
   void    DropSchema();
-  bool    ConsistentTables (XString p_schema);
+  bool    ConsistentTables (const XString& p_schema);
   void    PerformStatistics();
   void    PerformRecompile();
   void    PerformRetries();
@@ -100,21 +100,21 @@ public:
   void    ImportDump();
 
   // Schema SQL
-  XString GetDefineSQLTable   (XString p_table);
-  DDLS    GetDefineSQLIndex   (XString p_table);
-  DDLS    GetDefineSQLPrimary (XString p_table);
-  DDLS    GetDefineSQLForeigns(XString p_table);
+  XString GetDefineSQLTable   (const XString& p_table);
+  DDLS    GetDefineSQLIndex   (const XString& p_table);
+  DDLS    GetDefineSQLPrimary (const XString& p_table);
+  DDLS    GetDefineSQLForeigns(const XString& p_table);
 
-  XString GetDefineSQLUserType (XString p_type);
-  XString GetDefineSQLView     (XString p_view);
-  XString GetDefineSQLSequence (XString p_sequence);
-  XString GetDefineSQLProcedure(XString p_procedure);
-  XString GetDefineSQLTrigger  (XString p_trigger);
-  XString GetDefineSQLSynonym  (XString p_synonym);
+  XString GetDefineSQLUserType (const XString& p_type);
+  XString GetDefineSQLView     (const XString& p_view);
+  XString GetDefineSQLSequence (const XString& p_sequence);
+  XString GetDefineSQLProcedure(const XString& p_procedure);
+  XString GetDefineSQLTrigger  (const XString& p_trigger);
+  XString GetDefineSQLSynonym  (const XString& p_synonym);
   // Data SQL
-  XString GetDefineCountSelect(XString p_table,SQLInfoDB* p_info);
-  XString GetDefineRowSelect  (XString p_table,SQLInfoDB* p_info);
-  XString GetDefineRowInsert  (XString p_table,SQLInfoDB* p_info);
+  XString GetDefineCountSelect(const XString& p_table,SQLInfoDB* p_info);
+  XString GetDefineRowSelect  (const XString& p_table,SQLInfoDB* p_info);
+  XString GetDefineRowInsert  (const XString& p_table,SQLInfoDB* p_info);
 
   // Getters
   OList*        GetColumns();
@@ -122,17 +122,17 @@ public:
 
 private:
   // Exporting
-  void          WriteTableAccessRights (XString p_object,int& p_count);
-  void          WriteColumnAccessRights(XString p_object,int& p_count);
-  void          WriteProcedureAccessRights(XString p_object,int& p_count);
-  void          WriteSequenceAccessRights(XString p_sequence,int& p_count);
+  void          WriteTableAccessRights (const XString& p_object,int& p_count);
+  void          WriteColumnAccessRights(const XString& p_object,int& p_count);
+  void          WriteProcedureAccessRights(const XString& p_object,int& p_count);
+  void          WriteSequenceAccessRights(const XString& p_sequence,int& p_count);
   void          PostProcessSQL(XString& p_sql);
-  void          ShowRetryName(XString& p_sql);
-  bool          ImportObject(XString& p_object,XString& p_importing);
-  int           ImportSQL(XString& p_sql,bool p_retries = false,XString p_delim = _T(";"));
+  void          ShowRetryName(const XString& p_sql);
+  bool          ImportObject(const XString& p_object,const XString& p_importing);
+  int           ImportSQL(XString& p_sql,bool p_retries = false,const XString& p_delim = _T(";"));
   void          RecordAllColumns  (DDLCreateTable& p_create);
   void          RecordAllIndices  (DDLCreateTable& p_create,DDLS& p_ddls);
-  void          RecordAllPrimaries(DDLCreateTable& p_create,CString p_table);
+  void          RecordAllPrimaries(DDLCreateTable& p_create,const XString& p_table);
   void          RecordAllForeigns (DDLCreateTable& p_create);
   void          RecordAllComments (DDLCreateTable& p_create);
   // Drop old contents
@@ -155,8 +155,8 @@ private:
   void          ImportComments(TCHAR& p_type);
   // Prepare a table for bulk import and complete the bulk import
   void          FindIdentity(XString p_sql);
-  void          BulkImportPrepare (XString p_table);
-  void          BulkImportComplete(XString p_table);
+  void          BulkImportPrepare (const XString& p_table);
+  void          BulkImportComplete(const XString& p_table);
 
   // All the parameters
   Parameters& m_parameters;

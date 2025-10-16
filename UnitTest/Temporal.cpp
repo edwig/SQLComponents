@@ -2,8 +2,8 @@
 //
 // File: Temporal.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -24,7 +24,7 @@
 // Version number: See SQLComponents.h
 //
 #include "stdafx.h"
-#include "SQLDate.h"
+#include <SQLDate.h>
 #include "UnitTest.h"
 
 namespace DatabaseUnitTest
@@ -361,10 +361,10 @@ namespace DatabaseUnitTest
         CString expectUTC  (_T("2022-02-28T11:12:11.67800Z"));
         CString expectTZ   (_T("2022-02-28T13:12:11.68-02:00"));
 
-        CString stampString = stamp.AsString();
+        XString stampString = stamp.AsString();
         Assert::AreEqual(expect.GetString(),stampString.GetString());
 
-        CString stampLocal = stamp.AsXMLString(5);
+        XString stampLocal = stamp.AsXMLString(5);
         Assert::AreEqual(expectLocal.GetString(),stampLocal.GetString());
 
 //         // BEWARE: This test only succeeds in WEST-EUROPE during the summertime period!

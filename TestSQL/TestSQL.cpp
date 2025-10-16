@@ -2,8 +2,8 @@
 //
 // File: TestSQL.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -25,10 +25,6 @@
 //
 #include "stdafx.h"
 #include "TestSQL.h"
-
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
 
 // Firebird Open Source RDBMS 3.0
 // DSN "testing" points to the "testing.fdb" database
@@ -60,6 +56,7 @@ int _tmain(int argc,TCHAR* argv[],TCHAR* envp[])
 {
   int nRetCode = 0;
 
+  InitBaseLibrary();
   InitSQLComponents(LN_ENGLISH);
 
   // Simple test

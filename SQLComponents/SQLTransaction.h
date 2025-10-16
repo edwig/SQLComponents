@@ -2,8 +2,8 @@
 //
 // File: SQLTransaction.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -77,7 +77,7 @@ private:
   // To do after a rollback. Only SQLDatabase may call this method
   friend class SQLDatabase;
   void    AfterRollback();
-  void    SetSavepoint(XString p_savepoint);
+  void    SetSavepoint(const XString& p_savepoint);
 
 private:
   SQLDatabase*  m_database;
@@ -115,7 +115,7 @@ SQLTransaction::GetName() const
 }
 
 inline void
-SQLTransaction::SetSavepoint(XString p_savepoint)
+SQLTransaction::SetSavepoint(const XString& p_savepoint)
 {
   m_savepoint = p_savepoint;
 }

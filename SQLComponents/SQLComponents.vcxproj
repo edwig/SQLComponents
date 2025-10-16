@@ -515,7 +515,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h" />
     <ClInclude Include="SQLAutoDBS.h" />
     <ClInclude Include="BasicExcel.h" />
     <ClInclude Include="BasicXmlExcel.h" />

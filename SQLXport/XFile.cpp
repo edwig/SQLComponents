@@ -2,8 +2,8 @@
 //
 // File: Xfile.h
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -116,7 +116,7 @@ XFile::~XFile()
 }
 
 bool
-XFile::OpenCreate(XString p_filename,XString p_databaseType)
+XFile::OpenCreate(const XString& p_filename,const XString& p_databaseType)
 {
   Close();
   _tfopen_s(&m_file,p_filename,_T("wb+"));
@@ -133,7 +133,7 @@ XFile::OpenCreate(XString p_filename,XString p_databaseType)
 }
 
 bool
-XFile::OpenRead(XString p_filename,XString p_databaseType,bool p_listonly)
+XFile::OpenRead(const XString& p_filename,const XString& p_databaseType,bool p_listonly)
 {
   Close();
   _tfopen_s(&m_file,p_filename,_T("rb+"));
@@ -187,7 +187,7 @@ XFile::NextType()
 }
 
 void
-XFile::WriteHeader(XString p_type)
+XFile::WriteHeader(const XString& p_type)
 {
   xfwrite(_T("SQLXport "),9,m_file);
   xfwrite(XPORT_VERSION,3,  m_file);
@@ -267,7 +267,7 @@ XFile::ReadHeader(XString& p_type)
 }
 
 void
-XFile::WriteSQL(XString p_sql)
+XFile::WriteSQL(const XString& p_sql)
 {
   WriteString(_T('Q'),p_sql);
 }
@@ -291,7 +291,7 @@ XFile::ReadSQL()
 }
 
 void
-XFile::WriteSection(XString p_name)
+XFile::WriteSection(const XString& p_name)
 {
   WriteString(_T('S'),p_name);
   xprintf(false,_T("\n"));
@@ -319,7 +319,7 @@ XFile::ReadSection()
 }
 
 void
-XFile::WriteUserType(XString p_type)
+XFile::WriteUserType(const XString& p_type)
 {
   WriteString(_T('Y'),p_type);
   xprintf(false,_T("Exporting user type: %s\n"),p_type.GetString());
@@ -341,7 +341,7 @@ XFile::ReadUserType()
 }
 
 void
-XFile::WriteTable(XString p_table)
+XFile::WriteTable(const XString& p_table)
 {
   WriteString(_T('T'),p_table);
   xprintf(false,_T("Exporting table: %-32s "),p_table.GetString());
@@ -370,7 +370,7 @@ XFile::ReadTable(bool p_doNewline)
 }
 
 void
-XFile::WriteIndex(XString p_table,XString p_index)
+XFile::WriteIndex(const XString& p_table,const XString& p_index)
 {
   WriteString(_T('I'),p_index);
   xprintf(false,_T("Exporting index: %s.%s\n"),p_table.GetString(),p_index.GetString());
@@ -425,7 +425,7 @@ XFile::ReadColumns(OList* p_columns)
 }
 
 void  
-XFile::WriteSynonym(XString p_type,XString p_name)
+XFile::WriteSynonym(const XString& p_type,const XString& p_name)
 {
   WriteString(_T('P'),p_type);
   WriteString(_T('P'),p_name);
@@ -449,7 +449,7 @@ XFile::ReadSynonym(XString& p_type,XString& p_name)
 }
 
 void
-XFile::WriteConstraint(int p_num,XString p_table,XString p_constraint)
+XFile::WriteConstraint(int p_num,const XString& p_table,const XString& p_constraint)
 {
   WriteString(_T('C'),p_constraint);
 
@@ -483,7 +483,7 @@ XFile::ReadConstraint()
 }
 
 void
-XFile::WriteView(XString p_view)
+XFile::WriteView(const XString& p_view)
 {
   WriteString(_T('V'),p_view);
   xprintf(false,_T("Exporting view: %s\n"),p_view.GetString());
@@ -505,7 +505,7 @@ XFile::ReadView()
 }
 
 void
-XFile::WriteSequence(XString p_sequence)
+XFile::WriteSequence(const XString& p_sequence)
 {
   WriteString(_T('N'),p_sequence);
   xprintf(false,_T("Exporting sequence: %s\n"),p_sequence.GetString());
@@ -527,7 +527,7 @@ XFile::ReadSequence()
 }
 
 void
-XFile::WriteProcedure(XString p_procedure)
+XFile::WriteProcedure(const XString& p_procedure)
 {
   WriteString(_T('F'),p_procedure);
   xprintf(false,_T("Exporting source %s\n"),p_procedure.GetString());
@@ -549,7 +549,7 @@ XFile::ReadProcedure()
 }
 
 bool
-XFile::WriteRows(XPort& p_xport,XString& p_table,bool p_export)
+XFile::WriteRows(XPort& p_xport,const XString& p_table,bool p_export)
 {
   long    todo    = 0;
   long    rows    = 0;
@@ -844,7 +844,7 @@ XFile::Flush()
 //////////////////////////////////////////////////////////////////////////
 
 void    
-XFile::WriteString(TCHAR p_type,XString& p_string)
+XFile::WriteString(TCHAR p_type,const XString& p_string)
 {
   int length = p_string.GetLength();
 

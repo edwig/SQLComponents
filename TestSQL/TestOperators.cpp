@@ -2,8 +2,8 @@
 //
 // File: TestOperators.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -80,7 +80,7 @@ void TestSub()
   SQLVariant var2(&date2);
 
   SQLVariant var3 = var2 - var1;
-  CString diff;
+  XString diff;
   var3.GetAsString(diff);
   _tprintf(_T("Found interval is: %s\n"),diff.GetString());
 }
