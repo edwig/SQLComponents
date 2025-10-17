@@ -617,15 +617,15 @@ SQLDatabase::GetSQLInfoDB()
   {
     switch(m_rdbmsType)
     {
-      case RDBMS_ORACLE:    m_info = new SQLInfoOracle     (this); break;
-      case RDBMS_INFORMIX:  m_info = new SQLInfoInformix   (this); break;
-      case RDBMS_ACCESS:    m_info = new SQLInfoAccess     (this); break;
-      case RDBMS_SQLSERVER: m_info = new SQLInfoSQLServer  (this); break;
-      case RDBMS_POSTGRESQL:m_info = new SQLInfoPostgreSQL (this); break;
-      case RDBMS_FIREBIRD:  m_info = new SQLInfoFirebird   (this); break;
-      case RDBMS_MYSQL:     m_info = new SQLInfoMySQL      (this); break;
-      case RDBMS_MARIADB:   m_info = new SQLInfoMariaDB    (this); break;
-      default:              m_info = new SQLInfoGenericODBC(this); break;
+      case RDBMS_ORACLE:    m_info = alloc_new SQLInfoOracle     (this); break;
+      case RDBMS_INFORMIX:  m_info = alloc_new SQLInfoInformix   (this); break;
+      case RDBMS_ACCESS:    m_info = alloc_new SQLInfoAccess     (this); break;
+      case RDBMS_SQLSERVER: m_info = alloc_new SQLInfoSQLServer  (this); break;
+      case RDBMS_POSTGRESQL:m_info = alloc_new SQLInfoPostgreSQL (this); break;
+      case RDBMS_FIREBIRD:  m_info = alloc_new SQLInfoFirebird   (this); break;
+      case RDBMS_MYSQL:     m_info = alloc_new SQLInfoMySQL      (this); break;
+      case RDBMS_MARIADB:   m_info = alloc_new SQLInfoMariaDB    (this); break;
+      default:              m_info = alloc_new SQLInfoGenericODBC(this); break;
     }
   }
   return m_info;
@@ -888,8 +888,8 @@ SQLDatabase::MakeStmtHandle()
   // Check the results
   if(!Check(res))
   {
-    XString fout;
-    fout.Format(_T("Error creating a statement handle: ") + GetErrorString());
+    XString fout(_T("Error creating a statement handle: "));
+    fout += GetErrorString();
     throw StdException(fout);
   }
   // return the statement
@@ -996,7 +996,7 @@ SQLDatabase::ODBCNativeSQL(XString& p_sql)
   // Create a buffer that's 2 times the length
   // just to be sure for native constructions
   int len = p_sql.GetLength();
-  SQLTCHAR* buffer = new SQLTCHAR[(size_t)len * 2];
+  SQLTCHAR* buffer = alloc_new SQLTCHAR[(size_t)len * 2];
   SQLINTEGER lengte = 0;
   buffer[0] = 0;
 

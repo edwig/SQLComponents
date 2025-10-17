@@ -214,7 +214,7 @@ SQLVariant::SQLVariant(const void* p_binary,size_t p_size)
   m_sqlDatatype  = SQL_BINARY;
   m_indicator    = 0;
   m_binaryLength = (int) p_size;
-  m_data.m_dataBINARY = new BYTE[(size_t)p_size + 1];
+  m_data.m_dataBINARY = alloc_new BYTE[(size_t)p_size + 1];
   memcpy(m_data.m_dataBINARY,p_binary,p_size);
 }
 
@@ -377,19 +377,19 @@ SQLVariant::ReserveSpace(int p_type,int p_space)
   if(p_type == SQL_C_CHAR)
   {
     m_binaryLength = p_space + 1;
-    m_data.m_dataCHAR = new char[(size_t)m_binaryLength];
+    m_data.m_dataCHAR = alloc_new char[(size_t)m_binaryLength];
     m_data.m_dataCHAR[0] = 0;
   }
   if(p_type == SQL_C_WCHAR)
   {
     m_binaryLength = (p_space + 1) * 2;
-    m_data.m_dataWCHAR = new wchar_t[(size_t) (p_space + 1)];
+    m_data.m_dataWCHAR = alloc_new wchar_t[(size_t) (p_space + 1)];
     m_data.m_dataWCHAR[0] = 0;
   }
   if(p_type == SQL_C_BINARY)
   {
     m_binaryLength = p_space + 1;
-    m_data.m_dataBINARY = new BYTE[(size_t)m_binaryLength];
+    m_data.m_dataBINARY = alloc_new BYTE[(size_t)m_binaryLength];
   }
   // Reserving space means, that the contents is reset to logical NULL
   // Only, leave the indicator in case of AT_EXEC_DATA so drivers will not get upset!
@@ -762,7 +762,7 @@ SQLVariant::SetFromBinaryStreamData(int   p_type
     // Allocated buffer types
     m_binaryLength = p_length;
     m_indicator    = p_isnull ? SQL_NULL_DATA : p_length;
-    m_data.m_dataBINARY = new BYTE[(size_t)m_binaryLength + 2];
+    m_data.m_dataBINARY = alloc_new BYTE[(size_t)m_binaryLength + 2];
     memcpy(m_data.m_dataBINARY,p_data,(size_t)p_length);
     (reinterpret_cast<BYTE*>(m_data.m_dataBINARY))[p_length] = 0;
   }
@@ -2459,7 +2459,7 @@ SQLVariant::SetData(int p_type,LPCTSTR p_data)
                                           { 
                                             // Getting the length of the translation buffer first
                                             int clength = ::WideCharToMultiByte(GetACP(),0,p_data,-1,NULL,0,NULL,NULL);
-                                            m_data.m_dataCHAR = new char[clength + 1];
+                                            m_data.m_dataCHAR = alloc_new char[clength + 1];
                                             int blength = ::WideCharToMultiByte(GetACP(),0,p_data,clength,(LPSTR)m_data.m_dataCHAR,clength,NULL,NULL);
                                             m_data.m_dataCHAR[clength] = 0;
                                             if(blength > 0 && blength < clength)
@@ -2471,7 +2471,7 @@ SQLVariant::SetData(int p_type,LPCTSTR p_data)
                                           }
 #else
                                           m_binaryLength = (int)(dataLen);
-                                          m_data.m_dataCHAR = new char[(size_t)m_binaryLength + 1];
+                                          m_data.m_dataCHAR = alloc_new char[(size_t)m_binaryLength + 1];
                                           strcpy_s(m_data.m_dataCHAR, (size_t)m_binaryLength + 1,p_data);
                                           m_indicator = dataLen > 0 ? SQL_NTS : SQL_NULL_DATA;
 #endif
@@ -2479,14 +2479,14 @@ SQLVariant::SetData(int p_type,LPCTSTR p_data)
     case SQL_C_WCHAR:
 #ifdef UNICODE
                                           m_binaryLength = (int)(dataLen * 2);
-                                          m_data.m_dataWCHAR = new TCHAR[(size_t)m_binaryLength + 1];
+                                          m_data.m_dataWCHAR = alloc_new TCHAR[(size_t)m_binaryLength + 1];
                                           _tcscpy_s(m_data.m_dataWCHAR,(size_t)m_binaryLength + 1,p_data);
                                           m_indicator = dataLen > 0 ? SQL_NTS : SQL_NULL_DATA;
 #else
                                           {
                                             // Getting the needed buffer space (in codepoints! Not bytes!!)
                                             int length = MultiByteToWideChar(GetACP(),0,p_data,-1,NULL,NULL);
-                                            m_data.m_dataWCHAR = new wchar_t[(size_t)length + 1];
+                                            m_data.m_dataWCHAR = alloc_new wchar_t[(size_t)length + 1];
                                             MultiByteToWideChar(GetACP(),0,p_data,-1,reinterpret_cast<LPWSTR>(m_data.m_dataWCHAR),length);
                                             m_data.m_dataWCHAR[length] = 0;
                                             m_binaryLength = 2 * length;
@@ -2496,7 +2496,7 @@ SQLVariant::SetData(int p_type,LPCTSTR p_data)
                                           break;
     case SQL_C_BINARY:                    m_binaryLength = (int)(dataLen / 2);
                                           m_indicator    = m_binaryLength > 0 ? m_binaryLength : SQL_NULL_DATA;
-                                          m_data.m_dataBINARY = new BYTE[(size_t)m_binaryLength + 2];
+                                          m_data.m_dataBINARY = alloc_new BYTE[(size_t)m_binaryLength + 2];
                                           StringToBinary((const char*)p_data);
                                           break;
     case SQL_C_SHORT:                     // Fall through
@@ -2779,7 +2779,7 @@ SQLVariant::SetFromRawDataPointer(void* p_pointer,int p_size /*= 0*/)
                                           { 
                                             // Getting the length of the translation buffer first
                                             int clength = ::WideCharToMultiByte(GetACP(),0,(wchar_t*)p_pointer,-1,NULL,0,NULL,NULL);
-                                            m_data.m_dataCHAR = new char[clength + 1];
+                                            m_data.m_dataCHAR = alloc_new char[clength + 1];
                                             int blength = ::WideCharToMultiByte(GetACP(),0,(wchar_t*)p_pointer,clength,(LPSTR)m_data.m_dataCHAR,clength,NULL,NULL);
                                             m_data.m_dataCHAR[clength] = 0;
                                             if(blength > 0 && blength < clength)
@@ -2792,7 +2792,7 @@ SQLVariant::SetFromRawDataPointer(void* p_pointer,int p_size /*= 0*/)
 
 #else
                                           m_binaryLength    = p_size;
-                                          m_data.m_dataCHAR = new char[(size_t)m_binaryLength + 1];
+                                          m_data.m_dataCHAR = alloc_new char[(size_t)m_binaryLength + 1];
                                           strcpy_s(m_data.m_dataCHAR,  (size_t)m_binaryLength + 1,reinterpret_cast<char*>(p_pointer));
                                           m_indicator = p_size > 0 ? SQL_NTS : SQL_NULL_DATA;
 #endif
@@ -2800,14 +2800,14 @@ SQLVariant::SetFromRawDataPointer(void* p_pointer,int p_size /*= 0*/)
     case SQL_C_WCHAR:
 #ifdef UNICODE
                                           m_binaryLength = (int)(p_size * 2);
-                                          m_data.m_dataWCHAR = new TCHAR[(size_t)p_size + 1];
+                                          m_data.m_dataWCHAR = alloc_new TCHAR[(size_t)p_size + 1];
                                           wcscpy_s(m_data.m_dataWCHAR,(size_t)p_size+ 1,(wchar_t*)p_pointer);
                                           m_indicator = p_size > 0 ? SQL_NTS : SQL_NULL_DATA;
 #else
                                           {
                                             // Getting the needed buffer space (in codepoints! Not bytes!!)
                                             int length = MultiByteToWideChar(GetACP(),0,(char*)p_pointer,-1,NULL,NULL);
-                                            m_data.m_dataWCHAR = new wchar_t[(size_t) length + 1];
+                                            m_data.m_dataWCHAR = alloc_new wchar_t[(size_t) length + 1];
                                             MultiByteToWideChar(GetACP(),0,(char*)p_pointer,-1,reinterpret_cast<LPWSTR>(m_data.m_dataWCHAR),length);
                                             m_data.m_dataWCHAR[length] = 0;
                                             m_binaryLength = 2 * length;
@@ -2817,7 +2817,7 @@ SQLVariant::SetFromRawDataPointer(void* p_pointer,int p_size /*= 0*/)
                                           break;
     case SQL_C_BINARY:                    m_binaryLength = p_size;
                                           m_indicator = m_binaryLength > 0 ? m_binaryLength : SQL_NULL_DATA;
-                                          m_data.m_dataBINARY = new BYTE[(size_t)m_binaryLength + 1];
+                                          m_data.m_dataBINARY = alloc_new BYTE[(size_t)m_binaryLength + 1];
                                           memcpy_s(m_data.m_dataBINARY,p_size,p_pointer,p_size);
                                           break;
     case SQL_C_SHORT:                     // Fall through

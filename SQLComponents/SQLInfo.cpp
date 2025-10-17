@@ -586,7 +586,7 @@ SQLInfo::ReadingDataTypes()
         }
         int num = 1;
         XString key;
-        TypeInfo* ti = new TypeInfo();
+        TypeInfo* ti = alloc_new TypeInfo();
         dataLen =0;
 
         // DATA SOURCE DEPENDENT TYPE NAME. USE FOR CREATE TABLE
@@ -2921,7 +2921,7 @@ SQLInfo::NativeSQL(HDBC hdbc,const XString& sqlCommand)
 
   SQLINTEGER retLen = 0;
   SQLINTEGER buflen = sqlCommand.GetLength() * 4;
-  SQLTCHAR*  buffer = new SQLTCHAR[(size_t)buflen + 1];
+  SQLTCHAR*  buffer = alloc_new SQLTCHAR[(size_t)buflen + 1];
 
   // Perform the conversion call
   m_retCode = SqlNativeSql(hdbc

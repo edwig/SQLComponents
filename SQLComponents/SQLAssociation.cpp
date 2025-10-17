@@ -83,7 +83,7 @@ SQLAssociation::SetAssociation(const XString& p_primaryColumn
                               ,const XString& p_foreignColumn
                               ,SQLVariant*    p_value /*= NULL*/)
 {
-  PrimaryForeign* pf = new PrimaryForeign();
+  PrimaryForeign* pf = alloc_new PrimaryForeign();
   pf->m_primary = p_primaryColumn;
   pf->m_foreign = p_foreignColumn;
   pf->m_value   = p_value;

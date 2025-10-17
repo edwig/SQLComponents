@@ -2035,20 +2035,16 @@ SQLInfoSQLServer::GetCATALOGForeignExists(XString p_schema,XString p_tablename,X
   IdentifierCorrect(p_tablename);
   IdentifierCorrect(p_constraintname);
 
-  XString sql;
-  sql.Format(_T("SELECT COUNT(*)\n")
-             _T("  FROM sys.foreign_keys fok\n")
-             _T("      ,sys.schemas      sch\n")
-             _T("      ,sys.tables       tab\n")
-             _T(" WHERE fok.type = 'F'\n")
-             _T("   AND fok.parent_object_id = tab.object_id\n")
-             _T("   AND tab.schema_id        = sch.schema_id\n")
-             _T("   AND sch.name             = '") + p_schema + _T("'\n")
-             _T("   AND tab.name             = '") + p_tablename + _T("'\n")
-             _T("   AND fok.name             = '") + p_constraintname + _T("'")
-            ,p_schema.GetString()
-            ,p_tablename.GetString()
-            ,p_constraintname.GetString());
+  XString sql(_T("SELECT COUNT(*)\n")
+              _T("  FROM sys.foreign_keys fok\n")
+              _T("      ,sys.schemas      sch\n")
+              _T("      ,sys.tables       tab\n")
+              _T(" WHERE fok.type = 'F'\n")
+              _T("   AND fok.parent_object_id = tab.object_id\n")
+              _T("   AND tab.schema_id        = sch.schema_id\n")
+              _T("   AND sch.name             = '") + p_schema + _T("'\n")
+              _T("   AND tab.name             = '") + p_tablename + _T("'\n")
+              _T("   AND fok.name             = '") + p_constraintname + _T("'"));
   return sql;
 }
 

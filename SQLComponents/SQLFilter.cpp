@@ -72,7 +72,7 @@ SQLFilter::SQLFilter(const XString& p_field,SQLOperator p_operator,const SQLVari
 {
   if(p_value)
   {
-    m_values.push_back(new SQLVariant(p_value));
+    m_values.push_back(alloc_new SQLVariant(p_value));
   }
 }
 
@@ -81,7 +81,7 @@ SQLFilter::SQLFilter(const XString& p_field,SQLOperator p_operator,const int p_v
           :m_field(p_field)
           ,m_operator(p_operator)
 {
-  SQLVariant* val = new SQLVariant(p_value);
+  SQLVariant* val = alloc_new SQLVariant(p_value);
   m_values.push_back(val);
 }
 
@@ -90,7 +90,7 @@ SQLFilter::SQLFilter(const XString& p_field,SQLOperator p_operator,const XString
           :m_field(p_field)
           ,m_operator(p_operator)
 {
-  SQLVariant* val = new SQLVariant(p_value);
+  SQLVariant* val = alloc_new SQLVariant(p_value);
   m_values.push_back(val);
 }
 
@@ -188,7 +188,7 @@ SQLFilter::operator=(const SQLFilter& p_other)
 
   for(auto& variant : p_other.m_values)
   {
-    var* value = new SQLVariant(variant);
+    var* value = alloc_new SQLVariant(variant);
     m_values.push_back(value);
   }
   return *this;

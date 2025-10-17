@@ -205,7 +205,7 @@ SQLPrimaryKey::GetCondition(SQLInfoDB* p_info /*=nullptr*/)
 void 
 SQLPrimaryKey::AddField(const XString& p_field,SQLVariant& p_value)
 {
-  SQLVariant* value = new SQLVariant(p_value);
+  SQLVariant* value = alloc_new SQLVariant(p_value);
 
   m_fields.push_back(p_field);
   m_values.push_back(value);
@@ -237,7 +237,7 @@ SQLPrimaryKey::operator=(const SQLPrimaryKey& p_other)
 
   for(const auto& var : p_other.m_values)
   {
-    m_values.push_back(new SQLVariant(var));
+    m_values.push_back(alloc_new SQLVariant(var));
   }
 
   return *this;

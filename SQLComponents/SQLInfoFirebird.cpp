@@ -3564,7 +3564,7 @@ SQLInfoFirebird::DoSQLCallProcedure(SQLQuery* p_query,const XString& p_procedure
       }
       // Storing the result;
       SQLVariant* old = target->m_value;
-      target->m_value = new SQLVariant(result);
+      target->m_value = alloc_new SQLVariant(result);
       if(old)
       {
         delete old;

@@ -292,14 +292,14 @@ SQLDataSet::SetParameter(const XString& p_name,const SQLVariant& p_value)
     if(m_parameters[ind].m_name == p_name)
     {
       // Found it: set a new value
-      m_parameters[ind].m_value = new SQLVariant(p_value);
+      m_parameters[ind].m_value = alloc_new SQLVariant(p_value);
       return;
     }
   }
   // New parameter
   SQLParameter par;
   par.m_name   = p_name;
-  par.m_value  = new SQLVariant(p_value);
+  par.m_value  = alloc_new SQLVariant(p_value);
   m_parameters.push_back(par);
 }
 
@@ -339,7 +339,7 @@ SQLDataSet::SetFilter(const SQLFilter& p_filter)
 {
   if(!m_filters)
   {
-    m_filters = new SQLFilterSet();
+    m_filters = alloc_new SQLFilterSet();
     m_ownFilters = true;
   }
   m_filters->AddFilter(p_filter);
@@ -1005,7 +1005,7 @@ bool
 SQLDataSet::ReadRecordFromQuery(SQLQuery& p_query,bool p_modifiable,bool p_append /*=false*/)
 {
   // Make a new record
-  SQLRecord* record = new SQLRecord(this,p_modifiable);
+  SQLRecord* record = alloc_new SQLRecord(this,p_modifiable);
 
   // Get all the columns of the record
   int num = p_query.GetNumberOfColumns();
@@ -1291,7 +1291,7 @@ SQLDataSet::FindObjectFilter(bool p_primary /*=false*/)
 RecordSet* 
 SQLDataSet::FindRecordSet()
 {
-  RecordSet* records = new RecordSet();
+  RecordSet* records = alloc_new RecordSet();
 
   // Walk the chain of records
   for(auto& rec : m_records)
@@ -1371,7 +1371,7 @@ SQLDataSet::GetCurrentField(int p_num)
 SQLRecord* 
 SQLDataSet::InsertRecord()
 {
-  SQLRecord* record = new SQLRecord(this,true);
+  SQLRecord* record = alloc_new SQLRecord(this,true);
   m_records.push_back(record);
   m_current = (int)(m_records.size() - 1);
   m_status |= SQL_Insertions;

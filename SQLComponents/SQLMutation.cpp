@@ -38,8 +38,8 @@ SQLMutation::SQLMutation()
 SQLMutation::SQLMutation(const SQLVariant* p_base)
 {
   // Bottom of the stack
-  Mutation* mut = new Mutation();
-  mut->m_value  = new SQLVariant(p_base);
+  Mutation* mut = alloc_new Mutation();
+  mut->m_value  = alloc_new SQLVariant(p_base);
   mut->m_mutationID = 0;
   m_stack.push_back(mut);
 }
@@ -58,9 +58,9 @@ SQLMutation::~SQLMutation()
 void
 SQLMutation::Add(const SQLVariant* p_extra,int p_mutationID /*=0*/)
 {
-  Mutation* mut     = new Mutation();
+  Mutation* mut     = alloc_new Mutation();
   mut->m_mutationID = p_mutationID;
-  mut->m_value      = new SQLVariant(p_extra);
+  mut->m_value      = alloc_new SQLVariant(p_extra);
   m_stack.push_back(mut);
 }
 
@@ -76,7 +76,7 @@ SQLMutation::Mutate(const SQLVariant* p_mutate,int p_mutationID /*=0*/)
   if(m_stack.size() > 1 && m_stack.back()->m_mutationID == p_mutationID)
   {
     delete m_stack.back()->m_value;
-    m_stack.back()->m_value = new SQLVariant(p_mutate);
+    m_stack.back()->m_value = alloc_new SQLVariant(p_mutate);
   }
   else
   {

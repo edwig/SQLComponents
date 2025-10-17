@@ -1735,17 +1735,12 @@ SQLInfoOracle::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XStr
   IdentifierCorrect(p_tablename);
   IdentifierCorrect(p_constraintname);
 
-  XString sql;
-  sql.Format(_T("SELECT COUNT(*)\n")
-             _T("  FROM all_constraints con\n")
-             _T(" WHERE con.constraint_type = 'R'")
-             _T("   AND con.owner           = '") + p_schema + _T("'\n")
-             _T("   AND con.table_name      = '") + p_tablename + _T("'\n")
-             _T("   AND con.constraint_name = '") + p_constraintname + _T("'")
-            ,p_schema.GetString()
-            ,p_tablename.GetString()
-            ,p_constraintname.GetString());
-
+  XString sql(_T("SELECT COUNT(*)\n")
+              _T("  FROM all_constraints con\n")
+              _T(" WHERE con.constraint_type = 'R'")
+              _T("   AND con.owner           = '") + p_schema + _T("'\n")
+              _T("   AND con.table_name      = '") + p_tablename + _T("'\n")
+              _T("   AND con.constraint_name = '") + p_constraintname + _T("'"));
   return sql;
 }
 

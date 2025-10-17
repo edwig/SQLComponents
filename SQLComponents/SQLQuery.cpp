@@ -443,7 +443,7 @@ SQLQuery::SetParameterMaxSize(int p_num,unsigned p_maxSize)
 SQLVariant* 
 SQLQuery::SetParameter(int p_num,SQLVariant* p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(p_param);
+  SQLVariant* var = alloc_new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -451,7 +451,7 @@ SQLQuery::SetParameter(int p_num,SQLVariant* p_param,SQLParamType p_type /*=SQL_
 SQLVariant* 
 SQLQuery::SetParameter(int p_num,int p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(p_param);
+  SQLVariant* var = alloc_new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -459,7 +459,7 @@ SQLQuery::SetParameter(int p_num,int p_param,SQLParamType p_type /*=SQL_PARAM_IN
 SQLVariant*
 SQLQuery::SetParameterUL(int p_num,unsigned int p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant *var = new SQLVariant(p_param);
+  SQLVariant *var = alloc_new SQLVariant(p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -467,7 +467,7 @@ SQLQuery::SetParameterUL(int p_num,unsigned int p_param,SQLParamType p_type /*=S
 SQLVariant*
 SQLQuery::SetParameter(int p_num,LPCTSTR p_param,bool p_wide /*= false*/,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(p_param,p_wide);
+  SQLVariant* var = alloc_new SQLVariant(p_param,p_wide);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -475,7 +475,7 @@ SQLQuery::SetParameter(int p_num,LPCTSTR p_param,bool p_wide /*= false*/,SQLPara
 SQLVariant*
 SQLQuery::SetParameter(int p_num,const XString& p_param,bool p_wide /*= false*/,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(p_param,p_wide);
+  SQLVariant* var = alloc_new SQLVariant(p_param,p_wide);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -483,7 +483,7 @@ SQLQuery::SetParameter(int p_num,const XString& p_param,bool p_wide /*= false*/,
 SQLVariant*
 SQLQuery::SetParameter(int p_num,SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -491,7 +491,7 @@ SQLQuery::SetParameter(int p_num,SQLDate& p_param,SQLParamType p_type /*=SQL_PAR
 SQLVariant*
 SQLQuery::SetParameter(int p_num,SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -499,7 +499,7 @@ SQLQuery::SetParameter(int p_num,SQLTime& p_param,SQLParamType p_type /*=SQL_PAR
 SQLVariant*
 SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -507,7 +507,7 @@ SQLQuery::SetParameter(int p_num,SQLTimestamp& p_param,SQLParamType p_type /*=SQ
 SQLVariant*
 SQLQuery::SetParameter(int p_num,SQLInterval& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -515,7 +515,7 @@ SQLQuery::SetParameter(int p_num,SQLInterval& p_param,SQLParamType p_type /*=SQL
 SQLVariant*
 SQLQuery::SetParameter(int p_num,const bcd& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(p_num,var,p_type,p_name);
   return var;
 }
@@ -529,7 +529,7 @@ SQLVariant*
 SQLQuery::SetParameter(SQLVariant* p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int) m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(p_param);
+  SQLVariant* var = alloc_new SQLVariant(p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -538,7 +538,7 @@ SQLVariant*
 SQLQuery::SetParameter(int p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(p_param);
+  SQLVariant* var = alloc_new SQLVariant(p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -547,7 +547,7 @@ SQLVariant*
 SQLQuery::SetParameterUL(unsigned int p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant *var = new SQLVariant(p_param);
+  SQLVariant *var = alloc_new SQLVariant(p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -556,7 +556,7 @@ SQLVariant*
 SQLQuery::SetParameter(LPCTSTR p_param,bool p_wide /*= false*/,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(p_param,p_wide);
+  SQLVariant* var = alloc_new SQLVariant(p_param,p_wide);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -565,7 +565,7 @@ SQLVariant*
 SQLQuery::SetParameter(const XString& p_param,bool p_wide /*= false*/,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(p_param,p_wide);
+  SQLVariant* var = alloc_new SQLVariant(p_param,p_wide);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -574,7 +574,7 @@ SQLVariant*
 SQLQuery::SetParameter(SQLDate& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -583,7 +583,7 @@ SQLVariant*
 SQLQuery::SetParameter(SQLTime& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -592,7 +592,7 @@ SQLVariant*
 SQLQuery::SetParameter(SQLTimestamp& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -601,7 +601,7 @@ SQLVariant*
 SQLQuery::SetParameter(SQLInterval& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -610,7 +610,7 @@ SQLVariant*
 SQLQuery::SetParameter(const bcd& p_param,SQLParamType p_type /*=SQL_PARAM_INPUT*/,XString p_name /*= _T("")*/)
 {
   int size = (int)m_parameters.size() + 1;
-  SQLVariant* var = new SQLVariant(&p_param);
+  SQLVariant* var = alloc_new SQLVariant(&p_param);
   InternalSetParameter(size,var,p_type,p_name);
   return var;
 }
@@ -1288,7 +1288,7 @@ SQLQuery::BindColumns()
       }
     }
     // Create new variant and reserve space for CHAR and BINARY types
-    SQLVariant* var = new SQLVariant(type,(int)precision);
+    SQLVariant* var = alloc_new SQLVariant(type,(int)precision);
     var->SetColumnNumber(icol);
     var->SetSQLDataType(type);
     if(atexec)
@@ -2110,7 +2110,7 @@ SQLQuery::DescribeColumn(int          p_col
 SQLVariant*
 SQLQuery::DoSQLCall(const XString& p_schema,const XString& p_procedure,const int p_param1)
 {
-  SQLVariant* var = new SQLVariant(p_param1);
+  SQLVariant* var = alloc_new SQLVariant(p_param1);
   InternalSetParameter(1,var,P_SQL_PARAM_INPUT);
   return DoSQLCall(p_schema,p_procedure,true);
 }
@@ -2118,7 +2118,7 @@ SQLQuery::DoSQLCall(const XString& p_schema,const XString& p_procedure,const int
 SQLVariant*
 SQLQuery::DoSQLCall(const XString& p_schema,const XString& p_procedure,LPCTSTR p_param1)
 {
-  SQLVariant* var = new SQLVariant(p_param1);
+  SQLVariant* var = alloc_new SQLVariant(p_param1);
   InternalSetParameter(1,var,P_SQL_PARAM_INPUT);
   return DoSQLCall(p_schema,p_procedure,true);
 }
@@ -2126,7 +2126,7 @@ SQLQuery::DoSQLCall(const XString& p_schema,const XString& p_procedure,LPCTSTR p
 SQLVariant*
 SQLQuery::DoSQLCall(const XString& p_schema,const XString& p_procedure,const bcd& p_param1)
 {
-  SQLVariant* var = new SQLVariant(&p_param1);
+  SQLVariant* var = alloc_new SQLVariant(&p_param1);
   InternalSetParameter(1,var,P_SQL_PARAM_INPUT);
   return DoSQLCall(p_schema,p_procedure,true);
 }
@@ -2145,7 +2145,7 @@ SQLQuery::DoSQLCall(const XString& p_schema,const XString& p_procedure,bool p_ha
   // OTHERWISE, YOU HAVE TO PROVIDE IT YOURSELF!
   if(p_hasReturn && m_parameters.find(0) == m_parameters.end())
   {
-    SQLVariant* var = new SQLVariant((int)0);
+    SQLVariant* var = alloc_new SQLVariant((int)0);
     InternalSetParameter(0,var,P_SQL_PARAM_OUTPUT);
   }
 

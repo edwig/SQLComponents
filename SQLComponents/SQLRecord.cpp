@@ -93,7 +93,7 @@ int
 SQLRecord::AddField(const SQLVariant* p_field
                    ,bool p_insert /*= false*/)
 {
-  SQLMutation* mut = new SQLMutation(p_field);
+  SQLMutation* mut = alloc_new SQLMutation(p_field);
   m_fields.push_back(mut);
 
   // Optionally it can be a newly inserted record

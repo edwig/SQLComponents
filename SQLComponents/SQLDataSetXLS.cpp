@@ -60,14 +60,14 @@ SQLDataSetXLS::SQLDataSetXLS(const XString& p_file,const XString& p_sheetOrSeper
     m_excel     = true;
     m_sheetName = p_sheetOrSeperator;
     extensie    = tempString1;
-    m_workbook  = new BasicExcel();
+    m_workbook  = alloc_new BasicExcel();
   }
   if (tempString2 == _T(".xlsx"))
   {
     m_xmlExcel    = true;
     m_sheetName   = p_sheetOrSeperator;
     extensie      = tempString2;
-    m_xmlWorkbook = new BasicXmlExcel(p_file);
+    m_xmlWorkbook = alloc_new BasicXmlExcel(p_file);
     m_lastError   = m_xmlWorkbook->GetError();
   }
   else 
@@ -268,7 +268,7 @@ SQLDataSetXLS::AddRow(WordList& p_rowValues, long /*p_row*/, bool /*p_replace*/)
 
   while(cols-- && vals--)
   {
-    const SQLVariant* var = new SQLVariant(*it++); 
+    const SQLVariant* var = alloc_new SQLVariant(*it++); 
     record->AddField(var);
   }
   if(vals == 0 && cols > 0)
@@ -277,7 +277,7 @@ SQLDataSetXLS::AddRow(WordList& p_rowValues, long /*p_row*/, bool /*p_replace*/)
     // Append with empty values (strings)
     while(cols--)
     {
-      const SQLVariant* var = new SQLVariant("");
+      const SQLVariant* var = alloc_new SQLVariant("");
       record->AddField(var);
     }
   }
@@ -541,7 +541,7 @@ SQLDataSetXLS::Open()
         for(int col = 0; col < cols; ++col)
         {
           LPCTSTR value = sheet->CellValue(row,col,buffer,10000);
-          SQLVariant* var = new SQLVariant(value);
+          SQLVariant* var = alloc_new SQLVariant(value);
           record->AddField(var);
           delete var;
         }

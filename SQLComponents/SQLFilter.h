@@ -197,7 +197,7 @@ SQLFilter::GetValue() const
 inline void
 SQLFilter::AddValue(const SQLVariant* p_value)
 {
-  SQLVariant* value = new SQLVariant(p_value);
+  SQLVariant* value = alloc_new SQLVariant(p_value);
   m_values.push_back(value);
 }
 
@@ -296,13 +296,13 @@ public:
 
   void AddFilter(const SQLFilter* p_filter)
   {
-    SQLFilter* filter = new SQLFilter(p_filter);
+    SQLFilter* filter = alloc_new SQLFilter(p_filter);
     m_filters.push_back(filter);
   }
 
   void AddFilter(const SQLFilter& p_filter)
   {
-    SQLFilter* filter = new SQLFilter(p_filter);
+    SQLFilter* filter = alloc_new SQLFilter(p_filter);
     m_filters.push_back(filter);
   }
 

@@ -447,7 +447,7 @@ SQLVariantFormat::SetCurrentDateAndTime()
   m_format.Replace(_T("T"),_T(" "));
 
   // Getting a new variant
-  m_variant = new SQLVariant(&stamp);
+  m_variant = alloc_new SQLVariant(&stamp);
   m_owner   = true;
 }
 
@@ -647,7 +647,7 @@ SQLVariantFormat::FormatDate(const XString& p_pattern)
       {
         delete m_variant;
       }
-      m_variant = new SQLVariant(&timestamp);
+      m_variant = alloc_new SQLVariant(&timestamp);
       m_owner=true;
     }
     else if(hasDate)
@@ -660,7 +660,7 @@ SQLVariantFormat::FormatDate(const XString& p_pattern)
       {
         delete m_variant;
       }
-      m_variant = new SQLVariant(&datestr);
+      m_variant = alloc_new SQLVariant(&datestr);
       m_owner=true;
     }
     else if(hasTime)
@@ -673,7 +673,7 @@ SQLVariantFormat::FormatDate(const XString& p_pattern)
         {
           delete m_variant;
         }
-        m_variant = new SQLVariant(&timestr);
+        m_variant = alloc_new SQLVariant(&timestr);
         m_owner=true;
     }
   }
@@ -810,7 +810,7 @@ SQLVariantFormat::DateCalculate(char p_operator,const XString& p_argument)
     {
       delete m_variant;
     }
-    m_variant = new SQLVariant(&date);
+    m_variant = alloc_new SQLVariant(&date);
     m_owner   = true;
   }
   else
@@ -820,7 +820,7 @@ SQLVariantFormat::DateCalculate(char p_operator,const XString& p_argument)
     if(m_variant == nullptr)
     {
       DATE_STRUCT date = {0,0,0};
-      m_variant = new SQLVariant(&date);
+      m_variant = alloc_new SQLVariant(&date);
       m_owner   = true;
     }
     else

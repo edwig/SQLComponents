@@ -164,7 +164,7 @@ BasicXmlWorksheet::GetCell(int p_row,int p_col)
     return it->second;
   }
   // Cell did not exist, make an empty cell
-  BasicXmlCell* cell = new BasicXmlCell(p_row,p_col);
+  BasicXmlCell* cell = alloc_new BasicXmlCell(p_row,p_col);
   m_cells.insert(std::make_pair(cellnum,cell));
   return cell;
 }
@@ -217,7 +217,7 @@ BasicXmlWorksheet::Load(XMLMessage& p_msg,XMLElement* p_root)
         if(isString)
         {
           int stringNum = _ttoi(value);
-          cell = new BasicXmlCell(rowNumber,colNumber,stringNum,XCT_STRING);
+          cell = alloc_new BasicXmlCell(rowNumber,colNumber,stringNum,XCT_STRING);
         }
         else
         {
@@ -225,7 +225,7 @@ BasicXmlWorksheet::Load(XMLMessage& p_msg,XMLElement* p_root)
           {
             // Floating point
             double fl = _ttof(value);
-            cell = new BasicXmlCell(rowNumber,colNumber,fl);
+            cell = alloc_new BasicXmlCell(rowNumber,colNumber,fl);
           }
           else
           {
@@ -256,17 +256,17 @@ BasicXmlWorksheet::Load(XMLMessage& p_msg,XMLElement* p_root)
                   formatCode.Compare(_T("m/d/yyyy;@")) == 0
                 )
               {
-                cell = new BasicXmlCell(rowNumber, colNumber, intNum, XCT_DATE);
+                cell = alloc_new BasicXmlCell(rowNumber, colNumber, intNum, XCT_DATE);
               }
               else
               {
                 // Not a date after all, so we make an integer call :-(
-                cell = new BasicXmlCell(rowNumber, colNumber, intNum, XCT_INTEGER);
+                cell = alloc_new BasicXmlCell(rowNumber, colNumber, intNum, XCT_INTEGER);
               }
             }
             else
             {
-            	cell = new BasicXmlCell(rowNumber,colNumber,intNum,XCT_INTEGER);
+            	cell = alloc_new BasicXmlCell(rowNumber,colNumber,intNum,XCT_INTEGER);
           	}
         	}
         }
@@ -897,7 +897,7 @@ BasicXmlExcel::LoadWorksheets()
           return false;
         }
         // Make a new worksheet
-        BasicXmlWorksheet* sheet = new BasicXmlWorksheet(this,m_sheetnames[sheetnum]);
+        BasicXmlWorksheet* sheet = alloc_new BasicXmlWorksheet(this,m_sheetnames[sheetnum]);
         m_worksheets.push_back(sheet);
         
         // Load data in the worksheet

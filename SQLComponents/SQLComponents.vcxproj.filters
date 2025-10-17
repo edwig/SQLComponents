@@ -243,9 +243,6 @@
     <ClInclude Include="SQLLanguage.h">
       <Filter>Headers Files</Filter>
     </ClInclude>
-    <ClInclude Include="SQLMemoryDebug.h">
-      <Filter>Headers Files</Filter>
-    </ClInclude>
     <ClInclude Include="SQLMutation.h">
       <Filter>Headers Files</Filter>
     </ClInclude>

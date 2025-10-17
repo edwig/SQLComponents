@@ -420,7 +420,7 @@ SQLDatabasePool::GiveUpInternally(SQLDatabase* p_database,const XString& p_conne
   if(it == m_freeDatabases.end())
   {
     // Create a new free list
-    DbsList* list = new DbsList();
+    DbsList* list = alloc_new DbsList();
     list->push_back(p_database);
     m_freeDatabases.insert(std::make_pair(p_connectionName,list));
     return;
@@ -511,7 +511,7 @@ SQLDatabase*
 SQLDatabasePool::MakeDatabase(const XString& p_connectionName)
 {
   // Create the database
-  SQLDatabase* dbs = new SQLDatabase();
+  SQLDatabase* dbs = alloc_new SQLDatabase();
   dbs->SetConnectionName(p_connectionName);
 
   // Preset logging: derive it from the database pool
@@ -529,7 +529,7 @@ SQLDatabasePool::MakeDatabase(const XString& p_connectionName)
     DbsPool::iterator it = m_allDatabases.find(p_connectionName);
     if(it == m_allDatabases.end())
     {
-      DbsList* list = new DbsList();
+      DbsList* list = alloc_new DbsList();
       list->push_back(dbs);
       m_allDatabases.insert(std::make_pair(p_connectionName,list));
     }

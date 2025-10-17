@@ -100,7 +100,7 @@ SQLVariantFormat::SetVariant(const SQLVariant* p_variant)
   }
   if(p_variant)
   {
-    m_variant = new SQLVariant(p_variant);
+    m_variant = alloc_new SQLVariant(p_variant);
     m_owner   = true;
   }
 }

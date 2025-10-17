@@ -1377,20 +1377,16 @@ SQLInfoPostgreSQL::GetCATALOGForeignExists(XString p_schema,XString p_tablename,
   IdentifierCorrect(p_tablename);
   IdentifierCorrect(p_constraintname);
 
-  XString sql;
-  sql.Format(_T("SELECT COUNT(*)\n")
-             _T("  FROM pg_constraint con\n")
-             _T("      ,pg_class      cla\n")
-             _T("      ,pg_namespace  sch\n")
-             _T(" WHERE con.contype      = 'f'\n")
-             _T("   AND con.conrelid     = cla.oid\n")
-             _T("   AND cla.relnamespace = sch.oid\n")
-             _T("   AND sch.nspname      = '") + p_schema + _T("'\n")
-             _T("   AND cla.relname      = '") + p_tablename + _T("'\n")
-             _T("   AND con.conname      = '") + p_constraintname + _T("'")
-            ,p_schema.GetString()
-            ,p_tablename.GetString()
-            ,p_constraintname.GetString());
+  XString sql(_T("SELECT COUNT(*)\n")
+              _T("  FROM pg_constraint con\n")
+              _T("      ,pg_class      cla\n")
+              _T("      ,pg_namespace  sch\n")
+              _T(" WHERE con.contype      = 'f'\n")
+              _T("   AND con.conrelid     = cla.oid\n")
+              _T("   AND cla.relnamespace = sch.oid\n")
+              _T("   AND sch.nspname      = '") + p_schema + _T("'\n")
+              _T("   AND cla.relname      = '") + p_tablename + _T("'\n")
+              _T("   AND con.conname      = '") + p_constraintname + _T("'"));
   return sql;
 }
 
