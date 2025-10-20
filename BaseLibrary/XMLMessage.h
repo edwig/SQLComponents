@@ -157,7 +157,7 @@ public:
   // Reset all internal structures
   virtual void    Reset();
   // Parse string XML to internal structures
-  virtual void    ParseMessage(XString& p_message, WhiteSpace p_whiteSpace = WhiteSpace::PRESERVE_WHITESPACE);
+  virtual void    ParseMessage(const XString& p_message, WhiteSpace p_whiteSpace = WhiteSpace::PRESERVE_WHITESPACE);
   // Parse string with specialized XML parser
   virtual void    ParseMessage(XMLParser* p_parser,XString& p_message,WhiteSpace p_whiteSpace = WhiteSpace::PRESERVE_WHITESPACE);
     // Parse from a beginning node
@@ -250,22 +250,22 @@ public:
   double          GetElementDouble    (XMLElement* p_elem,const XString& p_name);
   XMLElement*     GetElementFirstChild(XMLElement* p_elem);
   XMLElement*     GetElementSibling   (XMLElement* p_elem);
-  XString         GetAttribute        (XMLElement* p_elem,const XString& p_attribName);
-  int             GetAttributeInteger (XMLElement* p_elem,const XString& p_attribName);
-  bool            GetAttributeBoolean (XMLElement* p_elem,const XString& p_attribName);
-  double          GetAttributeDouble  (XMLElement* p_elem,const XString& p_attribName);
+  XString         GetAttribute        (XMLElement* p_elem,const XString& p_attribName) const;
+  int             GetAttributeInteger (XMLElement* p_elem,const XString& p_attribName) const;
+  bool            GetAttributeBoolean (XMLElement* p_elem,const XString& p_attribName) const;
+  double          GetAttributeDouble  (XMLElement* p_elem,const XString& p_attribName) const;
   XString         GetStylesheetType();
   XString         GetStylesheet();
 
   // FINDING
-  XMLElement*     FindElement(const XString& p_name, bool p_recurse = true);
-  XMLElement*     FindElement(XMLElement* p_base,const XString& p_name, bool p_recurse = true);
+  XMLElement*     FindElement(const XString& p_name, bool p_recurse = true) const;
+  XMLElement*     FindElement(XMLElement* p_base,const XString& p_name, bool p_recurse = true) const;
   XMLElement*     FindElementWithAttribute(      XMLElement* p_base
                                           ,const XString&    p_elementName
                                           ,const XString&    p_attribName
                                           ,const XString&    p_attribValue = _T("")
                                           ,const bool        p_recurse     = true);
-  XMLAttribute*   FindAttribute(XMLElement* p_elem,const XString& p_attribName);
+  XMLAttribute*   FindAttribute(XMLElement* p_elem,const XString& p_attribName) const;
 
   // EXTRA OPERATIONS on element nodes
 

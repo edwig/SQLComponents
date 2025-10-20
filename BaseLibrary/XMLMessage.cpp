@@ -328,7 +328,7 @@ XMLMessage::SaveFile(const XString& p_fileName,Encoding p_encoding)
 
 // Parse incoming message to members
 void
-XMLMessage::ParseMessage(XString& p_message,WhiteSpace p_whiteSpace /* = PRESERVE_WHITESPACE*/)
+XMLMessage::ParseMessage(const XString& p_message,WhiteSpace p_whiteSpace /* = PRESERVE_WHITESPACE*/)
 {
   XMLParser parser(this);
   parser.ParseMessage(p_message,p_whiteSpace);
@@ -1058,7 +1058,7 @@ XMLMessage::GetElementSibling(XMLElement* p_elem)
 }
 
 XMLElement*
-XMLMessage::FindElement(XMLElement* p_base,const XString& p_name,bool p_recurse /*=true*/)
+XMLMessage::FindElement(XMLElement* p_base,const XString& p_name,bool p_recurse /*=true*/) const
 {
   XString elementName(p_name);
   XString namesp = SplitNamespace(elementName);
@@ -1097,7 +1097,7 @@ XMLMessage::FindElement(XMLElement* p_base,const XString& p_name,bool p_recurse 
 }
 
 XMLElement*
-XMLMessage::FindElement(const XString& p_name,bool p_recurse /*=true*/)
+XMLMessage::FindElement(const XString& p_name,bool p_recurse /*=true*/) const
 {
   return FindElement(m_root,p_name,p_recurse);
 }
@@ -1143,7 +1143,7 @@ XMLMessage::FindElementWithAttribute(      XMLElement* p_base
 
 // Get the attribute 
 XString
-XMLMessage::GetAttribute(XMLElement* p_elem,const XString& p_attribName)
+XMLMessage::GetAttribute(XMLElement* p_elem,const XString& p_attribName) const
 {
   if(p_elem)
   {
@@ -1170,14 +1170,14 @@ XMLMessage::GetAttribute(XMLElement* p_elem,const XString& p_attribName)
 
 // Get the integer attribute
 int
-XMLMessage::GetAttributeInteger(XMLElement* p_elem,const XString& p_attribName)
+XMLMessage::GetAttributeInteger(XMLElement* p_elem,const XString& p_attribName) const
 {
   return _ttoi(GetAttribute(p_elem,p_attribName));
 }
 
 // Get the boolean attribute
 bool     
-XMLMessage::GetAttributeBoolean(XMLElement* p_elem,const XString& p_attribName)
+XMLMessage::GetAttributeBoolean(XMLElement* p_elem,const XString& p_attribName) const
 {
   XString value = GetAttribute(p_elem,p_attribName);
   if(value.CompareNoCase(_T("true")) == 0)
@@ -1194,13 +1194,13 @@ XMLMessage::GetAttributeBoolean(XMLElement* p_elem,const XString& p_attribName)
 
 // Get the double attribute
 double
-XMLMessage::GetAttributeDouble(XMLElement* p_elem,const XString& p_attribName)
+XMLMessage::GetAttributeDouble(XMLElement* p_elem,const XString& p_attribName) const
 {
   return _ttof(GetAttribute(p_elem,p_attribName));
 }
 
 XMLAttribute*
-XMLMessage::FindAttribute(XMLElement* p_elem,const XString& p_attribName)
+XMLMessage::FindAttribute(XMLElement* p_elem,const XString& p_attribName) const
 {
   for(auto& attrib : p_elem->GetAttributes())
   {

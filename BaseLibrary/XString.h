@@ -54,6 +54,8 @@ public:
   XString(TCHAR p_char,int p_count = 1);
   // CTOR from other string
   XString(const XString& p_string);
+  // CTOR from other string
+  XString(const stdstring& p_string);
 #ifdef _UNICODE
 // CTOR form a wchar_t stream
   XString(wchar_t* p_string);
@@ -168,8 +170,8 @@ public:
   // Set string from a COM BSTR
   BSTR        SetSysString(BSTR* p_string);
   // Leftmost string (not) in argument
-  XString     SpanExcluding(PCTSTR p_string);
-  XString     SpanIncluding(PCTSTR p_string);
+  XString     SpanExcluding(PCTSTR p_string) const;
+  XString     SpanIncluding(PCTSTR p_string) const;
   // Length of the string
  static int   StringLength (PCTSTR p_string);
   // Return tokenized strings

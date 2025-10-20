@@ -56,6 +56,12 @@ XString::XString(const XString& p_string)
   append(p_string.c_str());
 }
 
+// CTOR from other string
+XString::XString(const stdstring& p_string)
+{
+  append(p_string.c_str());
+}
+
 #ifdef _UNICODE
 
 // CTOR form a wchar_t stream
@@ -644,7 +650,7 @@ XString::SetSysString(BSTR* p_string)
 
 // Leftmost string not in argument
 XString 
-XString::SpanExcluding(PCTSTR p_string)
+XString::SpanExcluding(LPCTSTR p_string) const
 {
   if(p_string == nullptr)
   {
@@ -655,7 +661,7 @@ XString::SpanExcluding(PCTSTR p_string)
 
 // Leftmost string in argument
 XString 
-XString::SpanIncluding(PCTSTR p_string)
+XString::SpanIncluding(LPCTSTR p_string) const
 {
   if(p_string == nullptr)
   {

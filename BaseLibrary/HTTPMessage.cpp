@@ -39,7 +39,7 @@
 
 // All headers. Must be in sequence with HTTPCommand
 // See HTTPCommand for sequencing
-LPCTSTR headers[] = 
+LPCTSTR g_headers[] = 
 {
    _T("HTTP")             // HTTP Response header
   ,_T("POST")             // Posting a resource
@@ -434,9 +434,9 @@ HTTPMessage::SetVerb(const XString& p_verb)
 {
   XString verb(p_verb);
   verb.MakeUpper();
-  for(unsigned ind = 0; ind < sizeof(headers) / sizeof(PTCHAR); ++ind)
+  for(unsigned ind = 0; ind < sizeof(g_headers) / sizeof(PTCHAR); ++ind)
   {
-    if(verb.Compare(headers[ind]) == 0)
+    if(verb.Compare(g_headers[ind]) == 0)
     {
       m_command = static_cast<HTTPCommand>(ind);
       return true;
@@ -452,7 +452,7 @@ HTTPMessage::GetVerb() const
   if(m_command >= HTTPCommand::http_response &&
      m_command <= HTTPCommand::http_last_command)
   {
-    return headers[static_cast<unsigned>(m_command)];
+    return g_headers[static_cast<unsigned>(m_command)];
   }
   return _T("");
 }
@@ -1021,7 +1021,7 @@ HTTPMessage::FindVerbTunneling()
     unsigned max = static_cast<unsigned>(HTTPCommand::http_last_command);
     for(unsigned ind = 1; ind <= max; ++ind)
     {
-      if(method.CompareNoCase(headers[ind]) == 0)
+      if(method.CompareNoCase(g_headers[ind]) == 0)
       {
         m_command = static_cast<HTTPCommand>(ind);
       }
@@ -1041,7 +1041,7 @@ HTTPMessage::UseVerbTunneling()
     if(m_command != HTTPCommand::http_post)
     {
       // Change of identity!
-      XString method = headers[static_cast<unsigned>(m_command)];
+      XString method = g_headers[static_cast<unsigned>(m_command)];
       AddHeader(_T("X-HTTP-Method-Override"),method);
       m_command = HTTPCommand::http_post;
       return true;

@@ -276,7 +276,7 @@ GetHTTPVerb(HTTPCommand p_verb,const char* p_unknown /*=nullptr*/)
   if(p_verb >= HTTPCommand::http_post &&
      p_verb <= HTTPCommand::http_last_command)
   {
-    return XString(headers[(int)p_verb]);
+    return XString(g_headers[(int)p_verb]);
   }
   if(p_unknown && *p_unknown)
   {

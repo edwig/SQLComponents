@@ -87,7 +87,7 @@ enum class HTTPCommand
 };
 
 // All HTTP header commands
-extern LPCTSTR headers[];
+extern LPCTSTR g_headers[];
 
 // Incoming and responding header names
 extern LPCTSTR header_fields[];
