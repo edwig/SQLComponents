@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Connections>
+  <Connect>
+    <Name>MyConn</Name>
+    <DSN>testing</DSN>
+    <Target />
+    <User>sysdba</User>
+    <Options>DBA=W;</Options>
+    <Password>Rt+8CBxWwshmWbyJoClXD7Sywm9MLds7TUXprdVR9DM=</Password>
+  </Connect>
+  <Connect>
+    <Name>Other</Name>
+    <DSN>testing</DSN>
+    <Target />
+    <User>user</User>
+    <Options>DBA=R;</Options>
+    <Password>kDrRkVAClaPqQYGsuN5LZ/qAz73Zcv/ZGrsS7//dz6A+ykdzFGtnRsk3KvaPk4qF0h4M2sIyftJWhhORMX4llQ==</Password>
+  </Connect>
+</Connections>

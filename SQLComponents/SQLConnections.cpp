@@ -208,14 +208,14 @@ SQLConnections::SaveConnectionsFile(XString& p_filename)
   
   for(auto& connect : m_connections)
   {
-    XMLElement* conn = msg.AddElement(nullptr,_T("Connect"),XDT_String,_T(""));
+    XMLElement* conn = msg.AddElement(nullptr,_T("Connect"),_T(""));
 
-    msg.AddElement(conn,_T("Name"),     XDT_String,connect.second.m_name);
-    msg.AddElement(conn,_T("DSN"),      XDT_String,connect.second.m_datasource);
-    msg.AddElement(conn,_T("Target"),   XDT_String,connect.second.m_targetSchema);
-    msg.AddElement(conn,_T("User"),     XDT_String,connect.second.m_username);
-    msg.AddElement(conn,_T("Options"),  XDT_String,connect.second.m_options);
-    msg.AddElement(conn,_T("Password"), XDT_String,PasswordScramble(connect.second.m_password));
+    msg.AddElement(conn,_T("Name"),     connect.second.m_name);
+    msg.AddElement(conn,_T("DSN"),      connect.second.m_datasource);
+    msg.AddElement(conn,_T("Target"),   connect.second.m_targetSchema);
+    msg.AddElement(conn,_T("User"),     connect.second.m_username);
+    msg.AddElement(conn,_T("Options"),  connect.second.m_options);
+    msg.AddElement(conn,_T("Password"), PasswordScramble(connect.second.m_password));
   }
 
   // Save the file

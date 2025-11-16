@@ -869,7 +869,7 @@ SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
   XString typName = dataset_names[g_defaultLanguage][DATASET_TYPE];
   XString attName = dataset_names[g_defaultLanguage][DATASET_NAME];
 
-  XMLElement* p_elem = p_msg->AddElement(p_base,recName,XDT_String,"");
+  XMLElement* p_elem = p_msg->AddElement(p_base,recName,_T(""));
   if(p_elem)
   {
     for(unsigned int ind = 0; ind < m_fields.size(); ++ind)
@@ -878,7 +878,7 @@ SQLRecord::XMLSave(XMLMessage* p_msg,XMLElement* p_base)
       XString fieldName = m_dataSet->GetFieldName(ind);
       int type = var->GetDataType();
 
-      XMLElement* fld = p_msg->AddElement(p_elem,fldName,XDT_String,"");
+      XMLElement* fld = p_msg->AddElement(p_elem,fldName,_T(""));
       p_msg->SetAttribute(fld,idName, (int)ind);
       p_msg->SetAttribute(fld,typName,type);
       p_msg->SetAttribute(fld,attName,fieldName);

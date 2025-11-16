@@ -1972,8 +1972,8 @@ SQLDataSet::XMLLoad(const XString& p_filename)
 void
 SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
 {
-                          p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_NAME],XDT_String,m_name);
-  XMLElement* structure = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_STRUCTURE],XDT_String,"");
+                          p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_NAME],m_name);
+  XMLElement* structure = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_STRUCTURE],_T(""));
   XString nameField = dataset_names[g_defaultLanguage][DATASET_FIELD];
 
   // Add record structure
@@ -1986,7 +1986,7 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
       const SQLVariant* var = record->GetField(ind);
       int type = var->GetDataType();
 
-      XMLElement* field = p_msg->AddElement(structure,nameField,XDT_String,fieldname);
+      XMLElement* field = p_msg->AddElement(structure,nameField,fieldname);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_ID],(int)ind);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPE],type);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],SQLDataType::FindDatatype(type));
@@ -2000,7 +2000,7 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
       int type = m_types[ind];
       SQLVariant var;
 
-      XMLElement* field = p_msg->AddElement(structure,nameField,XDT_String,fieldname);
+      XMLElement* field = p_msg->AddElement(structure,nameField,fieldname);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_ID],(int)ind);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPE],type);
       p_msg->SetAttribute(field,dataset_names[g_defaultLanguage][DATASET_TYPENAME],SQLDataType::FindDatatype(type));
@@ -2009,7 +2009,7 @@ SQLDataSet::XMLSave(XMLMessage* p_msg,XMLElement* p_dataset)
 
 
   // Add records of the dataset
-  XMLElement* records = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_RECORDS],XDT_String,"");
+  XMLElement* records = p_msg->AddElement(p_dataset,dataset_names[g_defaultLanguage][DATASET_RECORDS],_T(""));
   for(unsigned int ind = 0;ind < m_records.size(); ++ind)
   {
     m_records[ind]->XMLSave(p_msg,records);
