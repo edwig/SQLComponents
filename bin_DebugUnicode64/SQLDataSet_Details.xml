@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestDetails>
+  <Naam>detail</Naam>
+  <Structuur>
+    <Veld id="0" type="4" typenaam="LONG">id</Veld>
+    <Veld id="1" type="4" typenaam="LONG">mast_id</Veld>
+    <Veld id="2" type="4" typenaam="LONG">line</Veld>
+    <Veld id="3" type="1" typenaam="CHAR">description</Veld>
+    <Veld id="4" type="2" typenaam="DECIMAL">amount</Veld>
+  </Structuur>
+  <Records>
+    <Record>
+      <Veld id="0" type="4" Naam="id">4</Veld>
+      <Veld id="1" type="4" Naam="mast_id">2</Veld>
+      <Veld id="2" type="4" Naam="line">1</Veld>
+      <Veld id="3" type="1" Naam="description">First line of second invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">50</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">5</Veld>
+      <Veld id="1" type="4" Naam="mast_id">2</Veld>
+      <Veld id="2" type="4" Naam="line">2</Veld>
+      <Veld id="3" type="1" Naam="description">Second line of second invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">50</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">6</Veld>
+      <Veld id="1" type="4" Naam="mast_id">2</Veld>
+      <Veld id="2" type="4" Naam="line">3</Veld>
+      <Veld id="3" type="1" Naam="description">Third line of second invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">50</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">7</Veld>
+      <Veld id="1" type="4" Naam="mast_id">2</Veld>
+      <Veld id="2" type="4" Naam="line">4</Veld>
+      <Veld id="3" type="1" Naam="description">Fourth line of second invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">50</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">8</Veld>
+      <Veld id="1" type="4" Naam="mast_id">2</Veld>
+      <Veld id="2" type="4" Naam="line">5</Veld>
+      <Veld id="3" type="1" Naam="description">Fifth line of second invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">300</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">9</Veld>
+      <Veld id="1" type="4" Naam="mast_id">2</Veld>
+      <Veld id="2" type="4" Naam="line">6</Veld>
+      <Veld id="3" type="1" Naam="description">VAT for the second invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">100</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">1</Veld>
+      <Veld id="1" type="4" Naam="mast_id">1</Veld>
+      <Veld id="2" type="4" Naam="line">1</Veld>
+      <Veld id="3" type="1" Naam="description">First line of first invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">100</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">2</Veld>
+      <Veld id="1" type="4" Naam="mast_id">1</Veld>
+      <Veld id="2" type="4" Naam="line">2</Veld>
+      <Veld id="3" type="1" Naam="description">Second line of first invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">500</Veld>
+    </Record>
+    <Record>
+      <Veld id="0" type="4" Naam="id">3</Veld>
+      <Veld id="1" type="4" Naam="mast_id">1</Veld>
+      <Veld id="2" type="4" Naam="line">3</Veld>
+      <Veld id="3" type="1" Naam="description">Third line of first invoice</Veld>
+      <Veld id="4" type="2" Naam="amount">150</Veld>
+    </Record>
+  </Records>
+</TestDetails>

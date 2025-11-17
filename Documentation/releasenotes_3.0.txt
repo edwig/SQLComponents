@@ -12,3 +12,4 @@ Version 3.0.0 of xx-xx-2025
 1)  Now based on version 2.0.0 of the BaseLibrary dropping the dependency on MFC
     ATL::CString is now fully replaced by std::string and std::wstring
 2)  Converted to Visual Studio 2026
+3)  Dropped support for 32-bits builds.

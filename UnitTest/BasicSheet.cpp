@@ -56,7 +56,7 @@ namespace DatabaseUnitTest
       TestXMLWorksheet(excel,3,_T("Third"));
     }
 
-    void TestXMLWorksheet(BasicXmlExcel& p_excel,int p_sheet,XString p_name)
+    void TestXMLWorksheet(BasicXmlExcel& p_excel,int p_sheet,const XString& p_name)
     {
       Logger::WriteMessage(_T("Testing worksheet: ") + p_name);
 
@@ -104,14 +104,14 @@ namespace DatabaseUnitTest
       TestWorksheet(excel,3,_T("Third"));
     }
 
-    void TestWorksheet(BasicExcel& p_excel,int p_sheet,XString p_name)
+    void TestWorksheet(BasicExcel& p_excel,int p_sheet,const XString& p_name)
     {
       Logger::WriteMessage(_T("Testing worksheet: ") + p_name);
 
       // Get worksheet (zero based)
       BasicExcelWorksheet* sheet = p_excel.GetWorksheet(p_sheet - 1);
       Assert::IsNotNull(sheet);
-      XString name = sheet->GetAnsiSheetName();
+      XString name = (PCSTR) sheet->GetAnsiSheetName();
       number_of_tests++;
 
       Assert::IsTrue(p_name == name);

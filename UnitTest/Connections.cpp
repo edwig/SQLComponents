@@ -42,7 +42,7 @@ public:
     SQLConnections conn;
     FillConnections(conn);
 
-    SQLConnection* theConn = conn.GetConnection("Other");
+    SQLConnection* theConn = conn.GetConnection(_T("Other"));
     if(theConn)
     {
        Assert::AreEqual(theConn->m_password,_T("user_password"));

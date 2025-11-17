@@ -79,6 +79,7 @@ XString::XString(PCSTR p_string)
   int len = MultiByteToWideChar(CP_ACP,0,p_string,(int)strlen(p_string),nullptr,0);
   wchar_t* buffer = alloc_new wchar_t[len + 1];
   MultiByteToWideChar(CP_ACP,0,p_string,len,buffer,len);
+  buffer[len] = 0;
   append(buffer);
   delete [] buffer;
 }
