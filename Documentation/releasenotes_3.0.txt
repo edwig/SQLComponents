@@ -5,7 +5,7 @@ RELEASENOTES SQLCOMPONENTS VERSION 3.0
 
 CAVEAT: Work on the 3.0.0 has begun in the master branch
         THIS IS BY NOW MEANS A WORKING BRANCH
-        For production code: use the "version2" branche of this library!!!
+        For production code: use the "version2" branch of this library!!!
 
 Version 3.0.0 of xx-xx-2025
 ---------------------------
@@ -13,3 +13,12 @@ Version 3.0.0 of xx-xx-2025
     ATL::CString is now fully replaced by std::string and std::wstring
 2)  Converted to Visual Studio 2026
 3)  Dropped support for 32-bits builds.
+4)  Read-only mode:
+    The SQLDatabasePool now has a 'm_readOnly' member to open all databases in the
+    read-only mode. This is convenient for turning the complete application and all
+    of its database connections in the read-only state.
+    Transactions on a read-only state SQLDatabase connection now always rollback 
+    the complete connection, even if the program's logic dictates a commit.
+    The SQLDatabase transaction logic has been fully refurbished and checked
+    Read-only connections will no longer rollback to savepoint, as this leads to 
+    errors on all databases, and there is no point in rolling back only to savepoint.
