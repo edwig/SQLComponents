@@ -3254,17 +3254,17 @@ SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,XString& p_schema,XStr
   int index = 1;
   while(found)
   {
-    XString name;
-    found = p_query->GetColumnName(index++,name);
-    if(found)
+    SQLParameter* param = p_query->GetInputParameter(index++);
+    if(param == nullptr)
     {
-      if(index > 2)
-      {
-        sql += _T(",");
-      }
-      sql += name;
-      sql += _T(" => ? ");
+      break;
     }
+    if(index > 2)
+    {
+      sql += _T(",");
+    }
+    sql += param->m_name;
+    sql += _T(" => ? ");
   }
   sql += _T(");\n  END;");
   if(p_function)
@@ -3276,11 +3276,11 @@ SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,XString& p_schema,XStr
   if(p_function && p_query->GetParameter(0) == nullptr)
   {
     SQLVariant ret((int)0);
-    p_query->SetParameter(0,&ret);
+    p_query->SetParameter(0,&ret,SQLParamType::P_SQL_PARAM_OUTPUT);
   }
   // Now find the result
   p_query->DoSQLStatement(sql);
-  return p_query->GetParameter(0);
+  return p_query->GetParameter(0,SQLParamType::P_SQL_PARAM_OUTPUT);
 }
 
 // End of namespace
