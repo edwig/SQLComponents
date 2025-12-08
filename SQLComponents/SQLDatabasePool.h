@@ -44,7 +44,6 @@ namespace SQLComponents
 typedef std::deque<SQLDatabase*>     DbsList;
 typedef std::map<XString,DbsList*>   DbsPool;
 
-
 class SQLDatabasePool
 {
 public:
@@ -71,17 +70,19 @@ public:
   // GETTERS
 
   // Return current number of connections
-  unsigned GetConnections();
+  unsigned GetConnections() const;
   // Return current number of maximum databases
-  unsigned GetMaxDatabases();
+  unsigned GetMaxDatabases() const;
   // Get the number of free databases
-  unsigned GetFreeDatabases();
+  unsigned GetFreeDatabases() const;
   // List with current connections (meant for logging purposes only)
-  void     GetListOfConnections(XString& p_list);
+  void     GetListOfConnections(XString& p_list) const;
   // Get the current ODBC discovery for new connections
-  bool     GetPreferODBCDiscover();
+  bool     GetPreferODBCDiscover() const;
   // Get the use of identifier quotation
-  bool            GetUseIdentifierQuotation();
+  bool     GetUseIdentifierQuotation() const;
+  // New databases read-write or read-only
+  bool     GetReadOnly() const;
 
   // SETTERS
 
@@ -95,6 +96,8 @@ public:
   void     SetPreferODBCDiscovery(bool p_discover);
   // Set the use of identifier quotation
   void     SetUseIdentifierQuotation(bool p_use);
+  // New databases are created read-write or read-only
+  void     SetReadOnly(bool p_readonly);
 
   // FUNCTIONS
 
@@ -104,7 +107,7 @@ public:
   void     Cleanup(bool p_aggressive = false);
   // Support of logging functions (for all databases in the pool)
   void     RegisterLogContext(int p_level, LOGLEVEL p_loglevel, LOGPRINT p_logprinter, void* p_logContext);
-  void     LogPrint(LPCTSTR p_text);
+  void     LogPrint(LPCTSTR p_text) const;
   int      LogLevel();
   bool     WilLog();
 
@@ -130,8 +133,9 @@ private:
   bool            m_isopen          { false };          // If database pool is currently open for business
   unsigned        m_maxDatabases    { MIN_DATABASES };  // Maximum number of concurrently open database
   unsigned        m_openConnections { 0 };              // Currently open connections
-  bool            m_preferODBC      { true };           // Prefer standard ODBC discovery functions over SQL
-  bool            m_useQuotation    { true };           // Prefer to use the identifier quotation mechanisms
+  bool            m_preferODBC      { true  };          // Prefer standard ODBC discovery functions over SQL
+  bool            m_useQuotation    { true  };          // Prefer to use the identifier quotation mechanisms
+  bool            m_readOnly        { false };          // New databases are created read-write or read-only
   SQLConnections  m_connections;                        // Connection names out of "database.xml"
   DbsPool         m_allDatabases;                       // List with lists of all databases
   DbsPool         m_freeDatabases;                      // List with lists of currently unused databases
@@ -148,7 +152,7 @@ private:
   RebindMap       m_rebindColumns;                      // Rebinding of result columns for SQLBindCol
 
   // Thread synchronization
-  CRITICAL_SECTION m_lock;
+  mutable CRITICAL_SECTION m_lock;
 };
 
 inline void
@@ -164,19 +168,19 @@ SQLDatabasePool::SetEncryptionKey(XString p_key)
 }
 
 inline bool
-SQLDatabasePool::GetPreferODBCDiscover()
+SQLDatabasePool::GetPreferODBCDiscover() const
 {
   return m_preferODBC;
 }
 
-inline void
-SQLDatabasePool::SetPreferODBCDiscovery(bool p_discover)
+inline bool
+SQLDatabasePool::GetReadOnly() const
 {
-  m_preferODBC = p_discover;
+  return m_readOnly;
 }
 
 inline bool
-SQLDatabasePool::GetUseIdentifierQuotation()
+SQLDatabasePool::GetUseIdentifierQuotation() const
 {
   return m_useQuotation;
 }
@@ -187,5 +191,10 @@ SQLDatabasePool::SetUseIdentifierQuotation(bool p_use)
   m_useQuotation = p_use;
 }
 
+inline void
+SQLDatabasePool::SetPreferODBCDiscovery(bool p_discover)
+{
+  m_preferODBC = p_discover;
+}
 
 }

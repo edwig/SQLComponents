@@ -115,11 +115,11 @@ SQLConnections::AddConnection(XString p_name
 
   // New connection
   SQLConnection connect;
-  connect.m_name         = p_name;
-  connect.m_datasource   = p_datasource;
-  connect.m_username     = p_username;
-  connect.m_password     = p_password;
-  connect.m_options      = p_options;
+  connect.m_name       = p_name;
+  connect.m_datasource = p_datasource;
+  connect.m_username   = p_username;
+  connect.m_password   = p_password;
+  connect.m_options    = p_options;
   connect.m_targetSchema = p_targetSchema;
 
   // Keep this connection

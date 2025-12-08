@@ -193,7 +193,7 @@ SQLDatabasePool::Cleanup(bool p_aggressive /*=false*/)
 
 // Return current number of connections
 unsigned
-SQLDatabasePool::GetConnections()
+SQLDatabasePool::GetConnections() const
 {
   // Lock the pool
   AutoCritSec lock(&m_lock);
@@ -215,7 +215,7 @@ SQLDatabasePool::GetConnection(const int p_index)
 
 // Return current number of maximum databases
 unsigned
-SQLDatabasePool::GetMaxDatabases()
+SQLDatabasePool::GetMaxDatabases() const
 {
   // Lock the pool
   AutoCritSec lock(&m_lock);
@@ -225,7 +225,7 @@ SQLDatabasePool::GetMaxDatabases()
 
 // Get the number of free databases
 unsigned
-SQLDatabasePool::GetFreeDatabases()
+SQLDatabasePool::GetFreeDatabases() const
 {
   // Lock the pool
   AutoCritSec lock(&m_lock);
@@ -243,7 +243,7 @@ SQLDatabasePool::GetFreeDatabases()
 
 // List with current connections (meant for logging purposes only)
 void
-SQLDatabasePool::GetListOfConnections(XString& p_list)
+SQLDatabasePool::GetListOfConnections(XString& p_list) const
 {
   // Lock the pool
   AutoCritSec lock(&m_lock);
@@ -571,9 +571,10 @@ SQLDatabasePool::OpenDatabase(SQLDatabase* p_dbs,XString& p_connectionName)
   }
   if(conn)
   {
-    // Try to open the database right away
+    // Try to open the database right 
+    // Throws if database cannot be openend
     XString connString = m_connections.GetConnectionString(p_connectionName);
-    p_dbs->Open(connString);
+    p_dbs->Open(connString,m_readOnly);
     p_dbs->SetDatasource(conn->m_datasource);
     p_dbs->SetUserName(conn->m_username);
 
@@ -665,7 +666,7 @@ SQLDatabasePool::CleanupAllInternally()
 
 // Support printing to generic logfile
 void
-SQLDatabasePool::LogPrint(LPCTSTR p_text)
+SQLDatabasePool::LogPrint(LPCTSTR p_text) const
 {
   // If the loglevel is above the activation level
   if(m_loggingLevel >= m_logActive)
@@ -721,6 +722,23 @@ SQLDatabasePool::AddRebindsToDatabase(SQLDatabase* p_database)
   for(const auto& rebind : m_rebindParameters)
   {
     p_database->AddParameterRebind(rebind.first,rebind.second);
+  }
+}
+
+// Change the read-only state of the pool and all databases
+// Does NOT change the state of already running transactions
+void
+SQLDatabasePool::SetReadOnly(bool p_readonly)
+{
+  m_readOnly = p_readonly;
+
+  AutoCritSec lock(&m_lock);
+  for(auto& pool : m_allDatabases)
+  {
+    for(auto& dbs : (*pool.second))
+    {
+      dbs->SetReadOnly(p_readonly);
+    }
   }
 }
 
