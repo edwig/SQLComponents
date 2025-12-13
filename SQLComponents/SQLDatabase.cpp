@@ -929,7 +929,7 @@ SQLDatabase::FreeSQLHandle(HSTMT* p_statementHandle,UWORD p_option)
   {
     // Call the correct deallocator
     // Will otherwise not free the cursor on the database
-    ret = SQLFreeStmt(*p_statementHandle,p_option);
+    ret = SqlFreeStmt(*p_statementHandle,p_option);
     // On success, remove the handle, if the option was to drop it
     if(ret == SQL_SUCCESS && p_option == SQL_DROP)
     {

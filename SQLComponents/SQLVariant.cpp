@@ -608,6 +608,24 @@ SQLVariant::IsBinaryType() const
   }
 }
 
+bool
+SQLVariant::IsFixedLengthType() const
+{
+  switch(m_sqlDatatype)
+  {
+    case SQL_CHAR:
+    case SQL_VARCHAR:
+    case SQL_WCHAR:
+    case SQL_WVARCHAR:
+    case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
+    case SQL_BINARY:
+    case SQL_VARBINARY:
+    case SQL_LONGVARBINARY: return false;
+    default:                return true;
+  }
+}
+
 void
 SQLVariant::Reset()
 {

@@ -106,6 +106,7 @@ public:
    bool    IsIntervalType() const;
    bool    IsDateTimeType() const;
    bool    IsBinaryType() const;
+   bool    IsFixedLengthType() const;
 
    // GETTERS
    int     GetDataType() const;

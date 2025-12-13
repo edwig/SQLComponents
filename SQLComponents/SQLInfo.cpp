@@ -1736,7 +1736,7 @@ SQLInfo::MakeInfoTableColumns(MColumnMap& p_columns
          if(cbPrecision > 0 && Precision > 0)
          {
            theColumn.m_columnSize = Precision;                        // 7
-           if(cbScale > 0)
+           if(cbScale > 0 && Scale >= 0)
            {
              theColumn.m_decimalDigits = Scale;                       // 9
            }

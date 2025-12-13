@@ -130,7 +130,7 @@ public:
   // Named parameters for DoSQLCall()
   bool SetParameterName(int p_num,XString p_name,SQLParamType p_type = P_SQL_PARAM_INPUT);
   // Set bounded parameters for execute for datapumps (all in one go) 
-  void SetParameters(ParameterMap* p_map);
+  void SetParameters(ParameterMap& p_map);
 
   // SINGLE STATEMENT
 
@@ -219,6 +219,8 @@ public:
   bool        GetNoScan() const;
   // LengthOption for SQLPrepare/SQLExecDirect
   LOption     GetLengthOption() const;
+  // Getting the complete parameter map
+  ParameterMap& GetParameterMap();
 
   // Getting the results of the query as a SQLVariant reference
   SQLVariant& operator[](int p_index);
@@ -283,6 +285,8 @@ private:
   short RebindColumn(short p_datatype);
   // Character output parameters are sometimes not limited
   void  LimitOutputParameters();
+  // Fixed length for SQLGetData
+  bool  IsFixedLengthType(int p_datatype) const;
 
   SQLDatabase*  m_database;          // Database
   HDBC          m_connection;        // In CTOR connection handle.

@@ -45,6 +45,7 @@ namespace SQLComponents
 SQLInfoFirebird::SQLInfoFirebird(SQLDatabase* p_database)
                 :SQLInfoDB(p_database)
 {
+  m_RDBMSkeywords.insert(_T("PARAMETER"));
 }
 
 // Destructor. Does nothing
@@ -166,7 +167,7 @@ SQLInfoFirebird::GetRDBMSSupportsDatatypeInterval() const
 bool
 SQLInfoFirebird::GetRDBMSSupportsFunctionalIndexes() const
 {
-  return false;
+  return true;
 }
 
 // Support for "as" in alias statements (FROM clause)
@@ -369,12 +370,21 @@ SQLInfoFirebird::GetKEYWORDDataType(MetaColumn* p_column)
   switch(p_column->m_datatype)
   {
     case SQL_CHAR:                      // fall through
+    case SQL_WCHAR:                     type = _T("CHAR");
+                                        if(p_column->m_columnSize > GetRDBMSMaxVarchar() + 2)
+                                        {
+                                          p_column->m_columnSize = GetRDBMSMaxVarchar() + 2;
+                                        }
+                                        break;
     case SQL_VARCHAR:                   // fall through
-    case SQL_WCHAR:                     // fall through
     case SQL_WVARCHAR:                  type = _T("VARCHAR");
+                                        if(p_column->m_columnSize > GetRDBMSMaxVarchar())
+                                        {
+                                          p_column->m_columnSize = GetRDBMSMaxVarchar();
+                                        }
                                         break;
     case SQL_LONGVARCHAR:               // fall through
-    case SQL_WLONGVARCHAR:              type = _T("VARCHAR");  // CLOB -> VARCHAR
+    case SQL_WLONGVARCHAR:              type = _T("BLOB SUB_TYPE TEXT");
                                         break;
     case SQL_INTEGER:                   type = _T("INTEGER");
                                         break;
@@ -411,10 +421,10 @@ SQLInfoFirebird::GetKEYWORDDataType(MetaColumn* p_column)
                                             p_column->m_decimalDigits = p_column->m_columnSize - 1;
                                           }
                                           // Preserve scale!
-                                          if(p_column->m_decimalDigits == 0)
-                                          {
-                                            p_column->m_decimalDigits = -1;
-                                          }
+//                                           if(p_column->m_decimalDigits == 0)
+//                                           {
+//                                             p_column->m_decimalDigits = -1;
+//                                           }
                                         }
                                         break;
     //case SQL_DATE:
@@ -430,9 +440,10 @@ SQLInfoFirebird::GetKEYWORDDataType(MetaColumn* p_column)
                                         p_column->m_columnSize    = 0;
                                         p_column->m_decimalDigits = 0;
                                         break;
-    case SQL_BINARY:                    type = _T("BLOB");          break;
-    case SQL_VARBINARY:                 type = _T("BLOB");          break;
-    case SQL_LONGVARBINARY:             type = _T("BLOB");          break;
+    case SQL_BINARY:                    // fall through
+    case SQL_VARBINARY:                 // fall through
+    case SQL_LONGVARBINARY:             type = _T("BLOB SUB_TYPE 0");
+                                        break;
     case SQL_GUID:                      // fall through
     case SQL_INTERVAL_YEAR:             // fall through
     case SQL_INTERVAL_YEAR_TO_MONTH:    // fall through
@@ -700,10 +711,11 @@ SQLInfoFirebird::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool 
 
 // Changes to parameters before binding to an ODBC HSTMT handle  (returning the At-Exec status)
 bool
-SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/
+SQLInfoFirebird::DoBindParameterFixup(SQLVariant*    p_var
+                                     ,SQLSMALLINT&   p_dataType
                                      ,SQLSMALLINT&   p_sqlDatatype
                                      ,SQLULEN&     /*p_columnSize*/
-                                     ,SQLSMALLINT& /*p_scale*/
+                                     ,SQLSMALLINT&   p_scale
                                      ,SQLLEN&        p_bufferSize
                                      ,SQLLEN*        p_indicator) const
 {
@@ -712,6 +724,32 @@ SQLInfoFirebird::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/
   {
     p_sqlDatatype = SQL_VARBINARY;
     *p_indicator  = p_bufferSize;
+  }
+
+  // Binding a NUMERIC to a different datatype does only work for a very limited range of values (< 32K)
+  // And a column defined as a general NUMERIC without a standard precision or scale will be generated as
+  // an INTEGER in Firebird. So binding it as an INTEGER will work for a much larger range of values.
+  // But we must convert the parameter ourselves before using it.
+  if(p_dataType    == SQL_NUMERIC && 
+     p_sqlDatatype == SQL_NUMERIC && 
+     p_bufferSize  == sizeof(SQL_NUMERIC_STRUCT) &&
+     p_scale       == 16)
+  {
+    try
+    {
+      // Try to convert to int: can throw if out of integer range
+      int number    = p_var->GetAsBCD().AsLong();
+      p_sqlDatatype = SQL_INTEGER;
+      p_dataType    = SQL_C_SLONG;
+      p_scale       = 0;
+      p_bufferSize  = sizeof(int);
+      p_var->Set(number);
+    }
+    catch(StdException& /*ex*/)
+    {
+      // Doesn't fit into an INTEGER
+      // So keep fingers crossed and proceed
+    }
   }
   return false;
 }
@@ -1452,6 +1490,8 @@ XString
 SQLInfoFirebird::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicateNulls /*= false*/) const
 {
   XString query;
+  bool doFilter(false);
+
   for(auto& index : p_indices)
   {
     if(index.m_position == 1)
@@ -1474,18 +1514,29 @@ SQLInfoFirebird::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicate
     }
     else
     {
-      query += _T(",");
+      // Multiple column filtering works on VARCHAR fields only
+      query += doFilter ? _T("||") : _T(",");
     }
     if(index.m_columnName.Left(1) == _T("("))
     {
-      query.TrimRight(_T("("));
-      query += _T(" COMPUTED BY ");
+      if(index.m_position == 1)
+      {
+        query.TrimRight(_T("("));
+        query += _T(" COMPUTED BY ");
+      }
       query += QIQ(index.m_columnName);
       query.TrimRight(_T(")"));
+      doFilter = true;
     }
     else if(!index.m_filter.IsEmpty())
     {
+      if(index.m_position == 1)
+      {
+        query.TrimRight(_T("("));
+        query += _T(" COMPUTED BY (");
+      }
       query += index.m_filter;
+      doFilter = true;
     }
     else
     {

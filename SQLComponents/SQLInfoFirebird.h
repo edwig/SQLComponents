@@ -235,7 +235,8 @@ public:
   XString GetTempTablename(XString p_schema,XString p_tablename,bool p_local) const override;
 
   // Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
-  bool    DoBindParameterFixup(SQLSMALLINT& p_dataType
+  bool    DoBindParameterFixup(SQLVariant*  p_var
+                              ,SQLSMALLINT& p_dataType
                               ,SQLSMALLINT& p_sqlDatatype
                               ,SQLULEN&     p_columnSize
                               ,SQLSMALLINT& p_scale

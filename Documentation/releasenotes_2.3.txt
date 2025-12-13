@@ -3,6 +3,15 @@ RELEASENOTES SQLCOMPONENTS VERSION 2.3
 ===== Released since: 06-09-2023 =====
 ======================================
 
+Version 2.3.6 of xx-xx-2025
+---------------------------
+1)  Reworked the SQLMigrate application to be (again) able to convert an Oracle
+    database to Firebird.
+2)  Added a 'Slow datapump' method to the SQLMigrate program for those drivers
+    that cannot do the tight SQLExecute loop multiple times (Firebird).
+3)  Added the "IsFixedLengthType()" to the SQLVariant. This simplifies the 
+    SQLQuery procedure of getting long data from the ODBC driver.
+
 Version 2.3.5 of 08-12-2025
 ---------------------------
 1)  Ported to Visual Studio 2026
