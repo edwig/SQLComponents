@@ -46,6 +46,8 @@ SQLInfoFirebird::SQLInfoFirebird(SQLDatabase* p_database)
                 :SQLInfoDB(p_database)
 {
   m_RDBMSkeywords.insert(_T("PARAMETER"));
+  m_RDBMSkeywords.insert(_T("TIMESTAMP"));
+  m_RDBMSkeywords.insert(_T("BOOLEAN"));
 }
 
 // Destructor. Does nothing
@@ -1543,7 +1545,7 @@ SQLInfoFirebird::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicate
       query += QIQ(index.m_columnName);
     }
   }
-  query += ")";
+  query += _T(")");
   return query;
 }
 
@@ -2377,7 +2379,7 @@ SQLInfoFirebird::GetCATALOGViewAttributes(XString& p_schema,XString& p_viewname,
     IdentifierCorrect(p_viewname);
     sql += _T("\n AND rel.rdb$relation_name ");
     sql += (p_viewname.Find(_T("%")) >= 0) ? _T("LIKE") : _T("=");
-    sql += " ?";
+    sql += _T(" ?");
   }
   return sql;
 }
@@ -3278,7 +3280,7 @@ SQLInfoFirebird::GetPSMDeclaration(bool    /*p_first*/
   {
     line += _T(" TYPE OF ") + p_domain;
   }
-  else if(!p_asColumn)
+  else if(!p_asColumn.IsEmpty())
   {
     line += _T(" TYPE OF COLUMN ") + p_asColumn;
   }

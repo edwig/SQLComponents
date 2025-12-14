@@ -2,8 +2,8 @@
 //
 // File: SQLInfoOracle.cpp
 //
-// Copyright (c) 1998-2025 ir. W.E. Huisman
-// All rights reserved
+// Created: 1998-2025 ir. W.E. Huisman
+// MIT License
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -277,14 +277,14 @@ SQLInfoOracle::IsIdentifier(XString p_identifier) const
     return false;
   }
   // Must start with one alpha char
-  if(!_istalpha(p_identifier.GetAt(0)))
+  if(!_istalpha((TCHAR)p_identifier.GetAt(0)))
   {
     return false;
   }
   for(int index = 0;index < p_identifier.GetLength();++index)
   {
     // Can be upper/lower alpha or a number OR an underscore
-    TCHAR ch = p_identifier.GetAt(index);
+    TCHAR ch = (TCHAR) p_identifier.GetAt(index);
     if(!_istalnum(ch) && ch != '_')
     {
       return false;
@@ -947,7 +947,7 @@ SQLInfoOracle::GetCATALOGTypeSource(XString& p_schema,XString& p_typename,bool p
     IdentifierCorrect(p_schema);
     sql += _T("   AND owner = '") + p_schema + _T("'\n");
   }
-  if(!p_typename)
+  if(!p_typename.IsEmpty())
   {
     IdentifierCorrect(p_typename);
     sql += _T("   AND name  = '")  + p_typename + _T("'\n");
@@ -1741,17 +1741,12 @@ SQLInfoOracle::GetCATALOGForeignExists(XString p_schema,XString p_tablename,XStr
   IdentifierCorrect(p_tablename);
   IdentifierCorrect(p_constraintname);
 
-  XString sql;
-  sql.Format(_T("SELECT COUNT(*)\n")
-             _T("  FROM all_constraints con\n")
-             _T(" WHERE con.constraint_type = 'R'")
-             _T("   AND con.owner           = '") + p_schema + _T("'\n")
-             _T("   AND con.table_name      = '") + p_tablename + _T("'\n")
-             _T("   AND con.constraint_name = '") + p_constraintname + _T("'")
-            ,p_schema.GetString()
-            ,p_tablename.GetString()
-            ,p_constraintname.GetString());
-
+  XString sql(_T("SELECT COUNT(*)\n")
+              _T("  FROM all_constraints con\n")
+              _T(" WHERE con.constraint_type = 'R'")
+              _T("   AND con.owner           = '") + p_schema + _T("'\n")
+              _T("   AND con.table_name      = '") + p_tablename + _T("'\n")
+              _T("   AND con.constraint_name = '") + p_constraintname + _T("'"));
   return sql;
 }
 
@@ -2765,7 +2760,7 @@ SQLInfoOracle::GetPSMProcedureList(XString& p_schema,XString p_procedure,bool p_
 XString
 SQLInfoOracle::GetPSMProcedureAttributes(XString& p_schema,XString& p_procedure,bool p_quoted /*= false*/) const
 {
-  CString package;
+  XString package;
 
   int pos = p_procedure.Find('.');
   if(pos > 0)
@@ -2984,7 +2979,7 @@ SQLInfoOracle::GetPSMDeclaration(bool    p_first
   {
     line += p_domain;
   }
-  else if(!p_asColumn)
+  else if(!p_asColumn.IsEmpty())
   {
     line += p_asColumn + _T("%TYPE");
   }
@@ -3274,7 +3269,7 @@ SQLInfoOracle::DoSQLCallNamedParameters(SQLQuery* p_query,XString& p_schema,XStr
   }
 
   // Add parameter 0 as result parameter
-  if(p_function && p_query->GetParameter(0) == nullptr)
+  if(p_function && p_query->GetParameter(0,SQLParamType::P_SQL_PARAM_OUTPUT) == nullptr)
   {
     SQLVariant ret((int)0);
     p_query->SetParameter(0,&ret,SQLParamType::P_SQL_PARAM_OUTPUT);

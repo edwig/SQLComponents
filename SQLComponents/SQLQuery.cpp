@@ -720,7 +720,7 @@ SQLQuery::DoSQLStatement(const XString& p_statement)
   if(m_database && m_database->WilLog())
   {
     logging = true;
-    XString log = "[Database query]\n" + statement;
+    XString log = _T("[Database query]\n") + statement;
     m_database->LogPrint(log);
   }
 
@@ -1683,7 +1683,7 @@ SQLQuery::GetRecord()
 int
 SQLQuery::RetrieveAtExecData()
 {
-  // See which SQLGetData extentsions are reported by the ODBC driver
+  // See which SQLGetData extensions are reported by the ODBC driver
   SQLUINTEGER extensions = m_database ? m_database->GetSQLInfoDB()->GetGetDataExtensions() : 0;
 
   for(SQLUSMALLINT col = (SQLUSMALLINT) m_hasLongColumns; col <= m_numColumns; ++col)

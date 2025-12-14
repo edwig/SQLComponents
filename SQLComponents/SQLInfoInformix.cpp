@@ -2035,7 +2035,7 @@ SQLInfoInformix::GetPSMDeclaration(bool    /*p_first*/
       line += _T(" DEFAULT ") + p_default;
     }
   }
-  else if(!p_asColumn)
+  else if(!p_asColumn.IsEmpty())
   {
     line += _T(" LIKE ") + p_asColumn;
   }

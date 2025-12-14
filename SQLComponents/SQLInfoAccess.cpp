@@ -865,7 +865,7 @@ SQLInfoAccess::GetCATALOGIndexCreate(MIndicesMap& p_indices,bool /*p_duplicateNu
       {
         query += _T("UNIQUE ");
       }
-      if(index.m_ascending != "A")
+      if(index.m_ascending != _T("A"))
       {
         query += _T("DESC ");
       }
