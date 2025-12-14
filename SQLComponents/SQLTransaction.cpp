@@ -43,6 +43,7 @@ SQLTransaction::SQLTransaction(SQLDatabase* p_database
                ,m_lock      (p_database,INFINITE)
                ,m_name      (p_name)
                ,m_active    (false)
+               ,m_readonly  (false)
                ,m_hdbc      (NULL)
 {
   // No spaces allowed in the name on any RDBMS platform
@@ -52,9 +53,11 @@ SQLTransaction::SQLTransaction(SQLDatabase* p_database
   {
     Start(p_name, p_isSubTransaction);
   }
-  if(p_database)
+  // Override from database. 
+  // In a read-only database all transactions are read-only
+  if(p_database && p_database->GetReadOnly())
   {
-    m_readonly = p_database->GetReadOnly();
+    m_readonly = true;
   }
 }
 

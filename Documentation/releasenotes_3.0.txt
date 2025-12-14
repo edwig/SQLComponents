@@ -22,3 +22,6 @@ Version 3.0.0 of xx-xx-2025
     The SQLDatabase transaction logic has been fully refurbished and checked
     Read-only connections will no longer rollback to savepoint, as this leads to 
     errors on all databases, and there is no point in rolling back only to savepoint.
+5)  Added the "IsFixedLengthType()" to the SQLVariant. This simplies the 
+    SQLQuery procedure of getting long data from the ODBC driver.
+6)  Various small fixes for the database discovery classes.

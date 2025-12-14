@@ -636,16 +636,10 @@ SQLQuery::SetParameterName(int p_param,const XString& p_name,SQLParamType p_type
 
 // Set parameters from another SQLQuery
 void
-SQLQuery::SetParameters(ParameterMap* p_map)
+SQLQuery::SetParameters(ParameterMap& p_map)
 {
-  if(p_map)
-  {
-    m_parameters = *p_map;
-  }
-  else
-  {
-    m_parameters.clear();
-  }
+  ResetParameters();
+  m_parameters = p_map;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1089,7 +1083,7 @@ SQLQuery::BindParameters()
     sqlDatatype = RebindParameter(sqlDatatype);
 
     // Fix max length parameters for some database types
-    if(m_database->GetSQLInfoDB()->DoBindParameterFixup(dataType,sqlDatatype,columnSize,scale,bufferSize,indicator))
+    if(m_database->GetSQLInfoDB()->DoBindParameterFixup(var,dataType,sqlDatatype,columnSize,scale,bufferSize,indicator))
     {
       var->SetAtExec(true);
     }
@@ -1687,11 +1681,15 @@ SQLQuery::RetrieveAtExecData()
   // See which SQLGetData extensions are reported by the ODBC driver
   SQLUINTEGER extensions = m_database ? m_database->GetSQLInfoDB()->GetGetDataExtensions() : 0;
 
-  for(int col = m_hasLongColumns; col <= m_numColumns; ++col)
+  for(SQLUSMALLINT col = (SQLUSMALLINT) m_hasLongColumns; col <= m_numColumns; ++col)
   { 
-    SQLLEN actualLength = 0L;
-    SQLVariant* var = m_numMap[col];
-    int datatype = var->GetDataType();
+    SQLLEN actualLength   = 0L;
+    SQLVariant*  var      = m_numMap[col];
+    SQLUSMALLINT datatype = (SQLUSMALLINT) var->GetDataType();
+    // To prevent stack corruption in the Oracle ODBC driver, we must provide a datapointer
+    // and at least two extra pointers on the stack, otherwise we cannot retrieve the
+    // actualLength parameter for the data.
+    // SQLPOINTER datapointer[3] = { 0L };
 
     // See how to get the data. If we may retrieve any column, it will be bound
     // and thus already gotten by the SQLFetch. 
@@ -1702,10 +1700,11 @@ SQLQuery::RetrieveAtExecData()
     }
     // Retrieve actual length of this instance of the column
     m_retCode = SqlGetData(m_hstmt
-                          ,(SQLUSMALLINT) col
-                          ,(SQLSMALLINT)  datatype
-                          ,(SQLPOINTER)   &actualLength  // Some drivers need this!
-                          ,(SQLINTEGER)   0  // Request the actual length of this field
+                          ,col
+                          ,datatype
+                          // ,&datapointer[0]   // Some drivers need this!
+                          ,(SQLPOINTER)var->GetDataPointer()
+                          ,0                 // Request the actual length of this field
                           ,&actualLength);
     if(!SQL_SUCCEEDED(m_retCode))
     {
@@ -1728,6 +1727,12 @@ SQLQuery::RetrieveAtExecData()
       // we take this length into account including the SQL_LEN_DATA_AT_EXEC_OFFSET
       actualLength = -actualLength; 
     }
+    // Everything already gotten in the first try
+    if(var->IsFixedLengthType() && IsFixedLengthType(datatype))
+    {
+      continue;
+    }
+
     // Get extra overhead space for a zero-terminator
     actualLength += (datatype == SQL_C_CHAR || datatype == SQL_C_WCHAR) ? 2 : 0;
     // Reserve space in the SQLVariant for this data (same datatype)
@@ -1735,11 +1740,11 @@ SQLQuery::RetrieveAtExecData()
 
     // Now go get it
     m_retCode = SqlGetData(m_hstmt
-                          ,(SQLUSMALLINT) col
-                          ,(SQLUSMALLINT) datatype
-                          ,(SQLPOINTER)   var->GetDataPointer()
-                          ,(SQLINTEGER)   actualLength
-                          ,               var->GetIndicatorPointer());
+                          ,col
+                          ,datatype
+                          ,(SQLPOINTER)var->GetDataPointer()
+                          ,actualLength
+                          ,var->GetIndicatorPointer());
     if(!SQL_SUCCEEDED(m_retCode) && m_retCode != SQL_NO_DATA)
     {
       // SQL_ERROR / SQL_NO_DATA / SQL_STILL_EXECUTING / SQL_INVALID_HANDLE
@@ -1748,6 +1753,27 @@ SQLQuery::RetrieveAtExecData()
   }
   return SQL_SUCCESS;
 }
+
+// Fixed length for SQLGetData
+bool
+SQLQuery::IsFixedLengthType(int p_datatype) const
+{
+  switch(p_datatype)
+  {
+    case SQL_CHAR:
+    case SQL_VARCHAR:
+    case SQL_WCHAR:
+    case SQL_WVARCHAR:
+    case SQL_LONGVARCHAR:
+    case SQL_WLONGVARCHAR:
+    case SQL_BINARY:
+    case SQL_VARBINARY:
+    case SQL_LONGVARBINARY: return false;
+    default:                return true;
+  }
+}
+
+
 
 void
 SQLQuery::DoCancelQuery()
@@ -2523,6 +2549,13 @@ void
 SQLQuery::SetLengthOption(LOption p_option /*= LOption::LO_LEN_ZERO*/)
 {
   m_lengthOption = p_option;
+}
+
+// Getting the complete parameter map
+ParameterMap&
+SQLQuery::GetParameterMap()
+{
+  return m_parameters;
 }
 
 // End of namespace

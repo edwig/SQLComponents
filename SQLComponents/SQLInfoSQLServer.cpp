@@ -847,7 +847,7 @@ SQLInfoSQLServer::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool
 
 // Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
 bool
-SQLInfoSQLServer::DoBindParameterFixup(SQLSMALLINT& /*p_dataType*/,SQLSMALLINT& p_sqlDatatype,SQLULEN& p_columnSize,SQLSMALLINT& p_scale,SQLLEN& p_bufferSize,SQLLEN* p_indicator) const
+SQLInfoSQLServer::DoBindParameterFixup(SQLVariant* /*p_var*/,SQLSMALLINT& /*p_dataType*/,SQLSMALLINT& p_sqlDatatype,SQLULEN& p_columnSize,SQLSMALLINT& p_scale,SQLLEN& p_bufferSize,SQLLEN* p_indicator) const
 {
   if(*p_indicator == SQL_NULL_DATA)
   {
@@ -1301,6 +1301,7 @@ SQLInfoSQLServer::GetCATALOGTableSynonyms(XString& p_schema,XString& p_tablename
                   _T("            WHEN N'MS_Description' THEN CAST (e.value AS VARCHAR(Max))\n")
                   _T("            ELSE ''\n")
                   _T("       END  AS remarks\n")
+                  _T("      ,s.name + '.' + o.name AS fullname")
                   _T("      ,null AS tablespace\n")
                   _T("      ,0    AS temporary\n")
                   _T("  FROM sys.objects o\n")

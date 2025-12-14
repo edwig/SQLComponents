@@ -311,7 +311,8 @@ public:
   
 
   // Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
-  virtual bool DoBindParameterFixup(SQLSMALLINT& p_dataType
+  virtual bool DoBindParameterFixup(SQLVariant*  p_var
+                                   ,SQLSMALLINT& p_dataType
                                    ,SQLSMALLINT& p_sqlDatatype
                                    ,SQLULEN&     p_columnSize
                                    ,SQLSMALLINT& p_scale

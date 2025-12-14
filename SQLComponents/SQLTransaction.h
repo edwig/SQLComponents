@@ -2,8 +2,8 @@
 //
 // File: SQLTransaction.h
 //
-// Created: 1998-2025 ir. W.E. Huisman
-// MIT License
+// Copyright (c) 1998-2025 ir. W.E. Huisman
+// All rights reserved
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of 
 // this software and associated documentation files (the "Software"), 
@@ -48,7 +48,7 @@ public:
  ~SQLTransaction();
 
   // Transaction on the database. If a transaction is already started and isSubTransaction
-  // is requested, it will start a subtransactions SAVEPOINT, that can be rollbacked 
+  // is requested, it will start a subtransaction's SAVEPOINT, that can be rollback'ed 
   // independently. Whenever a subtransaction is off, the transaction will be linked to 
   // earlier transactions, and thus influence the complete behaviour,
   // until the last commit/rollback of the main transaction

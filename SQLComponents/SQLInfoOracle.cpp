@@ -729,7 +729,7 @@ SQLInfoOracle::GetTempTablename(XString /*p_schema*/,XString p_tablename,bool /*
 
 // Changes to parameters before binding to an ODBC HSTMT handle (returning the At-Exec status)
 bool
-SQLInfoOracle::DoBindParameterFixup(SQLSMALLINT& p_dataType,SQLSMALLINT& p_sqlDatatype,SQLULEN& /*p_columnSize*/,SQLSMALLINT& /*p_scale*/,SQLLEN& /*p_bufferSize*/,SQLLEN* /*p_indicator*/) const
+SQLInfoOracle::DoBindParameterFixup(SQLVariant* /*p_var*/,SQLSMALLINT& p_dataType,SQLSMALLINT& p_sqlDatatype,SQLULEN& /*p_columnSize*/,SQLSMALLINT& /*p_scale*/,SQLLEN& /*p_bufferSize*/,SQLLEN* /*p_indicator*/) const
 {
   // Oracle driver can only bind to SQL_DECIMAL
   if(p_dataType == SQL_DECIMAL)
@@ -1365,19 +1365,19 @@ SQLInfoOracle::GetCATALOGColumnAttributes(XString& p_schema,XString& p_tablename
   if(!p_schema.IsEmpty())
   {
     IdentifierCorrect(p_schema);
-    sql.AppendFormat(_T(" WHERE col.owner      = '%s'\n"),p_schema.GetString());
+    sql += _T(" WHERE col.owner      = ?\n");
   }
   if(!p_tablename.IsEmpty())
   {
     IdentifierCorrect(p_tablename);
-    sql += p_schema.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
-    sql.AppendFormat(_T("col.table_name = '%s'\n"),p_tablename.GetString());
+    sql += p_schema.IsEmpty() ? _T(" WHERE") : _T("   AND");
+    sql += _T(" col.table_name = ?\n");
   }
   if(!p_columnname.IsEmpty())
   {
     IdentifierCorrect(p_columnname);
-    sql += p_schema.IsEmpty() && p_tablename.IsEmpty() ? _T(" WHERE ") : _T("   AND ");
-    sql.AppendFormat(_T("col.column_name = '%s'\n"),p_columnname.GetString());
+    sql += p_schema.IsEmpty() && p_tablename.IsEmpty() ? _T(" WHERE") : _T("   AND");
+    sql += _T(" col.column_name = ?\n");
   }
   sql += _T(" ORDER BY 1,2,3,17");
   return sql;

@@ -729,12 +729,13 @@ DDLCreateTable::FindSchemaName(const XString& p_tableName)
   if(pos < 0)
   {
     m_tableName = p_tableName;
+    return false;
   }
   // Two part name
   m_schema    = p_tableName.Left(pos);
   m_tableName = p_tableName.Mid(pos + 1);
 
-  pos = p_tableName.Find('.');
+  pos = m_tableName.Find('.');
   if(pos < 0)
   {
     return true;
@@ -743,7 +744,7 @@ DDLCreateTable::FindSchemaName(const XString& p_tableName)
   m_catalog   = m_schema;
   m_schema    = m_tableName.Left(pos);
   m_tableName = m_tableName.Mid(pos + 1);
-  return false;
+  return true;
 }
 
 void
