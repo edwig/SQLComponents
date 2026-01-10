@@ -151,10 +151,10 @@ print_all_errors()
 }
 
 void
-PrintCopyright()
+WhoAreWe()
 {
-  xprintf(false,_T("SQLXport: SQL-Server export/import program for ODBC connections\n"));
-  xprintf(false,_T("Copyright (c) ") XPORT_YEAR _T(" ir. W.E. Huisman\n"));
+  xprintf(false,_T("SQLXport: SQL RDBMS Database export/import program for ODBC connections\n"));
+  xprintf(false,_T("Written by: ir. W.E. Huisman\n"));
   xprintf(false,_T("Version: ") XPORT_VERSION _T(" Date: ") XPORT_DATE _T("\n"));
   xprintf(false,_T("\n"));
 }
@@ -258,7 +258,7 @@ int _tmain(int argc, TCHAR* argv[])
   InitSQLComponents(LN_ENGLISH);
 
   // Print who we are
-  PrintCopyright();
+  WhoAreWe();
 
   // Get from the command line what we need to do
   params.ProcessCommandLine(argc,argv);

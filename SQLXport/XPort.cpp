@@ -60,10 +60,7 @@ XPort::Export()
     return;
   }
 
-  // STEP 3: Retrieve all tables
-  GetAllTables();
-
-  // STEP 4: Lock all tables
+  // STEP 3: Lock all tables
   if(m_parameters.m_consistent)
   {
     xprintf(false,_T("CONSISTENT Export mode: locking all tables in share mode\n"));
@@ -72,31 +69,40 @@ XPort::Export()
       return;
     }
   }
-
   ExportUserTypes();
 
-  // STEP 5: Export of all tables/columns and data of all tables
-  ExportTables();
-
-  if(m_parameters.m_constraints)
+  // STEP 4: Export of all tables/columns and data of all tables
+  if(m_parameters.m_tables)
   {
-    // STEP 6: Export all indices
-    ExportIndices();
+    // STEP 5: Retrieve all tables to work on
+    //         and export the table definitions and data
+    GetAllTables();
+    ExportTables();
 
-    // STEP 7: Export all primary keys
-    ExportPrimaryKeys();
+    if(m_parameters.m_constraints)
+    {
+      // STEP 6: Export all indices
+      ExportIndices();
 
-    // STEP 8: Export all foreign keys
-    ExportForeignKeys();
+      // STEP 7: Export all primary keys
+      ExportPrimaryKeys();
 
-    // STEP 9: Export all default constraints
-    ExportDefaultConstraints();
+      // STEP 8: Export all foreign keys
+      ExportForeignKeys();
 
-    // STEP 10: Export all check constraints
-    ExportCheckConstraints();
+      // STEP 9: Export all default constraints
+      ExportDefaultConstraints();
+
+      // STEP 10: Export all check constraints
+      ExportCheckConstraints();
+    }
   }
+
   // STEP 11: For all sequences
-  ExportSequences();
+  if(m_parameters.m_sequences)
+  {
+    ExportSequences();
+  }
 
   // STEP 12: for all procedures/functions/triggers/package/type/type body
   if(m_parameters.m_source)
@@ -106,10 +112,16 @@ XPort::Export()
   }
 
   // STEP 13: for all views
-  ExportViews();
+  if(m_parameters.m_views)
+  {
+    ExportViews();
+  }
 
   // STEP 14: Export of the synonyms
-  ExportSynonyms();
+  if(m_parameters.m_synonyms)
+  {
+    ExportSynonyms();
+  }
 
   // STEP 15: All object rights
   if(m_parameters.m_grants)

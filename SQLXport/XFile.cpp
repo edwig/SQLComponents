@@ -969,7 +969,7 @@ XFile::ReadData(SQLComponents::SQLVariant* p_var)
   xfread(&type,  (size_t)sizeof(int),m_file);
   xfread(&sqltyp,(size_t)sizeof(int),m_file);
   isnull = (TCHAR)xfgetc(m_file);
-  _TUCHAR* buffer = new _TUCHAR[length + 1];
+  _TUCHAR* buffer = alloc_new _TUCHAR[length + 1];
   xfread(buffer,(size_t)length,m_file);
   buffer[length] = 0;
 

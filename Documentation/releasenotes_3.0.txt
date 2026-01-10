@@ -25,3 +25,8 @@ Version 3.0.0 of xx-xx-2025
 5)  Added the "IsFixedLengthType()" to the SQLVariant. This simplies the 
     SQLQuery procedure of getting long data from the ODBC driver.
 6)  Various small fixes for the database discovery classes.
+7)  Extra options for SQLXport utility:
+    - Not exporting the tables
+    - Not exporting the views
+    - Not exporting the sequences
+    - Not exporting the synonyms.

@@ -51,8 +51,12 @@ Parameters::PrintArguments()
   if(m_export)
   {
     xprintf(false,_T("Extra filter for data   : %s\n"),m_filter.GetString());
+    xprintf(false,_T("Export tables           : %s\n"),m_tables      ? _T("true") : _T("false"));
+    xprintf(false,_T("Export views            : %s\n"),m_views       ? _T("true") : _T("false"));
     xprintf(false,_T("Export table data rows  : %s\n"),m_rows        ? _T("true") : _T("false"));
     xprintf(false,_T("Export table constraints: %s\n"),m_constraints ? _T("true") : _T("false"));
+    xprintf(false,_T("Export sequences        : %s\n"),m_sequences   ? _T("true") : _T("false"));
+    xprintf(false,_T("Export synonyms         : %s\n"),m_synonyms    ? _T("true") : _T("false"));
     xprintf(false,_T("Export rights           : %s\n"),m_grants      ? _T("true") : _T("false"));
     xprintf(false,_T("Export source code      : %s\n"),m_source      ? _T("true") : _T("false"));
     xprintf(false,_T("Use consistent export   : %s\n"),m_consistent  ? _T("true") : _T("false"));
@@ -180,6 +184,22 @@ Parameters::CheckArguments()
     {
       xerror(_T("SQLXport can only use /CREATESQL upon export mode\n"));
     }
+    if(m_tables == false)
+    {
+      xerror(_T("SQLXport can only use /NOTABLES upon export mode\n"));
+    }
+    if(m_views == false)
+    {
+      xerror(_T("SQLXport can only use /NOVIEWS upon export mode\n"));
+    }
+    if (m_sequences == false)
+    {
+      xerror(_T("SQLXport can only use /NOSEQUENCES upon export mode\n"));
+    }
+    if(m_synonyms == false)
+    {
+      xerror(_T("SQLXport can only use /NOSYNONYMS upon export mode\n"));
+    }
   }
 
   // Do error
@@ -212,8 +232,12 @@ Parameters::Usage()
   xprintf(false, _T("/DROP                Drop schema contents (import only)\n"));
   xprintf(false, _T("/CONSISTENT          Use share table lock (export only)\n"));
   xprintf(false, _T("/WAIT:<seconds>      Time to wait for a share table lock (export only)\n"));
+  xprintf(false, _T("/NOTABLES            Do not export the tables\n"));
+  xprintf(false, _T("/NOVIEWS             Do not export the views\n"));
   xprintf(false, _T("/NOROWS              Do not export the tables data rows\n"));
   xprintf(false, _T("/NOCONSTRAINTS       Do not export indices/primary/foreign/check constraints\n"));
+  xprintf(false, _T("/NOSEQUENCES         Do not export table sequences for primary keys\n"));
+  xprintf(false, _T("/NOSYNONYMS          Do not export synonym names for objects\n"));
   xprintf(false, _T("/NOSOURCE            Do not export functions/procedures/types/packages/triggers\n"));
   xprintf(false, _T("/NOGRANTS            Do not export the object's access rights\n"));
   xprintf(false, _T("/COMMIT:<nnn>        Do commit after <nnn> records (import only)\n"));
@@ -343,8 +367,6 @@ Parameters::FindDirection()
 }
 
 // STILL TO BE DONE
-// /NOVIEWS
-// /NOSEQUENCES
 // /NOSYNONYMS
 
 void
@@ -366,10 +388,14 @@ Parameters::ProcessOneParameter(XString p_parameter)
   else if(p_parameter.Left(5) .CompareNoCase(_T("debug"))         == 0) m_debug        = true;
   else if(p_parameter.Left(10).CompareNoCase(_T("statistics"))    == 0) m_statistics   = true;
   else if(p_parameter.Left(9) .CompareNoCase(_T("recompile"))     == 0) m_recompile    = true;
-  else if(p_parameter.Left(8) .CompareNoCase(_T("nogrants"))      == 0) m_grants       = false;
+  else if(p_parameter.Left(6) .CompareNoCase(_T("notables"))      == 0) m_tables       = false;
+  else if(p_parameter.Left(6) .CompareNoCase(_T("noviews"))       == 0) m_views        = false;
   else if(p_parameter.Left(6) .CompareNoCase(_T("norows"))        == 0) m_rows         = false;
   else if(p_parameter.Left(13).CompareNoCase(_T("noconstraints")) == 0) m_constraints  = false;
+  else if(p_parameter.Left(13).CompareNoCase(_T("nosequences"))   == 0) m_sequences    = false;
+  else if(p_parameter.Left(13).CompareNoCase(_T("nosynonyms"))    == 0) m_synonyms     = false;
   else if(p_parameter.Left(8) .CompareNoCase(_T("nosource"))      == 0) m_source       = false;
+  else if(p_parameter.Left(8) .CompareNoCase(_T("nogrants"))      == 0) m_grants       = false;
   else if(p_parameter.Left(9) .CompareNoCase(_T("createsql"))     == 0) m_createSql    = true;
   else if(p_parameter.Left(6) .CompareNoCase(_T("nohang"))        == 0) m_noHang       = true;
   else if(p_parameter.Left(9) .CompareNoCase(_T("stripdiac"))     == 0) m_stripDiacs   = true;

@@ -77,8 +77,12 @@ public:
   bool    m_stripDiacs { false };
   int     m_commitRange{ DATA_COMMIT_RANGE_DEFAULT };
   // Export options
+  bool    m_tables     { true  };
+  bool    m_views      { true  };
   bool    m_rows       { true  };
   bool    m_constraints{ true  };
+  bool    m_sequences  { true  };
+  bool    m_synonyms   { true  };
   bool    m_source     { true  };
   bool    m_grants     { true  };
   bool    m_createSql  { false };
