@@ -52,7 +52,7 @@ public:
   // independently. Whenever a subtransaction is off, the transaction will be linked to 
   // earlier transactions, and thus influence the complete behaviour,
   // until the last commit/rollback of the main transaction
-  void    Start(XString p_name,bool p_startSubtransaction = false);
+  void    Start(const XString& p_name,bool p_startSubtransaction = false);
   // Commit the transaction
   void    Commit();
   // Rollback the transaction

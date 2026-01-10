@@ -51,7 +51,7 @@ SQLTransaction::SQLTransaction(SQLDatabase* p_database
   // If asked for, start it right away
   if(p_startImmediate)
   {
-    Start(p_name, p_isSubTransaction);
+    Start(p_name,p_isSubTransaction);
   }
   // Override from database. 
   // In a read-only database all transactions are read-only
@@ -101,7 +101,7 @@ SQLTransaction::~SQLTransaction()
 }
 
 void 
-SQLTransaction::Start(XString p_name, bool p_startSubtransaction)
+SQLTransaction::Start(const XString& p_name, bool p_startSubtransaction)
 {
   // On transaction per instance
   if(m_active)
@@ -215,6 +215,9 @@ SQLTransaction::Rollback()
     }
   }
   AfterRollback();
+
+  // We are no longer active
+  m_active = false;
 }
 
 // Can be overridden. We do nothing here

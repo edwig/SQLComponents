@@ -1457,23 +1457,14 @@ SQLDatabase::CloseAllTransactions()
     // Commit last SELECT in multi-version databases
     // Otherwise we get an error at the disconnect of the HDBC
     ret = SqlEndTran(SQL_HANDLE_DBC,m_hdbc,m_readOnly ? SQL_ROLLBACK : SQL_COMMIT);
-
-    while(!m_transactions.empty())
-    {
-      m_transactions.pop();
-    }
   }
   else
   {
-    // IF SO: rollback these transactions
-    ret = SqlEndTran(SQL_HANDLE_DBC,m_hdbc,SQL_ROLLBACK);
-
     // Notifying all transactions that we are done!
     // and clearing the transactions stack
     while(!m_transactions.empty())
     {
-      m_transactions.top()->AfterRollback();
-      m_transactions.pop();
+      m_transactions.top()->Rollback();
     }
   }
   if(Check(ret) == FALSE)
