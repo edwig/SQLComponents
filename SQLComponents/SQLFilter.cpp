@@ -900,7 +900,7 @@ SQLFilter::MatchBetween(const SQLVariant* p_field)
 
 // Translate a string from the message to an operator
 SQLOperator 
-StringToSQLOperator(XString p_oper)
+StringToSQLOperator(const XString& p_oper)
 {
   OperatorName* filter = operatornames;
 
