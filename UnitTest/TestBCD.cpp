@@ -537,14 +537,14 @@ namespace DatabaseUnitTest
       return 0;
     }
 
-    void PrecisionTest(XString p_input,int p_precision,int p_scale)
+    void PrecisionTest(const XString& p_input,int p_precision,int p_scale)
     {
       SQL_NUMERIC_STRUCT numeric;
       bcd num(p_input);
       num.AsNumeric(&numeric);
 
       XString text;
-      text.Format(_T("BCD Precision/Scale [%d:%d] for: %s"),(int)numeric.precision,(int)numeric.scale,p_input);
+      text.Format(_T("BCD Precision/Scale [%d:%d] for: %s"),(int)numeric.precision,(int)numeric.scale,p_input.GetString());
       Logger::WriteMessage(text);
 
       Assert::AreEqual((SQLCHAR) p_precision,numeric.precision);
