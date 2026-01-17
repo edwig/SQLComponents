@@ -672,6 +672,7 @@ namespace DatabaseUnitTest
       MetaTrigger  trigger;
       MetaSequence sequence;
       MetaProcedure metaproc;
+      MColumnMap    viewcolumns;
       MParameterMap parameters;
       std::vector<XString> cursorcolumns;    // Cursor fetch
       std::vector<XString> cursorparameters; // Fetch into
@@ -710,7 +711,7 @@ namespace DatabaseUnitTest
       number_of_tests += 14;
       // SQL's
       ReportSQL    (_T("Generate new serial                :"),p_info->GetSQLGenerateSerial(table));
-      ReportString (_T("Effective serial                   :"),p_info->GetSQLEffectiveSerial("oid"));
+      ReportString (_T("Effective serial                   :"),p_info->GetSQLEffectiveSerial(_T("oid")));
       ReportSQL    (_T("Start new subtransaction           :"),p_info->GetSQLStartSubTransaction(table));
       ReportSQL    (_T("Commit subtransaction              :"),p_info->GetSQLCommitSubTransaction(table));
       ReportSQL    (_T("Rollback subtransaction            :"),p_info->GetSQLRollbackSubTransaction(table));
@@ -733,7 +734,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("TABLE Catalogs                     :"),p_info->GetCATALOGTableCatalog   (schema,table));
       ReportSQL    (_T("TABLE exists                       :"),p_info->GetCATALOGTableExists    (schema,table));
       ReportSQL    (_T("TABLE create                       :"),p_info->GetCATALOGTableCreate    (tables,metacolumns));
-      ReportSQL    (_T("TABLE Rename                       :"),p_info->GetCATALOGTableRename    (schema,table,table + "_ext"));
+      ReportSQL    (_T("TABLE Rename                       :"),p_info->GetCATALOGTableRename    (schema,table,table + _T("_ext")));
       ReportSQL    (_T("TABLE Drop                         :"),p_info->GetCATALOGTableDrop      (schema,table));
       number_of_tests += 9;
       // CATALOG Temp table
@@ -747,7 +748,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("COLUMN all attributes of the column:"),p_info->GetCATALOGColumnAttributes(schema,table,column));
       ReportSQL    (_T("COLUMN Create                      :"),p_info->GetCATALOGColumnCreate    (metacolumns));
       ReportSQL    (_T("COLUMN Alter                       :"),p_info->GetCATALOGColumnAlter     (metacolumns));
-      ReportSQL    (_T("COLUMN Rename                      :"),p_info->GetCATALOGColumnRename    (schema,table,column,column + "_ext",type));
+      ReportSQL    (_T("COLUMN Rename                      :"),p_info->GetCATALOGColumnRename    (schema,table,column,column + _T("_ext"),type));
       ReportSQL    (_T("COLUMN Drop                        :"),p_info->GetCATALOGColumnDrop      (schema,table,column));
       number_of_tests += 7;
       // CATALOG Index
@@ -762,7 +763,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("PRIMARY KEY exists                 :"),p_info->GetCATALOGPrimaryExists    (schema,table));
       ReportSQL    (_T("PRIMARY KEY attributes             :"),p_info->GetCATALOGPrimaryAttributes(schema,table));
       ReportSQL    (_T("PRIMARY KEY create                 :"),p_info->GetCATALOGPrimaryCreate    (primaries));
-      ReportSQL    (_T("PRIMARY KEY drop                   :"),p_info->GetCATALOGPrimaryDrop      (schema,table,"pk_" + table));
+      ReportSQL    (_T("PRIMARY KEY drop                   :"),p_info->GetCATALOGPrimaryDrop      (schema,table,_T("pk_") + table));
       number_of_tests += 4;
       // CATALOG Foreign key
       ReportSQL    (_T("FOREIGN KEY exists                 :"),p_info->GetCATALOGForeignExists    (schema,table,foreign));
@@ -784,13 +785,13 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("SEQUENCE lists                     :"),p_info->GetCATALOGSequenceList      (schema,table));
       ReportSQL    (_T("SEQUENCE attributes                :"),p_info->GetCATALOGSequenceAttributes(schema,table));
       ReportSQL    (_T("SEQUENCE create                    :"),p_info->GetCATALOGSequenceCreate    (sequence));
-      ReportSQL    (_T("SEQUENCE drop                      :"),p_info->GetCATALOGSequenceDrop      (schema,table + "_seq"));
+      ReportSQL    (_T("SEQUENCE drop                      :"),p_info->GetCATALOGSequenceDrop      (schema,table + _T("_seq")));
       number_of_tests += 5;
       // CATALOG View
       ReportSQL    (_T("VIEW exists                        :"),p_info->GetCATALOGViewExists    (schema,viewname));
       ReportSQL    (_T("VIEW list                          :"),p_info->GetCATALOGViewList      (schema,viewname));
       ReportSQL    (_T("VIEW attributes                    :"),p_info->GetCATALOGViewAttributes(schema,viewname));
-      ReportSQL    (_T("VIEW Create                        :"),p_info->GetCATALOGViewCreate    (schema,table,select));
+      ReportSQL    (_T("VIEW Create                        :"),p_info->GetCATALOGViewCreate    (schema,table,viewcolumns,select));
       ReportSQL    (_T("VIEW Drop                          :"),p_info->GetCATALOGViewDrop      (schema,table,precursor));
       number_of_tests += 5;
       // PERSISTENT STORED MODULES
@@ -819,14 +820,14 @@ namespace DatabaseUnitTest
       ReportString (_T("PSM CURSOR declaration             :"),p_info->GetPSMCursorDeclaration(destiny,select));
       ReportString (_T("PSM CURSOR Fetch                   :"),p_info->GetPSMCursorFetch(cursorname,cursorcolumns,cursorparameters));
       ReportString (_T("PSM exception catch NODATA         :"),p_info->GetPSMExceptionCatchNoData());
-      ReportString (_T("PSM exception catch SQLSTATE       :"),p_info->GetPSMExceptionCatch("HY001"));
-      ReportString (_T("PSM exception raise                :"),p_info->GetPSMExceptionRaise("NODATA"));
+      ReportString (_T("PSM exception catch SQLSTATE       :"),p_info->GetPSMExceptionCatch(_T("HY001")));
+      ReportString (_T("PSM exception raise                :"),p_info->GetPSMExceptionRaise(_T("NODATA")));
       number_of_tests += 16;
       // SESSION CONTROL
       ReportSQL    (_T("SESSION Getting session/terminal   :"),p_info->GetSESSIONMyself());
-      ReportSQL    (_T("SESSION exists                     :"),p_info->GetSESSIONExists("123"));
+      ReportSQL    (_T("SESSION exists                     :"),p_info->GetSESSIONExists(_T("123")));
       ReportSQL    (_T("SESSION list                       :"),p_info->GetSESSIONList());
-      ReportSQL    (_T("SESSION attributes                 :"),p_info->GetSESSIONExists("123"));
+      ReportSQL    (_T("SESSION attributes                 :"),p_info->GetSESSIONExists(_T("123")));
       ReportSQL    (_T("SET ALL CONSTRAINTS DEFERRED       :"),p_info->GetSESSIONConstraintsDeferred());
       ReportSQL    (_T("SET ALL CONSTRAINTS IMMEDIATE      :"),p_info->GetSESSIONConstraintsImmediate());
       number_of_tests += 6;
