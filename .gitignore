@@ -15,6 +15,8 @@ binDebug_x64/
 binDebug_win32/
 binRelease_x64/
 binRelease_win32/
+bin_Debug64/
+bin_Release64/
 Include/
 SQLComponents-cppcheck-build-dir/
  

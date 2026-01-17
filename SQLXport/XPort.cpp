@@ -1180,7 +1180,13 @@ XPort::GetDefineSQLView(const XString& p_view)
   // Some RDBMS only store the creation text partially
   if(create.Left(6).CompareNoCase(_T("CREATE")))
   {
-    XString extra = info->GetCATALOGViewCreate(m_schema,view,create);
+    // Getting the column information for the view
+    XString errors;
+    XString catalog;
+    MColumnMap columns;
+    info->MakeInfoTableColumns(columns,errors,catalog,m_schema,p_view);
+
+    XString extra = info->GetCATALOGViewCreate(m_schema,p_view,columns,create);
     if(extra.GetLength() > create.GetLength())
     {
       return extra;

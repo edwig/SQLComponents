@@ -672,6 +672,7 @@ namespace DatabaseUnitTest
       MetaTrigger  trigger;
       MetaSequence sequence;
       MetaProcedure metaproc;
+      MColumnMap    viewcolumns;
       MParameterMap parameters;
       std::vector<XString> cursorcolumns;    // Cursor fetch
       std::vector<XString> cursorparameters; // Fetch into
@@ -710,7 +711,7 @@ namespace DatabaseUnitTest
       number_of_tests += 14;
       // SQL's
       ReportSQL    (_T("Generate new serial                :"),p_info->GetSQLGenerateSerial(table));
-      ReportString (_T("Effective serial                   :"),p_info->GetSQLEffectiveSerial("oid"));
+      ReportString (_T("Effective serial                   :"),p_info->GetSQLEffectiveSerial(_T("oid")));
       ReportSQL    (_T("Start new subtransaction           :"),p_info->GetSQLStartSubTransaction(table));
       ReportSQL    (_T("Commit subtransaction              :"),p_info->GetSQLCommitSubTransaction(table));
       ReportSQL    (_T("Rollback subtransaction            :"),p_info->GetSQLRollbackSubTransaction(table));
@@ -790,7 +791,7 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("VIEW exists                        :"),p_info->GetCATALOGViewExists    (schema,viewname));
       ReportSQL    (_T("VIEW list                          :"),p_info->GetCATALOGViewList      (schema,viewname));
       ReportSQL    (_T("VIEW attributes                    :"),p_info->GetCATALOGViewAttributes(schema,viewname));
-      ReportSQL    (_T("VIEW Create                        :"),p_info->GetCATALOGViewCreate    (schema,table,select));
+      ReportSQL    (_T("VIEW Create                        :"),p_info->GetCATALOGViewCreate    (schema,table,viewcolumns,select));
       ReportSQL    (_T("VIEW Drop                          :"),p_info->GetCATALOGViewDrop      (schema,table,precursor));
       number_of_tests += 5;
       // PERSISTENT STORED MODULES
