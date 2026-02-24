@@ -288,11 +288,12 @@ XPort::GatherDropSchema(OList& p_statements)
 { 
   SQLInfoDB* info = m_database.GetSQLInfoDB();
   XString schema(m_schema);
+  XString package;
   XString all;
 
   XString allsynonyms    = info->GetCATALOGTableSynonyms(schema,all);
   XString allsequences   = info->GetCATALOGSequenceList (schema,all);
-  XString allprocedures  = info->GetPSMProcedureList    (schema,all);
+  XString allprocedures  = info->GetPSMProcedureList    (schema,package,all);
   XString alltriggers    = info->GetCATALOGTriggerList  (schema,all);
   XString allviews       = info->GetCATALOGViewList     (schema,all);
   XString allforeigns    = info->GetCATALOGForeignList  (schema,all);
@@ -325,7 +326,7 @@ XPort::GatherDropSchema(OList& p_statements)
     {
       XString procedure = query[MetaProcedure_procedurename];
       int     typeproc  = query[4];
-      XString dropline = info->GetPSMProcedureDrop(schema,procedure,typeproc == 2);
+      XString dropline = info->GetPSMProcedureDrop(schema,package,procedure,typeproc == 2);
       p_statements.push_back(dropline);
     }
     // TRIGGERS
@@ -657,11 +658,12 @@ XPort::GetAllProcedures()
 {
   int count = 0;
   XString object(m_object);
+  XString package;
   if(!object.IsEmpty() && (object.Find('%') < 0))
   {
     object = _T("%") + object + _T("%");
   }
-  XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,object,true);
+  XString sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,package,object,true);
 
   try
   {
@@ -690,7 +692,7 @@ XPort::GetAllProcedures()
       {
         return count;
       }
-      sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,object);
+      sql = m_database.GetSQLInfoDB()->GetPSMProcedureAttributes(m_schema,package,object);
     }
   }
   catch(StdException& ex)
@@ -1507,9 +1509,10 @@ void
 XPort::WriteProcedureAccessRights(const XString& p_object,int& p_count)
 {
   XString object(p_object);
+  XString package;
 
   SQLInfoDB* info = m_database.GetSQLInfoDB();
-  XString sql = info->GetPSMProcedurePrivilege(m_schema,object);
+  XString sql = info->GetPSMProcedurePrivilege(m_schema,package,object);
 
   if(sql.IsEmpty())
   {

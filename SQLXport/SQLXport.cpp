@@ -183,6 +183,23 @@ PrintTotalTime(SQLTimestamp& p_starting,SQLTimestamp& p_stopping)
   xprintf(false,_T("%d seconds\n"),howlong.GetSeconds() % 60);
 }
 
+void
+PrintResults()
+{
+  if(params.m_errors == 0)
+  {
+    xprintf(false,_T("SQLXport: %sed with no errors\n"),params.m_direction.GetString());
+  }
+  else
+  {
+    xprintf(false,_T("SQLXport: %sed with %d error%c\n")
+           ,params.m_direction.GetString()
+           ,params.m_errors
+           ,params.m_errors > 1 ? _T('s') : ' ');
+    print_all_errors();
+  }
+}
+
 //////////////////////////////////////////////////////////////////////////
 //
 // THE REAL EXPORT / IMPORT
@@ -192,12 +209,7 @@ PrintTotalTime(SQLTimestamp& p_starting,SQLTimestamp& p_stopping)
 void
 ExportImport()
 {
-  // Make logfile now we have a dump file name
-  params.MakeLogfile();
-
-  // Print arguments
-  params.PrintArguments();
-
+  // When we started our action
   SQLTimestamp starting = SQLTimestamp::CurrentTimestamp();
 
   // Main processing of export or import
@@ -222,18 +234,7 @@ ExportImport()
   }
 
   // Printing the result
-  if(params.m_errors == 0)
-  {
-    xprintf(false,_T("SQLXport: %sed with no errors\n"),params.m_direction.GetString());
-  }
-  else
-  {
-    xprintf(false,_T("SQLXport: %sed with %d error%c\n")
-           ,params.m_direction.GetString()
-           ,params.m_errors
-           ,params.m_errors > 1 ? _T('s') : ' ');
-    print_all_errors();
-  }
+  PrintResults();
 
   // How long it took us
   SQLTimestamp stopping = SQLTimestamp::CurrentTimestamp();

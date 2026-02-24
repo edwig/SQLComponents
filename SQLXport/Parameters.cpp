@@ -307,6 +307,12 @@ Parameters::ProcessCommandLine(int argc,TCHAR* argv[])
   // Check the arguments for correctness
   // Does NOT return here on error
   CheckArguments();
+
+  // Make logfile now we have a dump file name
+  MakeLogfile();
+
+  // Print arguments
+  PrintArguments();
 }
 
 void

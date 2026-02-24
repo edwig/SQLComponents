@@ -653,6 +653,7 @@ namespace DatabaseUnitTest
       XString splParam1(_T("CHAR"));
       XString splParam2(_T("NUMERIC"));
       XString quoteString(_T("This is 'a' string"));
+      XString package;
       int     statements = 0;
       bool    notnull    = true;
 
@@ -795,14 +796,14 @@ namespace DatabaseUnitTest
       ReportSQL    (_T("VIEW Drop                          :"),p_info->GetCATALOGViewDrop      (schema,table,precursor));
       number_of_tests += 5;
       // PERSISTENT STORED MODULES
-      ReportSQL    (_T("PSM PROCEDURE exists               :"),p_info->GetPSMProcedureExists    (schema,procedurename));
-      ReportSQL    (_T("PSM PROCEDURE list                 :"),p_info->GetPSMProcedureList      (schema,procedurename));
-      ReportSQL    (_T("PSM PROCEDURE attributes           :"),p_info->GetPSMProcedureAttributes(schema,procedurename));
-      ReportSQL    (_T("PSM PROCEDURE sourcecode           :"),p_info->GetPSMProcedureSourcecode(schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE exists               :"),p_info->GetPSMProcedureExists    (schema,package,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE list                 :"),p_info->GetPSMProcedureList      (schema,package,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE attributes           :"),p_info->GetPSMProcedureAttributes(schema,package,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE sourcecode           :"),p_info->GetPSMProcedureSourcecode(schema,package,procedurename));
       ReportSQL    (_T("PSM PROCEDURE create               :"),p_info->GetPSMProcedureCreate    (metaproc));
-      ReportSQL    (_T("PSM PROCEDURE drop                 :"),p_info->GetPSMProcedureDrop      (schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE drop                 :"),p_info->GetPSMProcedureDrop      (schema,package,procedurename));
     //ReportSQL    ("PSM PROCEDURE errors               :",p_info->GetPSMProcedureErrors    (schema,procedurename));
-      ReportSQL    (_T("PSM PROCEDURE parameters           :"),p_info->GetPSMProcedureParameters(schema,procedurename));
+      ReportSQL    (_T("PSM PROCEDURE parameters           :"),p_info->GetPSMProcedureParameters(schema,package,procedurename));
       number_of_tests += 7;
       // PSM elements
     //ReportString ("PSM Declaration                    :",p_info->GetPSMDeclaration(true,destiny,SQL_INTEGER,10,0,"","",""));
