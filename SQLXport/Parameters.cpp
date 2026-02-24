@@ -23,7 +23,7 @@
 //
 // Version number: See SQLXport.h
 //
-#include "stdafx.h"
+#include "pch.h"
 #include "parameters.h"
 #include "SQLXport.h"
 #include <GetExePath.h>

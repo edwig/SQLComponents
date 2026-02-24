@@ -5,9 +5,12 @@
 // Do not add files here that you will be updating frequently as this negates the performance advantage.
 #pragma once
 
+// Exclude rarely-used stuff from Windows headers
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN            // Exclude rarely-used stuff from Windows headers
+#define VC_EXTRALEAN
 #endif
+
+#define WIN32_LEAN_AND_MEAN
 
 #include "targetver.h"
 #include "framework.h"
