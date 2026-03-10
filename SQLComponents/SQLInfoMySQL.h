@@ -173,7 +173,7 @@ public:
   XString GetSQLNewSerial(const XString& p_table,const XString& p_sequence) const override;
 
   // Gets the construction / select for generating a new serial identity
-  XString GetSQLGenerateSerial  (const XString& p_table) const override;
+  XString GetSQLGenerateSerial(const XString& p_table) const override;
   XString GetSQLGenerateSequence(const XString& p_sequence) const override;
 
   // Gets the construction / select for the resulting effective generated serial

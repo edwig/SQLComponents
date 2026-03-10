@@ -86,7 +86,7 @@ public:
   XString GetSQLNewSerial(const XString& p_table,const XString& p_sequence) const override;
 
   // Gets the construction / select for generating a new serial identity
-  XString GetSQLGenerateSerial  (const XString& p_table) const override;
+  XString GetSQLGenerateSerial(const XString& p_table) const override;
   XString GetSQLGenerateSequence(const XString& p_sequence) const override;
 
   // Gets the sub-transaction commands
@@ -122,6 +122,9 @@ public:
   XString GetCATALOGSequenceCreate    (MetaSequence& p_sequence) const override;
   XString GetCATALOGSequenceDrop      (XString  p_schema,XString  p_sequence) const override;
   
+  // All table functions
+  XString GetCATALOGTableCreatePostfix(MetaTable& p_table,MetaColumn& p_column) const override;
+
   //////////////////////////////////////////////////////////////////////////
   //
   // SQL/PSM PERSISTENT STORED MODULES 
@@ -131,7 +134,7 @@ public:
   //////////////////////////////////////////////////////////////////////////
 
   // All procedure functions
-  XString GetPSMProcedureSourcecode(XString  p_schema,XString& /*p_package*/,XString  p_procedure,bool p_quoted = false) const override;
+  XString GetPSMProcedureSourcecode(XString p_schema,XString& p_package,XString  p_procedure,bool p_quoted = false) const override;
 
   
 private:
