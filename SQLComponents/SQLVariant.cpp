@@ -69,7 +69,7 @@ SQLVariant::SQLVariant(LPCTSTR p_data,bool p_wide /*=false*/)
   SetData(p_wide ? SQL_C_WCHAR : SQL_C_CHAR,p_data);
 }
 
-// XTOR SQL_C_CHAR / SQL_C_WCHAR FROM MFC XString
+// XTOR SQL_C_CHAR / SQL_C_WCHAR FROM XString
 SQLVariant::SQLVariant(const XString& p_data,bool p_wide /*=false*/)
 {
   Init();
@@ -83,7 +83,7 @@ SQLVariant::SQLVariant(short p_short)
   m_datatype    = SQL_C_SSHORT;
   m_sqlDatatype = SQL_INTEGER;
   m_indicator   = 0;
-  m_data.m_dataSSHORT  = p_short;
+  m_data.m_dataSSHORT = p_short;
 }
 
 // XTOR SQL_C_USHORT
@@ -93,7 +93,7 @@ SQLVariant::SQLVariant(unsigned short p_short)
   m_datatype    = SQL_C_USHORT;
   m_sqlDatatype = SQL_INTEGER;
   m_indicator   = 0;
-  m_data.m_dataUSHORT  = p_short;
+  m_data.m_dataUSHORT = p_short;
 }
 
 // XTOR SQL_C_LONG / SQL_C_SLONG
