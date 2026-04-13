@@ -2696,11 +2696,22 @@ SQLQuery::SetParameterArrayData(SQLVariant** p_array,int p_count)
 void
 SQLQuery::BindBulkParameters()
 {
+  BindBulkParametersAtOffset(0);
+}
+
+// Bind bulk parameter arrays at a specific row offset for chunked execution
+void
+SQLQuery::BindBulkParametersAtOffset(int p_offset)
+{
   int column = 1;
   for(auto& buffer : m_bulkParamBuffers)
   {
     // Check rebinds
     SQLSMALLINT sqlType = RebindParameter(buffer.m_sqlType);
+
+    // Calculate offset pointers into the contiguous buffers
+    unsigned char* dataPtr = static_cast<unsigned char*>(buffer.m_data) + ((size_t)p_offset * buffer.m_elementSize);
+    SQLLEN*        indPtr  = buffer.m_indicators + p_offset;
 
     m_retCode = SqlBindParameter(m_hstmt
                                 ,(SQLUSMALLINT)column
@@ -2709,9 +2720,9 @@ SQLQuery::BindBulkParameters()
                                 ,sqlType
                                 ,buffer.m_columnSize
                                 ,buffer.m_scale
-                                ,buffer.m_data
+                                ,(SQLPOINTER)dataPtr
                                 ,(SQLLEN)buffer.m_elementSize
-                                ,buffer.m_indicators);
+                                ,indPtr);
     if(!SQL_SUCCEEDED(m_retCode))
     {
       GetLastError(_T("Cannot bind bulk parameter. Error: "));
@@ -2722,7 +2733,7 @@ SQLQuery::BindBulkParameters()
   }
 }
 
-// Execute prepared statement with array-bound parameters
+// Execute prepared statement with array-bound parameters (with batch chunking)
 int
 SQLQuery::DoSQLExecuteBulk()
 {
@@ -2737,26 +2748,14 @@ SQLQuery::DoSQLExecuteBulk()
     throw StdException(m_lastError);
   }
 
-  // Allocate row status array
+  // Allocate row status array for all rows
   m_bulkRowStatus.clear();
   m_bulkRowStatus.resize(m_bulkArraySize,SQL_PARAM_UNUSED);
   m_bulkRowsProcessed = 0;
+  m_bulkRowErrors.clear();
+  m_rows = 0;
 
-  // Set array binding attributes on the statement handle
-  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAMSET_SIZE,(SQLPOINTER)(SQLULEN)m_bulkArraySize,SQL_IS_UINTEGER);
-  if(!SQL_SUCCEEDED(m_retCode))
-  {
-    GetLastError(_T("Cannot set SQL_ATTR_PARAMSET_SIZE. Error: "));
-    throw StdException(m_lastError);
-  }
-
-  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAM_STATUS_PTR,(SQLPOINTER)m_bulkRowStatus.data(),SQL_IS_POINTER);
-  if(!SQL_SUCCEEDED(m_retCode))
-  {
-    GetLastError(_T("Cannot set SQL_ATTR_PARAM_STATUS_PTR. Error: "));
-    throw StdException(m_lastError);
-  }
-
+  // Set up the processed-count pointer (shared across all chunks)
   m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAMS_PROCESSED_PTR,(SQLPOINTER)&m_bulkRowsProcessed,SQL_IS_POINTER);
   if(!SQL_SUCCEEDED(m_retCode))
   {
@@ -2764,47 +2763,113 @@ SQLQuery::DoSQLExecuteBulk()
     throw StdException(m_lastError);
   }
 
-  // Bind all parameter arrays
-  BindBulkParameters();
+  int totalRows       = m_bulkArraySize;
+  int batchSize       = (m_bulkBatchSize >= BULK_BATCH_SIZE_MIN) ? m_bulkBatchSize : totalRows;
+  int offset          = 0;
+  SQLULEN totalProcessed = 0;
+  SQLLEN  totalAffected  = 0;
 
-  // Execute
-  m_retCode = SqlExecute(m_hstmt);
-
-  if(m_retCode == SQL_SUCCESS || m_retCode == SQL_SUCCESS_WITH_INFO)
+  while(offset < totalRows)
   {
-    // Get row count for INSERT/UPDATE/DELETE
-    SQLLEN rowCount = 0;
-    ::SQLRowCount(m_hstmt,&rowCount);
-    m_rows = rowCount;
+    int currentBatch = (totalRows - offset < batchSize) ? (totalRows - offset) : batchSize;
 
-    // Log bulk results
-    if(m_database && m_database->WilLog())
+    // Set the array size for this chunk
+    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAMSET_SIZE,(SQLPOINTER)(SQLULEN)currentBatch,SQL_IS_UINTEGER);
+    if(!SQL_SUCCEEDED(m_retCode))
     {
-      XString msg;
-      msg.Format(_T("[Bulk execute] Rows processed: %llu, Rows affected: %lld")
-                ,(unsigned long long)m_bulkRowsProcessed
-                ,(long long)m_rows);
-      m_database->LogPrint(msg);
+      GetLastError(_T("Cannot set SQL_ATTR_PARAMSET_SIZE. Error: "));
+      throw StdException(m_lastError);
     }
-  }
-  else if(m_retCode == SQL_ERROR)
-  {
-    GetLastError(_T("Error in bulk SQL execute: "));
 
-    // Log per-row errors if available
-    if(m_database && m_database->WilLog())
+    // Point the status array to the correct offset in the global array
+    m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAM_STATUS_PTR,(SQLPOINTER)&m_bulkRowStatus[offset],SQL_IS_POINTER);
+    if(!SQL_SUCCEEDED(m_retCode))
     {
-      for(int i = 0; i < (int)m_bulkRowsProcessed; ++i)
+      GetLastError(_T("Cannot set SQL_ATTR_PARAM_STATUS_PTR. Error: "));
+      throw StdException(m_lastError);
+    }
+
+    // Bind parameters at the current offset
+    m_bulkRowsProcessed = 0;
+    BindBulkParametersAtOffset(offset);
+
+    // Execute this chunk
+    m_retCode = SqlExecute(m_hstmt);
+
+    totalProcessed += m_bulkRowsProcessed;
+
+    if(m_retCode == SQL_SUCCESS || m_retCode == SQL_SUCCESS_WITH_INFO)
+    {
+      // Get row count for this chunk
+      SQLLEN rowCount = 0;
+      ::SQLRowCount(m_hstmt,&rowCount);
+      totalAffected += rowCount;
+
+      // Collect diagnostics for SQL_SUCCESS_WITH_INFO
+      if(m_retCode == SQL_SUCCESS_WITH_INFO)
       {
-        if(m_bulkRowStatus[i] == SQL_PARAM_ERROR)
+        CollectBulkDiagnostics(offset);
+      }
+
+      // Log chunk results
+      if(m_database && m_database->WilLog())
+      {
+        XString msg;
+        msg.Format(_T("[Bulk execute] Chunk at offset %d: %d rows processed, %lld rows affected")
+                  ,offset,(int)m_bulkRowsProcessed,(long long)rowCount);
+        m_database->LogPrint(msg);
+      }
+    }
+    else if(m_retCode == SQL_ERROR)
+    {
+      // Collect per-row diagnostics before throwing
+      CollectBulkDiagnostics(offset);
+      GetLastError(_T("Error in bulk SQL execute: "));
+
+      // Log per-row errors if available
+      if(m_database && m_database->WilLog())
+      {
+        for(int i = 0; i < (int)m_bulkRowsProcessed; ++i)
+        {
+          if(m_bulkRowStatus[offset + i] == SQL_PARAM_ERROR)
+          {
+            XString msg;
+            msg.Format(_T("[Bulk execute] Row %d: ERROR"),offset + i);
+            m_database->LogPrint(msg);
+          }
+        }
+        // Log collected diagnostic details
+        for(const auto& err : m_bulkRowErrors)
         {
           XString msg;
-          msg.Format(_T("[Bulk execute] Row %d: ERROR"),i);
+          msg.Format(_T("[Bulk execute] Row %d: [%s][%d] %s")
+                    ,err.m_rowIndex,err.m_sqlState.GetString(),err.m_nativeError,err.m_message.GetString());
           m_database->LogPrint(msg);
         }
       }
+
+      // Store totals before throwing
+      m_bulkRowsProcessed = totalProcessed;
+      m_rows = totalAffected;
+
+      throw StdException(m_lastError);
     }
-    throw StdException(m_lastError);
+
+    offset += currentBatch;
+  }
+
+  // Store final totals
+  m_bulkRowsProcessed = totalProcessed;
+  m_rows = totalAffected;
+
+  // Log final summary
+  if(m_database && m_database->WilLog())
+  {
+    XString msg;
+    msg.Format(_T("[Bulk execute] Total: %llu rows processed, %lld rows affected")
+              ,(unsigned long long)m_bulkRowsProcessed
+              ,(long long)m_rows);
+    m_database->LogPrint(msg);
   }
 
   // Reset array size back to 1 for subsequent single-row operations
@@ -2834,6 +2899,66 @@ SQLQuery::GetIsBulkMode() const
   return (m_bulkArraySize >= BULK_BATCH_SIZE_MIN);
 }
 
+// Set the maximum batch size for chunked bulk execution
+void
+SQLQuery::SetBulkBatchSize(int p_batchSize)
+{
+  if(p_batchSize < BULK_BATCH_SIZE_MIN)
+  {
+    m_bulkBatchSize = BULK_BATCH_SIZE_DEFAULT;
+    return;
+  }
+  m_bulkBatchSize = p_batchSize;
+}
+
+// Get the current bulk batch size
+int
+SQLQuery::GetBulkBatchSize() const
+{
+  return m_bulkBatchSize;
+}
+
+// Get per-row error diagnostics after bulk execute
+const std::vector<BulkRowError>&
+SQLQuery::GetBulkRowErrors() const
+{
+  return m_bulkRowErrors;
+}
+
+// Collect ODBC diagnostic records after a bulk execute chunk
+void
+SQLQuery::CollectBulkDiagnostics(int p_rowOffset)
+{
+  SQLTCHAR    sqlState[SQL_SQLSTATE_SIZE + 1];
+  SQLINTEGER  nativeError = 0;
+  SQLTCHAR    messageText[SQL_MAX_MESSAGE_LENGTH + 1];
+  SQLSMALLINT messageLen  = 0;
+
+  for(SQLSMALLINT recNum = 1; ; ++recNum)
+  {
+    SQLRETURN ret = SqlGetDiagRec(SQL_HANDLE_STMT
+                                 ,m_hstmt
+                                 ,recNum
+                                 ,sqlState
+                                 ,&nativeError
+                                 ,messageText
+                                 ,SQL_MAX_MESSAGE_LENGTH
+                                 ,&messageLen);
+    if(ret == SQL_NO_DATA || !SQL_SUCCEEDED(ret))
+    {
+      break;
+    }
+
+    BulkRowError error;
+    error.m_rowIndex    = p_rowOffset + (recNum - 1);
+    error.m_sqlState    = sqlState;
+    error.m_nativeError = (int)nativeError;
+    error.m_message     = messageText;
+
+    m_bulkRowErrors.push_back(error);
+  }
+}
+
 // Free all bulk parameter buffers
 void
 SQLQuery::FreeBulkBuffers()
@@ -2853,7 +2978,9 @@ SQLQuery::FreeBulkBuffers()
   }
   m_bulkParamBuffers.clear();
   m_bulkRowStatus.clear();
+  m_bulkRowErrors.clear();
   m_bulkArraySize     = 0;
+  m_bulkBatchSize     = BULK_BATCH_SIZE_DEFAULT;
   m_bulkRowsProcessed = 0;
 }
 

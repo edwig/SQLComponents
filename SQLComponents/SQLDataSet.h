@@ -130,6 +130,8 @@ public:
   void         CancelMutation(int p_mutationID);
   // Insert / Update / delete records from the database
   bool         Synchronize(int p_mutationID = 0,bool p_throw = false);
+  // Bulk insert / update / delete records from the database (array binding)
+  bool         SynchronizeBulk(int p_mutationID = 0,bool p_throw = false);
   // In case synchronize doesn't work, ask for mixed mutations
   int          AllMixedMutations(MutationIDS& p_list,int p_mutationID);
   // Find the object record of a primary key
@@ -302,6 +304,11 @@ protected:
   void         Updates(int p_mutationID);
   void         Inserts(int p_mutationID);
   void         Reduce (int p_mutationID);
+
+  // Bulk writeback operations
+  void         BulkDeletes(int p_mutationID);
+  void         BulkUpdates(int p_mutationID);
+  void         BulkInserts(int p_mutationID);
 
   XString      GetSQLDelete  (SQLQuery* p_query,const SQLRecord* p_record);
   XString      GetSQLUpdate  (SQLQuery* p_query,const SQLRecord* p_record);

@@ -65,6 +65,15 @@ struct BulkParamBuffer
   int          m_count         { 0 };        // Number of rows in this buffer
 };
 
+// Per-row error diagnostic information from bulk execute
+struct BulkRowError
+{
+  int      m_rowIndex    { 0 };   // Zero-based row index
+  XString  m_sqlState;            // 5-character SQLSTATE code
+  int      m_nativeError { 0 };   // Driver-specific native error code
+  XString  m_message;             // Error message text
+};
+
 class SQLDate;
 class SQLDatabase;
 struct NoCaseCompare
@@ -269,8 +278,14 @@ public:
   SQLULEN     GetBulkRowsProcessed() const;
   // Check if bulk mode is active
   bool        GetIsBulkMode() const;
+  // Set the maximum batch size for chunked bulk execution
+  void        SetBulkBatchSize(int p_batchSize);
+  // Get the current bulk batch size
+  int         GetBulkBatchSize() const;
+  // Get per-row error diagnostics after bulk execute
+  const std::vector<BulkRowError>& GetBulkRowErrors() const;
 
-  // LEGACY SUPPORT ODBC 1.x AND 2.x
+  // LEGACY SUPPORT
   void DescribeColumn(int          p_col
                      ,XString&     p_columnName
                      ,XString&     p_colLabel
@@ -322,7 +337,9 @@ private:
   bool  IsFixedLengthType(int p_datatype) const;
   // Bulk operations: bind parameter arrays and free buffers
   void  BindBulkParameters();
+  void  BindBulkParametersAtOffset(int p_offset);
   void  FreeBulkBuffers();
+  void  CollectBulkDiagnostics(int p_rowOffset);
 
   SQLDatabase*  m_database;          // Database
   HDBC          m_connection;        // In CTOR connection handle.
@@ -355,8 +372,10 @@ private:
 
   // BULK OPERATION MEMBERS
   int           m_bulkArraySize    { 0 };       // Array binding size (0 = not bulk mode)
+  int           m_bulkBatchSize    { BULK_BATCH_SIZE_DEFAULT }; // Max rows per batch execute
   SQLULEN       m_bulkRowsProcessed{ 0 };       // Rows processed by last bulk execute
-  std::vector<SQLUSMALLINT>  m_bulkRowStatus;   // Per-row status from SQL_ATTR_PARAM_STATUS_PTR
+  std::vector<SQLUSMALLINT>    m_bulkRowStatus;    // Per-row status from SQL_ATTR_PARAM_STATUS_PTR
+  std::vector<BulkRowError>    m_bulkRowErrors;    // Per-row error diagnostics
   std::vector<BulkParamBuffer> m_bulkParamBuffers; // Column-wise parameter buffers
 
   // Lock database for multi-access from other threads
