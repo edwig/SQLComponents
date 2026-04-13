@@ -32,6 +32,7 @@
 #include "bcd.h"
 #include <sql.h>
 #include <map>
+#include <vector>
 
 namespace SQLComponents
 {
@@ -46,6 +47,23 @@ namespace SQLComponents
 // Separates SQL statements in a string of batched SQL's
 #define SQL_STATEMENT_SEPARATOR "<@>"
 #define SQL_SEPARATOR_LENGTH    3
+
+// Default batch size for bulk operations
+#define BULK_BATCH_SIZE_DEFAULT 1000
+#define BULK_BATCH_SIZE_MIN        2
+
+// Internal structure for bulk parameter array buffers
+struct BulkParamBuffer
+{
+  void*        m_data          { nullptr };  // Contiguous data buffer
+  SQLLEN*      m_indicators    { nullptr };  // Length/indicator array
+  SQLSMALLINT  m_cType         { 0 };        // SQL C type (SQL_C_LONG, etc.)
+  SQLSMALLINT  m_sqlType       { 0 };        // SQL type (SQL_INTEGER, etc.)
+  SQLULEN      m_elementSize   { 0 };        // Size of one element in the buffer
+  SQLULEN      m_columnSize    { 0 };        // Column size for binding
+  SQLSMALLINT  m_scale         { 0 };        // Numeric scale
+  int          m_count         { 0 };        // Number of rows in this buffer
+};
 
 class SQLDate;
 class SQLDatabase;
@@ -237,6 +255,21 @@ public:
   // Get version for work-around
   int         GetODBCVersion();
 
+  // BULK OPERATIONS
+
+  // Set the number of rows for array parameter binding
+  void        SetParameterArraySize(int p_size);
+  // Set column-wise parameter array data from SQLVariant arrays
+  void        SetParameterArrayData(SQLVariant** p_array,int p_count);
+  // Execute prepared statement with array-bound parameters
+  int         DoSQLExecuteBulk();
+  // Get per-row status after bulk execute
+  const std::vector<SQLUSMALLINT>& GetBulkRowStatus() const;
+  // Get number of rows processed by bulk execute
+  SQLULEN     GetBulkRowsProcessed() const;
+  // Check if bulk mode is active
+  bool        GetIsBulkMode() const;
+
   // LEGACY SUPPORT ODBC 1.x AND 2.x
   void DescribeColumn(int          p_col
                      ,XString&     p_columnName
@@ -287,6 +320,9 @@ private:
   void  LimitOutputParameters();
   // Fixed length for SQLGetData
   bool  IsFixedLengthType(int p_datatype) const;
+  // Bulk operations: bind parameter arrays and free buffers
+  void  BindBulkParameters();
+  void  FreeBulkBuffers();
 
   SQLDatabase*  m_database;          // Database
   HDBC          m_connection;        // In CTOR connection handle.
@@ -316,6 +352,12 @@ private:
   RebindMap*    m_rebindColumns;     // Rebind map for datatypes of result columns
   ColNumMap     m_numMap;            // column maps of the derived result set
   ColNameMap    m_nameMap;           // column by names
+
+  // BULK OPERATION MEMBERS
+  int           m_bulkArraySize    { 0 };       // Array binding size (0 = not bulk mode)
+  SQLULEN       m_bulkRowsProcessed{ 0 };       // Rows processed by last bulk execute
+  std::vector<SQLUSMALLINT>  m_bulkRowStatus;   // Per-row status from SQL_ATTR_PARAM_STATUS_PTR
+  std::vector<BulkParamBuffer> m_bulkParamBuffers; // Column-wise parameter buffers
 
   // Lock database for multi-access from other threads
   // For as long as the current statement takes

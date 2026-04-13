@@ -161,6 +161,9 @@ SQLQuery::Close(bool p_throw /*= true*/)
   }
   m_numMap.clear();
 
+  // Free any bulk parameter buffers
+  FreeBulkBuffers();
+
   // Reset other variables
   m_lastError.Empty();
   m_cursorName.Empty();
@@ -2557,6 +2560,301 @@ ParameterMap&
 SQLQuery::GetParameterMap()
 {
   return m_parameters;
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+// BULK OPERATIONS
+//
+//////////////////////////////////////////////////////////////////////////
+
+// Set the number of rows for array parameter binding
+void
+SQLQuery::SetParameterArraySize(int p_size)
+{
+  if(p_size < BULK_BATCH_SIZE_MIN)
+  {
+    // Not worth doing bulk mode for less than minimum
+    m_bulkArraySize = 0;
+    return;
+  }
+  m_bulkArraySize = p_size;
+}
+
+// Set column-wise parameter array data from SQLVariant arrays
+void
+SQLQuery::SetParameterArrayData(SQLVariant** p_array,int p_count)
+{
+  if(p_count <= 0 || p_array == nullptr)
+  {
+    return;
+  }
+
+  BulkParamBuffer buffer;
+  buffer.m_count = p_count;
+
+  // Determine types from the first non-NULL variant
+  SQLVariant* firstVar = nullptr;
+  for(int i = 0; i < p_count; ++i)
+  {
+    if(p_array[i] && !p_array[i]->IsNULL())
+    {
+      firstVar = p_array[i];
+      break;
+    }
+  }
+  if(!firstVar && p_count > 0)
+  {
+    firstVar = p_array[0];
+  }
+
+  buffer.m_cType      = (SQLSMALLINT)firstVar->GetDataType();
+  buffer.m_sqlType     = (SQLSMALLINT)firstVar->GetSQLDataType();
+  buffer.m_scale       = (SQLSMALLINT)firstVar->GetNumericScale();
+
+  // For variable-length types, scan all variants for max size
+  bool isStringType = (buffer.m_cType == SQL_C_CHAR || buffer.m_cType == SQL_C_WCHAR);
+  SQLULEN maxDataSize = 0;
+
+  if(isStringType)
+  {
+    for(int i = 0; i < p_count; ++i)
+    {
+      if(p_array[i] && !p_array[i]->IsNULL())
+      {
+        SQLULEN sz = p_array[i]->GetDataSize();
+        if(sz > maxDataSize)
+        {
+          maxDataSize = sz;
+        }
+      }
+    }
+    // Add room for null terminator
+    if(buffer.m_cType == SQL_C_CHAR)
+    {
+      maxDataSize += sizeof(char);
+    }
+    else if(buffer.m_cType == SQL_C_WCHAR)
+    {
+      maxDataSize += sizeof(wchar_t);
+    }
+    buffer.m_elementSize = maxDataSize;
+    buffer.m_columnSize  = maxDataSize - (buffer.m_cType == SQL_C_WCHAR ? sizeof(wchar_t) : sizeof(char));
+  }
+  else if(buffer.m_cType == SQL_C_NUMERIC)
+  {
+    buffer.m_elementSize = sizeof(SQL_NUMERIC_STRUCT);
+    buffer.m_columnSize  = firstVar->GetDataSize();
+  }
+  else
+  {
+    // Fixed-size types
+    buffer.m_elementSize = firstVar->GetDataSize();
+    buffer.m_columnSize  = firstVar->GetDataSize();
+  }
+
+  // Allocate contiguous data buffer
+  buffer.m_data = calloc(p_count,(size_t)buffer.m_elementSize);
+  if(!buffer.m_data)
+  {
+    throw StdException(_T("Bulk operation: cannot allocate parameter data buffer"));
+  }
+
+  // Allocate indicator/length array
+  buffer.m_indicators = new SQLLEN[p_count];
+
+  // Copy data from each SQLVariant into the contiguous buffer
+  for(int i = 0; i < p_count; ++i)
+  {
+    SQLLEN indicator = SQL_NULL_DATA;
+    unsigned char* dest = static_cast<unsigned char*>(buffer.m_data) + ((size_t)i * buffer.m_elementSize);
+
+    if(p_array[i] && !p_array[i]->IsNULL())
+    {
+      SQLPOINTER srcData = (SQLPOINTER)p_array[i]->GetDataPointer();
+      SQLULEN    srcSize  = p_array[i]->GetDataSize();
+
+      if(isStringType)
+      {
+        // Copy string data, zero-fill remainder
+        memcpy(dest,srcData,(size_t)srcSize);
+        indicator = (SQLLEN)srcSize;
+      }
+      else
+      {
+        memcpy(dest,srcData,(size_t)buffer.m_elementSize);
+        indicator = (SQLLEN)buffer.m_elementSize;
+      }
+    }
+    buffer.m_indicators[i] = indicator;
+  }
+
+  m_bulkParamBuffers.push_back(buffer);
+}
+
+// Bind bulk parameter arrays to the statement handle
+void
+SQLQuery::BindBulkParameters()
+{
+  int column = 1;
+  for(auto& buffer : m_bulkParamBuffers)
+  {
+    // Check rebinds
+    SQLSMALLINT sqlType = RebindParameter(buffer.m_sqlType);
+
+    m_retCode = SqlBindParameter(m_hstmt
+                                ,(SQLUSMALLINT)column
+                                ,SQL_PARAM_INPUT
+                                ,buffer.m_cType
+                                ,sqlType
+                                ,buffer.m_columnSize
+                                ,buffer.m_scale
+                                ,buffer.m_data
+                                ,(SQLLEN)buffer.m_elementSize
+                                ,buffer.m_indicators);
+    if(!SQL_SUCCEEDED(m_retCode))
+    {
+      GetLastError(_T("Cannot bind bulk parameter. Error: "));
+      m_lastError.AppendFormat(_T(" Parameter: %d"),column);
+      throw StdException(m_lastError);
+    }
+    ++column;
+  }
+}
+
+// Execute prepared statement with array-bound parameters
+int
+SQLQuery::DoSQLExecuteBulk()
+{
+  if(!m_prepareDone)
+  {
+    m_lastError = _T("Internal error: SQLExecute bulk without SQLPrepare.");
+    throw StdException(m_lastError);
+  }
+  if(m_bulkArraySize < BULK_BATCH_SIZE_MIN || m_bulkParamBuffers.empty())
+  {
+    m_lastError = _T("Internal error: Bulk execute without parameter arrays.");
+    throw StdException(m_lastError);
+  }
+
+  // Allocate row status array
+  m_bulkRowStatus.clear();
+  m_bulkRowStatus.resize(m_bulkArraySize,SQL_PARAM_UNUSED);
+  m_bulkRowsProcessed = 0;
+
+  // Set array binding attributes on the statement handle
+  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAMSET_SIZE,(SQLPOINTER)(SQLULEN)m_bulkArraySize,SQL_IS_UINTEGER);
+  if(!SQL_SUCCEEDED(m_retCode))
+  {
+    GetLastError(_T("Cannot set SQL_ATTR_PARAMSET_SIZE. Error: "));
+    throw StdException(m_lastError);
+  }
+
+  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAM_STATUS_PTR,(SQLPOINTER)m_bulkRowStatus.data(),SQL_IS_POINTER);
+  if(!SQL_SUCCEEDED(m_retCode))
+  {
+    GetLastError(_T("Cannot set SQL_ATTR_PARAM_STATUS_PTR. Error: "));
+    throw StdException(m_lastError);
+  }
+
+  m_retCode = SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAMS_PROCESSED_PTR,(SQLPOINTER)&m_bulkRowsProcessed,SQL_IS_POINTER);
+  if(!SQL_SUCCEEDED(m_retCode))
+  {
+    GetLastError(_T("Cannot set SQL_ATTR_PARAMS_PROCESSED_PTR. Error: "));
+    throw StdException(m_lastError);
+  }
+
+  // Bind all parameter arrays
+  BindBulkParameters();
+
+  // Execute
+  m_retCode = SqlExecute(m_hstmt);
+
+  if(m_retCode == SQL_SUCCESS || m_retCode == SQL_SUCCESS_WITH_INFO)
+  {
+    // Get row count for INSERT/UPDATE/DELETE
+    SQLLEN rowCount = 0;
+    ::SQLRowCount(m_hstmt,&rowCount);
+    m_rows = rowCount;
+
+    // Log bulk results
+    if(m_database && m_database->WilLog())
+    {
+      XString msg;
+      msg.Format(_T("[Bulk execute] Rows processed: %llu, Rows affected: %lld")
+                ,(unsigned long long)m_bulkRowsProcessed
+                ,(long long)m_rows);
+      m_database->LogPrint(msg);
+    }
+  }
+  else if(m_retCode == SQL_ERROR)
+  {
+    GetLastError(_T("Error in bulk SQL execute: "));
+
+    // Log per-row errors if available
+    if(m_database && m_database->WilLog())
+    {
+      for(int i = 0; i < (int)m_bulkRowsProcessed; ++i)
+      {
+        if(m_bulkRowStatus[i] == SQL_PARAM_ERROR)
+        {
+          XString msg;
+          msg.Format(_T("[Bulk execute] Row %d: ERROR"),i);
+          m_database->LogPrint(msg);
+        }
+      }
+    }
+    throw StdException(m_lastError);
+  }
+
+  // Reset array size back to 1 for subsequent single-row operations
+  SqlSetStmtAttr(m_hstmt,SQL_ATTR_PARAMSET_SIZE,(SQLPOINTER)1,SQL_IS_UINTEGER);
+
+  return (int)m_rows;
+}
+
+// Get per-row status after bulk execute
+const std::vector<SQLUSMALLINT>&
+SQLQuery::GetBulkRowStatus() const
+{
+  return m_bulkRowStatus;
+}
+
+// Get number of rows processed by bulk execute
+SQLULEN
+SQLQuery::GetBulkRowsProcessed() const
+{
+  return m_bulkRowsProcessed;
+}
+
+// Check if bulk mode is active
+bool
+SQLQuery::GetIsBulkMode() const
+{
+  return (m_bulkArraySize >= BULK_BATCH_SIZE_MIN);
+}
+
+// Free all bulk parameter buffers
+void
+SQLQuery::FreeBulkBuffers()
+{
+  for(auto& buffer : m_bulkParamBuffers)
+  {
+    if(buffer.m_data)
+    {
+      free(buffer.m_data);
+      buffer.m_data = nullptr;
+    }
+    if(buffer.m_indicators)
+    {
+      delete[] buffer.m_indicators;
+      buffer.m_indicators = nullptr;
+    }
+  }
+  m_bulkParamBuffers.clear();
+  m_bulkRowStatus.clear();
+  m_bulkArraySize     = 0;
+  m_bulkRowsProcessed = 0;
 }
 
 // End of namespace

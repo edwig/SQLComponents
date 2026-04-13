@@ -33,10 +33,15 @@ x64/
 x86/
 bld/
 [Bb]in/
+bin_DebugUnicode64/
 [Oo]bj/
 [Ll]og/
 [Ll]ib/
 .vs/
+.claude/
+.github/
+.specsmd/
+memory-bank/
 
 # Visual Studio 2015 cache/options directory 
 **/.vs/ 
