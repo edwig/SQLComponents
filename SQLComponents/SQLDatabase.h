@@ -210,6 +210,7 @@ public:
   int            GetErrorNumber(SQL_HANDLE statement = 0);
   bool           GetErrorInfo(SQLSMALLINT type, SQLHANDLE handle, int& nummer, XString& tekst);
   BOOL           Check(INT nRetCode);
+  void           ResetSQLState();
   // ODBC Native Support
   bool           ODBCNativeSQL(XString& p_sql);
 
@@ -506,6 +507,12 @@ inline XString
 SQLDatabase::GetSQLState()
 {
   return m_sqlState;
+}
+
+inline void
+SQLDatabase::ResetSQLState()
+{
+  m_sqlState.Empty();
 }
 
 inline bool

@@ -687,6 +687,12 @@ SQLQuery::DoSQLStatement(const XString& p_statement)
   LARGE_INTEGER start;
   QueryPerformanceCounter(&start);
 
+  // Clean bill of error state
+  if(m_database)
+  {
+    m_database->ResetSQLState();
+  }
+
   // Close last cursor/statement and open a new one
   Close();
   Open();
@@ -911,6 +917,13 @@ SQLQuery::DoSQLPrepare(const XString& p_statement)
     m_lastError = _T("Error in SQL statement: Empty statement.");
     throw StdException(m_lastError);
   }
+
+  // Clean bill of error state
+  if (m_database)
+  {
+    m_database->ResetSQLState();
+  }
+
   // close last m_hstmt if still open
   Close();
   Open();
@@ -1688,7 +1701,7 @@ SQLQuery::RetrieveAtExecData()
   { 
     SQLLEN actualLength   = 0L;
     SQLVariant*  var      = m_numMap[col];
-    SQLUSMALLINT datatype = (SQLUSMALLINT) var->GetDataType();
+    SQLSMALLINT datatype  = (SQLSMALLINT) var->GetDataType();
     // To prevent stack corruption in the Oracle ODBC driver, we must provide a datapointer
     // and at least two extra pointers on the stack, otherwise we cannot retrieve the
     // actualLength parameter for the data.
@@ -2561,6 +2574,7 @@ SQLQuery::GetParameterMap()
 {
   return m_parameters;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 //

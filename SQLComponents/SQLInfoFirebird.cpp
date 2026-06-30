@@ -43,6 +43,7 @@ SQLInfoFirebird::SQLInfoFirebird(SQLDatabase* p_database)
   m_RDBMSkeywords.insert(_T("TIMESTAMP"));
   m_RDBMSkeywords.insert(_T("BOOLEAN"));
   m_RDBMSkeywords.insert(_T("POSITION"));
+  m_RDBMSkeywords.insert(_T("VALUE"));
 }
 
 // Destructor. Does nothing
