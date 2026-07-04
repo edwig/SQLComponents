@@ -813,7 +813,7 @@ SQLVariant::GetAsString(XString& result) const
     result = "";
     return;
   }
-  unsigned char* pointer;
+  TCHAR* pointer;
   switch(m_datatype)
   {
     case SQL_C_CHAR:
@@ -846,8 +846,8 @@ SQLVariant::GetAsString(XString& result) const
                                           }
 #endif
                                           break;
-    case SQL_C_BINARY:                    pointer = reinterpret_cast<unsigned char*>(result.GetBufferSetLength(m_binaryLength * 2 + 2));
-                                          BinaryToString(pointer,m_binaryLength*2 + 2);
+    case SQL_C_BINARY:                    pointer = reinterpret_cast<TCHAR*>(result.GetBufferSetLength(m_binaryLength * 2));
+                                          BinaryToString(pointer,m_binaryLength * 2);
                                           result.ReleaseBuffer();
                                           break;
     case SQL_C_SHORT:                     // Fall through
@@ -3238,9 +3238,9 @@ SQLVariant::DetachBinary()
 // Get a binary buffer in a string
 // as hex printed values as Oracle does
 bool
-SQLVariant::BinaryToString(unsigned char* buffer,int buflen) const
+SQLVariant::BinaryToString(TCHAR* buffer,int buflen) const
 {
-  static const char number[17] = "0123456789ABCDEF";
+  static const TCHAR number[17] = _T("0123456789ABCDEF");
 
   *buffer = 0;
   if(m_datatype != SQL_C_BINARY)
@@ -3253,7 +3253,7 @@ SQLVariant::BinaryToString(unsigned char* buffer,int buflen) const
     return true;
   }
   BYTE* colPointer = reinterpret_cast<BYTE*>(m_data.m_dataBINARY);
-  SQLLEN dataLen = m_binaryLength;
+  SQLLEN dataLen   = m_binaryLength;
   if(m_indicator > 0 && m_indicator < m_binaryLength)
   {
     dataLen = m_indicator;

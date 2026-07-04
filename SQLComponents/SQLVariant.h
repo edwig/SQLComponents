@@ -303,7 +303,7 @@ private:
    void    ResetDataType(int p_type);
    // Internal conversions
    bool    StringToBinary (const char* p_data) const;
-   bool    BinaryToString (unsigned char* buffer,int buflen) const;
+   bool    BinaryToString (TCHAR* buffer,int buflen) const;
    // Throw error as a result of internal trimming
    void*   ThrowErrorDatatype(int p_getas) const;
    // Throw error as a result of an impossible operator
