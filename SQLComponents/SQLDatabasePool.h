@@ -56,7 +56,7 @@ public:
   virtual SQLConnection*  GetConnection(const XString& p_connectionName);
   virtual SQLConnection*  GetConnection(const int p_index);
   // Return a database connection to the pool
-  virtual void            GiveUp(SQLDatabase* p_database);
+  virtual void            GiveUp(SQLDatabase* p_database) noexcept;
   // Read all database definitions from 'database.xml'
   virtual bool            ReadConnections(const XString p_filename = _T(""),bool p_reset = false);
   // Add a column rebind for this database session: No bounds checking!

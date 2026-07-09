@@ -81,7 +81,7 @@ SQLDatabasePool::GetDatabase(const XString& p_connectionName)
 
 // Return a database connection to the pool
 void
-SQLDatabasePool::GiveUp(SQLDatabase* p_database)
+SQLDatabasePool::GiveUp(SQLDatabase* p_database) noexcept
 {
   // Lock the pool
   AutoCritSec lock(&m_lock);
@@ -94,19 +94,25 @@ SQLDatabasePool::GiveUp(SQLDatabase* p_database)
   // CHeck whether we are already/still open
   if(m_isopen == false)
   {
-    XString msg(_T("INTERNAL ERROR: Database pool called - before open/after closure - of the pool."));
-    SvcReportErrorEvent(0,false,_T(__FUNCTION__),msg);
-    throw StdException(msg);
+    SvcReportErrorEvent(0,false,_T(__FUNCTION__),_T("INTERNAL ERROR: Database pool called - before open/after closure - of the pool."));
+    return;
   }
 
-  // Remove the log context from the database
-  p_database->RegisterLogContext(0,nullptr,nullptr,NULL);
+  try
+  {
+    // Remove the log context from the database
+    p_database->RegisterLogContext(0,nullptr,nullptr,NULL);
 
-  // Grab our connection name
-  XString name = p_database->GetConnectionName();
-  name.MakeLower();
+    // Grab our connection name
+    XString name = p_database->GetConnectionName();
+    name.MakeLower();
 
-  GiveUpInternally(p_database,name);
+    GiveUpInternally(p_database,name);
+  }
+  catch(...)
+  {
+    SvcReportErrorEvent(0,false,_T(__FUNCTION__),_T("INTERNAL ERROR: Database pool called - Error in 'GiveUp' the database connection."));
+  }
 }
 
 // Clean-up all database connections
